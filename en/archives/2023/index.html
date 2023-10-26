@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html class="has-navbar-fixed-top" lang="zh-tw">
+<html class="has-navbar-fixed-top" lang="en">
 <head>
     <meta charset="utf-8">
-<title>標籤: Ajax - Huangzl&#39;s blog</title>
+<title>Archives: 2023 - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="http://home.hzlssb.com/en/tags/Ajax/" rel="alternate" hreflang="en" />
+<link href="http://home.hzlssb.com/archives/2023/" rel="alternate" hreflang="zh-TW" />
             
     
 
 
     
-    <meta name="description" content="Huli 的技術部落格，寫關於前端、JavaScript、資安以及各種技術議題。A tech blog about frotn-end and security">
+    <meta name="description" content="A tech blog about frotn-end and security">   
     
 
 
 
     
-<link rel="canonical" href="http://home.hzlssb.com/tags/Ajax/">
+<link rel="canonical" href="http://home.hzlssb.com/en/archives/2023/">
     
 
 
@@ -29,9 +29,9 @@
 
     <meta property="og:type" content="website">
 <meta property="og:title" content="Huangzl&#39;s blog">
-<meta property="og:url" content="http://home.hzlssb.com/tags/Ajax/index.html">
+<meta property="og:url" content="http://home.hzlssb.com/en/archives/2023/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:locale" content="zh_TW">
+<meta property="og:locale" content="en_US">
 <meta property="article:author" content="Huangzl">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -104,7 +104,7 @@
 <nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item navbar-logo" href="/">
+            <a class="navbar-item navbar-logo" href="/en">
                 
                     
                     Huangzl&#39;s blog
@@ -121,16 +121,13 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/archives">文章列表</a>
+               href="/en/archives">Archive</a>
             
             <a class="navbar-item "
-               href="/categories">分類</a>
+               href="/en/categories">Categories</a>
             
             <a class="navbar-item "
-               href="/recommend">推薦閱讀</a>
-            
-            <a class="navbar-item "
-               href="/abouts">關於我</a>
+               href="/en/abouts">About</a>
             
         </div>
         
@@ -138,13 +135,13 @@
             
             
             
-            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
                 <i class="fab fa-twitter"></i>
                 
             </a>
                
-            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
                 
                 <i class="fas fa-rss"></i>
                 
@@ -163,7 +160,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/en/tags/Ajax/">English</a>
+               <a class="navbar-item" href="/archives/2023/">中文</a>
             
             
 
@@ -171,53 +168,22 @@
     </div>
 </nav>
 
-    <section class="section section-heading">
+    <section class="section">
     <div class="container">
-        <div class="content">
-            <h5>#Ajax</h5>
+    
+    
+        <div class="archive content">
+            <h4 class="title is-4" id="2023">2023</h4>
+            <div class="articles">
+            
+                <div class="article content flexbox">
+                    <time class="is-text-small monospace mr1" datetime="2023-10-26T13:34:18.000Z" itemprop="datePublished">
+                        Oct 26</time>
+                    <h6 class="title is-6"><a href="/2023/10/26/en/Webpack-optimization/">Webpack Performance Optimization</a></h6>
+                </div>
+            
+            </div>
         </div>
-    </div>
-</section>
-<section class="section">
-    <div class="container">
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2017/08/27/ajax-and-cors/" itemprop="url">輕鬆理解 Ajax 與跨來源請求</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2017-08-27T14:12:00.000Z" itemprop="datePublished">2017年8月27日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Front-end/">Front-end</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2 id="前言">前言</h2>
-<p>一般來說在學習寫網頁的時候，最先碰到的會是 HTML 與 CSS，負責把版面刻出來以及美化版面，當基礎打穩之後，會開始學習 JavaScript，試著做出一點互動性的效果。而「互動」除了使用者跟瀏覽器的互動以外，別忘了還有 Client 端跟 Server 端的互動，也就是必須要學會從瀏覽器用 JavaScript 跟後端 Server 拿資料，否則你的網頁資料都只能是寫死的。</p>
-<p>這篇的主要預設讀者是網頁前端的初學者，希望能讓本來不太理解怎麼跟 Server 交換資料或是怎麼串 APi 的讀者看完之後，能夠更了解該怎麼跟後端串接。</p>
-        <p class="article-more-link">
-            <a href="/2017/08/27/ajax-and-cors/#more">閱讀更多</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
-
-
-
-
     
     
     </div>
@@ -254,7 +220,7 @@
                 <span class="icon">
                     <i class="fas fa-globe"></i>
                 </span>
-                <span>繁體中文</span>
+                <span>English</span>
                 <span class="icon is-small">
             <i class="fas fa-angle-down" aria-hidden="true"></i>
           </span>
@@ -264,8 +230,8 @@
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/en/tags/Ajax/" class="dropdown-item">
-                    English
+                <a href="/archives/2023/" class="dropdown-item">
+                    繁體中文
                 </a>
             
             </div>
