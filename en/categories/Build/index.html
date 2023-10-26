@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html class="has-navbar-fixed-top" lang="zh-tw">
+<html class="has-navbar-fixed-top" lang="en">
 <head>
     <meta charset="utf-8">
-<title>分類 - Huangzl&#39;s blog</title>
+<title>Category: Build - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="http://home.hzlssb.com/en/categories/" rel="alternate" hreflang="en" />
+<link href="http://home.hzlssb.com/categories/Build/" rel="alternate" hreflang="zh-TW" />
             
     
 
 
     
-    <meta name="description" content="Huli 的技術部落格，寫關於前端、JavaScript、資安以及各種技術議題。A tech blog about frotn-end and security">
+    <meta name="description" content="A tech blog about frotn-end and security">   
     
 
 
 
     
-<link rel="canonical" href="http://home.hzlssb.com/categories/">
+<link rel="canonical" href="http://home.hzlssb.com/en/categories/Build/">
     
 
 
@@ -29,15 +29,10 @@
 
     <meta property="og:type" content="website">
 <meta property="og:title" content="Huangzl&#39;s blog">
-<meta property="og:url" content="http://home.hzlssb.com/categories/index.html">
+<meta property="og:url" content="http://home.hzlssb.com/en/categories/Build/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:locale" content="zh_TW">
+<meta property="og:locale" content="en_US">
 <meta property="article:author" content="Huangzl">
-<meta property="article:tag" content="webpack">
-<meta property="article:tag" content="Build">
-<meta property="article:tag" content="Ajax">
-<meta property="article:tag" content="JavaScript">
-<meta property="article:tag" content="Front-end">
 <meta name="twitter:card" content="summary_large_image">
 
 
@@ -109,7 +104,7 @@
 <nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item navbar-logo" href="/">
+            <a class="navbar-item navbar-logo" href="/en">
                 
                     
                     Huangzl&#39;s blog
@@ -126,16 +121,13 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/archives">文章列表</a>
-            
-            <a class="navbar-item is-active"
-               href="/categories">分類</a>
+               href="/en/archives">Archive</a>
             
             <a class="navbar-item "
-               href="/recommend">推薦閱讀</a>
+               href="/en/categories">Categories</a>
             
             <a class="navbar-item "
-               href="/abouts">關於我</a>
+               href="/en/abouts">About</a>
             
         </div>
         
@@ -143,13 +135,13 @@
             
             
             
-            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
                 <i class="fab fa-twitter"></i>
                 
             </a>
                
-            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
                 
                 <i class="fas fa-rss"></i>
                 
@@ -168,7 +160,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/en/categories/">English</a>
+               <a class="navbar-item" href="/categories/Build/">中文</a>
             
             
 
@@ -176,78 +168,58 @@
     </div>
 </nav>
 
-    
-<section class="section section-heading">
+    <section class="section section-heading">
     <div class="container">
         <div class="content">
-            <h5><i class="far fa-folder"></i>分類</h5>
+            <h5><i class="far fa-folder"></i>Build</h5>
         </div>
     </div>
 </section>
-<section class="section section-categories">
+<section class="section">
     <div class="container">
-        <div class="columns is-variable is-1 is-multiline is-mobile">
-            
-            <span class="column is-narrow">
-                <a class="tag is-light article-tag" href="/categories/Front-end/">Front-end&nbsp;(1)</a>
-            </span>
-            
-            <span class="column is-narrow">
-                <a class="tag is-light article-tag" href="/categories/webpack/">webpack&nbsp;(1)</a>
-            </span>
-            
-            <span class="column is-narrow">
-                <a class="tag is-light article-tag" href="/categories/Build/">Build&nbsp;(1)</a>
-            </span>
-            
-        </div>
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/27/en/pack-tool-preview/" itemprop="url">pack-tool-preview</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-26T16:06:01.000Z" itemprop="datePublished">27 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Build/">Build</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>I tried migrating a real project from Vite to Rspack. The build time reduced from 125 seconds to 17 seconds, and the page refresh speed during development increased by 64%. However, the HMR (Hot Module Replacement) in Rspack is much slower compared to Vite.</p>
+<p>If you frequently trigger HMR during development and refresh the page less often, Vite still offers a better development experience. For complex projects where refreshing the page is more common, Rspack provides a better development experience.</p>
+<p><img src="/img/pack-tool-preview/preview.jfif" alt="Comparison"></p>
+<p>There are so many frontend build tools out there: RollDown, Rollup, Rspack, Vite…</p>
+<p>Just a sneak peek; stay tuned for the detailed comparison.</p>
 
-        <div>
-            
-            <div class="archive content">
-                <h4 class="title is-4" id="[object Object]">Front-end</h4>
-                <div class="articles">
-                    
-                    
-                        <div class="article content flexbox">
-                            <time class="is-text-small monospace mr1" datetime="2017-08-27T14:12:00.000Z" itemprop="datePublished">
-                                2017-08-27</time>
-                            <h6 class="title is-6"><a href="/2017/08/27/ajax-and-cors/">輕鬆理解 Ajax 與跨來源請求</a></h6>
-                        </div>
-                    
-                </div>
-            </div>
-            
-            <div class="archive content">
-                <h4 class="title is-4" id="[object Object]">webpack</h4>
-                <div class="articles">
-                    
-                    
-                        <div class="article content flexbox">
-                            <time class="is-text-small monospace mr1" datetime="2023-10-26T13:34:18.000Z" itemprop="datePublished">
-                                2023-10-26</time>
-                            <h6 class="title is-6"><a href="/2023/10/26/Webpack-optimization/">Webpack 性能优化</a></h6>
-                        </div>
-                    
-                </div>
-            </div>
-            
-            <div class="archive content">
-                <h4 class="title is-4" id="[object Object]">Build</h4>
-                <div class="articles">
-                    
-                    
-                        <div class="article content flexbox">
-                            <time class="is-text-small monospace mr1" datetime="2023-10-26T16:06:01.000Z" itemprop="datePublished">
-                                2023-10-27</time>
-                            <h6 class="title is-6"><a href="/2023/10/27/pack-tool-preview/">pack-tool-preview</a></h6>
-                        </div>
-                    
-                </div>
-            </div>
-            
-            </div>
-        </div>
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+    </div>
 </section>
     <footer class="footer">
     <div class="container">
@@ -281,7 +253,7 @@
                 <span class="icon">
                     <i class="fas fa-globe"></i>
                 </span>
-                <span>繁體中文</span>
+                <span>English</span>
                 <span class="icon is-small">
             <i class="fas fa-angle-down" aria-hidden="true"></i>
           </span>
@@ -291,8 +263,8 @@
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/en/categories/" class="dropdown-item">
-                    English
+                <a href="/categories/Build/" class="dropdown-item">
+                    繁體中文
                 </a>
             
             </div>
