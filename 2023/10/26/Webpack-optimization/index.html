@@ -2,42 +2,43 @@
 <html class="has-navbar-fixed-top" lang="zh-tw">
 <head>
     <meta charset="utf-8">
-<title>Huangzl&#39;s blog</title>
+<title>Webpack 性能优化 - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="http://home.hzlssb.com/en/" rel="alternate" hreflang="en" />
+<link href="http://home.hzlssb.com/2023/10/26/en/Webpack-optimization/" rel="alternate" hreflang="en" />
             
     
 
 
-    
-    <meta name="description" content="Huli 的技術部落格，寫關於前端、JavaScript、資安以及各種技術議題。A tech blog about frotn-end and security">
-    
-
 
 
     
-<link rel="canonical" href="http://home.hzlssb.com/">
+<link rel="canonical" href="http://home.hzlssb.com/2023/10/26/Webpack-optimization/">
     
 
 
 
 
 
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Huangzl&#39;s blog">
-<meta property="og:url" content="http://home.hzlssb.com/index.html">
+    <meta name="description" content="前言先来说说为什么要优化？当然如果你的项目很小，构建很快，其实不需要特别关注性能方面的问题。 但是随着项目涉及到的页面越来越多，功能和业务代码也会越来越多，相应的 webpack 的构建时间也会越来越久，这个时候我们就不得不考虑性能优化的事情了。 webpack 的性能优化较多，我们考虑从两方面入手：优化一：打包后的结果，上线时的性能优化。（比如分包处理、减小包体积、CDN服务器等）优化二：优化打">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 性能优化">
+<meta property="og:url" content="http://home.hzlssb.com/2023/10/26/Webpack-optimization/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="前言先来说说为什么要优化？当然如果你的项目很小，构建很快，其实不需要特别关注性能方面的问题。 但是随着项目涉及到的页面越来越多，功能和业务代码也会越来越多，相应的 webpack 的构建时间也会越来越久，这个时候我们就不得不考虑性能优化的事情了。 webpack 的性能优化较多，我们考虑从两方面入手：优化一：打包后的结果，上线时的性能优化。（比如分包处理、减小包体积、CDN服务器等）优化二：优化打">
 <meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2023-10-26T13:34:18.000Z">
+<meta property="article:modified_time" content="2023-10-26T15:01:03.859Z">
 <meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="webpack">
 <meta name="twitter:card" content="summary_large_image">
 
 
 
-<link rel="alternative" href="/atom.xml" title="Huangzl&#39;s blog" type="application/atom+xml">
+<link rel="alternative" href="/atom.xml" title="Webpack 性能优化" type="application/atom+xml">
 
 
 
@@ -137,6 +138,88 @@
         <div class="navbar-menu navbar-end">
             
             
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#前言">1&nbsp;&nbsp;<b>前言</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#性能优化-代码分离">2&nbsp;&nbsp;<b>性能优化 - 代码分离</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#入口起点优化-entry-dependencies入口依赖">2.1&nbsp;&nbsp;入口起点优化-Entry Dependencies(入口依赖)</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#动态导入dynamic-import">2.2&nbsp;&nbsp;动态导入(dynamic import)</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#自定义分包-splitchunks">2.3&nbsp;&nbsp;自定义分包-SplitChunks</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#性能优化-cdn">3&nbsp;&nbsp;<b>性能优化-CDN</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#将第三方库引入cdn">3.1&nbsp;&nbsp;将第三方库引入CDN</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#在webpack中配置externals">3.2&nbsp;&nbsp;在Webpack中配置externals</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#配置cdn的publicpath">3.3&nbsp;&nbsp;配置CDN的publicPath</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#性能优化-提取css文件">4&nbsp;&nbsp;<b>性能优化-提取css文件</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#配置webpack">4.1&nbsp;&nbsp;配置Webpack</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#引入css文件">4.2&nbsp;&nbsp;引入CSS文件</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#性能优化-打包文件命名hashcontenthashchunkhash">5&nbsp;&nbsp;<b>性能优化-打包文件命名(Hash,ContentHash,ChunkHash)</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#hash哈希">5.1&nbsp;&nbsp;Hash（哈希）</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#contenthash内容哈希">5.2&nbsp;&nbsp;ContentHash（内容哈希）</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#chunkhash块哈希">5.3&nbsp;&nbsp;ChunkHash（块哈希）</a>
+                    
+                </div>
+            </div>
+            
             
             <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
                 
@@ -163,7 +246,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/en/">English</a>
+                <a class="navbar-item" href="/2023/10/26/en/Webpack-optimization/">English</a>
             
             
 
@@ -173,11 +256,15 @@
 
     <section class="section">
     <div class="container">
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以填表單跟我說：<a href="https://forms.gle/XuWyRC5qtSd2ANta8" target="_blank">表單連結</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            <a href="/2023/10/26/Webpack-optimization/" itemprop="url">Webpack 性能优化</a>
+            Webpack 性能优化
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
@@ -381,51 +468,40 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     </div>
     
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/webpack/">#webpack</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2017/08/27/ajax-and-cors/">輕鬆理解 Ajax 與跨來源請求</a>
+            
+        </span>
+    </div>
     
 </article>
 
 
 
 
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2017/08/27/ajax-and-cors/" itemprop="url">輕鬆理解 Ajax 與跨來源請求</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2017-08-27T14:12:00.000Z" itemprop="datePublished">2017年8月27日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Front-end/">Front-end</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一般來說在學習寫網頁的時候，最先碰到的會是 HTML 與 CSS，負責把版面刻出來以及美化版面，當基礎打穩之後，會開始學習 JavaScript，試著做出一點互動性的效果。而「互動」除了使用者跟瀏覽器的互動以外，別忘了還有 Client 端跟 Server 端的互動，也就是必須要學會從瀏覽器用 JavaScript 跟後端 Server 拿資料，否則你的網頁資料都只能是寫死的。</p>
-<p>這篇的主要預設讀者是網頁前端的初學者，希望能讓本來不太理解怎麼跟 Server 交換資料或是怎麼串 APi 的讀者看完之後，能夠更了解該怎麼跟後端串接。</p>
-        <p class="article-more-link">
-            <a href="/2017/08/27/ajax-and-cors/#more">閱讀更多</a>
-        </p>
-    
-    </div>
-    
-    
-</article>
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
 
-
-
-
-    
-    
     </div>
 </section>
     <footer class="footer">
@@ -470,7 +546,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/en/" class="dropdown-item">
+                <a href="/2023/10/26/en/Webpack-optimization/" class="dropdown-item">
                     English
                 </a>
             
