@@ -2,13 +2,13 @@
 <html class="has-navbar-fixed-top" lang="en">
 <head>
     <meta charset="utf-8">
-<title>Tag: webpack - Huangzl&#39;s blog</title>
+<title>Tag: Webpack - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="https://ikkkp.github.io/tags/webpack/" rel="alternate" hreflang="zh-TW" />
+<link href="https://ikkkp.github.io/tags/Webpack/" rel="alternate" hreflang="zh-TW" />
             
     
 
@@ -20,7 +20,7 @@
 
 
     
-<link rel="canonical" href="https://ikkkp.github.io/en/tags/webpack/">
+<link rel="canonical" href="https://ikkkp.github.io/en/tags/Webpack/">
     
 
 
@@ -29,7 +29,7 @@
 
     <meta property="og:type" content="website">
 <meta property="og:title" content="Huangzl&#39;s blog">
-<meta property="og:url" content="https://ikkkp.github.io/en/tags/webpack/index.html">
+<meta property="og:url" content="https://ikkkp.github.io/en/tags/Webpack/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="Huangzl">
@@ -160,7 +160,7 @@
                 </div>
             </a>
             
-               <a class="navbar-item" href="/tags/webpack/">中文</a>
+               <a class="navbar-item" href="/tags/Webpack/">中文</a>
             
             
 
@@ -171,12 +171,117 @@
     <section class="section section-heading">
     <div class="container">
         <div class="content">
-            <h5>#webpack</h5>
+            <h5>#Webpack</h5>
         </div>
     </div>
 </section>
 <section class="section">
     <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/27/en/Webpack-optimization-3/" itemprop="url">How to Use `sideEffects` in Webpack</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-27T15:57:21.000Z" itemprop="datePublished">27 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <p>Starting from webpack v4, a new feature called <code>sideEffects</code> was introduced. By adding the <code>sideEffects</code> declaration in the package.json file, developers can specify whether a package&#x2F;module contains side effects. This information allows for greater optimization space in tree shaking.</p>
+<p>In conventional terms, if we are certain that the modules within our package have no side effects, we can mark the package published on npm with <code>&quot;sideEffects&quot;: false</code>. This annotation enables better bundling experiences for users, as webpack can transform imports like <code>import &#123;a&#125; from xx</code> into <code>import &#123;a&#125; from &#39;xx/a&#39;</code>, automatically trimming unnecessary imports, similar to <code>babel-plugin-import</code>.</p>
+<h2><span id="tree-shaking-and-side-effects">Tree Shaking and Side Effects</span></h2><p>Tree shaking was initially introduced and implemented by Rollup in the frontend development community. Later, webpack incorporated this feature in its 2.x versions using UglifyJS. Since then, discussions about optimizing bundling often mention tree shaking.</p>
+<h3><span id="principle-of-tree-shaking">Principle of Tree Shaking</span></h3><p>ES6 module imports are statically analyzable, allowing webpack to accurately determine what code is being loaded during compilation. By analyzing the program flow, webpack can identify unused or unreferenced variables and remove such code from the bundle.</p>
+<p>The concept seems perfect in theory, so why doesn’t our code always get removed as expected? The answer lies in <strong>side effects</strong>.</p>
+<h3><span id="side-effects">Side Effects</span></h3><p>For those familiar with functional programming, the term “side effects” is not new. It generally refers to actions performed by a function that can impact external variables.</p>
+<p>For example, consider this function:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span><span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>This function modifies the global variable <code>location</code> and triggers a browser redirection. Such a function is said to have side effects.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// componetns.js</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> name <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>className <span class="token operator">=</span> <span class="token string">'Person'</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>name<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Apple</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> model <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>className <span class="token operator">=</span> <span class="token string">'Apple'</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>model <span class="token operator">=</span> model<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token function">getModel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>model<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// main.js</span>
+<span class="token keyword">import</span> <span class="token punctuation">&#123;</span> Apple <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'./components'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> appleModel <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Apple</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">model</span><span class="token operator">:</span> <span class="token string">'IphoneX'</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getModel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>appleModel<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this code, the <code>Person</code> class is unused. So, why can’t webpack eliminate it? The culprit is <strong>Babel compilation + webpack bundling</strong>.</p>
+<p>Babel compilation wraps the <code>Person</code> class into an IIFE (Immediately Invoked Function Expression) and then returns a constructor. Here’s an insightful article: <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32831172">Your Tree-Shaking Isn’t Working and What to Do About It</a>.</p>
+<p>Webpack’s <code>tree shaking</code> can mark unused exported members as <code>unused</code> and avoid exporting them in re-exported modules. This can be a bit convoluted, but the concept is clear: if a module is not used, its exports won’t be included in the bundle. When combined with webpack’s scope hoisting and Uglify, traces of the <code>b</code> module will be completely eradicated.</p>
+<p>However, if the <code>b</code> module contains side effects, even a simple log statement, like this:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">b</span><span class="token punctuation">(</span><span class="token parameter">v</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> v<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token function">b</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Webpack will preserve the side effect code, even though the module’s exports are ignored.</p>
+<p>Due to various transformations introduced by tools, sometimes tree shaking doesn’t significantly reduce bundle size. This is where the <code>sideEffects</code> configuration comes into play: if a module&#x2F;package is marked with <code>&quot;sideEffects&quot;: false</code>, webpack will completely remove the entire module&#x2F;package if it’s not imported, regardless of potential side effects.</p>
+<p>For instance, consider the <code>mobx-react-devtool</code> library, commonly used like this:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">MyApp</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>
+      <span class="token operator">&lt;</span>div<span class="token operator">></span>
+        <span class="token operator">...</span>
+        <span class="token punctuation">&#123;</span>process<span class="token punctuation">.</span>env<span class="token punctuation">.</span><span class="token constant">NODE_ENV</span> <span class="token operator">===</span> <span class="token string">'production'</span> <span class="token operator">?</span> <span class="token keyword">null</span> <span class="token operator">:</span> <span class="token operator">&lt;</span>DevTools <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>This is a typical scenario of conditional import. Without <code>sideEffects: false</code>, even if <code>NODE_ENV</code> is set to <code>production</code>, the bundled code will still include the <code>mobx-react-devtools</code> package, because it <strong>might</strong> have side effects.</p>
+<p>However, with <code>sideEffects: false</code>, webpack can safely remove it from the bundle during tree shaking.</p>
+<h2><span id="use-cases-for-sideeffects">Use Cases for <code>sideEffects</code></span></h2><p>As mentioned earlier, it’s challenging to guarantee whether a package&#x2F;module contains side effects (whether it’s the package’s fault or a transformer’s). However, we can reasonably ensure whether a package&#x2F;module affects objects outside of its scope. For example, if it modifies properties on the <code>window</code> object or overrides native object methods. If this can be guaranteed, we can set <code>&quot;sideEffects&quot;: false</code> for the entire package&#x2F;module. Whether it truly has side effects is not crucial for webpack; it accepts the designation based on the intention that the package&#x2F;module should ideally have no side effects.</p>
+<p>This explains why packages like Vue, which inherently have side effects, can have <code>&quot;sideEffects&quot;: false</code> set. In webpack, <code>sideEffects: false</code> doesn’t mean the module truly has no side effects; it simply tells webpack that the package&#x2F;module is intended not to have side effects, even if side effects are introduced after bundling.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
     
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
@@ -191,7 +296,7 @@
         
         <span class="column is-narrow article-category">
             <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/webpack/">webpack</a>
+            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
         </span>
         
         
@@ -340,7 +445,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         
         <span class="column is-narrow article-category">
             <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/webpack/">webpack</a>
+            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
         </span>
         
         
@@ -598,7 +703,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/tags/webpack/" class="dropdown-item">
+                <a href="/tags/Webpack/" class="dropdown-item">
                     中文
                 </a>
             

@@ -9,8 +9,8 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
-        <lastmod>2023-10-27T06:56:09.259Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-3/</loc>
+        <lastmod>2023-10-27T16:29:29.667Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -23,8 +23,22 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-2/</loc>
-        <lastmod>2023-10-27T06:55:52.708Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
+        <lastmod>2023-10-27T16:26:56.722Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/</loc>
+        <lastmod>2023-10-27T16:26:54.226Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -38,7 +52,7 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/10/26/Webpack-optimization-1/</loc>
-        <lastmod>2023-10-27T02:27:21.753Z</lastmod>
+        <lastmod>2023-10-27T15:58:55.489Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -46,9 +60,23 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/10/26/en/Webpack-optimization-1/</loc>
-        <lastmod>2023-10-27T02:27:12.920Z</lastmod>
+        <lastmod>2023-10-27T15:58:54.336Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-2/</loc>
+        <lastmod>2023-10-27T15:58:51.914Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
 
     </url>
 
