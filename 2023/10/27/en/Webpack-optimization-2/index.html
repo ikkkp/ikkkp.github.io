@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="en">
+<head>
+    <meta charset="utf-8">
+<title>Webpack Optimization 2 - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="http://home.hzlssb.com/2023/10/27/Webpack-optimization-2/" rel="alternate" hreflang="zh-TW" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="http://home.hzlssb.com/2023/10/27/en/Webpack-optimization-2/">
+    
+
+
+
+
+
+    <meta name="description" content="Performance Optimization - JS-CSS Code Minification  Terser is a toolset for JavaScript parsing, mangling, and compressing. In the early days, we used uglify-js to minify and uglify our JavaScript cod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack Optimization 2">
+<meta property="og:url" content="http://home.hzlssb.com/2023/10/27/en/Webpack-optimization-2/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="Performance Optimization - JS-CSS Code Minification  Terser is a toolset for JavaScript parsing, mangling, and compressing. In the early days, we used uglify-js to minify and uglify our JavaScript cod">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://home.hzlssb.com/img/post-name/cover.png">
+<meta property="article:published_time" content="2023-10-27T02:28:04.000Z">
+<meta property="article:modified_time" content="2023-10-27T03:11:13.254Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="webpack">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://home.hzlssb.com/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Webpack Optimization 2" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=3.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/en">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/en/archives">Archive</a>
+            
+            <a class="navbar-item "
+               href="/en/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/en/abouts">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    Table of Contents
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#performance-optimization-js-css-code-minification">1.1&nbsp;&nbsp;Performance Optimization - JS-CSS Code Minification</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#javascript-code-minification">1.1.1&nbsp;&nbsp;JavaScript Code Minification</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#css-code-minification">1.1.2&nbsp;&nbsp;CSS Code Minification</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#tree-shaking-implementation-in-webpack">1.1.3&nbsp;&nbsp;Tree Shaking Implementation in Webpack</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#tree-shaking-in-webpack">2&nbsp;&nbsp;<b>Tree Shaking in Webpack</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#enable-es-module-syntax">2.1&nbsp;&nbsp;Enable ES Module Syntax</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#webpack-configuration">2.2&nbsp;&nbsp;Webpack Configuration</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#implementing-tree-shaking-for-javascript">2.2.1&nbsp;&nbsp;Implementing Tree Shaking for JavaScript</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#css-tree-shaking-implementation">2.2.2&nbsp;&nbsp;CSS Tree Shaking Implementation</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#file-compression-in-webpack">2.3&nbsp;&nbsp;File Compression in Webpack</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#what-is-http-compression">2.3.1&nbsp;&nbsp;What is HTTP Compression</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#popular-compression-formats">2.3.2&nbsp;&nbsp;Popular Compression Formats</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#webpack-configuration-for-file-compression">2.3.3&nbsp;&nbsp;Webpack Configuration for File Compression</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+               <a class="navbar-item" href="/2023/10/27/Webpack-optimization-2/">中文</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="https://forms.gle/SjJZ4cnNs6NnjXQG8" target="_blank">feedback form</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Webpack Optimization 2
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-27T02:28:04.000Z" itemprop="datePublished">27 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/webpack/">webpack</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="performance-optimization-js-css-code-minification">Performance Optimization - JS-CSS Code Minification</span></h2>
+<ul>
+<li>Terser is a toolset for JavaScript parsing, mangling, and compressing.</li>
+<li>In the early days, we used <code>uglify-js</code> to minify and uglify our JavaScript code. However, it is no longer maintained and does not support ES6+ syntax.</li>
+<li>Terser is a fork of <code>uglify-es</code> and retains most of its original APIs, compatible with <code>uglify-es</code> and <code>uglify-js@3</code>, etc.</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://github.com/terser/terser">webpack-terser</a></p>
+<h3><span id="javascript-code-minification">JavaScript Code Minification</span></h3>
+<p>Webpack provides the <code>terser-webpack-plugin</code> plugin for code optimization and minification.</p>
+<p>In production mode, TerserPlugin is used by default for code processing.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> TerserPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'terser-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Configure other Webpack options...</span>
+
+  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">TerserPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3><span id="css-code-minification">CSS Code Minification</span></h3>
+<p>Apart from JavaScript code, CSS code can also be minified using Webpack. Use <code>css-minimizer-webpack-plugin</code> to compress CSS code.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> CssMinimizerPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'css-minimizer-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Configure other Webpack options...</span>
+
+  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token keyword">new</span> <span class="token class-name">CssMinimizerPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token comment">// You can continue adding other compression plugins...</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3><span id="tree-shaking-implementation-in-webpack">Tree Shaking Implementation in Webpack</span></h3>
+<p>Tree shaking is a term commonly used to describe the removal of dead code in JavaScript context.</p>
+<h1><span id="tree-shaking-in-webpack">Tree Shaking in Webpack</span></h1>
+<p>In modern front-end development, optimizing code size is a crucial topic. Tree shaking is an optimization technique used to eliminate unused JavaScript modules in a project, reducing the size of the bundled files. Webpack provides built-in support, making it easy to implement tree shaking in projects.</p>
+<h2><span id="enable-es-module-syntax">Enable ES Module Syntax</span></h2>
+<p>First, ensure your JavaScript code follows ES module syntax, as Webpack’s tree shaking feature only works with ES modules. Use <code>import</code> and <code>export</code> syntax to define modules in your project.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// math.js</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">square</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">cube</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> x <span class="token operator">*</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2><span id="webpack-configuration">Webpack Configuration</span></h2>
+<p>In the Webpack configuration file, ensure the following settings to enable tree shaking:</p>
+<p>Set <code>mode</code> to <code>'production'</code>. Webpack will automatically enable related optimizations, including tree shaking.</p>
+<h3><span id="implementing-tree-shaking-for-javascript">Implementing Tree Shaking for JavaScript</span></h3>
+<p>Webpack implements tree shaking using two different approaches:</p>
+<ul>
+<li><code>usedExports</code>: Marks certain functions as used, and later optimizes them with Terser.</li>
+<li><code>sideEffects</code>: Skips entire modules/files and checks if the file has side effects.</li>
+</ul>
+<h4><span id="using-usedexports-to-implement-tree-shaking">Using <code>usedExports</code> to Implement Tree Shaking</span></h4>
+<p>Set the mode to production:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'production'</span><span class="token punctuation">,</span>
+  <span class="token comment">// ...other configurations</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Configure <code>usedExports</code> in the optimization section:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+ <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'development'</span><span class="token punctuation">,</span>
+ <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+   <span class="token literal-property property">usedExports</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+ <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4><span id="using-sideeffects-to-implement-tree-shaking">Using <code>sideEffects</code> to Implement Tree Shaking</span></h4>
+<p>Set the <code>sideEffects</code> field in <code>package.json</code>:</p>
+<ul>
+<li>Set it to <code>false</code> to inform Webpack that it can safely remove unused exports.</li>
+<li>If there are specific files you want to keep, set it as an array.</li>
+</ul>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"your-project"</span><span class="token punctuation">,</span>
+  <span class="token property">"sideEffects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./src/some-side-effectful-file.js"</span><span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/40052192">Webpack Side Effects</a></p>
+<h4><span id="understanding-tree-shaking-and-sideeffects">Understanding Tree Shaking and <code>sideEffects</code></span></h4>
+<p><code>sideEffects</code> and <code>usedExports</code> (more commonly considered tree shaking) are two different optimization techniques.</p>
+<p><code>sideEffects</code> is more efficient as it allows skipping entire modules/files and their entire subtree.</p>
+<p><code>usedExports</code> depends on <code>terser</code> to detect side effects in statements. It’s a more complex JavaScript task and is not as straightforward as <code>sideEffects</code>. Also, it cannot skip subtrees/dependencies because side effects need to be evaluated. While exported functions work as usual, higher-order functions (HOC) in the React framework can have issues in this scenario.</p>
+<h3><span id="css-tree-shaking-implementation">CSS Tree Shaking Implementation</span></h3>
+<p>For CSS tree shaking, additional plugins are required.</p>
+<p>In the past, <code>PurifyCss</code> plugin was used for CSS tree shaking, but it’s no longer maintained (last update was 4 years ago).</p>
+<p>A different library, <code>PurgeCSS</code>, can now be used for CSS tree shaking, helping remove unused CSS.</p>
+<h2><span id="file-compression-in-webpack">File Compression in Webpack</span></h2>
+<h3><span id="what-is-http-compression">What is HTTP Compression</span></h3>
+<p>HTTP compression is a technique used between servers and clients to improve transmission speed and bandwidth utilization.<br>
+The process of HTTP compression is as follows:</p>
+<ol>
+<li>Data is compressed on the server before being sent. (Can be done in Webpack)</li>
+<li>Compatible browsers inform the server about supported compression formats during requests.</li>
+<li>The server returns the corresponding compressed file to the browser, indicating it in the response headers.</li>
+</ol>
+<h3><span id="popular-compression-formats">Popular Compression Formats</span></h3>
+<p>There are several popular compression formats:</p>
+<ul>
+<li><code>compress</code>: Method used by UNIX’s “compress” program (historical reasons, not recommended for most applications, use gzip or deflate instead).</li>
+<li><code>deflate</code>: Compression based on the deflate algorithm (defined in RFC 1951) and encapsulated in zlib data format.</li>
+<li><code>gzip</code>: GNU zip format (defined in RFC 1952), widely used compression algorithm.</li>
+<li><code>br</code>: A new open-source compression algorithm designed specifically for HTTP content encoding.</li>
+</ul>
+<h3><span id="webpack-configuration-for-file-compression">Webpack Configuration for File Compression</span></h3>
+<p>Webpack essentially performs the first step of HTTP compression. You can use the <code>CompressionPlugin</code> for this purpose.</p>
+<p>Step 1: Install <code>CompressionPlugin</code>:</p>
+<pre class="line-numbers language-none"><code class="language-none">npm install compression-webpack-plugin -D<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>Step 2: Use <code>CompressionPlugin</code> in your Webpack configuration:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token keyword">new</span> <span class="token class-name">CompressionPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js(\?.*)?$</span><span class="token regex-delimiter">/</span><span class="token regex-flags">i</span></span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/webpack/">#webpack</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2023/10/27/en/pack-tool-preview/">pack-tool-preview</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>English</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2023/10/27/Webpack-optimization-2/" class="dropdown-item">
+                    繁體中文
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>
