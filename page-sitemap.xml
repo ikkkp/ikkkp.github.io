@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>http://home.hzlssb.com/</loc>
+        <loc>https://ikkkp.github.io/</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
@@ -10,7 +10,7 @@
     
     
     <url>
-        <loc>http://home.hzlssb.com/en/abouts/</loc>
+        <loc>https://ikkkp.github.io/en/abouts/</loc>
         <lastmod>2023-10-27T09:47:47.033Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -19,7 +19,7 @@
     
     
     <url>
-        <loc>http://home.hzlssb.com/abouts/</loc>
+        <loc>https://ikkkp.github.io/abouts/</loc>
         <lastmod>2023-10-27T09:43:23.043Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -28,7 +28,7 @@
     
     
     <url>
-        <loc>http://home.hzlssb.com/recommend/</loc>
+        <loc>https://ikkkp.github.io/recommend/</loc>
         <lastmod>2023-10-26T11:15:24.190Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -37,7 +37,7 @@
     
     
     <url>
-        <loc>http://home.hzlssb.com/404.html</loc>
+        <loc>https://ikkkp.github.io/404.html</loc>
         <lastmod>2023-10-15T08:40:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -46,7 +46,7 @@
     
     
     <url>
-        <loc>http://home.hzlssb.com/archive/</loc>
+        <loc>https://ikkkp.github.io/archive/</loc>
         <lastmod>2023-10-15T08:40:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

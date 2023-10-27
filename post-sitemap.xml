@@ -2,42 +2,42 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>http://home.hzlssb.com/</loc>
+        <loc>https://ikkkp.github.io/</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
 
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/27/Webpack-optimization-2/</loc>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
         <lastmod>2023-10-27T06:56:09.259Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
         <image:image>
 
-            <image:loc>http://home.hzlssb.com/img/post-name/cover.png</image:loc>
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
 
         </image:image>
 
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/27/en/Webpack-optimization-2/</loc>
+        <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-2/</loc>
         <lastmod>2023-10-27T06:55:52.708Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
         <image:image>
 
-            <image:loc>http://home.hzlssb.com/img/post-name/cover.png</image:loc>
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
 
         </image:image>
 
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/26/Webpack-optimization-1/</loc>
+        <loc>https://ikkkp.github.io/2023/10/26/Webpack-optimization-1/</loc>
         <lastmod>2023-10-27T02:27:21.753Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -45,7 +45,7 @@
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/26/en/Webpack-optimization-1/</loc>
+        <loc>https://ikkkp.github.io/2023/10/26/en/Webpack-optimization-1/</loc>
         <lastmod>2023-10-27T02:27:12.920Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -53,7 +53,7 @@
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/27/en/pack-tool-preview/</loc>
+        <loc>https://ikkkp.github.io/2023/10/27/en/pack-tool-preview/</loc>
         <lastmod>2023-10-26T16:11:59.487Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -61,21 +61,21 @@
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2023/10/27/pack-tool-preview/</loc>
+        <loc>https://ikkkp.github.io/2023/10/27/pack-tool-preview/</loc>
         <lastmod>2023-10-26T16:11:03.777Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
         <image:image>
 
-            <image:loc>http://home.hzlssb.com/img/post-name/cover.png</image:loc>
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
 
         </image:image>
 
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2017/08/27/ajax-and-cors/</loc>
+        <loc>https://ikkkp.github.io/2017/08/27/ajax-and-cors/</loc>
         <lastmod>2023-10-15T08:40:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -83,7 +83,7 @@
     </url>
 
     <url>
-        <loc>http://home.hzlssb.com/2017/08/27/en/ajax-and-cors/</loc>
+        <loc>https://ikkkp.github.io/2017/08/27/en/ajax-and-cors/</loc>
         <lastmod>2023-10-15T08:40:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
