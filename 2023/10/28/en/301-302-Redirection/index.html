@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html class="has-navbar-fixed-top" lang="zh-tw">
+<html class="has-navbar-fixed-top" lang="en">
 <head>
     <meta charset="utf-8">
-<title>301/302-重定向 - Huangzl&#39;s blog</title>
+<title>301/302 Redirection - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/" rel="alternate" hreflang="en" />
+<link href="https://ikkkp.github.io/2023/10/28/301-302-Redirection/" rel="alternate" hreflang="zh-TW" />
             
     
 
@@ -16,23 +16,23 @@
 
 
     
-<link rel="canonical" href="https://ikkkp.github.io/2023/10/28/301-302-Redirection/">
+<link rel="canonical" href="https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/">
     
 
 
 
 
 
-    <meta name="description" content="前言当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们">
+    <meta name="description" content="IntroductionWhen configuring redirects on a website, especially in the following scenarios, issues can arise: Redirecting from HTTP to HTTPS: Suppose you’ve set up an SSL certificate to upgrade your w">
 <meta property="og:type" content="article">
-<meta property="og:title" content="301&#x2F;302-重定向">
-<meta property="og:url" content="https://ikkkp.github.io/2023/10/28/301-302-Redirection/index.html">
+<meta property="og:title" content="301&#x2F;302 Redirection">
+<meta property="og:url" content="https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们">
-<meta property="og:locale" content="zh_TW">
+<meta property="og:description" content="IntroductionWhen configuring redirects on a website, especially in the following scenarios, issues can arise: Redirecting from HTTP to HTTPS: Suppose you’ve set up an SSL certificate to upgrade your w">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-28T08:18:48.000Z">
-<meta property="article:modified_time" content="2023-10-28T08:28:47.562Z">
+<meta property="article:modified_time" content="2023-10-28T08:28:53.243Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="http">
 <meta name="twitter:card" content="summary_large_image">
@@ -40,7 +40,7 @@
 
 
 
-<link rel="alternative" href="/atom.xml" title="301/302-重定向" type="application/atom+xml">
+<link rel="alternative" href="/atom.xml" title="301/302 Redirection" type="application/atom+xml">
 
 
 
@@ -107,7 +107,7 @@
 <nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item navbar-logo" href="/">
+            <a class="navbar-item navbar-logo" href="/en">
                 
                     
                     Huangzl&#39;s blog
@@ -124,16 +124,13 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/archives">文章列表</a>
+               href="/en/archives">Archive</a>
             
             <a class="navbar-item "
-               href="/categories">分類</a>
+               href="/en/categories">Categories</a>
             
             <a class="navbar-item "
-               href="/recommend">推薦閱讀</a>
-            
-            <a class="navbar-item "
-               href="/abouts">關於我</a>
+               href="/en/abouts">About</a>
             
         </div>
         
@@ -141,59 +138,59 @@
             
             
             <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
-                <a class="navbar-item" title="目錄">
-                    目錄
+                <a class="navbar-item" title="Table of Contents">
+                    Table of Contents
                 </a>
                 <div class="navbar-dropdown">
                     
                     
                     
                     
-                    <a class="navbar-item" href="#前言">1&nbsp;&nbsp;<b>前言</b></a>
+                    <a class="navbar-item" href="#introduction">1&nbsp;&nbsp;<b>Introduction</b></a>
                     
                     
                     <hr class="navbar-divider">
                     
                     
-                    <a class="navbar-item" href="#清除浏览器缓存适用于windows-macos-linux">2&nbsp;&nbsp;<b>清除浏览器缓存（适用于Windows、macOS、Linux）</b></a>
+                    <a class="navbar-item" href="#clearing-browser-cache-applicable-to-windows-macos-linux">2&nbsp;&nbsp;<b>Clearing Browser Cache (Applicable to Windows, macOS, Linux)</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#google-chrome">2.1&nbsp;&nbsp;Google Chrome：</a>
+                    <a class="navbar-item" href="#google-chrome">2.1&nbsp;&nbsp;Google Chrome:</a>
                     
                     
                     
-                    <a class="navbar-item" href="#mozilla-firefox">2.2&nbsp;&nbsp;Mozilla Firefox：</a>
+                    <a class="navbar-item" href="#mozilla-firefox">2.2&nbsp;&nbsp;Mozilla Firefox:</a>
                     
                     
                     
-                    <a class="navbar-item" href="#microsoft-edge">2.3&nbsp;&nbsp;Microsoft Edge：</a>
+                    <a class="navbar-item" href="#microsoft-edge">2.3&nbsp;&nbsp;Microsoft Edge:</a>
                     
                     
                     <hr class="navbar-divider">
                     
                     
-                    <a class="navbar-item" href="#清除操作系统的dns缓存适用于windows-macos">3&nbsp;&nbsp;<b>清除操作系统的DNS缓存（适用于Windows、macOS）</b></a>
+                    <a class="navbar-item" href="#clearing-operating-systems-dns-cache-applicable-to-windows-macos">3&nbsp;&nbsp;<b>Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#windows">3.1&nbsp;&nbsp;Windows：</a>
+                    <a class="navbar-item" href="#windows">3.1&nbsp;&nbsp;Windows:</a>
                     
                     
                     
-                    <a class="navbar-item" href="#macos">3.2&nbsp;&nbsp;macOS：</a>
+                    <a class="navbar-item" href="#macos">3.2&nbsp;&nbsp;macOS:</a>
                     
                 </div>
             </div>
             
             
-            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
                 <i class="fab fa-twitter"></i>
                 
             </a>
                
-            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
                 
                 <i class="fas fa-rss"></i>
                 
@@ -212,7 +209,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/2023/10/28/en/301-302-Redirection/">English</a>
+               <a class="navbar-item" href="/2023/10/28/301-302-Redirection/">中文</a>
             
             
 
@@ -224,87 +221,87 @@
     <div class="container">
       
       <div data-nosnippet class="self-notice">
-        最近開了一個讀者回饋表單，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以填表單跟我說：<a href="http://home.hzlssb.com" target="_blank">表單連結</a>
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="http://home.hzlssb.com" target="_blank">feedback form</a>
       </div>
       
     <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            301/302-重定向
+            301/302 Redirection
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-10-28T08:18:48.000Z" itemprop="datePublished">2023年10月28日</time>
+            <time datetime="2023-10-28T08:18:48.000Z" itemprop="datePublished">28 October 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
             <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/http/">http</a>
+            <a class="article-category-link" href="/en/categories/http/">http</a>
         </span>
         
         
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
         
     </div>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
-<p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p>
-<p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p>
-<p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p>
-<p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p>
-<p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p>
+        <h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
+<p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p>
+<p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p>
+<p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p>
 <ul>
-<li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
+<li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p>
 </li>
-<li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p>
+<li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p>
 </li>
 </ul>
-<p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p>
-<p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p>
-<p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
-<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol>
-<li>打开Chrome浏览器。</li>
-<li>点击右上角的三个垂直点，选择“更多工具”。</li>
-<li>选择“清除浏览数据”。</li>
-<li>在弹出的窗口中，选择“高级”选项卡。</li>
-<li>选择“所有时间”作为时间范围。</li>
-<li>勾选“缓存图像和文件”选项。</li>
-<li>点击“清除数据”按钮。</li>
+<p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p>
+<p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p>
+<p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
+<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol>
+<li>Open the Chrome browser.</li>
+<li>Click the three vertical dots in the upper right corner and select “More tools.”</li>
+<li>Choose “Clear browsing data.”</li>
+<li>In the popup window, select the “Advanced” tab.</li>
+<li>Set the time range to “All time.”</li>
+<li>Check the “Cached images and files” option.</li>
+<li>Click the “Clear data” button.</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol>
-<li>打开Firefox浏览器。</li>
-<li>点击右上角的三条水平线，选择“隐私与安全”。</li>
-<li>在“Cookie和站点数据”部分，点击“清除数据”。</li>
-<li>确保勾选了“缓存”选项。</li>
-<li>点击“清除”。</li>
+<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol>
+<li>Open the Firefox browser.</li>
+<li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li>
+<li>In the “Cookies and Site Data” section, click “Clear Data.”</li>
+<li>Ensure the “Cache” option is checked.</li>
+<li>Click “Clear.”</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol>
-<li>打开Edge浏览器。</li>
-<li>点击右上角的三个水平点，选择“设置”。</li>
-<li>滚动至底部，点击“查看高级设置”。</li>
-<li>在“隐私与服务”部分，点击“清除浏览数据”。</li>
-<li>勾选“缓存图像和文件”选项。</li>
-<li>点击“清除”按钮。</li>
+<h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol>
+<li>Open the Edge browser.</li>
+<li>Click the three horizontal dots in the upper right corner and select “Settings.”</li>
+<li>Scroll down and click “View advanced settings.”</li>
+<li>In the “Privacy and services” section, click “Clear browsing data.”</li>
+<li>Check the “Cached images and files” option.</li>
+<li>Click the “Clear” button.</li>
 </ol>
-<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol>
-<li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li>
-<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol>
+<li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS：</span></h3><ol>
-<li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li>
-<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-然后输入管理员密码并再次按下回车键。</li>
+<h3><span id="macos">macOS:</span></h3><ol>
+<li>Open Terminal (find it in Applications &gt; Utilities folder).</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+Then enter your administrator password and press Enter again.</li>
 </ol>
-<p>请注意，清除浏览器缓存可能会导致您在网站上的登录状态丢失，所以请确保您已经备份了重要的信息，以防需要重新登录网站。</p>
+<p>Please note that clearing browser cache might lead to loss of login sessions on websites. Ensure you have backed up essential information in case you need to log in again.</p>
 
     
     </div>
     
     <div class="columns is-variable is-1 is-multiline is-mobile">
     
-        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/http/">#http</a></span>
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/http/">#http</a></span>
     
     </div>
     
@@ -315,7 +312,7 @@
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
             
-            <a href="/2023/10/27/Webpack-optimization-3/">Webpack 中的 sideEffects 该怎么用</a>
+            <a href="/2023/10/27/en/Webpack-optimization-3/">How to Use `sideEffects` in Webpack</a>
             
         </span>
     </div>
@@ -326,7 +323,7 @@
 
 
 <div class="comments">
-    <h3 class="title is-4">評論</h3>
+    <h3 class="title is-4">Comments</h3>
     <script src="https://utteranc.es/client.js"
         repo="aszx87410/huli-blog"
         issue-term="title"
@@ -370,7 +367,7 @@
                 <span class="icon">
                     <i class="fas fa-globe"></i>
                 </span>
-                <span>中文</span>
+                <span>English</span>
                 <span class="icon is-small">
             <i class="fas fa-angle-down" aria-hidden="true"></i>
           </span>
@@ -380,8 +377,8 @@
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/2023/10/28/en/301-302-Redirection/" class="dropdown-item">
-                    English
+                <a href="/2023/10/28/301-302-Redirection/" class="dropdown-item">
+                    中文
                 </a>
             
             </div>

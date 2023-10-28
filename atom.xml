@@ -6,7 +6,7 @@
   <link href="https://ikkkp.github.io/atom.xml" rel="self"/>
   
   <link href="https://ikkkp.github.io/"/>
-  <updated>2023-10-28T08:25:16.870Z</updated>
+  <updated>2023-10-28T08:28:47.562Z</updated>
   <id>https://ikkkp.github.io/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>301/302-Redirection</title>
+    <title>301/302-重定向</title>
     <link href="https://ikkkp.github.io/2023/10/28/301-302-Redirection/"/>
     <id>https://ikkkp.github.io/2023/10/28/301-302-Redirection/</id>
     <published>2023-10-28T08:18:48.000Z</published>
-    <updated>2023-10-28T08:25:16.870Z</updated>
+    <updated>2023-10-28T08:28:47.562Z</updated>
     
     <content type="html"><![CDATA[<h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p><p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p><p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p><p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p><p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p><p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p><ul><li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p></li><li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p></li></ul><p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p><p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p><p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p><h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol><li>打开Chrome浏览器。</li><li>点击右上角的三个垂直点，选择“更多工具”。</li><li>选择“清除浏览数据”。</li><li>在弹出的窗口中，选择“高级”选项卡。</li><li>选择“所有时间”作为时间范围。</li><li>勾选“缓存图像和文件”选项。</li><li>点击“清除数据”按钮。</li></ol><h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol><li>打开Firefox浏览器。</li><li>点击右上角的三条水平线，选择“隐私与安全”。</li><li>在“Cookie和站点数据”部分，点击“清除数据”。</li><li>确保勾选了“缓存”选项。</li><li>点击“清除”。</li></ol><h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol><li>打开Edge浏览器。</li><li>点击右上角的三个水平点，选择“设置”。</li><li>滚动至底部，点击“查看高级设置”。</li><li>在“隐私与服务”部分，点击“清除浏览数据”。</li><li>勾选“缓存图像和文件”选项。</li><li>点击“清除”按钮。</li></ol><h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol><li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li><li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li></ol><h3><span id="macos">macOS：</span></h3><ol><li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li><li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>然后输入管理员密码并再次按下回车键。</li></ol><p>请注意，清除浏览器缓存可能会导致您在网站上的登录状态丢失，所以请确保您已经备份了重要的信息，以防需要重新登录网站。</p>]]></content>
     
@@ -35,10 +35,34 @@
     
     
     
-    <category term="Security" scheme="https://ikkkp.github.io/categories/Security/"/>
+    <category term="http" scheme="https://ikkkp.github.io/categories/http/"/>
     
     
-    <category term="Security" scheme="https://ikkkp.github.io/tags/Security/"/>
+    <category term="http" scheme="https://ikkkp.github.io/tags/http/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>301/302 Redirection</title>
+    <link href="https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/"/>
+    <id>https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/</id>
+    <published>2023-10-28T08:18:48.000Z</published>
+    <updated>2023-10-28T08:28:53.243Z</updated>
+    
+    <content type="html"><![CDATA[<h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p><p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p><p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p><p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p><ul><li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p></li><li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p></li></ul><p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p><p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p><p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p><h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol><li>Open the Chrome browser.</li><li>Click the three vertical dots in the upper right corner and select “More tools.”</li><li>Choose “Clear browsing data.”</li><li>In the popup window, select the “Advanced” tab.</li><li>Set the time range to “All time.”</li><li>Check the “Cached images and files” option.</li><li>Click the “Clear data” button.</li></ol><h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol><li>Open the Firefox browser.</li><li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li><li>In the “Cookies and Site Data” section, click “Clear Data.”</li><li>Ensure the “Cache” option is checked.</li><li>Click “Clear.”</li></ol><h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol><li>Open the Edge browser.</li><li>Click the three horizontal dots in the upper right corner and select “Settings.”</li><li>Scroll down and click “View advanced settings.”</li><li>In the “Privacy and services” section, click “Clear browsing data.”</li><li>Check the “Cached images and files” option.</li><li>Click the “Clear” button.</li></ol><h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol><li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li><li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li></ol><h3><span id="macos">macOS:</span></h3><ol><li>Open Terminal (find it in Applications &gt; Utilities folder).</li><li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>Then enter your administrator password and press Enter again.</li></ol><p>Please note that clearing browser cache might lead to loss of login sessions on websites. Ensure you have backed up essential information in case you need to log in again.</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2&gt;&lt;span id=&quot;introduction&quot;&gt;Introduction&lt;/span&gt;&lt;/h2&gt;&lt;p&gt;When configuring redirects on a website, especially in the following scenarios, issue</summary>
+      
+    
+    
+    
+    <category term="http" scheme="https://ikkkp.github.io/categories/http/"/>
+    
+    
+    <category term="http" scheme="https://ikkkp.github.io/tags/http/"/>
     
   </entry>
   
