@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-27T15:57:21.000Z">
-<meta property="article:modified_time" content="2023-10-27T16:26:54.226Z">
+<meta property="article:modified_time" content="2023-10-28T07:46:31.358Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Webpack">
 <meta name="twitter:card" content="summary_large_image">
@@ -236,7 +236,7 @@
 <h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2><p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
 <h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3><p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
 <p>分析程序流，判断哪些变量未被使用、引用，进而删除此代码。</p>
-<p>很好，原理非常完美，那为什么我们的代码又删不掉呢？</p>
+<p>很好，原理非常完美，那为什么有时候我们项目里面多余的的代码又删不掉呢？</p>
 <p>先说原因：都是副作用的锅！</p>
 <h3><span id="副作用">副作用</span></h3><p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
 <p>举个例子，比如这个函数：</p>
@@ -276,9 +276,27 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <p>很显然这个Person类是无用的代码</p>
 <p>而为什么有时候别的工具，比如rollup在线repl尝试了下tree-shaking，也确实删掉了无用的代码</p>
 <p>而使用webpack打包工具却不能进行有效的代码消除呢？</p>
-<p>答案是：<strong>babel编译 + webpack打包</strong></p>
-<p>babel编译会使得Person类被封装成了一个IIFE(立即执行函数)，然后返回一个构造函数。</p>
-<p>在这边贴一个链接<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32831172">你的Tree-Shaking并没什么卵用</a></p>
+<p>答案是：<em><strong>babel编译 + webpack打包</strong></em></p>
+<p>在这边贴一个链接，是有关于详细介绍babel编译 + webpack打包是怎么让你无效的代码消除不掉的。<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32831172">你的Tree-Shaking并没什么卵用</a></p>
+<p>如果不想看文章的话，这边直接简单说一下原理：babel编译会使得Person类被封装成了一个IIFE(立即执行函数)，然后返回一个构造函数，在这边就产生了一个副作用。</p>
+<p>这边有个Issues，<a target="_blank" rel="noopener" href="https://github.com/mishoo/UglifyJS/issues/1261">IIFE 中的类声明被视为副作用</a></p>
+<p>当我在 IIFE 中声明一个类，但没有使用类时，它不会被 UglifyJS 剥离，因为它被认为是副作用。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">var</span> V6Engine <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">function</span> <span class="token function">V6Engine</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token class-name">V6Engine</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">toString</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token string">'V6'</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>编译时收到这样的警告：<code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code></p>
+<p>下面给出的原因是Uglify 没做执行程序流分析。它并不会因为你注意到的副作用而删除代码。你要是想弄个完善一点的摇树，去隔壁rollup呗！</p>
+<p>issue中总结下几点关键信息：</p>
+<p>函数的参数若是引用类型，对于它属性的操作，都是有可能会产生副作用的。因为首先它是引用类型，对它属性的任何修改其实都是改变了函数外部的数据。其次获取或修改它的属性，会触发<code>getter</code>或者<code>setter</code>，而<code>getter</code>、<code>setter</code>是不透明的，有可能会产生副作用。</p>
+<p>uglify没有完善的程序流分析。它可以简单的判断变量后续是否被引用、修改，但是不能判断一个变量完整的修改过程，不知道它是否已经指向了外部变量，所以很多有可能会产生副作用的代码，都只能保守的不删除。</p>
+<p>rollup有程序流分析的功能，可以更好的判断代码是否真正会产生副作用。</p>
+<p>但这已经是很久之前的版本问题，现在的webpack <code>tree shaking</code>已经做了很多的优化，足够的程序流分析进行<code>tree shaking</code></p>
 <p>webpack 的 <code>tree shaking</code> 的作用是可以将未被使用的 <code>exported member</code> 标记为 <code>unused</code> 同时在将其 <code>re-export</code> 的模块中不再 <code>export</code>。说起来很拗口，看代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -305,7 +323,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>配合 webpack 的 scope hoisting 和 uglify 之后，b 模块的痕迹会被完全抹杀掉。</p>
+<p>配合 webpack 的 <code>scope hoisting</code> 和 <code>uglify</code> 之后，b 模块的痕迹会被完全抹杀掉。</p>
 <p>但是如果 b 模块中添加了一些副作用，比如一个简单的 log：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">b</span><span class="token punctuation">(</span><span class="token parameter">v</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> reutrn v <span class="token punctuation">&#125;</span>
@@ -317,9 +335,9 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 
 <p>虽然 b 模块的导出是被忽略了，但是副作用代码被保留下来了。</p>
-<p>由于目前 <code>transformer</code> 转换后可能引入的各种奇怪操作引发的副作用，很多时候我们会发现就算有了 tree shaking 我们的 bundle size 还是没有明显的减小。</p>
+<p>由于目前 <code>transformer</code> 转换后可能引入的各种奇怪操作引发的副作用，很多时候我们会发现就算有了 tree shaking 我们的 <code>bundle size</code> 还是没有明显的减小。</p>
 <p>而通常我们期望的是 b 模块既然不被使用了，其中所有的代码应该不被引入才对。</p>
-<p>这个时候 sideEffects 的作用就显现出来了：如果我们引入的 包&#x2F;模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块&#x2F;包 都会被完整的移除。</p>
+<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包&#x2F;模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块&#x2F;包 都会被完整的移除。</p>
 <p>以 mobx-react-devtool 为例，我们通常这样去用：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 

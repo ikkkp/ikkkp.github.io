@@ -9,8 +9,22 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/</loc>
+        <lastmod>2023-10-28T07:46:31.358Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-3/</loc>
-        <lastmod>2023-10-27T16:29:29.667Z</lastmod>
+        <lastmod>2023-10-28T07:46:28.484Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -25,20 +39,6 @@
     <url>
         <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
         <lastmod>2023-10-27T16:26:56.722Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/</loc>
-        <lastmod>2023-10-27T16:26:54.226Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
