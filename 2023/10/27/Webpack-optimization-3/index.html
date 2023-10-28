@@ -23,16 +23,16 @@
 
 
 
-    <meta name="description" content="webpack v4 开始新增了一个 sideEffects 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为">
+    <meta name="description" content="webpack v4 开始新增了一个 sideEffects 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 side">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Webpack 中的 sideEffects 该怎么用">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="webpack v4 开始新增了一个 sideEffects 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为">
+<meta property="og:description" content="webpack v4 开始新增了一个 sideEffects 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。 基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 side">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-27T15:57:21.000Z">
-<meta property="article:modified_time" content="2023-10-28T07:46:31.358Z">
+<meta property="article:modified_time" content="2023-10-28T07:49:54.928Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Webpack">
 <meta name="twitter:card" content="summary_large_image">
@@ -231,19 +231,21 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
-<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from &#39;xx/a&#39;</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
-<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2><p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
-<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3><p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
+        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包/模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
+<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from 'xx/a'</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
+<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2>
+<p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
+<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3>
+<p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
 <p>分析程序流，判断哪些变量未被使用、引用，进而删除此代码。</p>
 <p>很好，原理非常完美，那为什么有时候我们项目里面多余的的代码又删不掉呢？</p>
 <p>先说原因：都是副作用的锅！</p>
-<h3><span id="副作用">副作用</span></h3><p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
+<h3><span id="副作用">副作用</span></h3>
+<p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
 <p>举个例子，比如这个函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span> <span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>这个函数修改了全局变量location，甚至还让浏览器发生了跳转，这就是一个有副作用的函数。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// componetns.js</span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
@@ -289,9 +291,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>编译时收到这样的警告：<code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code></p>
-<p>下面给出的原因是Uglify 没做执行程序流分析。它并不会因为你注意到的副作用而删除代码。你要是想弄个完善一点的摇树，去隔壁rollup呗！</p>
+<p>下面给出的回复：Uglify 没做执行程序流分析。它并不会因为你注意到的副作用而删除代码。你要是想弄个完善一点的摇树，去隔壁rollup呗！</p>
 <p>issue中总结下几点关键信息：</p>
 <p>函数的参数若是引用类型，对于它属性的操作，都是有可能会产生副作用的。因为首先它是引用类型，对它属性的任何修改其实都是改变了函数外部的数据。其次获取或修改它的属性，会触发<code>getter</code>或者<code>setter</code>，而<code>getter</code>、<code>setter</code>是不透明的，有可能会产生副作用。</p>
 <p>uglify没有完善的程序流分析。它可以简单的判断变量后续是否被引用、修改，但是不能判断一个变量完整的修改过程，不知道它是否已经指向了外部变量，所以很多有可能会产生副作用的代码，都只能保守的不删除。</p>
@@ -309,7 +310,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>当我们以 app.js 为 <code>entry</code> 时，经过摇树后的代码会变成这样：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -322,7 +322,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>配合 webpack 的 <code>scope hoisting</code> 和 <code>uglify</code> 之后，b 模块的痕迹会被完全抹杀掉。</p>
 <p>但是如果 b 模块中添加了一些副作用，比如一个简单的 log：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
@@ -332,12 +331,10 @@ webpack 之后会发现 b 模块内容变成了：
 
 <span class="token comment">// b.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">v</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token keyword">return</span> v<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
 <p>虽然 b 模块的导出是被忽略了，但是副作用代码被保留下来了。</p>
 <p>由于目前 <code>transformer</code> 转换后可能引入的各种奇怪操作引发的副作用，很多时候我们会发现就算有了 tree shaking 我们的 <code>bundle size</code> 还是没有明显的减小。</p>
 <p>而通常我们期望的是 b 模块既然不被使用了，其中所有的代码应该不被引入才对。</p>
-<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包&#x2F;模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块&#x2F;包 都会被完整的移除。</p>
+<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包/模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除。</p>
 <p>以 mobx-react-devtool 为例，我们通常这样去用：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 
@@ -351,10 +348,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>这是一个很常见的按需导入场景，然而在没有 <code>sideEffects: false</code> 配置时，即便 <code>NODE_ENV</code> 设为 <code>production</code> ，打包后的代码里依然会包含 mobx-react-devtools 包，虽然我们没使用过其导出成员，但是 mobx-react-devtools 还是会被 import，因为里面“可能”会有副作用。</p>
 <p>但当我们加上 sideEffects false 之后，tree shaking 就能安全的把它从 bundle 里完整的移除掉了。</p>
-<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2><p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
+<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2>
+<p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
 <p>这也就能解释为什么能给 vue 这个本身充满副作用的包加上 <code>sideEffects: false</code> 了。</p>
 <p>所以其实 webpack 里的 <code>sideEffects: false</code> 的意思并不是我这个模块真的没有副作用，而只是为了在摇树时告诉 webpack：我这个包在设计的时候就是期望没有副作用的，即使他打完包后是有副作用的。</p>
 
