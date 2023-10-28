@@ -9,6 +9,20 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/10/28/301-302-Redirection/</loc>
+        <lastmod>2023-10-28T08:25:16.870Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-3/</loc>
         <lastmod>2023-10-28T07:51:14.932Z</lastmod>
         <changefreq>weekly</changefreq>
