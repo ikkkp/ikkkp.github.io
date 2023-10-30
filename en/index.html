@@ -195,13 +195,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>The concept of reactivity is not difficult to understand. It refers to triggering certain events when JavaScript operates on an object or a value. This is achieved by implementing a reactive system, where operations elicit specific responses.</p>
-<h2><span id="reactive-data-and-side-effect-functions">Reactive Data and Side Effect Functions</span></h2>
-<p>Side effect functions refer to functions that produce side effects. Consider the following code snippet:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>The concept of reactivity is not difficult to understand. It refers to triggering certain events when JavaScript operates on an object or a value. This is achieved by implementing a reactive system, where operations elicit specific responses.</p>
+<h2><span id="reactive-data-and-side-effect-functions">Reactive Data and Side Effect Functions</span></h2><p>Side effect functions refer to functions that produce side effects. Consider the following code snippet:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>When the <code>effect</code> function is executed, it sets the text content of the body. Any function other than <code>effect</code> can read or modify the body’s text content. In other words, the execution of the <code>effect</code> function directly or indirectly affects the execution of other functions, indicating that the <code>effect</code> function has side effects.</p>
 <p>Side effect functions are common and can impact various aspects, such as the effectiveness of “tree shaking” in webpack, a topic we discussed earlier. I won’t delve into this here.</p>
 <p>Side effects can easily occur; for example, if a function modifies a global variable, it creates a side effect, as shown in the following code:</p>
@@ -210,16 +209,17 @@
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   val <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Modifying a global variable creates a side effect</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Understanding side effect functions, let’s now discuss reactive data. Suppose a property of an object is read within a side effect function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// The execution of the effect function reads obj.text</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The side effect function <code>effect</code> sets the <code>innerText</code> property of the body element to <code>obj.text</code>. When the value of <code>obj.text</code> changes, we want the side effect function <code>effect</code> to re-execute.</p>
 <p>Our approach is as follows: we want to store the <code>effect</code> function in a bucket when reading the <code>obj.text</code> value, and when setting the <code>obj.text</code> value, we want to retrieve the <code>effect</code> function from the bucket and execute it.</p>
-<h2><span id="basic-implementation-of-reactive-data">Basic Implementation of Reactive Data</span></h2>
-<p>How can we make <code>obj</code> reactive data? By observing, we find that:</p>
+<h2><span id="basic-implementation-of-reactive-data">Basic Implementation of Reactive Data</span></h2><p>How can we make <code>obj</code> reactive data? By observing, we find that:</p>
 <ul>
 <li>When the side effect function <code>effect</code> is executed, it triggers the read operation of the <code>obj.text</code> property.</li>
 <li>When the <code>obj.text</code> value is modified, it triggers the write operation of the <code>obj.text</code> property.</li>
@@ -241,9 +241,9 @@
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Here, we create a reactive object based on the Proxy object. We have a <code>proxyMap</code>, which is a container for storing various types of proxies. We define <code>get</code> and <code>set</code> intercept functions to intercept read and write operations.</p>
-<h2><span id="designing-a-comprehensive-reactive-system">Designing a Comprehensive Reactive System</span></h2>
-<p>From the above examples, it’s clear that the workflow of a reactive system is as follows:</p>
+<h2><span id="designing-a-comprehensive-reactive-system">Designing a Comprehensive Reactive System</span></h2><p>From the above examples, it’s clear that the workflow of a reactive system is as follows:</p>
 <ul>
 <li>When a read operation occurs, collect the side effect functions into a “bucket”.</li>
 <li>When a write operation occurs, retrieve the side effect functions from the “bucket” and execute them.</li>
@@ -274,12 +274,15 @@
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>We also need to establish a clear link between side effect functions and the target fields being operated upon. For instance, when reading a property, it doesn’t matter which property is being read; all side effect functions should be collected into the “bucket.” Similarly, when setting a property, regardless of which property is being set, the side effect functions from the “bucket” should be retrieved and executed. There is no explicit connection between side effect functions and the operated fields. The solution is simple: we need to establish a connection between side effect functions and the operated fields. This requires redesigning the data structure of the “bucket” and cannot be as simple as using a Set type for the “bucket.”</p>
 <p>We use <code>WeakMap</code> to implement the bucket for storing effects as discussed earlier. If you are not familiar with the characteristics of the WeakMap class, you can learn more about it <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">here</a>.</p>
+<p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Map to store different types of proxies</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Once we have defined the buckets as above, we can proceed to implement the core part of the reactive system, which is the proxy:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// The core is the proxy</span>
@@ -297,6 +300,7 @@
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>For the previous <code>track</code> and <code>trigger</code> functions:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -380,11 +384,9 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
 <p>Here is an official link on <a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader usage and examples, including local development and testing of custom loaders</a>.</p>
-<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2>
-<p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
+<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2><p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
 <p>Synchronous loaders can return a single value representing the transformed module.</p>
 <p>Loaders can return one or two values. The first value is a string or buffer containing JavaScript code. The optional second value is a SourceMap, which is a JavaScript object.</p>
 <p>Here’s a simple example of using a loader. It matches all JavaScript files and processes them using <code>loader.js</code>:</p>
@@ -408,16 +410,16 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>From the above, we can understand how loaders are used. But this only scratches the surface. What does a specific loader look like?</p>
 <p>For example, a simple loader could be like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 	<span class="token comment">// content is the source content string passed in</span>
   <span class="token keyword">return</span> content
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>A loader is just a node module exposing a function that can only receive one parameter: a string containing the content of the resource file. The function’s return value is the processed content.</p>
-<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2>
-<h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3>
-<p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
+<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2><h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3><p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
 <ul>
 <li>Keep it <strong>simple</strong>.</li>
 <li>Use <strong>chaining</strong>.</li>
@@ -430,22 +432,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Avoid <strong>absolute paths</strong>.</li>
 <li>Use <strong>peer dependencies</strong>.</li>
 </ul>
-<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
-<p>First, create the following files in a folder within your webpack project directory:</p>
+<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following files in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/loader/custom-loader.js</code>: The source file for your custom loader.</li>
 <li><code>src/index.js</code>: JavaScript entry file for testing the custom loader.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3>
-<p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
+<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3><p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
 module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// Add a custom comment at the top of the source code</span>
     <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
-<p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -465,9 +465,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token punctuation">]</span><span class="token punctuation">,</span>
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>This configuration achieves a simple functionality. Now let’s discuss how to test the local loader. There are two ways to do this: one is through <code>Npm link</code> for testing, a convenient method where you can create a symbolic link for local testing. Here is a link to <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>. Another way is to configure the path directly in the project:</p>
-<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
   <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -477,8 +477,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4>
-<p>You can also configure it using an array:</p>
+
+<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4><p>You can also configure it using an array:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Look for loaders first in the node_modules directory; if not found, search in the loaders directory</span>
@@ -487,13 +487,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3>
-<p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
+
+<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3><p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3>
-<p>Run the following command to build your project:</p>
+
+<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3><p>Run the following command to build your project:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>After the build is complete, you will find the generated <code>bundle.js</code> file in the <code>dist</code> folder. In this file, you can see JavaScript code with a custom comment added at the top.</p>
 <pre class="line-numbers language-none"><code class="language-none">
 
@@ -521,23 +522,19 @@ module.exports &#x3D; &#123;
         &#x2F;&#x2F; You can add more plugins here
     ],
 &#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, the <code>HtmlWebpackPlugin</code> is used. It generates a new HTML file based on the specified HTML template and automatically adds the bundled JavaScript file to the generated HTML file.</p>
 <p>A basic webpack plugin consists of the following components:</p>
 <ul>
-<li>
-<p>A JavaScript named function or JavaScript class.</p>
+<li><p>A JavaScript named function or JavaScript class.</p>
 </li>
-<li>
-<p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
+<li><p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
 </li>
-<li>
-<p>Specify an event hook bound to webpack itself.</p>
+<li><p>Specify an event hook bound to webpack itself.</p>
 </li>
-<li>
-<p>Process specific data from webpack’s internal instances.</p>
+<li><p>Process specific data from webpack’s internal instances.</p>
 </li>
-<li>
-<p>Call the callback provided by webpack after the functionality is completed.</p>
+<li><p>Call the callback provided by webpack after the functionality is completed.</p>
 </li>
 </ul>
 <p>A plugin structure looks like this:</p>
@@ -555,18 +552,15 @@ module.exports &#x3D; &#123;
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2>
-<p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
 <p>The <code>compiler</code> object is essentially bound to the entire webpack environment. It contains all the environment configurations, including options, loaders, and plugins. When webpack starts, this object is instantiated and it is <code>globally unique</code>. The parameters passed into the <code>apply</code> method are properties of this object.</p>
 <p>The <code>compilation</code> object is created each time resources are built. It represents the current module resources, compiled generated resources, changed files, and tracked dependency status. It also provides many hooks.</p>
-<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2>
-<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
-<p>First, create the following file in a folder within your webpack project directory:</p>
+<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2><h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following file in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/plugins/CustomPlugin.js</code>: Source file for your custom plugin.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3>
-<p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
+<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3><p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
 <span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
     <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -577,8 +571,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
-<p>In the configuration file, use the custom plugin you just created.</p>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>In the configuration file, use the custom plugin you just created.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -593,8 +587,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// You can add more plugins here</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3>
-<p>Now, run the webpack build:</p>
+
+<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3><p>Now, run the webpack build:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
     
     </div>
@@ -630,25 +624,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
 <p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p>
 <p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p>
 <p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p>
 <ul>
-<li>
-<p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client/browser should not attempt to request the original location but use the new location from now on.</p>
+<li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p>
 </li>
-<li>
-<p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client/browser should continue requesting the original URL.</p>
+<li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p>
 </li>
 </ul>
 <p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p>
 <p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p>
-<p>Clearing 301/302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
-<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2>
-<h3><span id="google-chrome">Google Chrome:</span></h3>
-<ol>
+<p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
+<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol>
 <li>Open the Chrome browser.</li>
 <li>Click the three vertical dots in the upper right corner and select “More tools.”</li>
 <li>Choose “Clear browsing data.”</li>
@@ -657,16 +646,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear data” button.</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3>
-<ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol>
 <li>Open the Firefox browser.</li>
 <li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li>
 <li>In the “Cookies and Site Data” section, click “Clear Data.”</li>
 <li>Ensure the “Cache” option is checked.</li>
 <li>Click “Clear.”</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge:</span></h3>
-<ol>
+<h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol>
 <li>Open the Edge browser.</li>
 <li>Click the three horizontal dots in the upper right corner and select “Settings.”</li>
 <li>Scroll down and click “View advanced settings.”</li>
@@ -674,15 +661,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear” button.</li>
 </ol>
-<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2>
-<h3><span id="windows">Windows:</span></h3>
-<ol>
+<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol>
 <li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li>
-<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS:</span></h3>
-<ol>
+<h3><span id="macos">macOS:</span></h3><ol>
 <li>Open Terminal (find it in Applications &gt; Utilities folder).</li>
 <li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 Then enter your administrator password and press Enter again.</li>
@@ -723,19 +706,17 @@ Then enter your administrator password and press Enter again.</li>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <p>Webpack v4 introduced a new feature called <code>sideEffects</code>, which allows you to declare in your <code>package.json</code> whether a package/module contains side effects or not. This declaration provides more optimization space for tree-shaking.</p>
-<p>In the conventional understanding of side effects, if we are certain that the modules within our package have no side effects, we can mark the package in <code>npm</code> with <code>&quot;sideEffects&quot;: false</code> in <code>package.json</code>. This allows us to offer a better bundling experience for consumers. The principle behind this is that Webpack can transform imports like <code>import &#123;a&#125; from xx</code> into <code>import &#123;a&#125; from 'xx/a'</code> for packages marked as side-effects-free, automatically trimming unnecessary imports, similar to <code>babel-plugin-import</code>.</p>
-<h2><span id="tree-shaking-and-side-effects">Tree Shaking and Side Effects</span></h2>
-<p>Tree shaking, first introduced and implemented by Rollup in the frontend community, has been a topic of discussion in various articles about optimizing bundling.</p>
-<h3><span id="principles-of-tree-shaking">Principles of Tree Shaking</span></h3>
-<p>ES6 module imports are statically analyzable, meaning the compiler can accurately determine what code is loaded during compilation. The program flow is analyzed to identify unused or unreferenced variables, which are then removed from the code.</p>
+        <p>Webpack v4 introduced a new feature called <code>sideEffects</code>, which allows you to declare in your <code>package.json</code> whether a package&#x2F;module contains side effects or not. This declaration provides more optimization space for tree-shaking.</p>
+<p>In the conventional understanding of side effects, if we are certain that the modules within our package have no side effects, we can mark the package in <code>npm</code> with <code>&quot;sideEffects&quot;: false</code> in <code>package.json</code>. This allows us to offer a better bundling experience for consumers. The principle behind this is that Webpack can transform imports like <code>import &#123;a&#125; from xx</code> into <code>import &#123;a&#125; from &#39;xx/a&#39;</code> for packages marked as side-effects-free, automatically trimming unnecessary imports, similar to <code>babel-plugin-import</code>.</p>
+<h2><span id="tree-shaking-and-side-effects">Tree Shaking and Side Effects</span></h2><p>Tree shaking, first introduced and implemented by Rollup in the frontend community, has been a topic of discussion in various articles about optimizing bundling. </p>
+<h3><span id="principles-of-tree-shaking">Principles of Tree Shaking</span></h3><p>ES6 module imports are statically analyzable, meaning the compiler can accurately determine what code is loaded during compilation. The program flow is analyzed to identify unused or unreferenced variables, which are then removed from the code.</p>
 <p>The principle sounds perfect, so why do we sometimes find that unnecessary code in our projects isn’t eliminated? The reason is side effects.</p>
-<h3><span id="side-effects">Side Effects</span></h3>
-<p>For those familiar with functional programming, the term “side effect” is not unfamiliar. It can be broadly understood as any action of a function that might or might not affect variables outside its scope.</p>
+<h3><span id="side-effects">Side Effects</span></h3><p>For those familiar with functional programming, the term “side effect” is not unfamiliar. It can be broadly understood as any action of a function that might or might not affect variables outside its scope.</p>
 <p>For example, consider this function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span><span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>This function modifies the global variable <code>location</code> and even triggers a browser redirect, making it a function with side effects.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// components.js</span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
@@ -764,6 +745,7 @@ Then enter your administrator password and press Enter again.</li>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getModel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>appleModel<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, the <code>Person</code> class is clearly unused. However, why can other tools like Rollup successfully eliminate unused code, while Webpack cannot?</p>
 <p>The answer lies in <strong>Babel compilation + Webpack bundling</strong>.</p>
 <p>I’ll provide a link here that explains in detail how Babel compilation + Webpack bundling might prevent effective code elimination: <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32831172">Your Tree-Shaking Isn’t Working</a>.</p>
@@ -778,18 +760,16 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>During compilation, you might receive this warning: <code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code>.</p>
 <p>The reason is that UglifyJS doesn’t perform complete program flow analysis. It doesn’t remove code because you noticed a side effect. If you want a more sophisticated tree shaking, go check out Rollup!</p>
 <p>Summarizing some key points from the issue:</p>
 <ul>
-<li>
-<p>If a function’s parameter is a reference type, any operations on its properties could potentially have side effects. This is because it’s a reference type, and any modification to its properties affects data outside the function. Additionally, accessing or modifying its properties triggers <code>getter</code> or <code>setter</code>, which are opaque and may have side effects.</p>
+<li><p>If a function’s parameter is a reference type, any operations on its properties could potentially have side effects. This is because it’s a reference type, and any modification to its properties affects data outside the function. Additionally, accessing or modifying its properties triggers <code>getter</code> or <code>setter</code>, which are opaque and may have side effects.</p>
 </li>
-<li>
-<p>UglifyJS lacks complete program flow analysis. It can simple judge whether a variable is later referenced or modified but cannot determine the complete modification process of a variable. It doesn’t know if it points to an external variable, so many potentially side-effect-causing code cannot be removed.</p>
+<li><p>UglifyJS lacks complete program flow analysis. It can simple judge whether a variable is later referenced or modified but cannot determine the complete modification process of a variable. It doesn’t know if it points to an external variable, so many potentially side-effect-causing code cannot be removed.</p>
 </li>
-<li>
-<p>Rollup has the ability to perform program flow analysis, making it better at determining whether code truly has side effects.</p>
+<li><p>Rollup has the ability to perform program flow analysis, making it better at determining whether code truly has side effects.</p>
 </li>
 </ul>
 <p>However, these issues were prevalent in older versions. The current Webpack <code>tree shaking</code> has undergone many optimizations and can perform sufficient program flow analysis for <code>tree shaking</code>.</p>
@@ -805,6 +785,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>When using <code>app.js</code> as the entry point, the code after tree shaking becomes:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -817,6 +798,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>After combining Webpack’s <code>scope hoisting</code> and <code>uglify</code>, all traces of module <code>b</code> will be completely eliminated.</p>
 <p>But what if module <code>b</code> contains some side effects, such as a simple log:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
@@ -829,7 +811,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <p>Although the export of module <code>b</code> is ignored, the code with side effects is retained.</p>
 <p>Due to various strange operations introduced by the <code>transformer</code> after compilation, which may cause side effects, we often find that even with tree shaking, our <code>bundle size</code> doesn’t significantly decrease.</p>
 <p>Usually, we expect that if module <code>b</code> is not being used, none of its code should be included.</p>
-<p>This is where the role of <code>sideEffects</code> becomes apparent: if the imported package/module is marked as <code>&quot;sideEffects: false&quot;</code>, regardless of whether it truly has side effects, as long as it’s not being referenced, the entire module/package will be completely removed.</p>
+<p>This is where the role of <code>sideEffects</code> becomes apparent: if the imported package&#x2F;module is marked as <code>&quot;sideEffects: false&quot;</code>, regardless of whether it truly has side effects, as long as it’s not being referenced, the entire module&#x2F;package will be completely removed.</p>
 <p>Taking <code>mobx-react-devtools</code> as an example, we often use it like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 
@@ -843,10 +825,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>This is a common scenario of importing modules on demand. However, without the <code>sideEffects: false</code> configuration, even if <code>NODE_ENV</code> is set to <code>production</code>, the bundled code will still include the <code>mobx-react-devtools</code> package. Although we haven’t used any of its exported members, <code>mobx-react-devtools</code> will still be imported because it “might” have side effects.</p>
 <p>But when we add <code>sideEffects: false</code>, tree shaking can safely remove it entirely from the bundle.</p>
-<h2><span id="use-cases-of-sideeffects">Use Cases of sideEffects</span></h2>
-<p>As mentioned earlier, it’s often difficult to guarantee whether packages/modules published on npm contain side effects (it could be the code’s fault or the transformer’s fault). However, we can usually ensure whether a package/module will affect objects outside of it, such as modifying properties on the <code>window</code> object or overwriting native object methods. If we can guarantee this, we can determine whether a package can have <code>&quot;sideEffects: false&quot;</code>. Whether it truly has side effects is not that important for Webpack; it’s acceptable as long as it’s marked.</p>
+<h2><span id="use-cases-of-sideeffects">Use Cases of sideEffects</span></h2><p>As mentioned earlier, it’s often difficult to guarantee whether packages&#x2F;modules published on npm contain side effects (it could be the code’s fault or the transformer’s fault). However, we can usually ensure whether a package&#x2F;module will affect objects outside of it, such as modifying properties on the <code>window</code> object or overwriting native object methods. If we can guarantee this, we can determine whether a package can have <code>&quot;sideEffects: false&quot;</code>. Whether it truly has side effects is not that important for Webpack; it’s acceptable as long as it’s marked.</p>
 <p>This explains why packages with inherent side effects, like <code>vue</code>, can still have <code>&quot;sideEffects: false&quot;</code> applied.</p>
 <p>So, in Webpack, <code>&quot;sideEffects: false&quot;</code> doesn’t mean that the module truly has no side effects. It’s just a way to tell Webpack during tree shaking: “I designed this package with the expectation that it has no side effects, even if it ends up having side effects after being bundled.”</p>
 
@@ -884,15 +866,13 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="performance-optimization-js-css-code-minification">Performance Optimization - JS-CSS Code Minification</span></h2>
-<ul>
+        <h2><span id="performance-optimization-js-css-code-minification">Performance Optimization - JS-CSS Code Minification</span></h2><ul>
 <li>Terser is a toolset for JavaScript parsing, mangling, and compressing.</li>
 <li>In the early days, we used <code>uglify-js</code> to minify and uglify our JavaScript code. However, it is no longer maintained and does not support ES6+ syntax.</li>
 <li>Terser is a fork of <code>uglify-es</code> and retains most of its original APIs, compatible with <code>uglify-es</code> and <code>uglify-js@3</code>, etc.</li>
 </ul>
 <p><a target="_blank" rel="noopener" href="https://github.com/terser/terser">webpack-terser</a></p>
-<h3><span id="javascript-code-minification">JavaScript Code Minification</span></h3>
-<p>Webpack provides the <code>terser-webpack-plugin</code> plugin for code optimization and minification.</p>
+<h3><span id="javascript-code-minification">JavaScript Code Minification</span></h3><p>Webpack provides the <code>terser-webpack-plugin</code> plugin for code optimization and minification.</p>
 <p>In production mode, TerserPlugin is used by default for code processing.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> TerserPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'terser-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -903,8 +883,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">TerserPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="css-code-minification">CSS Code Minification</span></h3>
-<p>Apart from JavaScript code, CSS code can also be minified using Webpack. Use <code>css-minimizer-webpack-plugin</code> to compress CSS code.</p>
+
+
+<h3><span id="css-code-minification">CSS Code Minification</span></h3><p>Apart from JavaScript code, CSS code can also be minified using Webpack. Use <code>css-minimizer-webpack-plugin</code> to compress CSS code.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> CssMinimizerPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'css-minimizer-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -917,12 +898,10 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="tree-shaking-implementation-in-webpack">Tree Shaking Implementation in Webpack</span></h3>
-<p>Tree shaking is a term commonly used to describe the removal of dead code in JavaScript context.</p>
-<h1><span id="tree-shaking-in-webpack">Tree Shaking in Webpack</span></h1>
-<p>In modern front-end development, optimizing code size is a crucial topic. Tree shaking is an optimization technique used to eliminate unused JavaScript modules in a project, reducing the size of the bundled files. Webpack provides built-in support, making it easy to implement tree shaking in projects.</p>
-<h2><span id="enable-es-module-syntax">Enable ES Module Syntax</span></h2>
-<p>First, ensure your JavaScript code follows ES module syntax, as Webpack’s tree shaking feature only works with ES modules. Use <code>import</code> and <code>export</code> syntax to define modules in your project.</p>
+
+<h3><span id="tree-shaking-implementation-in-webpack">Tree Shaking Implementation in Webpack</span></h3><p>Tree shaking is a term commonly used to describe the removal of dead code in JavaScript context.</p>
+<h1><span id="tree-shaking-in-webpack">Tree Shaking in Webpack</span></h1><p>In modern front-end development, optimizing code size is a crucial topic. Tree shaking is an optimization technique used to eliminate unused JavaScript modules in a project, reducing the size of the bundled files. Webpack provides built-in support, making it easy to implement tree shaking in projects.</p>
+<h2><span id="enable-es-module-syntax">Enable ES Module Syntax</span></h2><p>First, ensure your JavaScript code follows ES module syntax, as Webpack’s tree shaking feature only works with ES modules. Use <code>import</code> and <code>export</code> syntax to define modules in your project.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// math.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">square</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
@@ -931,21 +910,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">cube</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> x <span class="token operator">*</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="webpack-configuration">Webpack Configuration</span></h2>
-<p>In the Webpack configuration file, ensure the following settings to enable tree shaking:</p>
-<p>Set <code>mode</code> to <code>'production'</code>. Webpack will automatically enable related optimizations, including tree shaking.</p>
-<h3><span id="implementing-tree-shaking-for-javascript">Implementing Tree Shaking for JavaScript</span></h3>
-<p>Webpack implements tree shaking using two different approaches:</p>
+
+<h2><span id="webpack-configuration">Webpack Configuration</span></h2><p>In the Webpack configuration file, ensure the following settings to enable tree shaking:</p>
+<p>Set <code>mode</code> to <code>&#39;production&#39;</code>. Webpack will automatically enable related optimizations, including tree shaking.</p>
+<h3><span id="implementing-tree-shaking-for-javascript">Implementing Tree Shaking for JavaScript</span></h3><p>Webpack implements tree shaking using two different approaches:</p>
 <ul>
 <li><code>usedExports</code>: Marks certain functions as used, and later optimizes them with Terser.</li>
-<li><code>sideEffects</code>: Skips entire modules/files and checks if the file has side effects.</li>
+<li><code>sideEffects</code>: Skips entire modules&#x2F;files and checks if the file has side effects.</li>
 </ul>
-<h4><span id="using-usedexports-to-implement-tree-shaking">Using <code>usedExports</code> to Implement Tree Shaking</span></h4>
-<p>Set the mode to production:</p>
+<h4><span id="using-usedexports-to-implement-tree-shaking">Using <code>usedExports</code> to Implement Tree Shaking</span></h4><p>Set the mode to production:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'production'</span><span class="token punctuation">,</span>
   <span class="token comment">// ...other configurations</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Configure <code>usedExports</code> in the optimization section:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -960,8 +938,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
    <span class="token literal-property property">usedExports</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="using-sideeffects-to-implement-tree-shaking">Using <code>sideEffects</code> to Implement Tree Shaking</span></h4>
-<p>Set the <code>sideEffects</code> field in <code>package.json</code>:</p>
+
+<h4><span id="using-sideeffects-to-implement-tree-shaking">Using <code>sideEffects</code> to Implement Tree Shaking</span></h4><p>Set the <code>sideEffects</code> field in <code>package.json</code>:</p>
 <ul>
 <li>Set it to <code>false</code> to inform Webpack that it can safely remove unused exports.</li>
 <li>If there are specific files you want to keep, set it as an array.</li>
@@ -970,36 +948,31 @@ module<span class="token punctuation">.</span>exports <span class="token operato
   <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"your-project"</span><span class="token punctuation">,</span>
   <span class="token property">"sideEffects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./src/some-side-effectful-file.js"</span><span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/40052192">Webpack Side Effects</a></p>
-<h4><span id="understanding-tree-shaking-and-sideeffects">Understanding Tree Shaking and <code>sideEffects</code></span></h4>
-<p><code>sideEffects</code> and <code>usedExports</code> (more commonly considered tree shaking) are two different optimization techniques.</p>
-<p><code>sideEffects</code> is more efficient as it allows skipping entire modules/files and their entire subtree.</p>
-<p><code>usedExports</code> depends on <code>terser</code> to detect side effects in statements. It’s a more complex JavaScript task and is not as straightforward as <code>sideEffects</code>. Also, it cannot skip subtrees/dependencies because side effects need to be evaluated. While exported functions work as usual, higher-order functions (HOC) in the React framework can have issues in this scenario.</p>
-<h3><span id="css-tree-shaking-implementation">CSS Tree Shaking Implementation</span></h3>
-<p>For CSS tree shaking, additional plugins are required.</p>
+<h4><span id="understanding-tree-shaking-and-sideeffects">Understanding Tree Shaking and <code>sideEffects</code></span></h4><p><code>sideEffects</code> and <code>usedExports</code> (more commonly considered tree shaking) are two different optimization techniques.</p>
+<p><code>sideEffects</code> is more efficient as it allows skipping entire modules&#x2F;files and their entire subtree.</p>
+<p><code>usedExports</code> depends on <code>terser</code> to detect side effects in statements. It’s a more complex JavaScript task and is not as straightforward as <code>sideEffects</code>. Also, it cannot skip subtrees&#x2F;dependencies because side effects need to be evaluated. While exported functions work as usual, higher-order functions (HOC) in the React framework can have issues in this scenario.</p>
+<h3><span id="css-tree-shaking-implementation">CSS Tree Shaking Implementation</span></h3><p>For CSS tree shaking, additional plugins are required.</p>
 <p>In the past, <code>PurifyCss</code> plugin was used for CSS tree shaking, but it’s no longer maintained (last update was 4 years ago).</p>
 <p>A different library, <code>PurgeCSS</code>, can now be used for CSS tree shaking, helping remove unused CSS.</p>
-<h2><span id="file-compression-in-webpack">File Compression in Webpack</span></h2>
-<h3><span id="what-is-http-compression">What is HTTP Compression</span></h3>
-<p>HTTP compression is a technique used between servers and clients to improve transmission speed and bandwidth utilization.<br>
-The process of HTTP compression is as follows:</p>
+<h2><span id="file-compression-in-webpack">File Compression in Webpack</span></h2><h3><span id="what-is-http-compression">What is HTTP Compression</span></h3><p>HTTP compression is a technique used between servers and clients to improve transmission speed and bandwidth utilization.<br>The process of HTTP compression is as follows:</p>
 <ol>
 <li>Data is compressed on the server before being sent. (Can be done in Webpack)</li>
 <li>Compatible browsers inform the server about supported compression formats during requests.</li>
 <li>The server returns the corresponding compressed file to the browser, indicating it in the response headers.</li>
 </ol>
-<h3><span id="popular-compression-formats">Popular Compression Formats</span></h3>
-<p>There are several popular compression formats:</p>
+<h3><span id="popular-compression-formats">Popular Compression Formats</span></h3><p>There are several popular compression formats:</p>
 <ul>
 <li><code>compress</code>: Method used by UNIX’s “compress” program (historical reasons, not recommended for most applications, use gzip or deflate instead).</li>
 <li><code>deflate</code>: Compression based on the deflate algorithm (defined in RFC 1951) and encapsulated in zlib data format.</li>
 <li><code>gzip</code>: GNU zip format (defined in RFC 1952), widely used compression algorithm.</li>
 <li><code>br</code>: A new open-source compression algorithm designed specifically for HTTP content encoding.</li>
 </ul>
-<h3><span id="webpack-configuration-for-file-compression">Webpack Configuration for File Compression</span></h3>
-<p>Webpack essentially performs the first step of HTTP compression. You can use the <code>CompressionPlugin</code> for this purpose.</p>
+<h3><span id="webpack-configuration-for-file-compression">Webpack Configuration for File Compression</span></h3><p>Webpack essentially performs the first step of HTTP compression. You can use the <code>CompressionPlugin</code> for this purpose.</p>
 <p>Step 1: Install <code>CompressionPlugin</code>:</p>
 <pre class="line-numbers language-none"><code class="language-none">npm install compression-webpack-plugin -D<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Step 2: Use <code>CompressionPlugin</code> in your Webpack configuration:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -1082,25 +1055,18 @@ The process of HTTP compression is as follows:</p>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Let’s talk about why optimization is necessary. If your project is small and builds quickly, you might not need to worry too much about performance optimization. However, as your project grows with more pages, features, and business logic, the build time of webpack, the underlying build tool, also increases. At this point, optimizing performance becomes crucial.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Let’s talk about why optimization is necessary. If your project is small and builds quickly, you might not need to worry too much about performance optimization. However, as your project grows with more pages, features, and business logic, the build time of webpack, the underlying build tool, also increases. At this point, optimizing performance becomes crucial.</p>
 <p>Webpack offers various avenues for performance optimization, which can be broadly categorized into two areas:</p>
-<p>Optimization One: Optimizing the built result for production, focusing on performance during deployment (e.g., code splitting, reducing bundle size, using CDN servers, etc.).<br>
-Optimization Two: Optimizing build speed for development or production build, enhancing the speed of the build process (e.g., using exclusion, cache loaders, etc.).<br>
-The performance during production directly affects user experience, whereas build time is closely related to developers’ daily workflow. If the local development server or production build takes too long, it significantly hampers productivity.</p>
-<h2><span id="performance-optimization-code-splitting">Performance Optimization - Code Splitting</span></h2>
-<p>Code splitting is a critical feature in webpack:</p>
-<p>Its primary purpose is to separate code into different bundles, which can be loaded on demand or in parallel.<br>
-By default, all JavaScript code (business logic, third-party dependencies, and modules not immediately used) is loaded on the initial page load, impacting the loading speed.<br>
-Code splitting allows creating smaller bundles and controlling resource loading priorities, thereby enhancing code loading performance.</p>
+<p>Optimization One: Optimizing the built result for production, focusing on performance during deployment (e.g., code splitting, reducing bundle size, using CDN servers, etc.).<br>Optimization Two: Optimizing build speed for development or production build, enhancing the speed of the build process (e.g., using exclusion, cache loaders, etc.).<br>The performance during production directly affects user experience, whereas build time is closely related to developers’ daily workflow. If the local development server or production build takes too long, it significantly hampers productivity.</p>
+<h2><span id="performance-optimization-code-splitting">Performance Optimization - Code Splitting</span></h2><p>Code splitting is a critical feature in webpack:</p>
+<p>Its primary purpose is to separate code into different bundles, which can be loaded on demand or in parallel.<br>By default, all JavaScript code (business logic, third-party dependencies, and modules not immediately used) is loaded on the initial page load, impacting the loading speed.<br>Code splitting allows creating smaller bundles and controlling resource loading priorities, thereby enhancing code loading performance.</p>
 <p>Webpack provides three common approaches to code splitting:</p>
 <ul>
 <li><strong>Entry Points: Manually splitting code using entry configuration</strong></li>
 <li><strong>Preventing Duplication: Avoiding duplicate code using Entry Dependencies or SplitChunksPlugin</strong></li>
 <li><strong>Dynamic Imports: Splitting code using inline functions in modules</strong></li>
 </ul>
-<h3><span id="optimizing-entry-points-entry-dependencies">Optimizing Entry Points - Entry Dependencies</span></h3>
-<p>When a project has multiple entry points, there might be issues with duplicate dependencies. Some modules might be referenced in multiple entry points, causing redundancy in the final output, increasing the output file size.</p>
+<h3><span id="optimizing-entry-points-entry-dependencies">Optimizing Entry Points - Entry Dependencies</span></h3><p>When a project has multiple entry points, there might be issues with duplicate dependencies. Some modules might be referenced in multiple entry points, causing redundancy in the final output, increasing the output file size.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
     <span class="token literal-property property">page1</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1118,8 +1084,8 @@ Code splitting allows creating smaller bundles and controlling resource loading 
     <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="dynamic-imports">Dynamic Imports</span></h3>
-<p>Dynamic imports are a technique in webpack for lazy loading, allowing modules to load asynchronously at runtime instead of bundling all modules into a large initial file. This approach improves the initial loading speed and reduces the initial bundle size.</p>
+
+<h3><span id="dynamic-imports">Dynamic Imports</span></h3><p>Dynamic imports are a technique in webpack for lazy loading, allowing modules to load asynchronously at runtime instead of bundling all modules into a large initial file. This approach improves the initial loading speed and reduces the initial bundle size.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1142,7 +1108,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>In the above configuration, code splitting is achieved using <code>optimization.splitChunks</code> with the option <code>chunks: 'all'</code>.</p>
+
+<p>In the above configuration, code splitting is achieved using <code>optimization.splitChunks</code> with the option <code>chunks: &#39;all&#39;</code>.</p>
 <p>Then, dynamic imports can be used in the code like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Dynamically import modules where needed</span>
 <span class="token keyword">const</span> <span class="token function-variable function">loadModule</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token keyword">import</span><span class="token punctuation">(</span><span class="token string">'./Module'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1150,9 +1117,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token function">loadModule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">module</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Use the loaded module</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Webpack will split the modules imported using <code>import()</code> into separate files. These files will be loaded asynchronously when needed during runtime.</p>
-<h3><span id="custom-bundle-splitting-splitchunks">Custom Bundle Splitting - SplitChunks</span></h3>
-<p>Bundle splitting is an optimization strategy that allows breaking down code into smaller pieces, enabling faster content display during loading.</p>
+<h3><span id="custom-bundle-splitting-splitchunks">Custom Bundle Splitting - SplitChunks</span></h3><p>Bundle splitting is an optimization strategy that allows breaking down code into smaller pieces, enabling faster content display during loading.</p>
 <p>Webpack provides various strategies for bundle splitting, one of which involves using the <code>SplitChunksPlugin</code> plugin. This strategy is known as <code>splitChunks</code>.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...other configurations</span>
@@ -1180,22 +1147,21 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>For more information, refer to the <a target="_blank" rel="noopener" href="https://webpack.js.org/plugins/split-chunks-plugin/">webpack-split-chunks-plugin documentation</a>.</p>
 <hr>
-<h2><span id="performance-optimization-cdn">Performance Optimization - CDN</span></h2>
-<p>CDN, or Content Delivery Network, refers to a network of interconnected servers strategically placed to deliver content to users efficiently. It ensures faster and more reliable delivery of resources such as music, images, videos, applications, and other files by utilizing servers closest to each user, providing high performance, scalability, and low-cost content delivery.</p>
+<h2><span id="performance-optimization-cdn">Performance Optimization - CDN</span></h2><p>CDN, or Content Delivery Network, refers to a network of interconnected servers strategically placed to deliver content to users efficiently. It ensures faster and more reliable delivery of resources such as music, images, videos, applications, and other files by utilizing servers closest to each user, providing high performance, scalability, and low-cost content delivery.</p>
 <p>In development, CDN is typically used in two ways:</p>
 <ul>
 <li>All static resources are bundled and stored on a CDN server, and users load resources exclusively through the CDN.</li>
 <li>Some third-party resources are hosted on CDN servers.</li>
 </ul>
 <p>Utilizing a Content Delivery Network (CDN) is a highly effective performance optimization strategy, especially within Webpack. CDN accelerates website loading speed, reduces server load, and enhances user experience. Here’s how you can configure and use CDN in Webpack:</p>
-<h3><span id="using-cdn-for-third-party-libraries">Using CDN for Third-Party Libraries</span></h3>
-<p>Integrate third-party libraries used in your project (such as React, Vue, jQuery, etc.) through CDN links directly in the HTML file:</p>
+<h3><span id="using-cdn-for-third-party-libraries">Using CDN for Third-Party Libraries</span></h3><p>Integrate third-party libraries used in your project (such as React, Vue, jQuery, etc.) through CDN links directly in the HTML file:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@version/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@version/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="configuring-externals-in-webpack">Configuring Externals in Webpack</span></h3>
-<p>In your Webpack configuration, utilize the <code>externals</code> field to inform Webpack about externally referenced modules that shouldn’t be bundled:</p>
+
+<h3><span id="configuring-externals-in-webpack">Configuring Externals in Webpack</span></h3><p>In your Webpack configuration, utilize the <code>externals</code> field to inform Webpack about externally referenced modules that shouldn’t be bundled:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...other configurations</span>
   <span class="token literal-property property">externals</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1203,11 +1169,12 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token string-property property">'react-dom'</span><span class="token operator">:</span> <span class="token string">'ReactDOM'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Then, include the CDN links in the HTML file using script tags:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@version/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@version/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="configuring-cdns-publicpath">Configuring CDN’s publicPath</span></h3>
-<p>In the Webpack <code>output</code> field, set the <code>publicPath</code> to specify the URL prefix for resource imports, typically set to the CDN’s address:</p>
+
+<h3><span id="configuring-cdns-publicpath">Configuring CDN’s publicPath</span></h3><p>In the Webpack <code>output</code> field, set the <code>publicPath</code> to specify the URL prefix for resource imports, typically set to the CDN’s address:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...other configurations</span>
   <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1215,11 +1182,10 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'https://cdn.example.com/'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>This way, during Webpack build, all resource paths will be prefixed with the CDN’s address.</p>
-<h2><span id="performance-optimization-extracting-css-files">Performance Optimization - Extracting CSS Files</span></h2>
-<p>Extracting CSS files from JavaScript bundles is a common performance optimization strategy. This approach reduces the size of JavaScript files, speeds up page loading, and allows browsers to download CSS and JavaScript files in parallel, enhancing loading performance. In Webpack, you can achieve this using the <code>mini-css-extract-plugin</code> plugin.</p>
-<h3><span id="webpack-configuration">Webpack Configuration</span></h3>
-<p>In your Webpack configuration file, include the <code>mini-css-extract-plugin</code> plugin and configure the <code>module.rules</code> to handle CSS files:</p>
+<h2><span id="performance-optimization-extracting-css-files">Performance Optimization - Extracting CSS Files</span></h2><p>Extracting CSS files from JavaScript bundles is a common performance optimization strategy. This approach reduces the size of JavaScript files, speeds up page loading, and allows browsers to download CSS and JavaScript files in parallel, enhancing loading performance. In Webpack, you can achieve this using the <code>mini-css-extract-plugin</code> plugin.</p>
+<h3><span id="webpack-configuration">Webpack Configuration</span></h3><p>In your Webpack configuration file, include the <code>mini-css-extract-plugin</code> plugin and configure the <code>module.rules</code> to handle CSS files:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> MiniCssExtractPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'mini-css-extract-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1244,42 +1210,40 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="including-css-files">Including CSS Files</span></h3>
-<p>In your JavaScript files or entry point file, import the CSS file:</p>
+
+<h3><span id="including-css-files">Including CSS Files</span></h3><p>In your JavaScript files or entry point file, import the CSS file:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token string">'./styles.css'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Alternatively, in the HTML file, use the link tag to include the extracted CSS file:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>stylesheet<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>styles.css<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<h2><span id="performance-optimization-bundling-file-naming-hash-contenthash-chunkhash">Performance Optimization - Bundling File Naming (Hash, ContentHash, ChunkHash)</span></h2>
-<p>In Webpack, how files are named during bundling is a crucial performance optimization strategy. Proper naming ensures that browsers can cache files correctly, avoiding unnecessary network requests and improving application loading speed. Here are three common bundling file naming techniques: Hash, ContentHash, and ChunkHash.</p>
-<h3><span id="hash">Hash</span></h3>
-<p>Hash is generated based on file content. When file content changes, its corresponding hash value also changes. In Webpack, you can use the <code>[hash]</code> placeholder to represent the hash value.</p>
+
+<h2><span id="performance-optimization-bundling-file-naming-hash-contenthash-chunkhash">Performance Optimization - Bundling File Naming (Hash, ContentHash, ChunkHash)</span></h2><p>In Webpack, how files are named during bundling is a crucial performance optimization strategy. Proper naming ensures that browsers can cache files correctly, avoiding unnecessary network requests and improving application loading speed. Here are three common bundling file naming techniques: Hash, ContentHash, and ChunkHash.</p>
+<h3><span id="hash">Hash</span></h3><p>Hash is generated based on file content. When file content changes, its corresponding hash value also changes. In Webpack, you can use the <code>[hash]</code> placeholder to represent the hash value.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[hash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="contenthash">ContentHash</span></h3>
-<p>ContentHash is generated based on file content as well, but unlike Hash, it’s solely influenced by file content and remains unaffected by file name or path changes. In Webpack, you can use the <code>[contenthash]</code> placeholder to represent the ContentHash value.</p>
+
+<h3><span id="contenthash">ContentHash</span></h3><p>ContentHash is generated based on file content as well, but unlike Hash, it’s solely influenced by file content and remains unaffected by file name or path changes. In Webpack, you can use the <code>[contenthash]</code> placeholder to represent the ContentHash value.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[contenthash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="chunkhash">ChunkHash</span></h3>
-<p>ChunkHash is generated based on module content. Different module contents result in different ChunkHash values. In Webpack, you can use the <code>[chunkhash]</code> placeholder to represent the ChunkHash value.</p>
+
+<h3><span id="chunkhash">ChunkHash</span></h3><p>ChunkHash is generated based on module content. Different module contents result in different ChunkHash values. In Webpack, you can use the <code>[chunkhash]</code> placeholder to represent the ChunkHash value.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[name].[chunkhash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2><span id="performance-optimization-implementing-tree-shaking-in-webpack">Performance Optimization - Implementing Tree Shaking in Webpack</span></h2>
-<p>JavaScript Tree Shaking:</p>
+
+<h2><span id="performance-optimization-implementing-tree-shaking-in-webpack">Performance Optimization - Implementing Tree Shaking in Webpack</span></h2><p>JavaScript Tree Shaking:</p>
 <p>Tree Shaking in JavaScript originates from the rollup bundler, a build tool. It relies on the static syntax analysis of ES Modules (no code execution) to determine module dependencies.</p>
 <p>Webpack 2 introduced native support for ES2015 modules, enhancing tree shaking capabilities. Webpack 4 extended this ability and introduced the <code>sideEffects</code> property in package.json to indicate which files have no side effects, allowing webpack to safely remove unused code.</p>
 <p>In Webpack 5, partial CommonJS tree shaking support was introduced.</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/webpack/changelog-v5#commonjs-tree-shaking">CommonJS Tree Shaking</a></p>
-<h3><span id="implementing-tree-shaking-in-javascript">Implementing Tree Shaking in JavaScript</span></h3>
-<p>Webpack implements Tree Shaking through two methods:</p>
+<h3><span id="implementing-tree-shaking-in-javascript">Implementing Tree Shaking in JavaScript</span></h3><p>Webpack implements Tree Shaking through two methods:</p>
 <ul>
 <li><strong>usedExports:</strong> Marking certain functions as used and optimizing them using Terser.</li>
-<li><strong>sideEffects:</strong> Skipping entire modules/files and checking if they have side effects.</li>
+<li><strong>sideEffects:</strong> Skipping entire modules&#x2F;files and checking if they have side effects.</li>
 </ul>
-<h3><span id="tree-shaking-for-css">Tree Shaking for CSS</span></h3>
-<p>Tree Shaking for CSS involves using additional plugins. While PurifyCss was used previously, it’s no longer maintained. An alternative is PurgeCSS, a tool for removing unused CSS.</p>
+<h3><span id="tree-shaking-for-css">Tree Shaking for CSS</span></h3><p>Tree Shaking for CSS involves using additional plugins. While PurifyCss was used previously, it’s no longer maintained. An alternative is PurgeCSS, a tool for removing unused CSS.</p>
 <hr>
 <p><strong>Note:</strong> This translation includes placeholder strings like <code>[hash]</code>, <code>[contenthash]</code>, and <code>[chunkhash]</code> to represent dynamic values. Please replace these placeholders with appropriate values based on your specific use case.</p>
 
@@ -1317,8 +1281,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2 id="Introduction">Introduction</h2>
-<p>When learning to write web pages, you usually start with HTML and CSS, which are responsible for creating and beautifying the layout. Once you have a solid foundation, you start learning JavaScript to create interactive effects. In addition to user and browser interactions, don’t forget about the interaction between the client and server, which means you must learn how to use JavaScript to retrieve data from the backend server. Otherwise, your web page data will be static.</p>
+        <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>When learning to write web pages, you usually start with HTML and CSS, which are responsible for creating and beautifying the layout. Once you have a solid foundation, you start learning JavaScript to create interactive effects. In addition to user and browser interactions, don’t forget about the interaction between the client and server, which means you must learn how to use JavaScript to retrieve data from the backend server. Otherwise, your web page data will be static.</p>
 <p>The main target audience of this article is beginners in web front-end development. I hope that after reading this article, readers who do not understand how to exchange data with the server or how to connect to APIs can have a better understanding of how to connect to the backend.</p>
         <p class="article-more-link">
             <a href="/2017/08/27/en/ajax-and-cors/#more">Read More</a>

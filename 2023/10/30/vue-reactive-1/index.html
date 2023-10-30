@@ -23,16 +23,16 @@
 
 
 
-    <meta name="description" content="引言 响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。 响应式数据与副作用函数 副作用函数指的是会产生副作用的函数，如下面的代码所示： function effect() &amp;#123;   document.body.innerText &#x3D; &#39;hello vue3&#39; &amp;#125; 当 effect 函数">
+    <meta name="description" content="引言响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。 响应式数据与副作用函数副作用函数指的是会产生副作用的函数，如下面的代码所示： function effect() &amp;#123;   document.body.innerText &#x3D; &#39;hello vue3&#39; &amp;#125;  当 effect 函数执">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue.js 响应式系统的作用与实现">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/30/vue-reactive-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="引言 响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。 响应式数据与副作用函数 副作用函数指的是会产生副作用的函数，如下面的代码所示： function effect() &amp;#123;   document.body.innerText &#x3D; &#39;hello vue3&#39; &amp;#125; 当 effect 函数">
+<meta property="og:description" content="引言响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。 响应式数据与副作用函数副作用函数指的是会产生副作用的函数，如下面的代码所示： function effect() &amp;#123;   document.body.innerText &#x3D; &#39;hello vue3&#39; &amp;#125;  当 effect 函数执">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-30T09:20:32.000Z">
-<meta property="article:modified_time" content="2023-10-30T15:16:35.227Z">
+<meta property="article:modified_time" content="2023-10-30T16:01:16.391Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary_large_image">
@@ -235,13 +235,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
-<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2>
-<p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
+        <h2><span id="引言">引言</span></h2><p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
+<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2><p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>当 effect 函数执行时，它会设置 body 的文本内容，但除了effect 函数之外的任何函数都可以读取或设置 body 的文本内容。也就是说，effect 函数的执行会直接或间接影响其他函数的执行，这时我们说 effect 函数产生了副作用。</p>
 <p>其实副作用函数并不少见，我们前面在讨论webpack的 <code>tree shaking</code> 话题里面涉及到的是否进行数据流处理对 <code>tree shaking</code> 的效果是不可忽略的。这边不再赘述。</p>
 <p>副作用很容易产生，例如一个函数修改了全局变量，这其实也是一个副作用，如下面的代码所示：</p>
@@ -250,16 +249,17 @@
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   val <span class="token operator">=</span> <span class="token number">2</span> <span class="token comment">// 修改全局变量，产生副作用</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>理解了什么是副作用函数，再来说说什么是响应式数据。假设在一个副作用函数中读取了某个对象的属性：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span>
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// effect 函数的执行会读取 obj.text</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>副作用函数 effect 会设置 body 元素的 <code>innerText</code> 属性，其值为 <code>obj.text</code>，当 <code>obj.text</code> 的值发生变化时，我们希望副作用函数 effect 会重新执行。</p>
 <p>那这样我们的思路就变成了：通过一些手段，在读取 <code>obj.text</code> 值的时候可以将effect函数储存进一个bucket里面，而在设置<code>obj.text</code> 值的时候可以在bucket里面把effect拿出来执行。</p>
-<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2>
-<p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
+<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2><p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
 <ul>
 <li>当副作用函数 effect 执行时，会触发字段 obj.text 的读取操作；</li>
 <li>当修改 obj.text 的值时，会触发字段 obj.text 的设置操作。</li>
@@ -282,14 +282,11 @@
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这样我们就基于 proxy 创建了一个用于存储副作用函数，并且我们使用了一个proxyMap，这是一个可以把各类型的proxy储存起来的容器。我们分别设置了 get 和 set 拦截函数，用于拦截读取和设置操作。</p>
-<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2>
-<p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
+<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2><p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
 <ul>
-<li>
-<p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
+<li><p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
 </li>
-<li>
-<p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
+<li><p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
 </li>
 </ul>
 <p>下面通过一个简单的响应式系统实现来讲解原理：</p>
@@ -320,13 +317,15 @@
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>
-例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
-<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键/值对的集合</a></p>
+<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
+<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键&#x2F;值对的集合</a></p>
+<p> WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
+<p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//Map存放不同类型的代理</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>定义好了上面的几种bucket，我们开始实现响应式系统最核心的部分，也就是proxy的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 核心就是 proxy</span>
@@ -344,6 +343,7 @@
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>对于前面的trick和trigger：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -393,6 +393,7 @@
   <span class="token comment">// 这里的目前应该是为了 triggerEffects 这个函数的复用</span>
   <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 
     
     </div>
