@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Webpack v4 introduced a new feature called sideEffects, which allows you to declare in your package.json whether a package&#x2F;module contains side effects or not. This declaration provides more opti">
+    <meta name="description" content="Webpack v4 introduced a new feature called sideEffects, which allows you to declare in your package.json whether a package&#x2F;module contains side effects or not. This declaration provides more optimizat">
 <meta property="og:type" content="article">
 <meta property="og:title" content="How to Use &#96;sideEffects&#96; in Webpack">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/27/en/Webpack-optimization-3/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Webpack v4 introduced a new feature called sideEffects, which allows you to declare in your package.json whether a package&#x2F;module contains side effects or not. This declaration provides more opti">
+<meta property="og:description" content="Webpack v4 introduced a new feature called sideEffects, which allows you to declare in your package.json whether a package&#x2F;module contains side effects or not. This declaration provides more optimizat">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-27T15:57:21.000Z">
@@ -230,17 +230,19 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <p>Webpack v4 introduced a new feature called <code>sideEffects</code>, which allows you to declare in your <code>package.json</code> whether a package&#x2F;module contains side effects or not. This declaration provides more optimization space for tree-shaking.</p>
-<p>In the conventional understanding of side effects, if we are certain that the modules within our package have no side effects, we can mark the package in <code>npm</code> with <code>&quot;sideEffects&quot;: false</code> in <code>package.json</code>. This allows us to offer a better bundling experience for consumers. The principle behind this is that Webpack can transform imports like <code>import &#123;a&#125; from xx</code> into <code>import &#123;a&#125; from &#39;xx/a&#39;</code> for packages marked as side-effects-free, automatically trimming unnecessary imports, similar to <code>babel-plugin-import</code>.</p>
-<h2><span id="tree-shaking-and-side-effects">Tree Shaking and Side Effects</span></h2><p>Tree shaking, first introduced and implemented by Rollup in the frontend community, has been a topic of discussion in various articles about optimizing bundling. </p>
-<h3><span id="principles-of-tree-shaking">Principles of Tree Shaking</span></h3><p>ES6 module imports are statically analyzable, meaning the compiler can accurately determine what code is loaded during compilation. The program flow is analyzed to identify unused or unreferenced variables, which are then removed from the code.</p>
+        <p>Webpack v4 introduced a new feature called <code>sideEffects</code>, which allows you to declare in your <code>package.json</code> whether a package/module contains side effects or not. This declaration provides more optimization space for tree-shaking.</p>
+<p>In the conventional understanding of side effects, if we are certain that the modules within our package have no side effects, we can mark the package in <code>npm</code> with <code>&quot;sideEffects&quot;: false</code> in <code>package.json</code>. This allows us to offer a better bundling experience for consumers. The principle behind this is that Webpack can transform imports like <code>import &#123;a&#125; from xx</code> into <code>import &#123;a&#125; from 'xx/a'</code> for packages marked as side-effects-free, automatically trimming unnecessary imports, similar to <code>babel-plugin-import</code>.</p>
+<h2><span id="tree-shaking-and-side-effects">Tree Shaking and Side Effects</span></h2>
+<p>Tree shaking, first introduced and implemented by Rollup in the frontend community, has been a topic of discussion in various articles about optimizing bundling.</p>
+<h3><span id="principles-of-tree-shaking">Principles of Tree Shaking</span></h3>
+<p>ES6 module imports are statically analyzable, meaning the compiler can accurately determine what code is loaded during compilation. The program flow is analyzed to identify unused or unreferenced variables, which are then removed from the code.</p>
 <p>The principle sounds perfect, so why do we sometimes find that unnecessary code in our projects isn’t eliminated? The reason is side effects.</p>
-<h3><span id="side-effects">Side Effects</span></h3><p>For those familiar with functional programming, the term “side effect” is not unfamiliar. It can be broadly understood as any action of a function that might or might not affect variables outside its scope.</p>
+<h3><span id="side-effects">Side Effects</span></h3>
+<p>For those familiar with functional programming, the term “side effect” is not unfamiliar. It can be broadly understood as any action of a function that might or might not affect variables outside its scope.</p>
 <p>For example, consider this function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span><span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>This function modifies the global variable <code>location</code> and even triggers a browser redirect, making it a function with side effects.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// components.js</span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
@@ -269,7 +271,6 @@
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getModel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>appleModel<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>In this code, the <code>Person</code> class is clearly unused. However, why can other tools like Rollup successfully eliminate unused code, while Webpack cannot?</p>
 <p>The answer lies in <strong>Babel compilation + Webpack bundling</strong>.</p>
 <p>I’ll provide a link here that explains in detail how Babel compilation + Webpack bundling might prevent effective code elimination: <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32831172">Your Tree-Shaking Isn’t Working</a>.</p>
@@ -284,16 +285,18 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>During compilation, you might receive this warning: <code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code>.</p>
 <p>The reason is that UglifyJS doesn’t perform complete program flow analysis. It doesn’t remove code because you noticed a side effect. If you want a more sophisticated tree shaking, go check out Rollup!</p>
 <p>Summarizing some key points from the issue:</p>
 <ul>
-<li><p>If a function’s parameter is a reference type, any operations on its properties could potentially have side effects. This is because it’s a reference type, and any modification to its properties affects data outside the function. Additionally, accessing or modifying its properties triggers <code>getter</code> or <code>setter</code>, which are opaque and may have side effects.</p>
+<li>
+<p>If a function’s parameter is a reference type, any operations on its properties could potentially have side effects. This is because it’s a reference type, and any modification to its properties affects data outside the function. Additionally, accessing or modifying its properties triggers <code>getter</code> or <code>setter</code>, which are opaque and may have side effects.</p>
 </li>
-<li><p>UglifyJS lacks complete program flow analysis. It can simple judge whether a variable is later referenced or modified but cannot determine the complete modification process of a variable. It doesn’t know if it points to an external variable, so many potentially side-effect-causing code cannot be removed.</p>
+<li>
+<p>UglifyJS lacks complete program flow analysis. It can simple judge whether a variable is later referenced or modified but cannot determine the complete modification process of a variable. It doesn’t know if it points to an external variable, so many potentially side-effect-causing code cannot be removed.</p>
 </li>
-<li><p>Rollup has the ability to perform program flow analysis, making it better at determining whether code truly has side effects.</p>
+<li>
+<p>Rollup has the ability to perform program flow analysis, making it better at determining whether code truly has side effects.</p>
 </li>
 </ul>
 <p>However, these issues were prevalent in older versions. The current Webpack <code>tree shaking</code> has undergone many optimizations and can perform sufficient program flow analysis for <code>tree shaking</code>.</p>
@@ -309,7 +312,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>When using <code>app.js</code> as the entry point, the code after tree shaking becomes:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -322,7 +324,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>After combining Webpack’s <code>scope hoisting</code> and <code>uglify</code>, all traces of module <code>b</code> will be completely eliminated.</p>
 <p>But what if module <code>b</code> contains some side effects, such as a simple log:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
@@ -335,7 +336,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <p>Although the export of module <code>b</code> is ignored, the code with side effects is retained.</p>
 <p>Due to various strange operations introduced by the <code>transformer</code> after compilation, which may cause side effects, we often find that even with tree shaking, our <code>bundle size</code> doesn’t significantly decrease.</p>
 <p>Usually, we expect that if module <code>b</code> is not being used, none of its code should be included.</p>
-<p>This is where the role of <code>sideEffects</code> becomes apparent: if the imported package&#x2F;module is marked as <code>&quot;sideEffects: false&quot;</code>, regardless of whether it truly has side effects, as long as it’s not being referenced, the entire module&#x2F;package will be completely removed.</p>
+<p>This is where the role of <code>sideEffects</code> becomes apparent: if the imported package/module is marked as <code>&quot;sideEffects: false&quot;</code>, regardless of whether it truly has side effects, as long as it’s not being referenced, the entire module/package will be completely removed.</p>
 <p>Taking <code>mobx-react-devtools</code> as an example, we often use it like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 
@@ -349,10 +350,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>This is a common scenario of importing modules on demand. However, without the <code>sideEffects: false</code> configuration, even if <code>NODE_ENV</code> is set to <code>production</code>, the bundled code will still include the <code>mobx-react-devtools</code> package. Although we haven’t used any of its exported members, <code>mobx-react-devtools</code> will still be imported because it “might” have side effects.</p>
 <p>But when we add <code>sideEffects: false</code>, tree shaking can safely remove it entirely from the bundle.</p>
-<h2><span id="use-cases-of-sideeffects">Use Cases of sideEffects</span></h2><p>As mentioned earlier, it’s often difficult to guarantee whether packages&#x2F;modules published on npm contain side effects (it could be the code’s fault or the transformer’s fault). However, we can usually ensure whether a package&#x2F;module will affect objects outside of it, such as modifying properties on the <code>window</code> object or overwriting native object methods. If we can guarantee this, we can determine whether a package can have <code>&quot;sideEffects: false&quot;</code>. Whether it truly has side effects is not that important for Webpack; it’s acceptable as long as it’s marked.</p>
+<h2><span id="use-cases-of-sideeffects">Use Cases of sideEffects</span></h2>
+<p>As mentioned earlier, it’s often difficult to guarantee whether packages/modules published on npm contain side effects (it could be the code’s fault or the transformer’s fault). However, we can usually ensure whether a package/module will affect objects outside of it, such as modifying properties on the <code>window</code> object or overwriting native object methods. If we can guarantee this, we can determine whether a package can have <code>&quot;sideEffects: false&quot;</code>. Whether it truly has side effects is not that important for Webpack; it’s acceptable as long as it’s marked.</p>
 <p>This explains why packages with inherent side effects, like <code>vue</code>, can still have <code>&quot;sideEffects: false&quot;</code> applied.</p>
 <p>So, in Webpack, <code>&quot;sideEffects: false&quot;</code> doesn’t mean that the module truly has no side effects. It’s just a way to tell Webpack during tree shaking: “I designed this package with the expectation that it has no side effects, even if it ends up having side effects after being bundled.”</p>
 
