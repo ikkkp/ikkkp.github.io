@@ -9,8 +9,22 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/10/29/webpack-plugin-design/</loc>
-        <lastmod>2023-10-29T09:18:28.881Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/10/30/en/vue-reactive-1/</loc>
+        <lastmod>2023-10-30T15:21:12.486Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/30/vue-reactive-1/</loc>
+        <lastmod>2023-10-30T15:16:35.227Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -24,7 +38,21 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/10/29/en/webpack-plugin-design/</loc>
-        <lastmod>2023-10-29T09:18:24.562Z</lastmod>
+        <lastmod>2023-10-29T09:21:12.932Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/29/webpack-plugin-design/</loc>
+        <lastmod>2023-10-29T09:18:28.881Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

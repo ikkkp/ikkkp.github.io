@@ -23,16 +23,16 @@
 
 
 
-    <meta name="description" content="IntroductionA loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the Loader API and can be accessed thro">
+    <meta name="description" content="Introduction A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the Loader API and can be accessed thr">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Webpack Custom Loader&#x2F;Plugin">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/29/en/webpack-plugin-design/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="IntroductionA loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the Loader API and can be accessed thro">
+<meta property="og:description" content="Introduction A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the Loader API and can be accessed thr">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-29T06:50:05.000Z">
-<meta property="article:modified_time" content="2023-10-29T09:18:24.562Z">
+<meta property="article:modified_time" content="2023-10-29T09:21:12.932Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Webpack">
 <meta name="twitter:card" content="summary_large_image">
@@ -261,7 +261,7 @@
     <div class="container">
       
       <div data-nosnippet class="self-notice">
-        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="" target="_blank">feedback form</a>
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
       </div>
       
     <article class="article content gallery" itemscope itemprop="blogPost">
@@ -288,9 +288,11 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2><p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
+        <h2><span id="introduction">Introduction</span></h2>
+<p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
 <p>Here is an official link on <a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader usage and examples, including local development and testing of custom loaders</a>.</p>
-<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2><p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
+<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2>
+<p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
 <p>Synchronous loaders can return a single value representing the transformed module.</p>
 <p>Loaders can return one or two values. The first value is a string or buffer containing JavaScript code. The optional second value is a SourceMap, which is a JavaScript object.</p>
 <p>Here’s a simple example of using a loader. It matches all JavaScript files and processes them using <code>loader.js</code>:</p>
@@ -314,16 +316,16 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>From the above, we can understand how loaders are used. But this only scratches the surface. What does a specific loader look like?</p>
 <p>For example, a simple loader could be like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 	<span class="token comment">// content is the source content string passed in</span>
   <span class="token keyword">return</span> content
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>A loader is just a node module exposing a function that can only receive one parameter: a string containing the content of the resource file. The function’s return value is the processed content.</p>
-<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2><h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3><p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
+<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2>
+<h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3>
+<p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
 <ul>
 <li>Keep it <strong>simple</strong>.</li>
 <li>Use <strong>chaining</strong>.</li>
@@ -336,20 +338,22 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Avoid <strong>absolute paths</strong>.</li>
 <li>Use <strong>peer dependencies</strong>.</li>
 </ul>
-<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following files in a folder within your webpack project directory:</p>
+<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
+<p>First, create the following files in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/loader/custom-loader.js</code>: The source file for your custom loader.</li>
 <li><code>src/index.js</code>: JavaScript entry file for testing the custom loader.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3><p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
+<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3>
+<p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
 module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// Add a custom comment at the top of the source code</span>
     <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
+<p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -369,9 +373,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token punctuation">]</span><span class="token punctuation">,</span>
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>This configuration achieves a simple functionality. Now let’s discuss how to test the local loader. There are two ways to do this: one is through <code>Npm link</code> for testing, a convenient method where you can create a symbolic link for local testing. Here is a link to <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>. Another way is to configure the path directly in the project:</p>
-<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
   <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -381,8 +385,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4><p>You can also configure it using an array:</p>
+<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4>
+<p>You can also configure it using an array:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Look for loaders first in the node_modules directory; if not found, search in the loaders directory</span>
@@ -391,14 +395,13 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3><p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
+<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3>
+<p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3><p>Run the following command to build your project:</p>
+<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3>
+<p>Run the following command to build your project:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>After the build is complete, you will find the generated <code>bundle.js</code> file in the <code>dist</code> folder. In this file, you can see JavaScript code with a custom comment added at the top.</p>
 <pre class="line-numbers language-none"><code class="language-none">
 
@@ -426,19 +429,23 @@ module.exports &#x3D; &#123;
         &#x2F;&#x2F; You can add more plugins here
     ],
 &#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>In this example, the <code>HtmlWebpackPlugin</code> is used. It generates a new HTML file based on the specified HTML template and automatically adds the bundled JavaScript file to the generated HTML file.</p>
 <p>A basic webpack plugin consists of the following components:</p>
 <ul>
-<li><p>A JavaScript named function or JavaScript class.</p>
+<li>
+<p>A JavaScript named function or JavaScript class.</p>
 </li>
-<li><p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
+<li>
+<p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
 </li>
-<li><p>Specify an event hook bound to webpack itself.</p>
+<li>
+<p>Specify an event hook bound to webpack itself.</p>
 </li>
-<li><p>Process specific data from webpack’s internal instances.</p>
+<li>
+<p>Process specific data from webpack’s internal instances.</p>
 </li>
-<li><p>Call the callback provided by webpack after the functionality is completed.</p>
+<li>
+<p>Call the callback provided by webpack after the functionality is completed.</p>
 </li>
 </ul>
 <p>A plugin structure looks like this:</p>
@@ -456,15 +463,18 @@ module.exports &#x3D; &#123;
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2>
+<p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
 <p>The <code>compiler</code> object is essentially bound to the entire webpack environment. It contains all the environment configurations, including options, loaders, and plugins. When webpack starts, this object is instantiated and it is <code>globally unique</code>. The parameters passed into the <code>apply</code> method are properties of this object.</p>
 <p>The <code>compilation</code> object is created each time resources are built. It represents the current module resources, compiled generated resources, changed files, and tracked dependency status. It also provides many hooks.</p>
-<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2><h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following file in a folder within your webpack project directory:</p>
+<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2>
+<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
+<p>First, create the following file in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/plugins/CustomPlugin.js</code>: Source file for your custom plugin.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3><p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
+<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3>
+<p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
 <span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
     <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -475,8 +485,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>In the configuration file, use the custom plugin you just created.</p>
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
+<p>In the configuration file, use the custom plugin you just created.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -491,8 +501,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// You can add more plugins here</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3><p>Now, run the webpack build:</p>
+<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3>
+<p>Now, run the webpack build:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
     
     </div>
@@ -505,7 +515,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     
     <div class="columns is-mobile is-multiline article-nav">
-        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2023/10/30/en/vue-reactive-1/">The Role and Implementation of Vue.js Reactive System</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
