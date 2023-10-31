@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/10/31/vue-effect/</loc>
+        <lastmod>2023-10-31T03:14:22.021Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/31/en/vue-effect/</loc>
+        <lastmod>2023-10-31T03:14:20.447Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/10/30/en/vue-reactive-1/</loc>
         <lastmod>2023-10-30T16:02:52.305Z</lastmod>
         <changefreq>weekly</changefreq>
