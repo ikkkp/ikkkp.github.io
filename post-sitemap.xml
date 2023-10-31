@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/01/en/vue-expired-side-effects/</loc>
+        <lastmod>2023-10-31T16:39:50.923Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/01/vue-expired-side-effects/</loc>
+        <lastmod>2023-10-31T16:38:19.013Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/10/31/en/vue-watch-computed/</loc>
         <lastmod>2023-10-31T16:12:38.432Z</lastmod>
         <changefreq>weekly</changefreq>

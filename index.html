@@ -177,6 +177,90 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/01/vue-expired-side-effects/" itemprop="url">vue-expired-side-effects</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-31T16:13:47.000Z" itemprop="datePublished">2023年11月1日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="引言">引言</span></h2><p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
+<p>例如，考虑以下的异步代码：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    data <span class="token operator">=</span> <span class="token string">'Fetched data'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出 undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在这个例子中，<code>fetchData</code> 函数是异步的，它在1秒后将数据赋给 <code>data</code> 变量。但是，由于 JavaScript 是单线程的，<code>fetchData</code> 函数会在主线程的事件队列中等待1秒，而在这1秒内，<code>console.log(data)</code> 语句会立即执行，此时 <code>data</code> 的值为 <code>undefined</code>，因为 <code>fetchData</code> 函数还未完成执行。</p>
+<p>在异步编程中，由于代码的非阻塞性质，会出现类似的竞态条件问题。在处理异步操作时，我们需要小心确保数据的一致性和正确性，避免在异步操作完成前就去访问或修改相关数据。</p>
+<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2><p>那么竞态问题跟我们响应式有什么联系呢？</p>
+<p>举个例子：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData
+<span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+<span class="token comment">// 发送并等待网络请求</span>
+<span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span>
+<span class="token comment">// 将请求结果赋值给 data</span>
+finalData <span class="token operator">=</span> res
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在这段代码中，我们使用 watch 观测 obj 对象的变化，每次 obj对象发生变化都会发送网络请求，例如请求接口数据，等数据请求成功之后，将结果赋值给 finalData 变量。观察上面的代码，乍一看似乎没什么问题。但仔细思考会发现这段代码会发生竞态问题。假设我们第一次修改 obj 对象的某个字段值，这会导致回调函数执行，同时发送了第一次请求 A。随着时间的推移，在请求 A 的结果返回之前，我们对 obj 对象的某个字段值进行了第二次修改，这会导致发送第二次请求 B。此时请求 A 和请求 B 都在进行中，那么哪一个请求会先返回结果呢？我们不确定，如果请求B 先于请求 A 返回结果，就会导致最终 finalData 中存储的是 A 请求的结果</p>
+<p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="对比"></p>
+<p>但由于请求 B 是后发送的，因此我们认为请求 B 返回的数据才是“最新”的，而请求 A 则应该被视为“过期”的，所以我们希望变量finalData 存储的值应该是由请求 B 返回的结果，而非请求 A 返回的结果。</p>
+<p>实际上，我们可以对这个问题做进一步总结。请求 A 是副作用函数第一次执行所产生的副作用，请求 B 是副作用函数第二次执行所产生的副作用。由于请求 B 后发生，所以请求 B 的结果应该被视为“最新”的，而请求 A 已经“过期”了，其产生的结果应被视为无效。通过这种方式，就可以避免竞态问题导致的错误结果。归根结底，我们需要的是一个让副作用过期的手段。为了让问题更加清晰，我们先拿 Vue.js 中的 watch 函数来复现场景，看看 Vue.js是如何帮助开发者解决这个问题的，然后尝试实现这个功能。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">newValue<span class="token punctuation">,</span> oldValue<span class="token punctuation">,</span> onInvalidate</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 定义一个标志，代表当前副作用函数是否过期，默认为 false，代表没有过期</span>
+  <span class="token keyword">let</span> expired <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// 调用 onInvalidate() 函数注册一个过期回调</span>
+  <span class="token function">onInvalidate</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 当过期时，将 expired 设置为 true</span>
+    expired <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 发送网络请求</span>
+  <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 只有当该副作用函数的执行没有过期时，才会执行后续操作。</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>expired<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
+    <span class="token comment">// 后续操作...</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>如上面的代码所示，在发送请求之前，我们定义了 expired 标志变量，用来标识当前副作用函数的执行是否过期；接着调用onInvalidate 函数注册了一个过期回调，当该副作用函数的执行过期时将 expired 标志变量设置为 true；最后只有当没有过期时才采用请求结果，这样就可以有效地避免上述问题了。</p>
+<p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="对比"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/10/31/vue-watch-computed/" itemprop="url">vue-watch-computed</a>
         
     </h1>
@@ -1508,43 +1592,23 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 
 
     
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+    
         
-            <a href="/2017/08/27/ajax-and-cors/" itemprop="url">輕鬆理解 Ajax 與跨來源請求</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2017-08-27T14:12:00.000Z" itemprop="datePublished">2017年8月27日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Front-end/">Front-end</a>
-        </span>
-        
-        
-        
+<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
+    <div class="pagination-previous is-invisible is-hidden-mobile">
+        <a href="/archives/0/">上一頁</a>
     </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一般來說在學習寫網頁的時候，最先碰到的會是 HTML 與 CSS，負責把版面刻出來以及美化版面，當基礎打穩之後，會開始學習 JavaScript，試著做出一點互動性的效果。而「互動」除了使用者跟瀏覽器的互動以外，別忘了還有 Client 端跟 Server 端的互動，也就是必須要學會從瀏覽器用 JavaScript 跟後端 Server 拿資料，否則你的網頁資料都只能是寫死的。</p>
-<p>這篇的主要預設讀者是網頁前端的初學者，希望能讓本來不太理解怎麼跟 Server 交換資料或是怎麼串 APi 的讀者看完之後，能夠更了解該怎麼跟後端串接。</p>
-        <p class="article-more-link">
-            <a href="/2017/08/27/ajax-and-cors/#more">閱讀更多</a>
-        </p>
-    
+    <div class="pagination-next">
+        <a href="/archives/2/">下一頁</a>
     </div>
-    
-    
-</article>
-
-
-
-
-    
+    <ul class="pagination-list is-hidden-mobile">
+        
+        <li><a class="pagination-link is-current" href="/">1</a></li>
+        
+        <li><a class="pagination-link" href="/archives/2/">2</a></li>
+        
+    </ul>
+</nav>
     
     </div>
 </section>

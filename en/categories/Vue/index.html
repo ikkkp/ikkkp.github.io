@@ -181,6 +181,91 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/01/en/vue-expired-side-effects/" itemprop="url">vue-expired-side-effects</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-31T16:13:47.000Z" itemprop="datePublished">1 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
+<p>For instance, consider the following asynchronous code:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    data <span class="token operator">=</span> <span class="token string">'Fetched data'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this example, the <code>fetchData</code> function is asynchronous, and it assigns the data to the <code>data</code> variable after 1 second. However, due to JavaScript’s single-threaded nature, the <code>fetchData</code> function waits in the main thread’s event queue for 1 second. Within this 1 second, the <code>console.log(data)</code> statement executes immediately, and at that point, the value of <code>data</code> is <code>undefined</code> because the <code>fetchData</code> function has not completed yet.</p>
+<p>In asynchronous programming, due to the non-blocking nature of the code, similar race condition issues can arise. When dealing with asynchronous operations, it’s crucial to ensure data consistency and correctness, avoiding accessing or modifying related data before the asynchronous operation is completed.</p>
+<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2><p>So, how are race conditions related to reactivity?</p>
+<p>Consider the following example:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData<span class="token punctuation">;</span>
+<span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Send and wait for a network request</span>
+  <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// Assign the request result to data</span>
+  finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this code snippet, we use the <code>watch</code> function to observe changes to the <code>obj</code> object. Every time the <code>obj</code> object changes, a network request, such as an API call, is sent. After the data request is successful, the result is assigned to the <code>finalData</code> variable. At first glance, this code might seem fine. However, upon closer inspection, you’ll realize that this code can lead to race condition problems. Let’s assume we modify a field of the <code>obj</code> object for the first time, triggering the callback function and sending the first request A. As time passes, before the result of request A returns, we modify a field of the <code>obj</code> object again, triggering the second request B. Now, both request A and request B are in progress. Which request will return its result first? We don’t know. If request B completes before request A, the finalData variable will store the result of request B, making request A’s result outdated.</p>
+<p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="Comparison"></p>
+<p>However, because request B was sent later, we consider its data as the “latest.” Request A is deemed “expired,” and its result should be invalidated. By ensuring that request B’s result is considered the latest, we can prevent errors caused by race conditions. Essentially, what we need is a way to expire side effects. To illustrate this concept further, let’s replicate the scenario using the <code>watch</code> function in Vue.js to see how Vue.js helps developers address this problem. Later, we’ll attempt to implement this functionality ourselves.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">newValue<span class="token punctuation">,</span> oldValue<span class="token punctuation">,</span> onInvalidate</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Define a flag to indicate whether the current side effect has expired, initially set to false (not expired)</span>
+  <span class="token keyword">let</span> expired <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// Call the onInvalidate() function to register an expiration callback</span>
+  <span class="token function">onInvalidate</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// When expired, set the expired flag to true</span>
+    expired <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Send a network request</span>
+  <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Perform subsequent operations only if the side effect has not expired</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>expired<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
+    <span class="token comment">// Subsequent operations...</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
+<p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/10/31/en/vue-watch-computed/" itemprop="url">vue-watch-computed</a>
         
     </h1>
