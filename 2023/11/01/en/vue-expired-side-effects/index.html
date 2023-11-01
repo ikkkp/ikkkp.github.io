@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="IntroductionWhen we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly enc">
+    <meta name="description" content="Introduction When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly en">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-expired-side-effects">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/01/en/vue-expired-side-effects/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="IntroductionWhen we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly enc">
+<meta property="og:description" content="Introduction When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly en">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T16:13:47.000Z">
@@ -222,7 +222,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2><p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
+        <h2><span id="introduction">Introduction</span></h2>
+<p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
 <p>For instance, consider the following asynchronous code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -234,10 +235,10 @@
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>In this example, the <code>fetchData</code> function is asynchronous, and it assigns the data to the <code>data</code> variable after 1 second. However, due to JavaScript’s single-threaded nature, the <code>fetchData</code> function waits in the main thread’s event queue for 1 second. Within this 1 second, the <code>console.log(data)</code> statement executes immediately, and at that point, the value of <code>data</code> is <code>undefined</code> because the <code>fetchData</code> function has not completed yet.</p>
 <p>In asynchronous programming, due to the non-blocking nature of the code, similar race condition issues can arise. When dealing with asynchronous operations, it’s crucial to ensure data consistency and correctness, avoiding accessing or modifying related data before the asynchronous operation is completed.</p>
-<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2><p>So, how are race conditions related to reactivity?</p>
+<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2>
+<p>So, how are race conditions related to reactivity?</p>
 <p>Consider the following example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData<span class="token punctuation">;</span>
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -246,7 +247,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// Assign the request result to data</span>
   finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>In this code snippet, we use the <code>watch</code> function to observe changes to the <code>obj</code> object. Every time the <code>obj</code> object changes, a network request, such as an API call, is sent. After the data request is successful, the result is assigned to the <code>finalData</code> variable. At first glance, this code might seem fine. However, upon closer inspection, you’ll realize that this code can lead to race condition problems. Let’s assume we modify a field of the <code>obj</code> object for the first time, triggering the callback function and sending the first request A. As time passes, before the result of request A returns, we modify a field of the <code>obj</code> object again, triggering the second request B. Now, both request A and request B are in progress. Which request will return its result first? We don’t know. If request B completes before request A, the finalData variable will store the result of request B, making request A’s result outdated.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="Comparison"></p>
 <p>However, because request B was sent later, we consider its data as the “latest.” Request A is deemed “expired,” and its result should be invalidated. By ensuring that request B’s result is considered the latest, we can prevent errors caused by race conditions. Essentially, what we need is a way to expire side effects. To illustrate this concept further, let’s replicate the scenario using the <code>watch</code> function in Vue.js to see how Vue.js helps developers address this problem. Later, we’ll attempt to implement this functionality ourselves.</p>
@@ -269,7 +269,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token comment">// Subsequent operations...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
 
@@ -284,7 +283,9 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     
     <div class="columns is-mobile is-multiline article-nav">
-        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2023/11/01/en/vue-Proxy-and-Reflect/">Vue Proxy and Reflect</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
