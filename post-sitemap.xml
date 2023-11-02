@@ -9,8 +9,8 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/01/vue-reactive-shallowReactive/</loc>
-        <lastmod>2023-11-01T12:23:46.946Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/11/01/en/vue-reactive-shallowReactive/</loc>
+        <lastmod>2023-11-02T12:33:26.508Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -23,10 +23,16 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/01/en/vue-reactive-shallowReactive/</loc>
-        <lastmod>2023-11-01T11:48:06.446Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/11/01/vue-reactive-shallowReactive/</loc>
+        <lastmod>2023-11-01T12:23:46.946Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
 
     </url>
 
