@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a prox">
+    <meta name="description" content="IntroductionSince Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue Proxy and Reflect">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/01/en/vue-Proxy-and-Reflect/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a prox">
+<meta property="og:description" content="IntroductionSince Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-01T02:52:27.000Z">
@@ -236,8 +236,7 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Create object proxies with Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Built-in object Reflect</a></p>
 <p>When we talk about “basic semantics” in programming languages, we mean the fundamental operations for reading and modifying data. In JavaScript, these operations typically include reading property values and setting property values. For example, given an object <code>obj</code>, the following operations are considered basic semantics:</p>
@@ -247,9 +246,9 @@
 </ol>
 <p>In the above code, <code>Proxy</code> objects allow us to intercept (or redefine) these basic semantic operations. The <code>Proxy</code> constructor takes two parameters: the object being proxied and an object containing interceptors (also known as traps). In the interceptor object, we can define the <code>get</code> method to intercept property read operations and the <code>set</code> method to intercept property set operations. This way, we can execute custom logic when these operations occur.</p>
 <p>Understanding these basic semantic operations and how to use <code>Proxy</code> and <code>Reflect</code> to intercept and handle them is crucial for implementing reactive data in JavaScript. In reactive data, we can use <code>Proxy</code> and <code>Reflect</code> to track reads and modifications of object properties, enabling reactive updates of data.</p>
-<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2>
-<p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
+<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2><p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Here, <code>obj.foo</code> is a basic semantic operation for reading property values, and <code>obj.foo = newValue</code> is a basic semantic operation for setting property values.</p>
 <p>Now, we can use <code>Proxy</code> to intercept these basic semantic operations.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -267,6 +266,7 @@
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// Outputs: Reading property foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Setting property foo to 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we created a <code>handler</code> object that defines <code>get</code> and <code>set</code> methods to intercept property reads and sets. Then, we created a proxy object <code>proxyObj</code> using the <code>Proxy</code> constructor, which intercepts read and set operations on the <code>obj</code> object. When we access <code>proxyObj.foo</code>, the <code>get</code> method is triggered, outputting the corresponding message. When we set the value of <code>proxyObj.foo</code>, the <code>set</code> method is triggered, again outputting the corresponding message.</p>
 <p>This way, <code>Proxy</code> allows us to execute custom logic when basic semantic operations occur, without directly manipulating the original object. In practical applications, this capability can be used to implement reactive data, data validation, logging, and more.</p>
 <p>When intercepting object property reads with <code>Proxy</code>, special attention is required for accessor properties because accessor properties are defined using getter functions. The <code>this</code> keyword inside these getter functions changes based on the method of invocation.</p>
@@ -287,13 +287,12 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// Triggers re-execution of the side effect function</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we use <code>Reflect.get</code> with the <code>receiver</code> parameter to ensure that <code>this</code> points to the proxy object within the <code>get</code> interceptor function. This establishes the correct reactive relationship, allowing proper dependency tracking when accessing object properties.</p>
-<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2>
-<p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
+<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2><p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
 <p>To address this issue, we use <code>Reflect.get(target, key, receiver)</code> instead of <code>target[key]</code>. By doing so, the <code>receiver</code> parameter correctly points to the proxy object, allowing the <code>this</code> keyword inside the getter function to refer to the proxy object. This establishes the proper reactive relationship.</p>
 <p>Here is an example demonstrating the use of the <code>receiver</code> parameter and comparing it with the scenario where the <code>receiver</code> parameter is not used:</p>
-<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -308,9 +307,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we use the <code>receiver</code> parameter passed to <code>Reflect.get</code> to ensure that <code>this</code> inside the <code>get</code> interceptor function refers to the proxy object <code>proxy</code>. When you access <code>proxy.foo</code>, the <code>get</code> interceptor function is triggered, and <code>this</code> points to the <code>proxy</code> object.</p>
-<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -326,6 +325,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Output: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
 <p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
 

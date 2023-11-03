@@ -196,51 +196,44 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
-<h2><span id="wasm-汇编级性能">WASM == 汇编级性能？</span></h2>
-<p>这显然不对，**WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。**这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
-<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1/20 的水平，而 WASM 则可以跑到机器码 1/3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
+        <h2><span id="引言">引言</span></h2><p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
+<h2><span id="wasm-x3dx3d-汇编级性能">WASM &#x3D;&#x3D; 汇编级性能？</span></h2><p>这显然不对，<strong>WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。</strong> 这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
+<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1&#x2F;20 的水平，而 WASM 则可以跑到机器码 1&#x2F;3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
 <p>一个在 WASM 和 JS 之间做性能对比的经典案例，就是 Mozilla 开发者和 V8 开发者的白学现场。整个过程是这样的：</p>
 <p>Mozilla Hacks 发表了一篇名为 <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">用 Rust 和 WASM 优化 Source Map 性能 的博文</a>，将 source-map 这个 JS 包的性能优化了五倍。</p>
 <p>V8 核心开发 Vyacheslav Egorov 回应名为<a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">你也许不需要用 Rust 和 WASM 来优化 JS 的博文</a>，用纯 JS 实现了速度比 Rust 更快的惊人优化。</p>
 <p>原文作者以 无需魔法的速度 为名展开了进一步讨论，并用 Rust 做出了新的性能优化。</p>
 <p>巧的是，这场论战正发生在两年前白色相簿的季节。双方就像雪菜和冬马那样展开了高水平的对决，名场面十分精彩。最终 Vyacheslav 给出了一张三轮过招后的性能对比图。可以看到虽然最终还是 Rust 更快，但 JS 被逼到极限后非但不是败犬，还胜出了一回合：</p>
-<p><img src="/img/wasm/Rust&amp;Js.png" alt="Rust&amp;Js"></p>
+<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
 <p>另外，大佬Milo Yip 做过的不同语言光线追踪性能测试（修罗场），也能侧面印证带 VM 语言与机器码之间的性能对比结论。C++、Java 和 JS 在未经特别优化的前提下，可以分别代表三个典型的性能档次：</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++/C#/F#/Java/JS/Lua/Python/Ruby 渲染比试</a></p>
-<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2>
-<p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby 渲染比试</a></p>
+<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2><p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
 <p>而这种套两层 for 循环的苦力活，用现在的 WASM 重写能快几倍就非常不错了。至于浏览器内 AI 计算的性能方面，社区的评测结论也是 WebGL 和 WebMetal 具备最高的性能水平，然后才是 WASM。参见这里：<a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">浏览器内的 AI 评测</a></p>
-<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca/pica</a></p>
+<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
 <p>而且，对于前端来说，计算密集型的应用场景并不算太多，比起 WebGPU 这种图形渲染的技术的发展前景可以说算是比较弱势，但毕竟二者不在同一种应用场景下。</p>
 <p>所以对计算密集型任务，WASM 并不是前端唯一的救星，而是给大家多了一种在性能、开发成本和效果之间权衡的选择。在我个人印象里，前端在图形渲染外需要算力的场景说实话并不太多，像加密、压缩、挖矿这种，都难说是高频刚需。至于未来可能相当重要的 AI 应用，<strong>长期而言我还是看好 WebGPU 这种更能发挥出 GPU 潜力的下一代标准，当然 WASM 也已经是个不错的可选项了。</strong></p>
-<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2>
-<p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) =&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
+<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2><p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) &#x3D;&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
 <p><strong>这还真不一定。</strong></p>
 <p>因为现代浏览器内的 JS 引擎都有进行性能优化的利器，都标配了一种东西，那就是 <code>JIT</code>。简单来说，上面这个 add 函数如果始终都在算整数加法，那么 JS 引擎就会自动编译出一份计算 int a + int b 的机器码来替代掉原始的 JS 函数，这样高频调用这个函数的性能就会得到极大的提升，这也就是 JIT 所谓 Just-in-time 编译的奥妙所在了。</p>
 <p>所以，不要一觉得 JS 慢就想着手动靠 WASM 来嵌入 C，其实现代 JS 引擎可都是在不停地帮你<code>「自动把 JS 转换成 C」</code>的！如果你可以把一个 JS 函数改写成等价的 C，那么我猜如果把这个函数单独抽离出来，靠 JS 引擎的 JIT 都很可能达到相近的性能。这应该就是 V8 开发者敢用 JS 和 Rust 对线的底气所在吧。</p>
 <p><a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">像在 JS 和 WASM 之间的调用终于变快了</a> 这篇文章中，Lin Clark 非常精彩地论述了整个优化过程，<strong>最终使得 JS 和 WASM 间的函数调用，比非内联的 JS 函数间调用要快</strong>。不过，至于和被 JIT 内联掉的 JS 函数调用相比起来如何，这篇文章就没有提及了。</p>
 <p>这里偏个题，Mozilla 经常宣传自己实现的超大幅优化，有不少都可能来源于之前明显的设计问题（平心而论，我们自己何尝不是这样呢）。像去年 Firefox 70 在 Mac 上实现的 大幅省电优化，其根源是什么呢？粗略的理解是，以前的 Firefox 在 Mac 上竟然每帧都会全量更新窗口像素！当然，这些文章的干货都相当多，十分推荐大家打好基础后看看原文，至少是个更大的世界，也常常能对软件架构设计有所启发。</p>
 <p>如果后续 WASM 支持了 GC，那么嵌入互调的情况很可能更复杂。例如我最近就尝试在 Flutter 的 Dart 和安卓的 Java 之间手动同步大对象，希望能「嵌入一些安卓平台能力到 Flutter 体系里」，然而这带来了许多冗长而低性能的胶水代码，需要通过异步的消息来做深拷贝，可控性很低。虽然 WASM 现在还没有 GC，但一旦加上，我有理由怀疑它和 JS 之间的对象生命周期管理也会遇到类似的问题。只是这个问题主要是让 Mozilla 和 Google 的人来操心，用不着我们管而已。</p>
-<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2>
-<p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
+<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2><p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
 <ul>
 <li>在安卓的 Java class 里调用 C++</li>
 <li>在 Flutter 的 Dart 里调用 C</li>
 <li>在 QuickJS 这种嵌入式 JS 引擎里调用 C</li>
 </ul>
 <p>它们都能做到一件事，那就是在引擎里新建原生对象，并将它以传引用的方式直接交给<code>C / C++</code>函数调用，并用引擎的 GC 来管理对象的生命周期。这种方式一般称为<code> FFI（Foreign Function Interface 外部函数接口）</code>，可以把原生代码嵌入到语言 Runtime 中。但如果是两个不同的 Runtime，事情就没有这么简单了。<strong>例如 QuickJS 到 Java 的 binding 项目 Quack，就需要在 JS 的对象和 Java 对象中做 Marshalling（类似于 JSON 那样的序列化和反序列化）的过程，不能随便传引用。</strong></p>
-<p>**对 WASM 来说是怎样的呢？**基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,**wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。**但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C / C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
+<p><strong>对 WASM 来说是怎样的呢？</strong>基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,<strong>wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。</strong>但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C &#x2F; C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
 <p>例如现在如果需要频繁地用 WASM 操作 JS 对象，那么几乎必然是影响性能的。这方面典型的坑是基于 WASM 移植的 OpenGL 应用。像 C++ 中的一个 glTexImage2D 函数，目前编译到 WASM 后就需要先从 WASM 走到 JS 胶水层，再在 JS 里调 gl.texImage2D 这样的 WebGL API，最后才能经由 C++ binding 调用到原生的图形 API。这样从一层胶水变成了两层，性能不要说比起原生 C++，能比得上直接写 JS 吗？</p>
 <p>当然，Mozilla 也意识到了这个问题，因此他们在尝试如何更好地将 <code>Web IDL（也就是浏览器原生 API 的 binding）</code>开放给 WASM，并在这个过程中提出了 WASM Interface Types 概念：既然 WASM 已经是个字节码的中间层了，那么干脆给它约定个能一统所有编程语言运行时类型的 IR 规范吧！不过，这一规范还是希望主要靠协议化、结构化的深拷贝来解决问题，只有未来的 anyref 类型是可以传引用的。anyref 有些像 Unix 里的文件描述符，这里就不展开了。</p>
-<p><img src="/img/wasm/Rust&amp;Js3.webp" alt="Js2WASM"></p>
-<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2>
-<p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
-<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 / ARM / MIPS / WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
+<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
+<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2><p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
+<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 &#x2F; ARM &#x2F; MIPS &#x2F; WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
 <p>所以这里再重复一遍，编译 WASM 应用所需的依赖库和整套工具链，几乎都跟 JS 没什么关系。JS 就像机器码那样，只是人家工具链编译出来的输出格式而已。在 JS 开发者看来，这整套东西可能显得相当突兀。但从原生应用开发者的视角看来，这一切都再正常不过了。</p>
-<h2><span id="后记">后记</span></h2>
-<p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
+<h2><span id="后记">后记</span></h2><p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
 
     
     </div>
@@ -274,15 +267,14 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>介绍 reactive 与 shallowReactive 的区别，即深响应和浅响应的区别。</p>
-<h2><span id="浅响应式与深相应式">浅响应式与深相应式</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <h2><span id="前言">前言</span></h2><p>介绍 reactive 与 shallowReactive 的区别，即深响应和浅响应的区别。</p>
+<h2><span id="浅响应式与深相应式">浅响应式与深相应式</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><span class="token punctuation">&#123;</span> 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar<span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// 修改 obj.foo.bar 的值，并不能触发响应</span>
 obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar <span class="token operator">=</span> <span class="token number">2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>首先，创建 obj 代理对象，该对象的 foo 属性值也是一个对象，即 { bar: 1} 。接着，在副作用函数内访问 obj.foo.bar 的值。但是我们发现，后续对 obj.foo.bar 的修改不能触发副作用函数重新执行，这是为什么呢？来看一下现在的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj <span class="token punctuation">,</span><span class="token punctuation">&#123;</span>
@@ -296,6 +288,7 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token comment">// 省略其他拦截函数</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>由上面这段代码可知，当我们读取 obj.foo.bar 时，首先要读取 obj.foo 的值。这里我们直接使用 Reflect.get 函数返回obj.foo 的结果。由于通过 Reflect.get 得到 obj.foo 的结果是一个普通对象，即 { bar: 1} ，它并不是一个响应式对象，所以在副作用函数中访问 obj.foo.bar 时，是不能建立响应联系的。要解决这个问题，我们需要对 Reflect.get 返回的结果做一层包装:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
@@ -310,12 +303,12 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
     <span class="token comment">// Other traps...</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>这段代码定义了一个名为reactive的函数，该函数接收一个对象作为参数，并返回该对象的代理。这个代理使用了get陷阱函数，当我们尝试获取对象的某个属性时，这个函数就会被触发。</p>
 <p>在get陷阱函数中，我们首先使用Reflect.get方法获取目标对象的属性值。Reflect.get方法接收三个参数：目标对象、属性名和接收器对象。在这里，接收器对象就是代理对象本身。</p>
 <p>然后，我们检查获取的结果是否为对象。如果是对象，我们就对其进行响应式处理，即再次调用reactive函数。这样做的目的是确保嵌套的对象也具有响应式特性，也就是说，当我们修改这些嵌套对象的属性时，也能触发响应式系统。</p>
 <p>最后，如果获取的结果不是对象，我们就直接返回结果。</p>
-<h2><span id="浅响应式">浅响应式</span></h2>
-<p>然而，并非所有情况下我们都希望深响应，这就催生了shallowReactive，即浅响应。所谓浅响应，指的是只有对象的第一层属性是响应的，例如：</p>
+<h2><span id="浅响应式">浅响应式</span></h2><p>然而，并非所有情况下我们都希望深响应，这就催生了shallowReactive，即浅响应。所谓浅响应，指的是只有对象的第一层属性是响应的，例如：</p>
 <p>例如，我们有一个对象，它的属性值也是一个对象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">innerObj</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -324,15 +317,18 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果我们对obj进行深响应处理：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> reactiveObj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>那么，无论我们修改obj的属性，还是修改innerObj的属性，都会触发响应式系统：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">reactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>但是，如果我们只想要obj的第一层属性是响应的，也就是说，只有当我们修改obj的属性时才触发响应式系统，而修改innerObj的属性则不触发，那么我们就需要使用shallowReactive函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>这样，只有当我们修改obj的属性时，才会触发响应式系统：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">shallowReactiveObj<span class="token punctuation">.</span>innerObj <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">// 触发响应式系统</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 不触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h2><span id="vuejs里reactive和shallowreactive">Vuejs里reactive和shallowReactive</span></h2>
-<p>在Vue.js中，reactive和shallowReactive函数都用于创建响应式对象，这一小节来讨论下他们的不同。</p>
+
+<h2><span id="vuejs里reactive和shallowreactive">Vuejs里reactive和shallowReactive</span></h2><p>在Vue.js中，reactive和shallowReactive函数都用于创建响应式对象，这一小节来讨论下他们的不同。</p>
 <p>reactive函数创建的是深度响应式对象。这意味着不仅对象本身，而且它内部的所有嵌套对象都会变成响应式的。无论是修改对象的属性，还是修改其嵌套对象的属性，都会触发响应式系统。</p>
 <p>而shallowReactive函数创建的是浅层响应式对象。这意味着只有对象的顶层属性是响应式的。如果对象包含嵌套对象，那么修改这些嵌套对象的属性不会触发响应式系统。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -346,22 +342,22 @@ reactiveObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 这将不会触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="只读和浅只读">只读和浅只读</span></h2>
-<p>讨论完响应式和浅响应式，我们在来说下只读和浅只读：</p>
+
+<h2><span id="只读和浅只读">只读和浅只读</span></h2><p>讨论完响应式和浅响应式，我们在来说下只读和浅只读：</p>
 <p>Vue.js还提供了<code>readonly</code>和<code>shallowReadonly</code>函数，它们用于创建只读的响应式对象。</p>
 <p><code>readonly</code>函数创建的是深度只读的响应式对象。这意味着不仅对象本身是只读的，而且它内部的所有嵌套对象也都是只读的。任何尝试修改对象或其嵌套对象的属性的操作都会失败。</p>
 <p><code>shallowReadonly</code>函数创建的是浅层只读的响应式对象。这意味着只有对象的顶层属性是只读的。如果对象包含嵌套对象，那么这些嵌套对象的属性是可以修改的。</p>
-<pre><code class="language-javascript">let obj = &#123;
+<pre><code class="javascript">let obj = &#123;
   innerObj: &#123;
-    key: 'value'
+    key: &#39;value&#39;
   &#125;
 &#125;
 
 let readonlyObj = Vue.readonly(obj);
-readonlyObj.innerObj.key = 'new value'; // 这将失败，因为对象是只读的
+readonlyObj.innerObj.key = &#39;new value&#39;; // 这将失败，因为对象是只读的
 
 let shallowReadonlyObj = Vue.shallowReadonly(obj);
-shallowReadonlyObj.innerObj.key = 'new value'; // 这将成功，因为只有顶层属性是只读的
+shallowReadonlyObj.innerObj.key = &#39;new value&#39;; // 这将成功，因为只有顶层属性是只读的
 </code></pre>
 
     
@@ -396,11 +392,10 @@ shallowReadonlyObj.innerObj.key = 'new value'; // 这将成功，因为只有顶
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
+        <h2><span id="引言">引言</span></h2><p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">创建对象代理 Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">内置的对象 Reflect</a></p>
-<p>当我们讨论编程语言中的&quot;基本语义&quot;时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
+<p>当我们讨论编程语言中的”基本语义”时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
 <ol>
 <li>读取属性值：<code>obj.foo</code> （读取属性<code>foo</code>的值）</li>
 <li>设置属性值：<code>obj.foo = newValue</code> （设置属性<code>foo</code>的值）</li>
@@ -408,9 +403,9 @@ shallowReadonlyObj.innerObj.key = 'new value'; // 这将成功，因为只有顶
 <p>在上述代码中，<code>Proxy</code>对象允许我们拦截（或者说重定义）这些基本语义的操作。<code>Proxy</code>的构造函数接受两个参数：被代理的对象和一个包含拦截器（也称为夹子或陷阱）的对象。在拦截器对象中，我们可以定义<code>get</code>方法来拦截读取属性操作，定义<code>set</code>方法来拦截设置属性操作。这样，我们就可以在这些操作发生时执行自定义的逻辑。</p>
 <p>关于<code>Reflect</code>对象，它是JavaScript的一个全局对象，提供了与<code>Proxy</code>拦截器方法一一对应的方法。这些<code>Reflect</code>方法提供了默认的操作行为。例如，<code>Reflect.get(target, key)</code>方法提供了访问对象属性的默认行为，与直接使用<code>target[key]</code>是等价的。同时，<code>Reflect</code>方法还可以接受第三个参数，用来指定函数调用时的<code>this</code>值。</p>
 <p>理解这些基本语义操作以及如何使用<code>Proxy</code>和<code>Reflect</code>来拦截和处理这些操作，是理解JavaScript中响应式数据（Reactive Data）实现的关键。在响应式数据中，我们可以利用<code>Proxy</code>和<code>Reflect</code>来追踪对象属性的读取和修改，从而实现数据的响应式更新。</p>
-<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2>
-<p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
+<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2><p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>在这里，<code>obj.foo</code> 是一个读取属性的基本语义操作，<code>obj.foo = newValue</code> 是一个设置属性的基本语义操作。</p>
 <p>现在，我们可以使用 <code>Proxy</code> 来拦截这些基本语义的操作。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -428,11 +423,11 @@ shallowReadonlyObj.innerObj.key = 'new value'; // 这将成功，因为只有顶
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// 输出：读取属性 foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// 输出：设置属性 foo 为 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面的代码中，我们创建了一个 <code>handler</code> 对象，其中定义了 <code>get</code> 和 <code>set</code> 方法，用来拦截属性的读取和设置。然后，我们使用 <code>Proxy</code> 构造函数创建了一个代理对象 <code>proxyObj</code>，它会拦截 <code>obj</code> 对象上的读取和设置操作。当我们访问 <code>proxyObj.foo</code> 时，会触发 <code>get</code> 方法，输出相应的信息。当我们设置 <code>proxyObj.foo</code> 的值时，会触发 <code>set</code> 方法，同样输出相应的信息。</p>
 <p>这样，<code>Proxy</code> 允许我们在基本语义操作发生时执行自定义的逻辑，而不需要直接操作原始对象。在实际应用中，这种能力可以用来实现响应式数据、数据验证、日志记录等功能。</p>
 <p>当我们使用 <code>Proxy</code> 拦截对象属性的读取操作时，我们需要特别注意访问器属性（accessor properties）的情况，因为访问器属性使用 getter 函数来定义，而这个函数内部的 <code>this</code> 关键字会根据调用方式而变化。</p>
-<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2>
-<p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
+<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2><p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
 <p>解决这个问题的方法是使用 <code>Reflect.get(target, key, receiver)</code> 来代替 <code>target[key]</code>。这样，<code>Reflect.get</code> 的第三个参数 <code>receiver</code> 就能正确地指向代理对象，而不是原始对象。这样一来，在访问器属性的 getter 函数内部，<code>this</code> 关键字就会指向代理对象，从而建立了正确的响应关系。</p>
 <p>以下是使用 <code>Reflect.get</code> 的修正代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -450,10 +445,10 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// 触发副作用函数的重新执行</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>我们可以再看一个简单一点的示例：</p>
 <p>当使用代理对象时，<code>receiver</code>参数主要用于确保在代理的拦截函数内部，<code>this</code>指向代理对象，从而建立响应式联系。下面我将对比使用<code>receiver</code>参数和不使用的情况，以便更清楚地理解它的作用。</p>
-<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -468,9 +463,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，我们使用了<code>receiver</code>参数传递给<code>Reflect.get</code>，确保在<code>get</code>拦截函数内部，<code>this</code>指向代理对象<code>proxy</code>。当你访问<code>proxy.foo</code>时，<code>get</code>拦截函数被触发，并且<code>this</code>指向<code>proxy</code>对象。</p>
-<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -487,6 +482,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，我们没有使用<code>receiver</code>参数。由于没有传递<code>receiver</code>参数，<code>this</code>在<code>get</code>拦截函数内部指向的是原始对象<code>data</code>。虽然代理对象<code>proxy</code>被使用，但<code>get</code>拦截函数内部的<code>this</code>并不指向<code>proxy</code>，而是指向原始对象<code>data</code>。因此，这种情况下，响应式联系不会得到建立。</p>
 <p>虽然说两个函数的输出是一致的，但显然没有使用<code>receiver</code>参数时响应式联系不会得到建立。也就是说在effect函数里面，对象不会得到正确的响应。</p>
 
@@ -522,8 +518,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
+        <h2><span id="引言">引言</span></h2><p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
 <p>例如，考虑以下的异步代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -535,10 +530,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出 undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，<code>fetchData</code> 函数是异步的，它在1秒后将数据赋给 <code>data</code> 变量。但是，由于 JavaScript 是单线程的，<code>fetchData</code> 函数会在主线程的事件队列中等待1秒，而在这1秒内，<code>console.log(data)</code> 语句会立即执行，此时 <code>data</code> 的值为 <code>undefined</code>，因为 <code>fetchData</code> 函数还未完成执行。</p>
 <p>在异步编程中，由于代码的非阻塞性质，会出现类似的竞态条件问题。在处理异步操作时，我们需要小心确保数据的一致性和正确性，避免在异步操作完成前就去访问或修改相关数据。</p>
-<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2>
-<p>那么竞态问题跟我们响应式有什么联系呢？</p>
+<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2><p>那么竞态问题跟我们响应式有什么联系呢？</p>
 <p>举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -547,6 +542,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// 将请求结果赋值给 data</span>
 finalData <span class="token operator">=</span> res
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这段代码中，我们使用 watch 观测 obj 对象的变化，每次 obj对象发生变化都会发送网络请求，例如请求接口数据，等数据请求成功之后，将结果赋值给 finalData 变量。观察上面的代码，乍一看似乎没什么问题。但仔细思考会发现这段代码会发生竞态问题。假设我们第一次修改 obj 对象的某个字段值，这会导致回调函数执行，同时发送了第一次请求 A。随着时间的推移，在请求 A 的结果返回之前，我们对 obj 对象的某个字段值进行了第二次修改，这会导致发送第二次请求 B。此时请求 A 和请求 B 都在进行中，那么哪一个请求会先返回结果呢？我们不确定，如果请求B 先于请求 A 返回结果，就会导致最终 finalData 中存储的是 A 请求的结果</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="对比"></p>
 <p>但由于请求 B 是后发送的，因此我们认为请求 B 返回的数据才是“最新”的，而请求 A 则应该被视为“过期”的，所以我们希望变量finalData 存储的值应该是由请求 B 返回的结果，而非请求 A 返回的结果。</p>
@@ -570,6 +566,7 @@ finalData <span class="token operator">=</span> res
     <span class="token comment">// 后续操作...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>如上面的代码所示，在发送请求之前，我们定义了 expired 标志变量，用来标识当前副作用函数的执行是否过期；接着调用onInvalidate 函数注册了一个过期回调，当该副作用函数的执行过期时将 expired 标志变量设置为 true；最后只有当没有过期时才采用请求结果，这样就可以有效地避免上述问题了。</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="对比"></p>
 
@@ -605,13 +602,12 @@ finalData <span class="token operator">=</span> res
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
-<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2>
-<p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
+        <h2><span id="引言">引言</span></h2><p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
+<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2><p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>然而，在某些情况下，我们希望副作用函数在需要的时候才执行，而不是立即执行。一个典型的例子是计算属性。为了实现这种延迟执行的效果，我们可以在<code>options</code>中添加一个<code>lazy</code>属性，并将其设置为<code>true</code>。当<code>lazy</code>为<code>true</code>时，副作用函数不会在初始化时立即执行，而是在需要的时候才执行。修正后的代码如下所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// 这个函数不会立即执行</span>
@@ -623,6 +619,7 @@ finalData <span class="token operator">=</span> res
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>具体实现中，我们将副作用函数<code>effectFn</code>作为<code>effect</code>函数的返回值返回。这意味着，当我们调用<code>effect</code>函数时，我们会得到对应的副作用函数，并且可以在需要的时候手动执行它。这种机制赋予了我们更多的控制权，允许我们决定何时触发副作用函数的执行，而不是立即执行它。</p>
 <p>这种设计模式特别适用于特定场景，例如计算属性。在计算属性中，我们可能希望在特定时刻触发副作用函数的执行，而不是在初始化时立即执行。通过将副作用函数作为<code>effect</code>函数的返回值，我们能够灵活地控制副作用函数的执行时机，以满足不同场景的需求。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -647,6 +644,7 @@ finalData <span class="token operator">=</span> res
   <span class="token comment">// 将副作用函数作为返回值返回</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个代码中，<code>effect</code>函数的第二个参数是一个<code>options</code>对象，其中<code>lazy</code>属性被设置为<code>true</code>。这意味着传递给<code>effect</code>的副作用函数会在需要的时候才执行，例如在计算属性被访问时。这种延迟执行的特性使得<code>effect</code>函数非常适合用于实现计算属性等场景。</p>
 <p>在上述代码中，我们通过<code>options</code>参数的<code>lazy</code>属性控制副作用函数的立即执行。如果<code>options.lazy</code>为<code>true</code>，副作用函数将被延迟执行，直到手动触发为止。</p>
 <p>现在我们通过计算属性实现了lazy懒加载，那么数据缓存该怎么实现呢。</p>
@@ -674,14 +672,15 @@ finalData <span class="token operator">=</span> res
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>解决了懒计算的问题，只有在真正需要计算<code>value</code>的时候，才会执行<code>effectFn</code>。同时，它还引入了一个<code>dirty</code>标志，用于标识当前的计算是否需要重新进行。如果<code>dirty</code>为<code>true</code>，则重新计算<code>value</code>的值，并将<code>dirty</code>标志设置为<code>false</code>，以便下一次访问时可以直接使用缓存的值。</p>
-<h2><span id="watch-的实现原理">watch 的实现原理</span></h2>
-<p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
+<h2><span id="watch-的实现原理">watch 的实现原理</span></h2><p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'数据变了'</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// 修改响应数据的值，会导致回调函数执行</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>假设 obj 是一个响应数据，使用 watch 函数观测它，并传递一个回调函数，当修改响应式数据的值时，会触发该回调函数执行。实际上，watch 的实现本质上就是利用了 effect 以及options.scheduler 选项，如以下代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -690,6 +689,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// 当 obj.foo 的值变化时，会执行 scheduler 调度函数</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在一个副作用函数中访问响应式数据 obj.foo，通过前面的介绍，我们知道这会在副作用函数与响应式数据之间建立联系，当响应式数据变化时，会触发副作用函数重新执行。但有一个例外，即如果副作用函数存在 scheduler 选项，当响应式数据发生变化时，会触发 scheduler 调度函数执行，而非直接触发副作用函数执行。从这个角度来看，其实 scheduler 调度函数就相当于一个回调函数，而watch 的实现就是利用了这个特点。</p>
 <p>下面是最简单的 watch 函数的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// watch 函数接收两个参数，source 是响应式数据，cb 是回调函数</span>
@@ -752,6 +752,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span>
 
 <span class="token comment">// 输出: 数据变化了</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>我们首先定义了一个原始的数据对象data，其中有一个属性foo，初始值为1。接着，我们使用Proxy创建了一个代理对象obj，该代理对象会拦截对data的操作。</p>
 <p>当你调用obj.foo++时，会触发Proxy的set拦截器。在set拦截器中，我们首先将属性值设置到目标对象上，然后调用watch函数，并传入obj和一个回调函数。在watch函数中，我们使用了一个假设的effect函数（实际开发中可能是框架提供的响应式函数），这个函数用于监听数据的变化。在watch函数中，我们传入了source.foo的读取操作，以及一个包含scheduler和fn属性的配置对象。scheduler可以用于定义调度逻辑（在示例中为空函数），fn则是一个当数据变化时会被调用的回调函数。</p>
 <p>当obj.foo++执行时，set拦截器触发，watch函数被调用。</p>
@@ -788,13 +789,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
-<h2><span id="嵌套的-effect">嵌套的 effect</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <h2><span id="引言">引言</span></h2><p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
+<h2><span id="嵌套的-effect">嵌套的 effect</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
     <span class="token comment">/* ... */</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effectFn1 的执行会导致 effectFn2 的执行。那么，什么场景下会出现嵌套的 effect 呢？拿 Vue.js 来说，实际上 Vue.js 的渲染函数就是在一个 effect 中执行的.</p>
 <p>当组件发生嵌套时，例如 Foo 组件渲染了 Bar 组件：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar 组件</span>
@@ -814,9 +814,10 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>effect函数可以嵌套使用，也就是说，一个effect函数内部可以包含另一个effect函数。当外部effect函数依赖于内部effect函数创建的响应式数据时，内部effect函数会被自动追踪，确保外部effect函数在内部effect函数发生变化时得以执行。</p>
 <p>这种嵌套的effect函数用于创建依赖关系链，确保当某个响应式数据变化时，所有依赖于它的effect函数都能够被触发执行，从而保持应用的响应性。</p>
-<p>而&quot;effect 栈&quot;，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
+<p>而”effect 栈”，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
 <p>现在有一个不使用栈结构的嵌套的<code>effect</code>函数的例子，但是他并不能实现嵌套的功能。假设我们有两个响应式数据<code>count1</code>和<code>count2</code>，其中<code>count2</code>的值依赖于<code>count1</code>的值。我们可以使用嵌套的<code>effect</code>函数来实现这种依赖关系。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 原始数据</span>
 <span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
@@ -845,6 +846,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// 在 effectFn1 中读取 obj.foo 属性</span>
   temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><code>effectFn1</code>是外部的<code>effect</code>函数，它依赖于<code>obj.foo</code>的值，并且在内部包含了一个<code>innerEffect</code>，内部的<code>effect</code>函数依赖于<code>obj.bar</code>的值。当我们修改<code>obj.foo</code>时，我们希望外部的<code>effect</code>函数被触发执行，并且输出<code>obj.foo</code>的值，然后触发内部的依赖函数。当我们修改<code>obj.bar</code>时，内部的<code>effect</code>函数被触发执行，并且输出<code>obj.bar</code>的值。</p>
 <p>我们用全局变量 activeEffect 来存储通过 effect 函数注册的副作用函数，这意味着同一时刻 activeEffect 所存储的副作用函数只能有一个。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
@@ -896,6 +898,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+
     
     </div>
     
@@ -928,13 +931,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
-<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2>
-<p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
+        <h2><span id="引言">引言</span></h2><p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
+<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2><p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>当 effect 函数执行时，它会设置 body 的文本内容，但除了effect 函数之外的任何函数都可以读取或设置 body 的文本内容。也就是说，effect 函数的执行会直接或间接影响其他函数的执行，这时我们说 effect 函数产生了副作用。</p>
 <p>其实副作用函数并不少见，我们前面在讨论webpack的 <code>tree shaking</code> 话题里面涉及到的是否进行数据流处理对 <code>tree shaking</code> 的效果是不可忽略的。这边不再赘述。</p>
 <p>副作用很容易产生，例如一个函数修改了全局变量，这其实也是一个副作用，如下面的代码所示：</p>
@@ -943,16 +945,17 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   val <span class="token operator">=</span> <span class="token number">2</span> <span class="token comment">// 修改全局变量，产生副作用</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>理解了什么是副作用函数，再来说说什么是响应式数据。假设在一个副作用函数中读取了某个对象的属性：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span>
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// effect 函数的执行会读取 obj.text</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>副作用函数 effect 会设置 body 元素的 <code>innerText</code> 属性，其值为 <code>obj.text</code>，当 <code>obj.text</code> 的值发生变化时，我们希望副作用函数 effect 会重新执行。</p>
 <p>那这样我们的思路就变成了：通过一些手段，在读取 <code>obj.text</code> 值的时候可以将effect函数储存进一个bucket里面，而在设置<code>obj.text</code> 值的时候可以在bucket里面把effect拿出来执行。</p>
-<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2>
-<p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
+<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2><p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
 <ul>
 <li>当副作用函数 effect 执行时，会触发字段 obj.text 的读取操作；</li>
 <li>当修改 obj.text 的值时，会触发字段 obj.text 的设置操作。</li>
@@ -975,14 +978,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这样我们就基于 proxy 创建了一个用于存储副作用函数，并且我们使用了一个proxyMap，这是一个可以把各类型的proxy储存起来的容器。我们分别设置了 get 和 set 拦截函数，用于拦截读取和设置操作。</p>
-<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2>
-<p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
+<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2><p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
 <ul>
-<li>
-<p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
+<li><p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
 </li>
-<li>
-<p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
+<li><p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
 </li>
 </ul>
 <p>下面通过一个简单的响应式系统实现来讲解原理：</p>
@@ -1013,15 +1013,15 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>
-例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
-<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键/值对的集合</a></p>
-<p>WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
+<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
+<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键&#x2F;值对的集合</a></p>
+<p> WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
 <p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//Map存放不同类型的代理</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>定义好了上面的几种bucket，我们开始实现响应式系统最核心的部分，也就是proxy的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 核心就是 proxy</span>
@@ -1039,6 +1039,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>对于前面的trick和trigger：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1089,6 +1090,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+
     
     </div>
     
@@ -1121,11 +1123,9 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 <code>Loader API</code>，并通过 this 上下文访问。</p>
+        <h2><span id="引言">引言</span></h2><p>loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 <code>Loader API</code>，并通过 this 上下文访问。</p>
 <p>这边贴一个官网链接<a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader的用法和例子，以及自定义loader本地开发测试</a></p>
-<h2><span id="webpack-loader的简单使用">Webpack Loader的简单使用</span></h2>
-<p>当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。</p>
+<h2><span id="webpack-loader的简单使用">Webpack Loader的简单使用</span></h2><p>当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。</p>
 <p>同步 loader 可以 return 一个代表已转换模块（transformed module）的单一值。</p>
 <p>loader 会返回一个或者两个值。第一个值的类型是 JavaScript 代码的字符串或者 buffer。第二个可选值是 SourceMap，它是个 JavaScript 对象。</p>
 <p>下面是一个简单的loader的用法，他将匹配所有的js文件，并使用loader.js处理</p>
@@ -1149,6 +1149,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>由上面我们可以知道loader的使用方法，但对loader仅停留在使用，那具体的一个loader长什么样呢？</p>
 <p>比如说一个简单的loader是这样的：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1156,9 +1157,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
   <span class="token keyword">return</span> content
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>一个 loader 就是一个node模块，其中暴露了一个函数，并只可以接收一个入参，这个参数是一个包含包含资源文件内容的字符串，而函数的返回值就是处理后的内容。</p>
-<h2><span id="自定义webpack-loader">自定义webpack loader</span></h2>
-<h3><span id="自定义loader的用法准则">自定义loader的用法准则</span></h3>
-<p>编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。</p>
+<h2><span id="自定义webpack-loader">自定义webpack loader</span></h2><h3><span id="自定义loader的用法准则">自定义loader的用法准则</span></h3><p>编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。</p>
 <ul>
 <li>保持 简单 。</li>
 <li>使用 链式 传递。</li>
@@ -1171,22 +1170,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>避免 绝对路径 。</li>
 <li>使用 <code>peer dependencies</code>。</li>
 </ul>
-<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3>
-<p>首先，在一个webpack项目目录中的文件夹中创建以下文件：</p>
+<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，在一个webpack项目目录中的文件夹中创建以下文件：</p>
 <ul>
 <li><code>src/loader/custom-loader.js</code>：自定义Loader的源文件。</li>
 <li><code>src/index.js</code>：JavaScript入口文件，用于测试自定义Loader。</li>
 </ul>
-<h3><span id="步骤2编写自定义loader">步骤2：编写自定义Loader</span></h3>
-<p>在 <code>custom-loader.js</code> 文件中，编写你的自定义loader代码。这个Loader的作用是将在每个加载的JavaScript文件的顶部添加一个注释。</p>
+<h3><span id="步骤2编写自定义loader">步骤2：编写自定义Loader</span></h3><p>在 <code>custom-loader.js</code> 文件中，编写你的自定义loader代码。这个Loader的作用是将在每个加载的JavaScript文件的顶部添加一个注释。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
 module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 在源代码的顶部添加自定义注释</span>
     <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3>
-<p>在项目根目录下创建Webpack配置文件 <code>webpack.config.js</code>。在配置文件中，使用刚刚编写的自定义Loader。</p>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在项目根目录下创建Webpack配置文件 <code>webpack.config.js</code>。在配置文件中，使用刚刚编写的自定义Loader。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1206,9 +1203,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token punctuation">]</span><span class="token punctuation">,</span>
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>功能就简单的进行了一下实现，这里我们主要说一下如何测试调用我们的本地的 loader，方式有两种，一种是通过 <code>Npm link</code> 的方式进行测试，这边贴一个<code>Npm link</code>的链接，大家可以去创建一个软连接进行本地测试，还是挺方便的<a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>。 另外一种就是直接在项目里面进行路径配置：</p>
-<h4><span id="单loader配置方法">单loader配置方法</span></h4>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
+<h4><span id="单loader配置方法">单loader配置方法</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
 <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
   <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -1218,8 +1215,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="多loader配置方法">多loader配置方法</span></h4>
-<p>当然也可以通过数组的方式进行配置</p>
+
+<h4><span id="多loader配置方法">多loader配置方法</span></h4><p>当然也可以通过数组的方式进行配置</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
 <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 这里就是说先去找 node_modules 目录中，如果没有的话再去 loaders 目录查找</span>
@@ -1228,17 +1225,17 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤4测试自定义loader">步骤4：测试自定义Loader</span></h3>
-<p>在 <code>index.js</code> 文件中，编写一些JavaScript代码，例如：</p>
+
+<h3><span id="步骤4测试自定义loader">步骤4：测试自定义Loader</span></h3><p>在 <code>index.js</code> 文件中，编写一些JavaScript代码，例如：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="步骤5运行webpack构建">步骤5：运行Webpack构建</span></h3>
-<p>运行以下命令来构建你的项目：</p>
+
+<h3><span id="步骤5运行webpack构建">步骤5：运行Webpack构建</span></h3><p>运行以下命令来构建你的项目：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>构建完成后，你将在 <code>dist</code> 文件夹中找到生成的 <code>bundle.js</code> 文件。在这个文件里面可以看到在顶部添加了自定义注释的JavaScript代码。</p>
 <hr>
-<h2><span id="webpack-plugin的简单使用">Webpack plugin的简单使用</span></h2>
-<p>插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以在 webpack 构建流程中引入自定义的行为。</p>
+<h2><span id="webpack-plugin的简单使用">Webpack plugin的简单使用</span></h2><p>插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以在 webpack 构建流程中引入自定义的行为。</p>
 <p>比如说最简单的一个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1257,23 +1254,19 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// 可以添加更多的插件</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面这个例子里面使用了HtmlWebpackPlugin插件，根据指定的HTML模板生成一个新的HTML文件，并将打包后的JavaScript文件自动添加到生成的HTML文件中。</p>
 <p>一个基本的webpack 插件由以下组成：</p>
 <ul>
-<li>
-<p>一个 JavaScript 命名函数或 JavaScript 类。</p>
+<li><p>一个 JavaScript 命名函数或 JavaScript 类。</p>
 </li>
-<li>
-<p>在插件函数的 prototype 上定义一个 apply 方法，apply 方法在 webpack 装载这个插件的时候被调用，并且会传入 compiler 对象。。</p>
+<li><p>在插件函数的 prototype 上定义一个 apply 方法，apply 方法在 webpack 装载这个插件的时候被调用，并且会传入 compiler 对象。。</p>
 </li>
-<li>
-<p>指定一个绑定到 webpack 自身的事件钩子。</p>
+<li><p>指定一个绑定到 webpack 自身的事件钩子。</p>
 </li>
-<li>
-<p>处理 webpack 内部实例的特定数据。</p>
+<li><p>处理 webpack 内部实例的特定数据。</p>
 </li>
-<li>
-<p>功能完成后调用 webpack 提供的回调。</p>
+<li><p>功能完成后调用 webpack 提供的回调。</p>
 </li>
 </ul>
 <p>一个插件结构如下：</p>
@@ -1291,18 +1284,15 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2>
-<p>在插件开发中最重要的两个资源就是 compiler 和 compilation 对象。可以说Webpack plugin的开发就是围绕着这两个对象的 hook 进行操作</p>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>在插件开发中最重要的两个资源就是 compiler 和 compilation 对象。可以说Webpack plugin的开发就是围绕着这两个对象的 hook 进行操作</p>
 <p><code>compiler</code> 对象可以理解为一个和 webpack 环境整体绑定的一个对象，它包含了所有的环境配置，包括 options，loader 和 plugin，当 webpack 启动时，这个对象会被实例化，并且他是<code>全局唯一</code>的，上面我们说到的 apply 方法传入的参数就是它。</p>
 <p><code>compilation</code> 在每次构建资源的过程中都会被创建出来，一个 compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息。它同样也提供了很多的 hook 。</p>
-<h2><span id="自定义webpack-plugin">自定义Webpack plugin</span></h2>
-<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3>
-<p>首先，还是需要一个webpack项目。我们在这个文件夹中创建以下文件：</p>
+<h2><span id="自定义webpack-plugin">自定义Webpack plugin</span></h2><h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，还是需要一个webpack项目。我们在这个文件夹中创建以下文件：</p>
 <ul>
 <li><code>src/plugins/CustomPlugin.js</code>：自定义插件的源文件。</li>
 </ul>
-<h3><span id="步骤2编写自定义插件">步骤2：编写自定义插件</span></h3>
-<p>在 <code>CustomPlugin.js</code> 文件中，我们编写了一个插件，并将在Webpack构建结束时输出一条信息。</p>
+<h3><span id="步骤2编写自定义插件">步骤2：编写自定义插件</span></h3><p>在 <code>CustomPlugin.js</code> 文件中，我们编写了一个插件，并将在Webpack构建结束时输出一条信息。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
 <span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
     <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1313,8 +1303,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3>
-<p>在配置文件中，使用上面我们的自定义插件。</p>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在配置文件中，使用上面我们的自定义插件。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1329,9 +1319,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// 可以添加更多的插件</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤4运行webpack构建">步骤4：运行Webpack构建</span></h3>
-<p>现在进行Webpack构建：</p>
+
+
+<h3><span id="步骤4运行webpack构建">步骤4：运行Webpack构建</span></h3><p>现在进行Webpack构建：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 
     
     </div>
@@ -1365,27 +1357,22 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
+        <h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
 <p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p>
 <p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p>
 <p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p>
 <p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p>
 <p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p>
 <ul>
-<li>
-<p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端/浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
+<li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
 </li>
-<li>
-<p>302重定向：意味着资源暂时位于其他地方，客户端/浏览器应继续请求原始URL。</p>
+<li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p>
 </li>
 </ul>
 <p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p>
 <p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p>
-<p>清除301/302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
-<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2>
-<h3><span id="google-chrome">Google Chrome：</span></h3>
-<ol>
+<p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
+<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol>
 <li>打开Chrome浏览器。</li>
 <li>点击右上角的三个垂直点，选择“更多工具”。</li>
 <li>选择“清除浏览数据”。</li>
@@ -1394,16 +1381,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除数据”按钮。</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3>
-<ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol>
 <li>打开Firefox浏览器。</li>
 <li>点击右上角的三条水平线，选择“隐私与安全”。</li>
 <li>在“Cookie和站点数据”部分，点击“清除数据”。</li>
 <li>确保勾选了“缓存”选项。</li>
 <li>点击“清除”。</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge：</span></h3>
-<ol>
+<h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol>
 <li>打开Edge浏览器。</li>
 <li>点击右上角的三个水平点，选择“设置”。</li>
 <li>滚动至底部，点击“查看高级设置”。</li>
@@ -1411,15 +1396,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除”按钮。</li>
 </ol>
-<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2>
-<h3><span id="windows">Windows：</span></h3>
-<ol>
+<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol>
 <li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li>
-<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
+<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS：</span></h3>
-<ol>
+<h3><span id="macos">macOS：</span></h3><ol>
 <li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li>
 <li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 然后输入管理员密码并再次按下回车键。</li>
@@ -1458,21 +1439,19 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包/模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
-<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from 'xx/a'</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
-<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2>
-<p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
-<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3>
-<p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
+        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
+<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from &#39;xx/a&#39;</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
+<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2><p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
+<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3><p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
 <p>分析程序流，判断哪些变量未被使用、引用，进而删除此代码。</p>
 <p>很好，原理非常完美，那为什么有时候我们项目里面多余的的代码又删不掉呢？</p>
 <p>先说原因：都是副作用的锅！</p>
-<h3><span id="副作用">副作用</span></h3>
-<p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
+<h3><span id="副作用">副作用</span></h3><p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
 <p>举个例子，比如这个函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span> <span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>这个函数修改了全局变量location，甚至还让浏览器发生了跳转，这就是一个有副作用的函数。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// componetns.js</span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
@@ -1518,6 +1497,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>编译时收到这样的警告：<code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code></p>
 <p>下面给出的回复：Uglify 没做执行程序流分析。它并不会因为你注意到的副作用而删除代码。你要是想弄个完善一点的摇树，去隔壁rollup呗！</p>
 <p>issue中总结下几点关键信息：</p>
@@ -1537,6 +1517,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>当我们以 app.js 为 <code>entry</code> 时，经过摇树后的代码会变成这样：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -1549,6 +1530,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>配合 webpack 的 <code>scope hoisting</code> 和 <code>uglify</code> 之后，b 模块的痕迹会被完全抹杀掉。</p>
 <p>但是如果 b 模块中添加了一些副作用，比如一个简单的 log：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
@@ -1558,10 +1540,12 @@ webpack 之后会发现 b 模块内容变成了：
 
 <span class="token comment">// b.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">v</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token keyword">return</span> v<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <p>虽然 b 模块的导出是被忽略了，但是副作用代码被保留下来了。</p>
 <p>由于目前 <code>transformer</code> 转换后可能引入的各种奇怪操作引发的副作用，很多时候我们会发现就算有了 tree shaking 我们的 <code>bundle size</code> 还是没有明显的减小。</p>
 <p>而通常我们期望的是 b 模块既然不被使用了，其中所有的代码应该不被引入才对。</p>
-<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包/模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除。</p>
+<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包&#x2F;模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块&#x2F;包 都会被完整的移除。</p>
 <p>以 mobx-react-devtool 为例，我们通常这样去用：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 
@@ -1575,10 +1559,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>这是一个很常见的按需导入场景，然而在没有 <code>sideEffects: false</code> 配置时，即便 <code>NODE_ENV</code> 设为 <code>production</code> ，打包后的代码里依然会包含 mobx-react-devtools 包，虽然我们没使用过其导出成员，但是 mobx-react-devtools 还是会被 import，因为里面“可能”会有副作用。</p>
 <p>但当我们加上 sideEffects false 之后，tree shaking 就能安全的把它从 bundle 里完整的移除掉了。</p>
-<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2>
-<p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
+<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2><p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
 <p>这也就能解释为什么能给 vue 这个本身充满副作用的包加上 <code>sideEffects: false</code> 了。</p>
 <p>所以其实 webpack 里的 <code>sideEffects: false</code> 的意思并不是我这个模块真的没有副作用，而只是为了在摇树时告诉 webpack：我这个包在设计的时候就是期望没有副作用的，即使他打完包后是有副作用的。</p>
 

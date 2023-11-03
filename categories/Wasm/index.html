@@ -203,51 +203,44 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
-<h2><span id="wasm-汇编级性能">WASM == 汇编级性能？</span></h2>
-<p>这显然不对，**WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。**这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
-<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1/20 的水平，而 WASM 则可以跑到机器码 1/3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
+        <h2><span id="引言">引言</span></h2><p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
+<h2><span id="wasm-x3dx3d-汇编级性能">WASM &#x3D;&#x3D; 汇编级性能？</span></h2><p>这显然不对，<strong>WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。</strong> 这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
+<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1&#x2F;20 的水平，而 WASM 则可以跑到机器码 1&#x2F;3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
 <p>一个在 WASM 和 JS 之间做性能对比的经典案例，就是 Mozilla 开发者和 V8 开发者的白学现场。整个过程是这样的：</p>
 <p>Mozilla Hacks 发表了一篇名为 <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">用 Rust 和 WASM 优化 Source Map 性能 的博文</a>，将 source-map 这个 JS 包的性能优化了五倍。</p>
 <p>V8 核心开发 Vyacheslav Egorov 回应名为<a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">你也许不需要用 Rust 和 WASM 来优化 JS 的博文</a>，用纯 JS 实现了速度比 Rust 更快的惊人优化。</p>
 <p>原文作者以 无需魔法的速度 为名展开了进一步讨论，并用 Rust 做出了新的性能优化。</p>
 <p>巧的是，这场论战正发生在两年前白色相簿的季节。双方就像雪菜和冬马那样展开了高水平的对决，名场面十分精彩。最终 Vyacheslav 给出了一张三轮过招后的性能对比图。可以看到虽然最终还是 Rust 更快，但 JS 被逼到极限后非但不是败犬，还胜出了一回合：</p>
-<p><img src="/img/wasm/Rust&amp;Js.png" alt="Rust&amp;Js"></p>
+<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
 <p>另外，大佬Milo Yip 做过的不同语言光线追踪性能测试（修罗场），也能侧面印证带 VM 语言与机器码之间的性能对比结论。C++、Java 和 JS 在未经特别优化的前提下，可以分别代表三个典型的性能档次：</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++/C#/F#/Java/JS/Lua/Python/Ruby 渲染比试</a></p>
-<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2>
-<p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby 渲染比试</a></p>
+<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2><p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
 <p>而这种套两层 for 循环的苦力活，用现在的 WASM 重写能快几倍就非常不错了。至于浏览器内 AI 计算的性能方面，社区的评测结论也是 WebGL 和 WebMetal 具备最高的性能水平，然后才是 WASM。参见这里：<a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">浏览器内的 AI 评测</a></p>
-<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca/pica</a></p>
+<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
 <p>而且，对于前端来说，计算密集型的应用场景并不算太多，比起 WebGPU 这种图形渲染的技术的发展前景可以说算是比较弱势，但毕竟二者不在同一种应用场景下。</p>
 <p>所以对计算密集型任务，WASM 并不是前端唯一的救星，而是给大家多了一种在性能、开发成本和效果之间权衡的选择。在我个人印象里，前端在图形渲染外需要算力的场景说实话并不太多，像加密、压缩、挖矿这种，都难说是高频刚需。至于未来可能相当重要的 AI 应用，<strong>长期而言我还是看好 WebGPU 这种更能发挥出 GPU 潜力的下一代标准，当然 WASM 也已经是个不错的可选项了。</strong></p>
-<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2>
-<p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) =&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
+<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2><p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) &#x3D;&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
 <p><strong>这还真不一定。</strong></p>
 <p>因为现代浏览器内的 JS 引擎都有进行性能优化的利器，都标配了一种东西，那就是 <code>JIT</code>。简单来说，上面这个 add 函数如果始终都在算整数加法，那么 JS 引擎就会自动编译出一份计算 int a + int b 的机器码来替代掉原始的 JS 函数，这样高频调用这个函数的性能就会得到极大的提升，这也就是 JIT 所谓 Just-in-time 编译的奥妙所在了。</p>
 <p>所以，不要一觉得 JS 慢就想着手动靠 WASM 来嵌入 C，其实现代 JS 引擎可都是在不停地帮你<code>「自动把 JS 转换成 C」</code>的！如果你可以把一个 JS 函数改写成等价的 C，那么我猜如果把这个函数单独抽离出来，靠 JS 引擎的 JIT 都很可能达到相近的性能。这应该就是 V8 开发者敢用 JS 和 Rust 对线的底气所在吧。</p>
 <p><a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">像在 JS 和 WASM 之间的调用终于变快了</a> 这篇文章中，Lin Clark 非常精彩地论述了整个优化过程，<strong>最终使得 JS 和 WASM 间的函数调用，比非内联的 JS 函数间调用要快</strong>。不过，至于和被 JIT 内联掉的 JS 函数调用相比起来如何，这篇文章就没有提及了。</p>
 <p>这里偏个题，Mozilla 经常宣传自己实现的超大幅优化，有不少都可能来源于之前明显的设计问题（平心而论，我们自己何尝不是这样呢）。像去年 Firefox 70 在 Mac 上实现的 大幅省电优化，其根源是什么呢？粗略的理解是，以前的 Firefox 在 Mac 上竟然每帧都会全量更新窗口像素！当然，这些文章的干货都相当多，十分推荐大家打好基础后看看原文，至少是个更大的世界，也常常能对软件架构设计有所启发。</p>
 <p>如果后续 WASM 支持了 GC，那么嵌入互调的情况很可能更复杂。例如我最近就尝试在 Flutter 的 Dart 和安卓的 Java 之间手动同步大对象，希望能「嵌入一些安卓平台能力到 Flutter 体系里」，然而这带来了许多冗长而低性能的胶水代码，需要通过异步的消息来做深拷贝，可控性很低。虽然 WASM 现在还没有 GC，但一旦加上，我有理由怀疑它和 JS 之间的对象生命周期管理也会遇到类似的问题。只是这个问题主要是让 Mozilla 和 Google 的人来操心，用不着我们管而已。</p>
-<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2>
-<p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
+<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2><p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
 <ul>
 <li>在安卓的 Java class 里调用 C++</li>
 <li>在 Flutter 的 Dart 里调用 C</li>
 <li>在 QuickJS 这种嵌入式 JS 引擎里调用 C</li>
 </ul>
 <p>它们都能做到一件事，那就是在引擎里新建原生对象，并将它以传引用的方式直接交给<code>C / C++</code>函数调用，并用引擎的 GC 来管理对象的生命周期。这种方式一般称为<code> FFI（Foreign Function Interface 外部函数接口）</code>，可以把原生代码嵌入到语言 Runtime 中。但如果是两个不同的 Runtime，事情就没有这么简单了。<strong>例如 QuickJS 到 Java 的 binding 项目 Quack，就需要在 JS 的对象和 Java 对象中做 Marshalling（类似于 JSON 那样的序列化和反序列化）的过程，不能随便传引用。</strong></p>
-<p>**对 WASM 来说是怎样的呢？**基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,**wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。**但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C / C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
+<p><strong>对 WASM 来说是怎样的呢？</strong>基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,<strong>wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。</strong>但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C &#x2F; C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
 <p>例如现在如果需要频繁地用 WASM 操作 JS 对象，那么几乎必然是影响性能的。这方面典型的坑是基于 WASM 移植的 OpenGL 应用。像 C++ 中的一个 glTexImage2D 函数，目前编译到 WASM 后就需要先从 WASM 走到 JS 胶水层，再在 JS 里调 gl.texImage2D 这样的 WebGL API，最后才能经由 C++ binding 调用到原生的图形 API。这样从一层胶水变成了两层，性能不要说比起原生 C++，能比得上直接写 JS 吗？</p>
 <p>当然，Mozilla 也意识到了这个问题，因此他们在尝试如何更好地将 <code>Web IDL（也就是浏览器原生 API 的 binding）</code>开放给 WASM，并在这个过程中提出了 WASM Interface Types 概念：既然 WASM 已经是个字节码的中间层了，那么干脆给它约定个能一统所有编程语言运行时类型的 IR 规范吧！不过，这一规范还是希望主要靠协议化、结构化的深拷贝来解决问题，只有未来的 anyref 类型是可以传引用的。anyref 有些像 Unix 里的文件描述符，这里就不展开了。</p>
-<p><img src="/img/wasm/Rust&amp;Js3.webp" alt="Js2WASM"></p>
-<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2>
-<p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
-<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 / ARM / MIPS / WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
+<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
+<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2><p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
+<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 &#x2F; ARM &#x2F; MIPS &#x2F; WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
 <p>所以这里再重复一遍，编译 WASM 应用所需的依赖库和整套工具链，几乎都跟 JS 没什么关系。JS 就像机器码那样，只是人家工具链编译出来的输出格式而已。在 JS 开发者看来，这整套东西可能显得相当突兀。但从原生应用开发者的视角看来，这一切都再正常不过了。</p>
-<h2><span id="后记">后记</span></h2>
-<p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
+<h2><span id="后记">后记</span></h2><p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
 
     
     </div>
