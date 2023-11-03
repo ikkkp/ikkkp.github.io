@@ -202,20 +202,25 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
+        <h2><span id="introduction">Introduction</span></h2>
+<p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
 <p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p>
 <p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p>
 <p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p>
 <ul>
-<li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p>
+<li>
+<p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client/browser should not attempt to request the original location but use the new location from now on.</p>
 </li>
-<li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p>
+<li>
+<p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client/browser should continue requesting the original URL.</p>
 </li>
 </ul>
 <p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p>
 <p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p>
-<p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
-<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol>
+<p>Clearing 301/302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
+<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2>
+<h3><span id="google-chrome">Google Chrome:</span></h3>
+<ol>
 <li>Open the Chrome browser.</li>
 <li>Click the three vertical dots in the upper right corner and select “More tools.”</li>
 <li>Choose “Clear browsing data.”</li>
@@ -224,14 +229,16 @@
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear data” button.</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3>
+<ol>
 <li>Open the Firefox browser.</li>
 <li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li>
 <li>In the “Cookies and Site Data” section, click “Clear Data.”</li>
 <li>Ensure the “Cache” option is checked.</li>
 <li>Click “Clear.”</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol>
+<h3><span id="microsoft-edge">Microsoft Edge:</span></h3>
+<ol>
 <li>Open the Edge browser.</li>
 <li>Click the three horizontal dots in the upper right corner and select “Settings.”</li>
 <li>Scroll down and click “View advanced settings.”</li>
@@ -239,11 +246,15 @@
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear” button.</li>
 </ol>
-<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol>
+<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2>
+<h3><span id="windows">Windows:</span></h3>
+<ol>
 <li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li>
-<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
 </ol>
-<h3><span id="macos">macOS:</span></h3><ol>
+<h3><span id="macos">macOS:</span></h3>
+<ol>
 <li>Open Terminal (find it in Applications &gt; Utilities folder).</li>
 <li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 Then enter your administrator password and press Enter again.</li>

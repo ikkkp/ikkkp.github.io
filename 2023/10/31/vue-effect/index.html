@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="引言effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢 嵌套的 effecteffect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#125;)  在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effect">
+    <meta name="description" content="引言 effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢 嵌套的 effect effect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#125;) 在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effec">
 <meta property="og:type" content="article">
 <meta property="og:title" content="嵌套的 effect 与 effect 栈">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/31/vue-effect/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="引言effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢 嵌套的 effecteffect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#125;)  在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effect">
+<meta property="og:description" content="引言 effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢 嵌套的 effect effect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#125;) 在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effec">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T02:09:08.000Z">
@@ -223,12 +223,13 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
-<h2><span id="嵌套的-effect">嵌套的 effect</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <h2><span id="引言">引言</span></h2>
+<p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
+<h2><span id="嵌套的-effect">嵌套的 effect</span></h2>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
     <span class="token comment">/* ... */</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effectFn1 的执行会导致 effectFn2 的执行。那么，什么场景下会出现嵌套的 effect 呢？拿 Vue.js 来说，实际上 Vue.js 的渲染函数就是在一个 effect 中执行的.</p>
 <p>当组件发生嵌套时，例如 Foo 组件渲染了 Bar 组件：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar 组件</span>
@@ -248,10 +249,9 @@
     Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>effect函数可以嵌套使用，也就是说，一个effect函数内部可以包含另一个effect函数。当外部effect函数依赖于内部effect函数创建的响应式数据时，内部effect函数会被自动追踪，确保外部effect函数在内部effect函数发生变化时得以执行。</p>
 <p>这种嵌套的effect函数用于创建依赖关系链，确保当某个响应式数据变化时，所有依赖于它的effect函数都能够被触发执行，从而保持应用的响应性。</p>
-<p>而”effect 栈”，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
+<p>而&quot;effect 栈&quot;，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
 <p>现在有一个不使用栈结构的嵌套的<code>effect</code>函数的例子，但是他并不能实现嵌套的功能。假设我们有两个响应式数据<code>count1</code>和<code>count2</code>，其中<code>count2</code>的值依赖于<code>count1</code>的值。我们可以使用嵌套的<code>effect</code>函数来实现这种依赖关系。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 原始数据</span>
 <span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
@@ -280,7 +280,6 @@
   <span class="token comment">// 在 effectFn1 中读取 obj.foo 属性</span>
   temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><code>effectFn1</code>是外部的<code>effect</code>函数，它依赖于<code>obj.foo</code>的值，并且在内部包含了一个<code>innerEffect</code>，内部的<code>effect</code>函数依赖于<code>obj.bar</code>的值。当我们修改<code>obj.foo</code>时，我们希望外部的<code>effect</code>函数被触发执行，并且输出<code>obj.foo</code>的值，然后触发内部的依赖函数。当我们修改<code>obj.bar</code>时，内部的<code>effect</code>函数被触发执行，并且输出<code>obj.bar</code>的值。</p>
 <p>我们用全局变量 activeEffect 来存储通过 effect 函数注册的副作用函数，这意味着同一时刻 activeEffect 所存储的副作用函数只能有一个。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
@@ -331,7 +330,6 @@
   <span class="token comment">// 执行副作用函数</span>
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 
     
     </div>

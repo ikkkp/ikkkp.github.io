@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="引言当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。 例如，考虑以下的异步代码： let data;  function fetchData() &amp;#123;   setTimeout(() &#x3D;&gt; &amp;#">
+    <meta name="description" content="引言 当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。 例如，考虑以下的异步代码： let data;  function fetchData() &amp;#123;   setTimeout(() &#x3D;&gt; &amp;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-expired-side-effects">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/01/vue-expired-side-effects/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="引言当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。 例如，考虑以下的异步代码： let data;  function fetchData() &amp;#123;   setTimeout(() &#x3D;&gt; &amp;#">
+<meta property="og:description" content="引言 当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。 例如，考虑以下的异步代码： let data;  function fetchData() &amp;#123;   setTimeout(() &#x3D;&gt; &amp;">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T16:13:47.000Z">
@@ -223,7 +223,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
+        <h2><span id="引言">引言</span></h2>
+<p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
 <p>例如，考虑以下的异步代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -235,10 +236,10 @@
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出 undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这个例子中，<code>fetchData</code> 函数是异步的，它在1秒后将数据赋给 <code>data</code> 变量。但是，由于 JavaScript 是单线程的，<code>fetchData</code> 函数会在主线程的事件队列中等待1秒，而在这1秒内，<code>console.log(data)</code> 语句会立即执行，此时 <code>data</code> 的值为 <code>undefined</code>，因为 <code>fetchData</code> 函数还未完成执行。</p>
 <p>在异步编程中，由于代码的非阻塞性质，会出现类似的竞态条件问题。在处理异步操作时，我们需要小心确保数据的一致性和正确性，避免在异步操作完成前就去访问或修改相关数据。</p>
-<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2><p>那么竞态问题跟我们响应式有什么联系呢？</p>
+<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2>
+<p>那么竞态问题跟我们响应式有什么联系呢？</p>
 <p>举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -247,7 +248,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// 将请求结果赋值给 data</span>
 finalData <span class="token operator">=</span> res
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们使用 watch 观测 obj 对象的变化，每次 obj对象发生变化都会发送网络请求，例如请求接口数据，等数据请求成功之后，将结果赋值给 finalData 变量。观察上面的代码，乍一看似乎没什么问题。但仔细思考会发现这段代码会发生竞态问题。假设我们第一次修改 obj 对象的某个字段值，这会导致回调函数执行，同时发送了第一次请求 A。随着时间的推移，在请求 A 的结果返回之前，我们对 obj 对象的某个字段值进行了第二次修改，这会导致发送第二次请求 B。此时请求 A 和请求 B 都在进行中，那么哪一个请求会先返回结果呢？我们不确定，如果请求B 先于请求 A 返回结果，就会导致最终 finalData 中存储的是 A 请求的结果</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="对比"></p>
 <p>但由于请求 B 是后发送的，因此我们认为请求 B 返回的数据才是“最新”的，而请求 A 则应该被视为“过期”的，所以我们希望变量finalData 存储的值应该是由请求 B 返回的结果，而非请求 A 返回的结果。</p>
@@ -271,7 +271,6 @@ finalData <span class="token operator">=</span> res
     <span class="token comment">// 后续操作...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>如上面的代码所示，在发送请求之前，我们定义了 expired 标志变量，用来标识当前副作用函数的执行是否过期；接着调用onInvalidate 函数注册了一个过期回调，当该副作用函数的执行过期时将 expired 标志变量设置为 true；最后只有当没有过期时才采用请求结果，这样就可以有效地避免上述问题了。</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="对比"></p>
 
