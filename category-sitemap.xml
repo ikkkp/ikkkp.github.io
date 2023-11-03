@@ -9,8 +9,15 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/categories/Webpack/</loc>
+        <lastmod>2023-11-03T14:08:23.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/categories/Wasm/</loc>
-        <lastmod>2023-11-03T13:53:43.619Z</lastmod>
+        <lastmod>2023-11-03T14:06:39.833Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -18,13 +25,6 @@
     <url>
         <loc>https://ikkkp.github.io/categories/Vue/</loc>
         <lastmod>2023-11-02T12:33:26.508Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Webpack/</loc>
-        <lastmod>2023-10-29T09:21:12.932Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

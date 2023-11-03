@@ -174,6 +174,75 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/03/en/wasm-1/" itemprop="url">A Brief Discussion on WebAssembly</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-03T11:33:25.000Z" itemprop="datePublished">3 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Wasm/">Wasm</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>After reading numerous articles on WebAssembly and conducting some performance tests, I’d like to share my insights on this technology.</p>
+<h2><span id="is-wasm-equivalent-to-assembly-level-performance">Is WASM Equivalent to Assembly-Level Performance?</span></h2><p>Certainly not. <strong>The assembly in WASM does not mean actual assembly code; it is a new bytecode with its own conventions that need an interpreter to run.</strong> This interpreter is much faster than a JavaScript interpreter but still falls short of native machine code performance.</p>
+<p>As a reference point, when JavaScript is optimized with Just-In-Time (JIT) compilation, its overall performance is roughly 1&#x2F;20th of machine code. In comparison, WASM can achieve about 1&#x2F;3rd of machine code performance (these figures vary depending on the context and are for reference purposes only). Even if you write code in languages like C++ and Rust, the performance you get is comparable to Java and C#, not native machine code. This explains why WASM does not demonstrate overwhelming performance advantages in all application scenarios: if you know how to optimize JS to run efficiently, it can compete with Rust in the browser environment.</p>
+<p>A classic case of performance comparison between WASM and JS occurred in a debate between Mozilla developers and V8 developers. Mozilla Hacks published an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“Optimizing Source Maps Performance with Rust and WebAssembly”</a>, optimizing the performance of the source-map JavaScript package by five times. V8 core developer Vyacheslav Egorov responded with an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“You Might Not Need Rust and WebAssembly to Speed Up Your JS”</a>, achieving astonishing optimizations in pure JS that outperformed Rust. The debate was intense, and the performance comparison chart after three rounds clearly showed Rust’s superiority, although JS managed to outperform in one round:</p>
+<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
+<p>Additionally, Milo Yip conducted performance tests on different languages for ray tracing (a highly intensive computation task), supporting the conclusion about performance comparisons between languages and machine code. C++, Java, and JS, without specific optimizations, can represent three typical performance levels:</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">Language Rendering Comparison (C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby)</a></p>
+<h2><span id="is-wasm-faster-than-js-so-it-should-be-used-for-compute-intensive-applications">Is WASM Faster Than JS, So It Should Be Used for Compute-Intensive Applications?</span></h2><p>This assumption is a bit biased. <code>WASM</code> is still processed on the CPU. For tasks that can be highly parallelized, using <code>WebGL</code> for GPU acceleration is often much faster. For instance, algorithms for image processing, as I discussed in my article [“Practical WebGL Image Processing Introduction”](link to the article), can easily be several tens of times faster by using WebGL than by looping through canvas pixels in JS.</p>
+<p>Rewriting such a nested loop in WASM to achieve a few times improvement over JS is already considered quite good. Regarding AI computations in the browser, community evaluations show that WebGL and WebMetal offer the highest performance levels, followed by WASM. Refer to this article: <a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">“Browser-Based AI Evaluations”</a></p>
+<p>However, WebGL acceleration has precision issues. For example, the core of the frontend image resizing library Pica uses the Lanczos sampling algorithm. I implemented this algorithm with WebGL shaders; it is not complicated. The early version of Pica once included optional WebGL optimizations, but now it has shifted to WASM. The reason is that WASM can ensure consistent computation results with JS for the same parameters, whereas WebGL cannot. For related discussions, see <a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
+<p>Moreover, there are not many compute-intensive scenarios in frontend development. Tasks like encryption, compression, and mining are not high-frequency requirements. As for potentially essential AI applications in the future, <strong>I personally have confidence in WebGPU, the next-generation standard that can fully unleash GPU potential. However, WASM is already a good alternative.</strong></p>
+<h2><span id="does-embedding-a-wasm-function-in-js-automatically-improve-performance">Does Embedding a WASM Function in JS Automatically Improve Performance?</span></h2><p>Not necessarily. Modern JS engines have powerful tools for performance optimization, namely <code>JIT</code> (Just-In-Time compilation). Simply put, if a function like the <code>add</code> function in the code <code>const add = (a, b) =&gt; a + b</code> consistently performs integer addition, the JS engine will automatically compile machine code to compute <code>int a + int b</code>, replacing the original JS function. This optimization significantly enhances the performance of frequent calls to this function. This is the magic of JIT (Just-In-Time) compilation.</p>
+<p>So, don’t assume that JS is slow and think of manually replacing such JS functions with C compiled to WASM to improve performance. Modern JS engines automatically “translate JS to C” like this for you! If you can rewrite a JS function into equivalent C code, it’s highly likely that this function, when inlined, will achieve similar performance through JIT compilation. This is probably why V8 developers confidently challenged Rust with JS in the debate I mentioned earlier.</p>
+<p>In the article <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">“Calls between JavaScript and WebAssembly are Finally Fast 🎉”</a>, Lin Clark eloquently discusses the optimization process. <strong>In the end, function calls between JS and WASM are faster than non-inlined JS function calls.</strong> However, the comparison between these calls and JS functions that are inlined by JIT is not mentioned in the article.</p>
+<p>It’s worth mentioning that Mozilla often promotes their massively optimized work, much of which might have stemmed from apparent design issues (let’s be honest; we all have our moments). For instance, the significant power-saving optimization in Firefox 70 for Mac was rooted in what exactly? A rough understanding is that the previous version of Firefox on Mac updated the window pixels for every frame! Of course, these articles contain substantial information, and I highly recommend reading the original texts after building a good foundation. It opens up a broader world and often inspires insights into software architecture design.</p>
+<p>If WASM supports garbage collection (GC) in the future, managing object lifecycles between JS and WASM may become more complicated. For example, I recently attempted to synchronize large objects between Dart in Flutter and Java in Android, hoping to “embed some Android platform capabilities into the Flutter ecosystem.” However, this approach led to a lot of verbose and low-performance glue code. Objects had to be deep-copied asynchronously through messages, with very low controllability. Although WASM currently does not have GC, once it’s added, I have reasons to suspect that managing object lifecycles between WASM and JS will face similar challenges. However, this problem mainly concerns Mozilla and Google developers; it’s not something we need to worry about.</p>
+<h2><span id="is-wasm-just-like-calling-c-from-python-in-terms-of-simplicity">Is WASM Just Like Calling C from Python in Terms of Simplicity?</span></h2><p>This question can only be answered by practical experience. For example, I have recently attempted the following:</p>
+<ul>
+<li>Calling C++ from Java classes in Android</li>
+<li>Calling C from Dart in Flutter</li>
+<li>Calling C&#x2F;C++ from QuickJS, an embedded JS engine</li>
+</ul>
+<p>All of these cases involve creating native objects in the engine and passing them to C&#x2F;C++ functions by reference. This method is generally referred to as <code>FFI (Foreign Function Interface)</code>, allowing native code to be embedded in language runtimes. However, if you are dealing with two different runtimes, things are not that simple. <strong>For instance, in the Quack project, which aims to bind QuickJS with Java, marshaling (similar to serialization and deserialization like JSON) has to be done between JS and Java objects; you cannot simply pass references.</strong></p>
+<p><strong>So, how does it work with WASM?</strong> Essentially, WASM’s linear memory can be freely read and written by JS, without the hassle of deep copying. However, WASM does present some challenges in terms of data flow. It only supports basic data types such as integers and floats; there is no support for complex data structures like strings. Thus, for slightly more complex objects, it’s challenging to manually define corresponding structures on both the JS and WASM sides. This difficulty makes it complicated to directly perform complex object transformations using WASM. Currently, this dirty work is left to tools like <code>wasm-bindgen</code>, which handles complex object transformations between languages. <code>wasm-pack</code> uses another tool called <code>wasm-bindgen</code> to bridge JavaScript and Rust, among other types. However, this process is not the same as directly embedding C&#x2F;C++ functions in JS runtime, as with traditional FFI compiled to machine code.</p>
+<p>For example, if you frequently manipulate JS objects with WASM, it can almost certainly impact performance. A typical pitfall in this regard is porting OpenGL applications to WASM. For example, a function like <code>glTexImage2D</code> in C++ now needs to go through two layers: first, it goes from WASM to JS in the glue layer, and then from JS to WebGL API like <code>gl.texImage2D</code> through C++ binding. This adds an extra layer of complexity compared to directly writing the equivalent JS code. Can this approach match the performance of writing JS directly instead of two layers of glue code?</p>
+<p>Of course, Mozilla is aware of this issue. Hence, they are exploring how to better expose <code>Web IDL (the bindings of browser-native APIs)</code> to WASM. In this process, they introduced the concept of <code>WASM Interface Types</code>: since WASM is already an intermediate bytecode, why not establish a universal Intermediate Representation (IR) specification that can unify all types across programming language runtimes? However, this specification hopes to solve problems mainly through protocolization and structured deep copying, with only the <code>anyref</code> type allowing passing by reference. <code>anyref</code> behaves somewhat like file descriptors in Unix; I won’t delve into this here.</p>
+<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
+<h2><span id="is-wasm-part-of-the-frontend-ecosystem">Is WASM Part of the Frontend Ecosystem?</span></h2><p>I do not agree with this statement. It’s essential to note that the toolchains for compiling WASM applications and the libraries they depend on have little to do with JS.</p>
+<p>A toolchain that supports cross-compilation typically comes with libraries supporting the target platform. For example, after including <code>&lt;GLES2/gl2.h&gt;</code>, the <code>glTexImage2D</code> API you call is provided by the dynamic library. This API can run consistently on x86, ARM, MIPS, WASM, etc., platforms (similar to <code>.so</code> files in Android). Emscripten provides a set of dynamic libraries specifically for the WASM platform, compiling them into JS format. However, it only guarantees that these APIs are available; performance is a different story. Emscripten also provides many optimization suggestions for porting WebGL applications.</p>
+<p>So, I’d like to reiterate that the dependencies and toolchains required to compile WASM applications are almost entirely unrelated to JS. JS is just a format produced by these toolchains, similar to machine code. From the perspective of JS developers, these toolchains may seem quite unfamiliar. Still, from the perspective of native application developers, everything is quite standard.</p>
+<h2><span id="conclusion">Conclusion</span></h2><p>WebAssembly is undoubtedly a revolutionary technology, representing a new cross-platform direction, especially valuable for native application developers. However, for frontend developers, it’s just a bytecode virtual machine embedded in the browser.</p>
+<p>I hope this article clarifies some misconceptions and provides a better understanding of WebAssembly’s capabilities and limitations. While it’s a powerful tool, it’s essential to use it judiciously and consider its advantages and trade-offs within the context of your specific use case. Remember, WebAssembly is not a magic solution that automatically improves performance in all scenarios. It’s another option in the toolkit, providing a balance between performance, development cost, and effectiveness. As the technology evolves, it will be interesting to see how it integrates further into the broader web ecosystem.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/01/en/vue-reactive-shallowReactive/" itemprop="url">Vue Shallow Reactivity vs Deep Reactivity</a>
         
     </h1>
@@ -1210,6 +1279,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 
 <h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3><p>Now, run the webpack build:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
     
     </div>
     
@@ -1452,155 +1526,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <p>This explains why packages with inherent side effects, like <code>vue</code>, can still have <code>&quot;sideEffects: false&quot;</code> applied.</p>
 <p>So, in Webpack, <code>&quot;sideEffects: false&quot;</code> doesn’t mean that the module truly has no side effects. It’s just a way to tell Webpack during tree shaking: “I designed this package with the expectation that it has no side effects, even if it ends up having side effects after being bundled.”</p>
 
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/27/en/Webpack-optimization-2/" itemprop="url">Webpack Performance Optimization-2</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-27T02:28:04.000Z" itemprop="datePublished">27 October 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="performance-optimization-js-css-code-minification">Performance Optimization - JS-CSS Code Minification</span></h2><ul>
-<li>Terser is a toolset for JavaScript parsing, mangling, and compressing.</li>
-<li>In the early days, we used <code>uglify-js</code> to minify and uglify our JavaScript code. However, it is no longer maintained and does not support ES6+ syntax.</li>
-<li>Terser is a fork of <code>uglify-es</code> and retains most of its original APIs, compatible with <code>uglify-es</code> and <code>uglify-js@3</code>, etc.</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://github.com/terser/terser">webpack-terser</a></p>
-<h3><span id="javascript-code-minification">JavaScript Code Minification</span></h3><p>Webpack provides the <code>terser-webpack-plugin</code> plugin for code optimization and minification.</p>
-<p>In production mode, TerserPlugin is used by default for code processing.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> TerserPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'terser-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Configure other Webpack options...</span>
-
-  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">TerserPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
-<h3><span id="css-code-minification">CSS Code Minification</span></h3><p>Apart from JavaScript code, CSS code can also be minified using Webpack. Use <code>css-minimizer-webpack-plugin</code> to compress CSS code.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> CssMinimizerPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'css-minimizer-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Configure other Webpack options...</span>
-
-  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token keyword">new</span> <span class="token class-name">CssMinimizerPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-      <span class="token comment">// You can continue adding other compression plugins...</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="tree-shaking-implementation-in-webpack">Tree Shaking Implementation in Webpack</span></h3><p>Tree shaking is a term commonly used to describe the removal of dead code in JavaScript context.</p>
-<h1><span id="tree-shaking-in-webpack">Tree Shaking in Webpack</span></h1><p>In modern front-end development, optimizing code size is a crucial topic. Tree shaking is an optimization technique used to eliminate unused JavaScript modules in a project, reducing the size of the bundled files. Webpack provides built-in support, making it easy to implement tree shaking in projects.</p>
-<h2><span id="enable-es-module-syntax">Enable ES Module Syntax</span></h2><p>First, ensure your JavaScript code follows ES module syntax, as Webpack’s tree shaking feature only works with ES modules. Use <code>import</code> and <code>export</code> syntax to define modules in your project.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// math.js</span>
-<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">square</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">return</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">cube</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">return</span> x <span class="token operator">*</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="webpack-configuration">Webpack Configuration</span></h2><p>In the Webpack configuration file, ensure the following settings to enable tree shaking:</p>
-<p>Set <code>mode</code> to <code>&#39;production&#39;</code>. Webpack will automatically enable related optimizations, including tree shaking.</p>
-<h3><span id="implementing-tree-shaking-for-javascript">Implementing Tree Shaking for JavaScript</span></h3><p>Webpack implements tree shaking using two different approaches:</p>
-<ul>
-<li><code>usedExports</code>: Marks certain functions as used, and later optimizes them with Terser.</li>
-<li><code>sideEffects</code>: Skips entire modules&#x2F;files and checks if the file has side effects.</li>
-</ul>
-<h4><span id="using-usedexports-to-implement-tree-shaking">Using <code>usedExports</code> to Implement Tree Shaking</span></h4><p>Set the mode to production:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'production'</span><span class="token punctuation">,</span>
-  <span class="token comment">// ...other configurations</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Configure <code>usedExports</code> in the optimization section:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
- <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'development'</span><span class="token punctuation">,</span>
- <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-   <span class="token literal-property property">usedExports</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
- <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4><span id="using-sideeffects-to-implement-tree-shaking">Using <code>sideEffects</code> to Implement Tree Shaking</span></h4><p>Set the <code>sideEffects</code> field in <code>package.json</code>:</p>
-<ul>
-<li>Set it to <code>false</code> to inform Webpack that it can safely remove unused exports.</li>
-<li>If there are specific files you want to keep, set it as an array.</li>
-</ul>
-<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
-  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"your-project"</span><span class="token punctuation">,</span>
-  <span class="token property">"sideEffects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./src/some-side-effectful-file.js"</span><span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/40052192">Webpack Side Effects</a></p>
-<h4><span id="understanding-tree-shaking-and-sideeffects">Understanding Tree Shaking and <code>sideEffects</code></span></h4><p><code>sideEffects</code> and <code>usedExports</code> (more commonly considered tree shaking) are two different optimization techniques.</p>
-<p><code>sideEffects</code> is more efficient as it allows skipping entire modules&#x2F;files and their entire subtree.</p>
-<p><code>usedExports</code> depends on <code>terser</code> to detect side effects in statements. It’s a more complex JavaScript task and is not as straightforward as <code>sideEffects</code>. Also, it cannot skip subtrees&#x2F;dependencies because side effects need to be evaluated. While exported functions work as usual, higher-order functions (HOC) in the React framework can have issues in this scenario.</p>
-<h3><span id="css-tree-shaking-implementation">CSS Tree Shaking Implementation</span></h3><p>For CSS tree shaking, additional plugins are required.</p>
-<p>In the past, <code>PurifyCss</code> plugin was used for CSS tree shaking, but it’s no longer maintained (last update was 4 years ago).</p>
-<p>A different library, <code>PurgeCSS</code>, can now be used for CSS tree shaking, helping remove unused CSS.</p>
-<h2><span id="file-compression-in-webpack">File Compression in Webpack</span></h2><h3><span id="what-is-http-compression">What is HTTP Compression</span></h3><p>HTTP compression is a technique used between servers and clients to improve transmission speed and bandwidth utilization.<br>The process of HTTP compression is as follows:</p>
-<ol>
-<li>Data is compressed on the server before being sent. (Can be done in Webpack)</li>
-<li>Compatible browsers inform the server about supported compression formats during requests.</li>
-<li>The server returns the corresponding compressed file to the browser, indicating it in the response headers.</li>
-</ol>
-<h3><span id="popular-compression-formats">Popular Compression Formats</span></h3><p>There are several popular compression formats:</p>
-<ul>
-<li><code>compress</code>: Method used by UNIX’s “compress” program (historical reasons, not recommended for most applications, use gzip or deflate instead).</li>
-<li><code>deflate</code>: Compression based on the deflate algorithm (defined in RFC 1951) and encapsulated in zlib data format.</li>
-<li><code>gzip</code>: GNU zip format (defined in RFC 1952), widely used compression algorithm.</li>
-<li><code>br</code>: A new open-source compression algorithm designed specifically for HTTP content encoding.</li>
-</ul>
-<h3><span id="webpack-configuration-for-file-compression">Webpack Configuration for File Compression</span></h3><p>Webpack essentially performs the first step of HTTP compression. You can use the <code>CompressionPlugin</code> for this purpose.</p>
-<p>Step 1: Install <code>CompressionPlugin</code>:</p>
-<pre class="line-numbers language-none"><code class="language-none">npm install compression-webpack-plugin -D<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Step 2: Use <code>CompressionPlugin</code> in your Webpack configuration:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token keyword">new</span> <span class="token class-name">CompressionPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js(\?.*)?$</span><span class="token regex-delimiter">/</span><span class="token regex-flags">i</span></span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-  <span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
     
     </div>
     

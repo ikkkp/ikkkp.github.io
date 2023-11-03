@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="en">
+<head>
+    <meta charset="utf-8">
+<title>Category: Wasm - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/categories/Wasm/" rel="alternate" hreflang="zh-TW" />
+            
+    
+
+
+    
+    <meta name="description" content="A tech blog about frotn-end and security">   
+    
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/en/categories/Wasm/">
+    
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Huangzl&#39;s blog">
+<meta property="og:url" content="https://ikkkp.github.io/en/categories/Wasm/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Huangzl">
+<meta name="twitter:card" content="summary_large_image">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Huangzl&#39;s blog" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/en">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/en/archives">Archive</a>
+            
+            <a class="navbar-item "
+               href="/en/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/en/abouts">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+               <a class="navbar-item" href="/categories/Wasm/">中文</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5><i class="far fa-folder"></i>Wasm</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/11/03/en/wasm-1/" itemprop="url">A Brief Discussion on WebAssembly</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-03T11:33:25.000Z" itemprop="datePublished">3 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Wasm/">Wasm</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>After reading numerous articles on WebAssembly and conducting some performance tests, I’d like to share my insights on this technology.</p>
+<h2><span id="is-wasm-equivalent-to-assembly-level-performance">Is WASM Equivalent to Assembly-Level Performance?</span></h2><p>Certainly not. <strong>The assembly in WASM does not mean actual assembly code; it is a new bytecode with its own conventions that need an interpreter to run.</strong> This interpreter is much faster than a JavaScript interpreter but still falls short of native machine code performance.</p>
+<p>As a reference point, when JavaScript is optimized with Just-In-Time (JIT) compilation, its overall performance is roughly 1&#x2F;20th of machine code. In comparison, WASM can achieve about 1&#x2F;3rd of machine code performance (these figures vary depending on the context and are for reference purposes only). Even if you write code in languages like C++ and Rust, the performance you get is comparable to Java and C#, not native machine code. This explains why WASM does not demonstrate overwhelming performance advantages in all application scenarios: if you know how to optimize JS to run efficiently, it can compete with Rust in the browser environment.</p>
+<p>A classic case of performance comparison between WASM and JS occurred in a debate between Mozilla developers and V8 developers. Mozilla Hacks published an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“Optimizing Source Maps Performance with Rust and WebAssembly”</a>, optimizing the performance of the source-map JavaScript package by five times. V8 core developer Vyacheslav Egorov responded with an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“You Might Not Need Rust and WebAssembly to Speed Up Your JS”</a>, achieving astonishing optimizations in pure JS that outperformed Rust. The debate was intense, and the performance comparison chart after three rounds clearly showed Rust’s superiority, although JS managed to outperform in one round:</p>
+<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
+<p>Additionally, Milo Yip conducted performance tests on different languages for ray tracing (a highly intensive computation task), supporting the conclusion about performance comparisons between languages and machine code. C++, Java, and JS, without specific optimizations, can represent three typical performance levels:</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">Language Rendering Comparison (C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby)</a></p>
+<h2><span id="is-wasm-faster-than-js-so-it-should-be-used-for-compute-intensive-applications">Is WASM Faster Than JS, So It Should Be Used for Compute-Intensive Applications?</span></h2><p>This assumption is a bit biased. <code>WASM</code> is still processed on the CPU. For tasks that can be highly parallelized, using <code>WebGL</code> for GPU acceleration is often much faster. For instance, algorithms for image processing, as I discussed in my article [“Practical WebGL Image Processing Introduction”](link to the article), can easily be several tens of times faster by using WebGL than by looping through canvas pixels in JS.</p>
+<p>Rewriting such a nested loop in WASM to achieve a few times improvement over JS is already considered quite good. Regarding AI computations in the browser, community evaluations show that WebGL and WebMetal offer the highest performance levels, followed by WASM. Refer to this article: <a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">“Browser-Based AI Evaluations”</a></p>
+<p>However, WebGL acceleration has precision issues. For example, the core of the frontend image resizing library Pica uses the Lanczos sampling algorithm. I implemented this algorithm with WebGL shaders; it is not complicated. The early version of Pica once included optional WebGL optimizations, but now it has shifted to WASM. The reason is that WASM can ensure consistent computation results with JS for the same parameters, whereas WebGL cannot. For related discussions, see <a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
+<p>Moreover, there are not many compute-intensive scenarios in frontend development. Tasks like encryption, compression, and mining are not high-frequency requirements. As for potentially essential AI applications in the future, <strong>I personally have confidence in WebGPU, the next-generation standard that can fully unleash GPU potential. However, WASM is already a good alternative.</strong></p>
+<h2><span id="does-embedding-a-wasm-function-in-js-automatically-improve-performance">Does Embedding a WASM Function in JS Automatically Improve Performance?</span></h2><p>Not necessarily. Modern JS engines have powerful tools for performance optimization, namely <code>JIT</code> (Just-In-Time compilation). Simply put, if a function like the <code>add</code> function in the code <code>const add = (a, b) =&gt; a + b</code> consistently performs integer addition, the JS engine will automatically compile machine code to compute <code>int a + int b</code>, replacing the original JS function. This optimization significantly enhances the performance of frequent calls to this function. This is the magic of JIT (Just-In-Time) compilation.</p>
+<p>So, don’t assume that JS is slow and think of manually replacing such JS functions with C compiled to WASM to improve performance. Modern JS engines automatically “translate JS to C” like this for you! If you can rewrite a JS function into equivalent C code, it’s highly likely that this function, when inlined, will achieve similar performance through JIT compilation. This is probably why V8 developers confidently challenged Rust with JS in the debate I mentioned earlier.</p>
+<p>In the article <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">“Calls between JavaScript and WebAssembly are Finally Fast 🎉”</a>, Lin Clark eloquently discusses the optimization process. <strong>In the end, function calls between JS and WASM are faster than non-inlined JS function calls.</strong> However, the comparison between these calls and JS functions that are inlined by JIT is not mentioned in the article.</p>
+<p>It’s worth mentioning that Mozilla often promotes their massively optimized work, much of which might have stemmed from apparent design issues (let’s be honest; we all have our moments). For instance, the significant power-saving optimization in Firefox 70 for Mac was rooted in what exactly? A rough understanding is that the previous version of Firefox on Mac updated the window pixels for every frame! Of course, these articles contain substantial information, and I highly recommend reading the original texts after building a good foundation. It opens up a broader world and often inspires insights into software architecture design.</p>
+<p>If WASM supports garbage collection (GC) in the future, managing object lifecycles between JS and WASM may become more complicated. For example, I recently attempted to synchronize large objects between Dart in Flutter and Java in Android, hoping to “embed some Android platform capabilities into the Flutter ecosystem.” However, this approach led to a lot of verbose and low-performance glue code. Objects had to be deep-copied asynchronously through messages, with very low controllability. Although WASM currently does not have GC, once it’s added, I have reasons to suspect that managing object lifecycles between WASM and JS will face similar challenges. However, this problem mainly concerns Mozilla and Google developers; it’s not something we need to worry about.</p>
+<h2><span id="is-wasm-just-like-calling-c-from-python-in-terms-of-simplicity">Is WASM Just Like Calling C from Python in Terms of Simplicity?</span></h2><p>This question can only be answered by practical experience. For example, I have recently attempted the following:</p>
+<ul>
+<li>Calling C++ from Java classes in Android</li>
+<li>Calling C from Dart in Flutter</li>
+<li>Calling C&#x2F;C++ from QuickJS, an embedded JS engine</li>
+</ul>
+<p>All of these cases involve creating native objects in the engine and passing them to C&#x2F;C++ functions by reference. This method is generally referred to as <code>FFI (Foreign Function Interface)</code>, allowing native code to be embedded in language runtimes. However, if you are dealing with two different runtimes, things are not that simple. <strong>For instance, in the Quack project, which aims to bind QuickJS with Java, marshaling (similar to serialization and deserialization like JSON) has to be done between JS and Java objects; you cannot simply pass references.</strong></p>
+<p><strong>So, how does it work with WASM?</strong> Essentially, WASM’s linear memory can be freely read and written by JS, without the hassle of deep copying. However, WASM does present some challenges in terms of data flow. It only supports basic data types such as integers and floats; there is no support for complex data structures like strings. Thus, for slightly more complex objects, it’s challenging to manually define corresponding structures on both the JS and WASM sides. This difficulty makes it complicated to directly perform complex object transformations using WASM. Currently, this dirty work is left to tools like <code>wasm-bindgen</code>, which handles complex object transformations between languages. <code>wasm-pack</code> uses another tool called <code>wasm-bindgen</code> to bridge JavaScript and Rust, among other types. However, this process is not the same as directly embedding C&#x2F;C++ functions in JS runtime, as with traditional FFI compiled to machine code.</p>
+<p>For example, if you frequently manipulate JS objects with WASM, it can almost certainly impact performance. A typical pitfall in this regard is porting OpenGL applications to WASM. For example, a function like <code>glTexImage2D</code> in C++ now needs to go through two layers: first, it goes from WASM to JS in the glue layer, and then from JS to WebGL API like <code>gl.texImage2D</code> through C++ binding. This adds an extra layer of complexity compared to directly writing the equivalent JS code. Can this approach match the performance of writing JS directly instead of two layers of glue code?</p>
+<p>Of course, Mozilla is aware of this issue. Hence, they are exploring how to better expose <code>Web IDL (the bindings of browser-native APIs)</code> to WASM. In this process, they introduced the concept of <code>WASM Interface Types</code>: since WASM is already an intermediate bytecode, why not establish a universal Intermediate Representation (IR) specification that can unify all types across programming language runtimes? However, this specification hopes to solve problems mainly through protocolization and structured deep copying, with only the <code>anyref</code> type allowing passing by reference. <code>anyref</code> behaves somewhat like file descriptors in Unix; I won’t delve into this here.</p>
+<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
+<h2><span id="is-wasm-part-of-the-frontend-ecosystem">Is WASM Part of the Frontend Ecosystem?</span></h2><p>I do not agree with this statement. It’s essential to note that the toolchains for compiling WASM applications and the libraries they depend on have little to do with JS.</p>
+<p>A toolchain that supports cross-compilation typically comes with libraries supporting the target platform. For example, after including <code>&lt;GLES2/gl2.h&gt;</code>, the <code>glTexImage2D</code> API you call is provided by the dynamic library. This API can run consistently on x86, ARM, MIPS, WASM, etc., platforms (similar to <code>.so</code> files in Android). Emscripten provides a set of dynamic libraries specifically for the WASM platform, compiling them into JS format. However, it only guarantees that these APIs are available; performance is a different story. Emscripten also provides many optimization suggestions for porting WebGL applications.</p>
+<p>So, I’d like to reiterate that the dependencies and toolchains required to compile WASM applications are almost entirely unrelated to JS. JS is just a format produced by these toolchains, similar to machine code. From the perspective of JS developers, these toolchains may seem quite unfamiliar. Still, from the perspective of native application developers, everything is quite standard.</p>
+<h2><span id="conclusion">Conclusion</span></h2><p>WebAssembly is undoubtedly a revolutionary technology, representing a new cross-platform direction, especially valuable for native application developers. However, for frontend developers, it’s just a bytecode virtual machine embedded in the browser.</p>
+<p>I hope this article clarifies some misconceptions and provides a better understanding of WebAssembly’s capabilities and limitations. While it’s a powerful tool, it’s essential to use it judiciously and consider its advantages and trade-offs within the context of your specific use case. Remember, WebAssembly is not a magic solution that automatically improves performance in all scenarios. It’s another option in the toolkit, providing a balance between performance, development cost, and effectiveness. As the technology evolves, it will be interesting to see how it integrates further into the broader web ecosystem.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>English</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/categories/Wasm/" class="dropdown-item">
+                    中文
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>
