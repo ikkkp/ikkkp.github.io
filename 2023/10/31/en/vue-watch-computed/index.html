@@ -32,7 +32,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T04:45:41.000Z">
-<meta property="article:modified_time" content="2023-10-31T16:12:38.432Z">
+<meta property="article:modified_time" content="2023-11-03T14:08:54.169Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary_large_image">
@@ -334,6 +334,8 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 
 <p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
 <p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>

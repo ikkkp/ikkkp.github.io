@@ -32,7 +32,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-01T02:52:27.000Z">
-<meta property="article:modified_time" content="2023-11-01T07:58:42.189Z">
+<meta property="article:modified_time" content="2023-11-03T14:08:50.806Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary_large_image">
@@ -328,6 +328,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
 <p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>

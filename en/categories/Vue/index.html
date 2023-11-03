@@ -287,6 +287,11 @@ readonlyObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReadonlyObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReadonly</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// This will succeed because only top-level properties are readonly</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
     
     </div>
     
@@ -413,6 +418,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
 <p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -498,6 +505,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -639,6 +648,8 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 
 <p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
 <p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -786,7 +797,10 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
+<pre><code>
+</code></pre>
 
     
     </div>
@@ -977,6 +991,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// Currently, it should be reused for the triggerEffects function</span>
   <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
     
     </div>
     

@@ -32,7 +32,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-27T15:57:21.000Z">
-<meta property="article:modified_time" content="2023-10-28T07:51:14.932Z">
+<meta property="article:modified_time" content="2023-11-03T14:08:58.354Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Webpack">
 <meta name="twitter:card" content="summary_large_image">
@@ -355,6 +355,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <h2><span id="use-cases-of-sideeffects">Use Cases of sideEffects</span></h2><p>As mentioned earlier, it’s often difficult to guarantee whether packages&#x2F;modules published on npm contain side effects (it could be the code’s fault or the transformer’s fault). However, we can usually ensure whether a package&#x2F;module will affect objects outside of it, such as modifying properties on the <code>window</code> object or overwriting native object methods. If we can guarantee this, we can determine whether a package can have <code>&quot;sideEffects: false&quot;</code>. Whether it truly has side effects is not that important for Webpack; it’s acceptable as long as it’s marked.</p>
 <p>This explains why packages with inherent side effects, like <code>vue</code>, can still have <code>&quot;sideEffects: false&quot;</code> applied.</p>
 <p>So, in Webpack, <code>&quot;sideEffects: false&quot;</code> doesn’t mean that the module truly has no side effects. It’s just a way to tell Webpack during tree shaking: “I designed this package with the expectation that it has no side effects, even if it ends up having side effects after being bundled.”</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
