@@ -195,42 +195,33 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Before delving into JIT, it’s essential to have a basic understanding of the compilation process.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Before delving into JIT, it’s essential to have a basic understanding of the compilation process.</p>
 <p>In compiler theory, translating source code into machine instructions generally involves several crucial steps:</p>
 <p><img src="/img/just-in-time/JIT1.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h2><span id="jit-overview">JIT Overview</span></h2>
-<p><strong>JIT stands for Just-In-Time compiler.</strong> Through JIT technology, it’s possible to accelerate the execution speed of Java programs. But how is this achieved?</p>
+<h2><span id="jit-overview">JIT Overview</span></h2><p><strong>JIT stands for Just-In-Time compiler.</strong> Through JIT technology, it’s possible to accelerate the execution speed of Java programs. But how is this achieved?</p>
 <p>Java is an interpreted language (or semi-compiled, semi-interpreted language). Java compiles the source code into platform-independent Java bytecode files (.class) using the javac compiler. These bytecode files are then interpreted and executed by the Java Virtual Machine (JVM), ensuring platform independence. However, interpreting bytecode involves translating it into corresponding machine instructions, which inevitably slows down the execution speed compared to directly executing binary bytecode files.</p>
 <p>To enhance execution speed, JIT technology is introduced. When the JVM identifies a method or code block that is executed frequently, it recognizes it as a <strong>“Hot Spot Code.”</strong> JIT compiles these “Hot Spot Codes” into native machine-specific machine code, optimizes it, and caches the compiled machine code for future use.</p>
 <p><img src="/img/just-in-time/JIT2.webp" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="hot-spot-compilation">Hot Spot Compilation</span></h3>
-<p>When the JVM executes code, it doesn’t immediately start compiling it. There are two main reasons for this:</p>
+<h3><span id="hot-spot-compilation">Hot Spot Compilation</span></h3><p>When the JVM executes code, it doesn’t immediately start compiling it. There are two main reasons for this:</p>
 <p>Firstly, if a piece of code is expected to be executed only once in the future, compiling it immediately is essentially a waste of resources. Compiling code into Java bytecode is much faster than both compiling and executing the code.</p>
 <p>However, if a piece of code, such as a method call or a loop, is executed multiple times, compiling it becomes worthwhile. The compiler has the ability to discern which methods are frequently called to ensure efficient compilation. <strong>Hot Spot VM employs JIT compilation technology to directly compile high-frequency bytecode into machine instructions</strong> (with the method as the compilation unit). These compiled machine instructions are executed directly when bytecode is JIT-compiled, providing a performance boost.</p>
 <p>The second reason involves optimization. As a method or loop is executed more frequently, the JVM gains a better understanding of the code structure. Therefore, the JVM can make corresponding optimizations during the compilation process.</p>
-<h2><span id="how-javascript-is-compiled-how-jit-just-in-time-compiler-works">How JavaScript is Compiled - How JIT (Just-In-Time) Compiler Works</span></h2>
-<p>In general, there are two ways to translate programs into machine-executable instructions: using a Compiler or an Interpreter.</p>
-<h3><span id="interpreter">Interpreter</span></h3>
-<p>An interpreter translates and executes code line by line as it encounters it.</p>
+<h2><span id="how-javascript-is-compiled-how-jit-just-in-time-compiler-works">How JavaScript is Compiled - How JIT (Just-In-Time) Compiler Works</span></h2><p>In general, there are two ways to translate programs into machine-executable instructions: using a Compiler or an Interpreter.</p>
+<h3><span id="interpreter">Interpreter</span></h3><p>An interpreter translates and executes code line by line as it encounters it.</p>
 <p>Pros:</p>
 <ul>
-<li>Fast execution, no compilation delay.<br>
-Cons:</li>
+<li>Fast execution, no compilation delay.<br>Cons:</li>
 <li>Same code might be translated multiple times, especially within loops.</li>
 </ul>
 <p><img src="/img/just-in-time/JIT3.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="compiler">Compiler</span></h3>
-<p>A compiler translates the code in advance and generates an executable program.</p>
+<h3><span id="compiler">Compiler</span></h3><p>A compiler translates the code in advance and generates an executable program.</p>
 <p>Pros:</p>
 <ul>
-<li>No need for repeated compilation; can optimize code during compilation.<br>
-Cons:</li>
+<li>No need for repeated compilation; can optimize code during compilation.<br>Cons:</li>
 <li>Requires upfront compilation.</li>
 </ul>
 <p><img src="/img/just-in-time/JIT4.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="jit">JIT</span></h3>
-<p>When JavaScript first emerged, it was a typical interpreted language, resulting in slow execution speeds. Later, browsers introduced JIT compilers, significantly improving JavaScript’s execution speed.</p>
+<h3><span id="jit">JIT</span></h3><p>When JavaScript first emerged, it was a typical interpreted language, resulting in slow execution speeds. Later, browsers introduced JIT compilers, significantly improving JavaScript’s execution speed.</p>
 <blockquote>
 <p>Principle: They added a new component to the JavaScript engine, known as a monitor (or profiler). This monitor observes the running code, noting how many times it runs and the types used.</p>
 </blockquote>
@@ -243,6 +234,7 @@ Cons:</li>
     sum <span class="token operator">+=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><strong>1st Step - Interpreter</strong></p>
 <p>Initially, the code is executed using an interpreter. When a line of code is executed several times, it is marked as <strong>“Warm,”</strong> and if executed frequently, it is labeled as <strong>“Hot.”</strong></p>
 <p><strong>2nd Step - Baseline Compiler</strong></p>
@@ -253,8 +245,7 @@ Cons:</li>
 <p>For instance:</p>
 <ul>
 <li><code>sum</code> is Int, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is simple addition, corresponding to one compilation result.</li>
-<li><code>sum</code> is string, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is string concatenation, requiring the conversion of <code>i</code> to a string type.<br>
-…</li>
+<li><code>sum</code> is string, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is string concatenation, requiring the conversion of <code>i</code> to a string type.<br>…</li>
 </ul>
 <p>As illustrated in the diagram below, such a simple line of code has 16 possible compilation results.</p>
 <p><img src="/img/just-in-time/JIT5.png" alt="JIT (Just-In-Time) Compiler"></p>
@@ -263,8 +254,7 @@ Cons:</li>
 <p>However, when the code becomes “Hot,” more optimizations are performed. Here, optimization means JIT makes a specific assumption. For example, assuming <code>sum</code> and <code>i</code> are both Integers and <code>arr</code> is an Array, only one compilation result is needed.</p>
 <p>In practice, type checks are performed before execution. If the assumptions are incorrect, the execution is <strong>“deoptimized,”</strong> reverting to the interpreter or baseline compiler versions. This process is called <strong>“deoptimization.”</strong></p>
 <p>As evident, the speed of execution relies on the accuracy of these assumptions. If the assumption success rate is high, the code executes faster. Conversely, low success rates lead to slower execution than without any optimization (due to the <code>optimize =&gt; deoptimize</code> process).</p>
-<h2><span id="conclusion">Conclusion</span></h2>
-<p>In summary, this is what JIT does at runtime. It monitors running code, identifies hot code paths for optimization, making JavaScript run faster. This significantly improves the performance of most JavaScript applications.</p>
+<h2><span id="conclusion">Conclusion</span></h2><p>In summary, this is what JIT does at runtime. It monitors running code, identifies hot code paths for optimization, making JavaScript run faster. This significantly improves the performance of most JavaScript applications.</p>
 <p>However, JavaScript performance remains unpredictable. To make it faster, JIT adds some overhead at runtime, including:</p>
 <p><strong>Optimization and Deoptimization</strong></p>
 <ul>
@@ -308,48 +298,40 @@ Cons:</li>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>After reading numerous articles on WebAssembly and conducting some performance tests, I’d like to share my insights on this technology.</p>
-<h2><span id="is-wasm-equivalent-to-assembly-level-performance">Is WASM Equivalent to Assembly-Level Performance?</span></h2>
-<p>Certainly not. <strong>The assembly in WASM does not mean actual assembly code; it is a new bytecode with its own conventions that need an interpreter to run.</strong> This interpreter is much faster than a JavaScript interpreter but still falls short of native machine code performance.</p>
-<p>As a reference point, when JavaScript is optimized with Just-In-Time (JIT) compilation, its overall performance is roughly 1/20th of machine code. In comparison, WASM can achieve about 1/3rd of machine code performance (these figures vary depending on the context and are for reference purposes only). Even if you write code in languages like C++ and Rust, the performance you get is comparable to Java and C#, not native machine code. This explains why WASM does not demonstrate overwhelming performance advantages in all application scenarios: if you know how to optimize JS to run efficiently, it can compete with Rust in the browser environment.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>After reading numerous articles on WebAssembly and conducting some performance tests, I’d like to share my insights on this technology.</p>
+<h2><span id="is-wasm-equivalent-to-assembly-level-performance">Is WASM Equivalent to Assembly-Level Performance?</span></h2><p>Certainly not. <strong>The assembly in WASM does not mean actual assembly code; it is a new bytecode with its own conventions that need an interpreter to run.</strong> This interpreter is much faster than a JavaScript interpreter but still falls short of native machine code performance.</p>
+<p>As a reference point, when JavaScript is optimized with Just-In-Time (JIT) compilation, its overall performance is roughly 1&#x2F;20th of machine code. In comparison, WASM can achieve about 1&#x2F;3rd of machine code performance (these figures vary depending on the context and are for reference purposes only). Even if you write code in languages like C++ and Rust, the performance you get is comparable to Java and C#, not native machine code. This explains why WASM does not demonstrate overwhelming performance advantages in all application scenarios: if you know how to optimize JS to run efficiently, it can compete with Rust in the browser environment.</p>
 <p>A classic case of performance comparison between WASM and JS occurred in a debate between Mozilla developers and V8 developers. Mozilla Hacks published an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“Optimizing Source Maps Performance with Rust and WebAssembly”</a>, optimizing the performance of the source-map JavaScript package by five times. V8 core developer Vyacheslav Egorov responded with an article titled <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">“You Might Not Need Rust and WebAssembly to Speed Up Your JS”</a>, achieving astonishing optimizations in pure JS that outperformed Rust. The debate was intense, and the performance comparison chart after three rounds clearly showed Rust’s superiority, although JS managed to outperform in one round:</p>
-<p><img src="/img/wasm/Rust&amp;Js.png" alt="Rust&amp;Js"></p>
+<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
 <p>Additionally, Milo Yip conducted performance tests on different languages for ray tracing (a highly intensive computation task), supporting the conclusion about performance comparisons between languages and machine code. C++, Java, and JS, without specific optimizations, can represent three typical performance levels:</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">Language Rendering Comparison (C++/C#/F#/Java/JS/Lua/Python/Ruby)</a></p>
-<h2><span id="is-wasm-faster-than-js-so-it-should-be-used-for-compute-intensive-applications">Is WASM Faster Than JS, So It Should Be Used for Compute-Intensive Applications?</span></h2>
-<p>This assumption is a bit biased. <code>WASM</code> is still processed on the CPU. For tasks that can be highly parallelized, using <code>WebGL</code> for GPU acceleration is often much faster. For instance, algorithms for image processing, as I discussed in my article [“Practical WebGL Image Processing Introduction”](link to the article), can easily be several tens of times faster by using WebGL than by looping through canvas pixels in JS.</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">Language Rendering Comparison (C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby)</a></p>
+<h2><span id="is-wasm-faster-than-js-so-it-should-be-used-for-compute-intensive-applications">Is WASM Faster Than JS, So It Should Be Used for Compute-Intensive Applications?</span></h2><p>This assumption is a bit biased. <code>WASM</code> is still processed on the CPU. For tasks that can be highly parallelized, using <code>WebGL</code> for GPU acceleration is often much faster. For instance, algorithms for image processing, as I discussed in my article [“Practical WebGL Image Processing Introduction”](link to the article), can easily be several tens of times faster by using WebGL than by looping through canvas pixels in JS.</p>
 <p>Rewriting such a nested loop in WASM to achieve a few times improvement over JS is already considered quite good. Regarding AI computations in the browser, community evaluations show that WebGL and WebMetal offer the highest performance levels, followed by WASM. Refer to this article: <a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">“Browser-Based AI Evaluations”</a></p>
-<p>However, WebGL acceleration has precision issues. For example, the core of the frontend image resizing library Pica uses the Lanczos sampling algorithm. I implemented this algorithm with WebGL shaders; it is not complicated. The early version of Pica once included optional WebGL optimizations, but now it has shifted to WASM. The reason is that WASM can ensure consistent computation results with JS for the same parameters, whereas WebGL cannot. For related discussions, see <a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca/pica</a></p>
+<p>However, WebGL acceleration has precision issues. For example, the core of the frontend image resizing library Pica uses the Lanczos sampling algorithm. I implemented this algorithm with WebGL shaders; it is not complicated. The early version of Pica once included optional WebGL optimizations, but now it has shifted to WASM. The reason is that WASM can ensure consistent computation results with JS for the same parameters, whereas WebGL cannot. For related discussions, see <a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
 <p>Moreover, there are not many compute-intensive scenarios in frontend development. Tasks like encryption, compression, and mining are not high-frequency requirements. As for potentially essential AI applications in the future, <strong>I personally have confidence in WebGPU, the next-generation standard that can fully unleash GPU potential. However, WASM is already a good alternative.</strong></p>
-<h2><span id="does-embedding-a-wasm-function-in-js-automatically-improve-performance">Does Embedding a WASM Function in JS Automatically Improve Performance?</span></h2>
-<p>Not necessarily. Modern JS engines have powerful tools for performance optimization, namely <code>JIT</code> (Just-In-Time compilation). Simply put, if a function like the <code>add</code> function in the code <code>const add = (a, b) =&gt; a + b</code> consistently performs integer addition, the JS engine will automatically compile machine code to compute <code>int a + int b</code>, replacing the original JS function. This optimization significantly enhances the performance of frequent calls to this function. This is the magic of JIT (Just-In-Time) compilation.</p>
+<h2><span id="does-embedding-a-wasm-function-in-js-automatically-improve-performance">Does Embedding a WASM Function in JS Automatically Improve Performance?</span></h2><p>Not necessarily. Modern JS engines have powerful tools for performance optimization, namely <code>JIT</code> (Just-In-Time compilation). Simply put, if a function like the <code>add</code> function in the code <code>const add = (a, b) =&gt; a + b</code> consistently performs integer addition, the JS engine will automatically compile machine code to compute <code>int a + int b</code>, replacing the original JS function. This optimization significantly enhances the performance of frequent calls to this function. This is the magic of JIT (Just-In-Time) compilation.</p>
 <p>So, don’t assume that JS is slow and think of manually replacing such JS functions with C compiled to WASM to improve performance. Modern JS engines automatically “translate JS to C” like this for you! If you can rewrite a JS function into equivalent C code, it’s highly likely that this function, when inlined, will achieve similar performance through JIT compilation. This is probably why V8 developers confidently challenged Rust with JS in the debate I mentioned earlier.</p>
 <p>In the article <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">“Calls between JavaScript and WebAssembly are Finally Fast 🎉”</a>, Lin Clark eloquently discusses the optimization process. <strong>In the end, function calls between JS and WASM are faster than non-inlined JS function calls.</strong> However, the comparison between these calls and JS functions that are inlined by JIT is not mentioned in the article.</p>
 <p>It’s worth mentioning that Mozilla often promotes their massively optimized work, much of which might have stemmed from apparent design issues (let’s be honest; we all have our moments). For instance, the significant power-saving optimization in Firefox 70 for Mac was rooted in what exactly? A rough understanding is that the previous version of Firefox on Mac updated the window pixels for every frame! Of course, these articles contain substantial information, and I highly recommend reading the original texts after building a good foundation. It opens up a broader world and often inspires insights into software architecture design.</p>
 <p>If WASM supports garbage collection (GC) in the future, managing object lifecycles between JS and WASM may become more complicated. For example, I recently attempted to synchronize large objects between Dart in Flutter and Java in Android, hoping to “embed some Android platform capabilities into the Flutter ecosystem.” However, this approach led to a lot of verbose and low-performance glue code. Objects had to be deep-copied asynchronously through messages, with very low controllability. Although WASM currently does not have GC, once it’s added, I have reasons to suspect that managing object lifecycles between WASM and JS will face similar challenges. However, this problem mainly concerns Mozilla and Google developers; it’s not something we need to worry about.</p>
-<h2><span id="is-wasm-just-like-calling-c-from-python-in-terms-of-simplicity">Is WASM Just Like Calling C from Python in Terms of Simplicity?</span></h2>
-<p>This question can only be answered by practical experience. For example, I have recently attempted the following:</p>
+<h2><span id="is-wasm-just-like-calling-c-from-python-in-terms-of-simplicity">Is WASM Just Like Calling C from Python in Terms of Simplicity?</span></h2><p>This question can only be answered by practical experience. For example, I have recently attempted the following:</p>
 <ul>
 <li>Calling C++ from Java classes in Android</li>
 <li>Calling C from Dart in Flutter</li>
-<li>Calling C/C++ from QuickJS, an embedded JS engine</li>
+<li>Calling C&#x2F;C++ from QuickJS, an embedded JS engine</li>
 </ul>
-<p>All of these cases involve creating native objects in the engine and passing them to C/C++ functions by reference. This method is generally referred to as <code>FFI (Foreign Function Interface)</code>, allowing native code to be embedded in language runtimes. However, if you are dealing with two different runtimes, things are not that simple. <strong>For instance, in the Quack project, which aims to bind QuickJS with Java, marshaling (similar to serialization and deserialization like JSON) has to be done between JS and Java objects; you cannot simply pass references.</strong></p>
-<p><strong>So, how does it work with WASM?</strong> Essentially, WASM’s linear memory can be freely read and written by JS, without the hassle of deep copying. However, WASM does present some challenges in terms of data flow. It only supports basic data types such as integers and floats; there is no support for complex data structures like strings. Thus, for slightly more complex objects, it’s challenging to manually define corresponding structures on both the JS and WASM sides. This difficulty makes it complicated to directly perform complex object transformations using WASM. Currently, this dirty work is left to tools like <code>wasm-bindgen</code>, which handles complex object transformations between languages. <code>wasm-pack</code> uses another tool called <code>wasm-bindgen</code> to bridge JavaScript and Rust, among other types. However, this process is not the same as directly embedding C/C++ functions in JS runtime, as with traditional FFI compiled to machine code.</p>
+<p>All of these cases involve creating native objects in the engine and passing them to C&#x2F;C++ functions by reference. This method is generally referred to as <code>FFI (Foreign Function Interface)</code>, allowing native code to be embedded in language runtimes. However, if you are dealing with two different runtimes, things are not that simple. <strong>For instance, in the Quack project, which aims to bind QuickJS with Java, marshaling (similar to serialization and deserialization like JSON) has to be done between JS and Java objects; you cannot simply pass references.</strong></p>
+<p><strong>So, how does it work with WASM?</strong> Essentially, WASM’s linear memory can be freely read and written by JS, without the hassle of deep copying. However, WASM does present some challenges in terms of data flow. It only supports basic data types such as integers and floats; there is no support for complex data structures like strings. Thus, for slightly more complex objects, it’s challenging to manually define corresponding structures on both the JS and WASM sides. This difficulty makes it complicated to directly perform complex object transformations using WASM. Currently, this dirty work is left to tools like <code>wasm-bindgen</code>, which handles complex object transformations between languages. <code>wasm-pack</code> uses another tool called <code>wasm-bindgen</code> to bridge JavaScript and Rust, among other types. However, this process is not the same as directly embedding C&#x2F;C++ functions in JS runtime, as with traditional FFI compiled to machine code.</p>
 <p>For example, if you frequently manipulate JS objects with WASM, it can almost certainly impact performance. A typical pitfall in this regard is porting OpenGL applications to WASM. For example, a function like <code>glTexImage2D</code> in C++ now needs to go through two layers: first, it goes from WASM to JS in the glue layer, and then from JS to WebGL API like <code>gl.texImage2D</code> through C++ binding. This adds an extra layer of complexity compared to directly writing the equivalent JS code. Can this approach match the performance of writing JS directly instead of two layers of glue code?</p>
 <p>Of course, Mozilla is aware of this issue. Hence, they are exploring how to better expose <code>Web IDL (the bindings of browser-native APIs)</code> to WASM. In this process, they introduced the concept of <code>WASM Interface Types</code>: since WASM is already an intermediate bytecode, why not establish a universal Intermediate Representation (IR) specification that can unify all types across programming language runtimes? However, this specification hopes to solve problems mainly through protocolization and structured deep copying, with only the <code>anyref</code> type allowing passing by reference. <code>anyref</code> behaves somewhat like file descriptors in Unix; I won’t delve into this here.</p>
-<p><img src="/img/wasm/Rust&amp;Js3.webp" alt="Js2WASM"></p>
-<h2><span id="is-wasm-part-of-the-frontend-ecosystem">Is WASM Part of the Frontend Ecosystem?</span></h2>
-<p>I do not agree with this statement. It’s essential to note that the toolchains for compiling WASM applications and the libraries they depend on have little to do with JS.</p>
+<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
+<h2><span id="is-wasm-part-of-the-frontend-ecosystem">Is WASM Part of the Frontend Ecosystem?</span></h2><p>I do not agree with this statement. It’s essential to note that the toolchains for compiling WASM applications and the libraries they depend on have little to do with JS.</p>
 <p>A toolchain that supports cross-compilation typically comes with libraries supporting the target platform. For example, after including <code>&lt;GLES2/gl2.h&gt;</code>, the <code>glTexImage2D</code> API you call is provided by the dynamic library. This API can run consistently on x86, ARM, MIPS, WASM, etc., platforms (similar to <code>.so</code> files in Android). Emscripten provides a set of dynamic libraries specifically for the WASM platform, compiling them into JS format. However, it only guarantees that these APIs are available; performance is a different story. Emscripten also provides many optimization suggestions for porting WebGL applications.</p>
 <p>So, I’d like to reiterate that the dependencies and toolchains required to compile WASM applications are almost entirely unrelated to JS. JS is just a format produced by these toolchains, similar to machine code. From the perspective of JS developers, these toolchains may seem quite unfamiliar. Still, from the perspective of native application developers, everything is quite standard.</p>
-<h2><span id="conclusion">Conclusion</span></h2>
-<p>WebAssembly is undoubtedly a revolutionary technology, representing a new cross-platform direction, especially valuable for native application developers. However, for frontend developers, it’s just a bytecode virtual machine embedded in the browser.</p>
+<h2><span id="conclusion">Conclusion</span></h2><p>WebAssembly is undoubtedly a revolutionary technology, representing a new cross-platform direction, especially valuable for native application developers. However, for frontend developers, it’s just a bytecode virtual machine embedded in the browser.</p>
 <p>I hope this article clarifies some misconceptions and provides a better understanding of WebAssembly’s capabilities and limitations. While it’s a powerful tool, it’s essential to use it judiciously and consider its advantages and trade-offs within the context of your specific use case. Remember, WebAssembly is not a magic solution that automatically improves performance in all scenarios. It’s another option in the toolkit, providing a balance between performance, development cost, and effectiveness. As the technology evolves, it will be interesting to see how it integrates further into the broader web ecosystem.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -385,15 +367,14 @@ Cons:</li>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
-<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <h2><span id="introduction">Introduction</span></h2><p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
+<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><span class="token punctuation">&#123;</span> 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar<span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying obj.foo.bar value does not trigger reactivity</span>
 obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar <span class="token operator">=</span> <span class="token number">2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Initially, an object <code>obj</code> is created with a property <code>foo</code> containing another object <code>&#123; bar: 1 &#125;</code>. When accessing <code>obj.foo.bar</code> inside an effect function, it is noticed that modifying <code>obj.foo.bar</code> does not trigger the effect function again. Why does this happen? Let’s take a look at the current implementation:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj <span class="token punctuation">,</span><span class="token punctuation">&#123;</span>
@@ -407,6 +388,7 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token comment">// Other trapping functions are omitted</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the given code, when accessing <code>obj.foo.bar</code>, it first reads the value of <code>obj.foo</code>. Here, <code>Reflect.get</code> is used to directly return the result of <code>obj.foo</code>. Since the result obtained through <code>Reflect.get</code> is a plain object, namely <code>&#123; bar: 1 &#125;</code>, it is not a reactive object. Therefore, when accessing <code>obj.foo.bar</code> inside the effect function, no reactivity is established. To address this, the result returned by <code>Reflect.get</code> needs to be wrapped:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
@@ -421,26 +403,30 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
     <span class="token comment">// Other traps...</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, the <code>reactive</code> function is defined. It takes an object as a parameter and returns a proxy of that object. The proxy uses a <code>get</code> trap function that triggers when accessing a property of the object. In the <code>get</code> trap, <code>Reflect.get</code> is used to retrieve the property value. If the result is an object, it is made reactive by calling the <code>reactive</code> function recursively. This ensures that nested objects also possess reactive properties, allowing modifications to trigger the reactivity system.</p>
-<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2>
-<p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
+<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2><p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
 <p>Suppose we have an object with a nested object as its property:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">innerObj</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>If we apply deep reactivity to <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> reactiveObj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Any modifications to <code>obj</code> or <code>innerObj</code> properties will trigger the reactivity system:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">reactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>However, if we want only the top-level properties of <code>obj</code> to be reactive, meaning modifications to <code>obj</code> trigger reactivity but modifications to <code>innerObj</code> do not, we use the <code>shallowReactive</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>With <code>shallowReactive</code>, only modifications to <code>obj</code> will trigger reactivity:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">shallowReactiveObj<span class="token punctuation">.</span>innerObj <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Does not trigger reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2>
-<p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
+
+<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2><p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
 <p>The <code>reactive</code> function creates deeply reactive objects. This means that both the object itself and all its nested objects become reactive. Any modifications to the object or its nested objects’ properties will trigger the reactivity system.</p>
 <p>On the other hand, the <code>shallowReactive</code> function creates shallowly reactive objects. This means that only the top-level properties of the object are reactive. If the object contains nested objects, modifications to those nested objects’ properties will not trigger the reactivity system.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -448,12 +434,10 @@ shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="t
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>let reactiveObj = Vue.reactive(obj);<br>
-reactiveObj.innerObj.key = ‘new value’; // Triggers reactivity</p>
-<p>let shallowReactiveObj = Vue.shallowReactive(obj);<br>
-shallowReactiveObj.innerObj.key = ‘new value’; // Does not trigger reactivity</p>
-<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2>
-<p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
+
+<p>let reactiveObj &#x3D; Vue.reactive(obj);<br>reactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Triggers reactivity</p>
+<p>let shallowReactiveObj &#x3D; Vue.shallowReactive(obj);<br>shallowReactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Does not trigger reactivity</p>
+<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2><p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
 <p>Vue.js provides <code>readonly</code> and <code>shallowReadonly</code> functions to create readonly reactive objects.</p>
 <p>The <code>readonly</code> function creates deeply readonly reactive objects. This means that both the object itself and all its nested objects are readonly. Any attempts to modify the object or its nested objects’ properties will fail.</p>
 <p>The <code>shallowReadonly</code> function creates shallow readonly reactive objects. This means that only the top-level properties of the object are readonly. If the object contains nested objects, properties of these nested objects can be modified.</p>
@@ -468,9 +452,10 @@ readonlyObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReadonlyObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReadonly</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// This will succeed because only top-level properties are readonly</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -506,8 +491,7 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Create object proxies with Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Built-in object Reflect</a></p>
 <p>When we talk about “basic semantics” in programming languages, we mean the fundamental operations for reading and modifying data. In JavaScript, these operations typically include reading property values and setting property values. For example, given an object <code>obj</code>, the following operations are considered basic semantics:</p>
@@ -517,9 +501,9 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
 </ol>
 <p>In the above code, <code>Proxy</code> objects allow us to intercept (or redefine) these basic semantic operations. The <code>Proxy</code> constructor takes two parameters: the object being proxied and an object containing interceptors (also known as traps). In the interceptor object, we can define the <code>get</code> method to intercept property read operations and the <code>set</code> method to intercept property set operations. This way, we can execute custom logic when these operations occur.</p>
 <p>Understanding these basic semantic operations and how to use <code>Proxy</code> and <code>Reflect</code> to intercept and handle them is crucial for implementing reactive data in JavaScript. In reactive data, we can use <code>Proxy</code> and <code>Reflect</code> to track reads and modifications of object properties, enabling reactive updates of data.</p>
-<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2>
-<p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
+<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2><p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Here, <code>obj.foo</code> is a basic semantic operation for reading property values, and <code>obj.foo = newValue</code> is a basic semantic operation for setting property values.</p>
 <p>Now, we can use <code>Proxy</code> to intercept these basic semantic operations.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -537,6 +521,7 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// Outputs: Reading property foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Setting property foo to 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we created a <code>handler</code> object that defines <code>get</code> and <code>set</code> methods to intercept property reads and sets. Then, we created a proxy object <code>proxyObj</code> using the <code>Proxy</code> constructor, which intercepts read and set operations on the <code>obj</code> object. When we access <code>proxyObj.foo</code>, the <code>get</code> method is triggered, outputting the corresponding message. When we set the value of <code>proxyObj.foo</code>, the <code>set</code> method is triggered, again outputting the corresponding message.</p>
 <p>This way, <code>Proxy</code> allows us to execute custom logic when basic semantic operations occur, without directly manipulating the original object. In practical applications, this capability can be used to implement reactive data, data validation, logging, and more.</p>
 <p>When intercepting object property reads with <code>Proxy</code>, special attention is required for accessor properties because accessor properties are defined using getter functions. The <code>this</code> keyword inside these getter functions changes based on the method of invocation.</p>
@@ -557,13 +542,12 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// Triggers re-execution of the side effect function</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we use <code>Reflect.get</code> with the <code>receiver</code> parameter to ensure that <code>this</code> points to the proxy object within the <code>get</code> interceptor function. This establishes the correct reactive relationship, allowing proper dependency tracking when accessing object properties.</p>
-<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2>
-<p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
+<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2><p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
 <p>To address this issue, we use <code>Reflect.get(target, key, receiver)</code> instead of <code>target[key]</code>. By doing so, the <code>receiver</code> parameter correctly points to the proxy object, allowing the <code>this</code> keyword inside the getter function to refer to the proxy object. This establishes the proper reactive relationship.</p>
 <p>Here is an example demonstrating the use of the <code>receiver</code> parameter and comparing it with the scenario where the <code>receiver</code> parameter is not used:</p>
-<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -578,9 +562,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we use the <code>receiver</code> parameter passed to <code>Reflect.get</code> to ensure that <code>this</code> inside the <code>get</code> interceptor function refers to the proxy object <code>proxy</code>. When you access <code>proxy.foo</code>, the <code>get</code> interceptor function is triggered, and <code>this</code> points to the <code>proxy</code> object.</p>
-<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -596,11 +580,11 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Output: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
 <p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -636,8 +620,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
 <p>For instance, consider the following asynchronous code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -649,10 +632,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, the <code>fetchData</code> function is asynchronous, and it assigns the data to the <code>data</code> variable after 1 second. However, due to JavaScript’s single-threaded nature, the <code>fetchData</code> function waits in the main thread’s event queue for 1 second. Within this 1 second, the <code>console.log(data)</code> statement executes immediately, and at that point, the value of <code>data</code> is <code>undefined</code> because the <code>fetchData</code> function has not completed yet.</p>
 <p>In asynchronous programming, due to the non-blocking nature of the code, similar race condition issues can arise. When dealing with asynchronous operations, it’s crucial to ensure data consistency and correctness, avoiding accessing or modifying related data before the asynchronous operation is completed.</p>
-<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2>
-<p>So, how are race conditions related to reactivity?</p>
+<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2><p>So, how are race conditions related to reactivity?</p>
 <p>Consider the following example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData<span class="token punctuation">;</span>
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -661,6 +644,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// Assign the request result to data</span>
   finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, we use the <code>watch</code> function to observe changes to the <code>obj</code> object. Every time the <code>obj</code> object changes, a network request, such as an API call, is sent. After the data request is successful, the result is assigned to the <code>finalData</code> variable. At first glance, this code might seem fine. However, upon closer inspection, you’ll realize that this code can lead to race condition problems. Let’s assume we modify a field of the <code>obj</code> object for the first time, triggering the callback function and sending the first request A. As time passes, before the result of request A returns, we modify a field of the <code>obj</code> object again, triggering the second request B. Now, both request A and request B are in progress. Which request will return its result first? We don’t know. If request B completes before request A, the finalData variable will store the result of request B, making request A’s result outdated.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="Comparison"></p>
 <p>However, because request B was sent later, we consider its data as the “latest.” Request A is deemed “expired,” and its result should be invalidated. By ensuring that request B’s result is considered the latest, we can prevent errors caused by race conditions. Essentially, what we need is a way to expire side effects. To illustrate this concept further, let’s replicate the scenario using the <code>watch</code> function in Vue.js to see how Vue.js helps developers address this problem. Later, we’ll attempt to implement this functionality ourselves.</p>
@@ -683,11 +667,11 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token comment">// Subsequent operations...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -723,13 +707,12 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
-<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2>
-<p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
+<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2><p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>However, in certain cases, we want the side-effect function to execute only when needed, not immediately. A typical scenario is with computed properties. To achieve this delayed execution, we can add a <code>lazy</code> property to the <code>options</code> object and set it to <code>true</code>. When <code>lazy</code> is <code>true</code>, the side-effect function is not executed during initialization but only when necessary. The modified code looks like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// This function will not execute immediately</span>
@@ -741,6 +724,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the implementation, the side-effect function <code>effectFn</code> is returned as the result of the <code>effect</code> function. This means that when we call the <code>effect</code> function, we get the corresponding side-effect function and can manually execute it when needed. This mechanism gives us more control, allowing us to decide when to trigger the execution of the side-effect function rather than executing it immediately.</p>
 <p>This design pattern is particularly suitable for specific scenarios like computed properties. In computed properties, we might want to trigger the side-effect function’s execution at a specific moment rather than immediately during initialization. By returning the side-effect function from the <code>effect</code> function, we can flexibly control when the side-effect function is executed to meet different requirements in various scenarios.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -765,6 +749,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// Return the side-effect function as the result</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, the <code>effect</code> function’s second parameter is an <code>options</code> object, where the <code>lazy</code> property is set to <code>true</code>. This means that the side-effect function passed to <code>effect</code> will be executed only when necessary, such as when accessing a computed property. The <code>lazy</code> property allows us to control the immediate execution of the side-effect function.</p>
 <p>Now that we have achieved lazy computation through computed properties, how do we implement data caching?</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -791,14 +776,15 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>With lazy computation resolved, the <code>value</code> is calculated only when it is truly needed, executing <code>effectFn</code> only when necessary. Additionally, a <code>dirty</code> flag is introduced to indicate whether the current computation needs to be recalculated. If <code>dirty</code> is <code>true</code>, the <code>value</code> is recalculated, and the <code>dirty</code> flag is set to <code>false</code> so that the cached value can be used directly next time.</p>
-<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2>
-<p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
+<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2><p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Data changed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying the reactive data triggers the execution of the callback function</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Suppose <code>obj</code> is a reactive data, watched using the <code>watch</code> function with a provided callback function. When modifying the reactive data’s value, the callback function is triggered. In fact, the implementation of <code>watch</code> essentially utilizes the <code>effect</code> and the <code>options.scheduler</code> option, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -807,6 +793,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// The scheduler function is executed when obj.foo's value changes</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In a side-effect function accessing the reactive data <code>obj.foo</code>, based on the previous discussion, we know that this establishes a connection between the side-effect function and the reactive data. When the reactive data changes, the side-effect function is re-executed. However, there is an exception: if the side-effect function has a <code>scheduler</code> option, when the reactive data changes, the <code>scheduler</code> function is executed instead of directly triggering the side-effect function. From this perspective, the <code>scheduler</code> function acts as a callback function, and the implementation of <code>watch</code> utilizes this characteristic.</p>
 <p>Below is the simplest implementation of the <code>watch</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// The watch function receives two parameters: source (reactive data) and cb (callback function)</span>
@@ -823,11 +810,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
 <p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -863,13 +850,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Effect functions can be nested. But why is this design choice made?</p>
-<h2><span id="nested-effects">Nested Effects</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <h2><span id="introduction">Introduction</span></h2><p>Effect functions can be nested. But why is this design choice made?</p>
+<h2><span id="nested-effects">Nested Effects</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
     <span class="token comment">/* ... */</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the code above, <code>effectFn1</code> is nested within <code>effectFn2</code>. The execution of <code>effectFn1</code> will trigger the execution of <code>effectFn2</code>. So, when do we encounter nested effects? Take Vue.js, for example; Vue.js’s rendering function is executed within an effect.</p>
 <p>When components are nested, for instance, when the Foo component renders the Bar component:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar component</span>
@@ -882,6 +868,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">return</span> <span class="token operator">&lt;</span>Bar <span class="token operator">/</span><span class="token operator">></span> <span class="token punctuation">&#125;</span><span class="token comment">// JSX syntax</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Nested effects occur in this scenario. It can be visualized as follows:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   Foo<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -890,6 +877,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The <code>effect</code> function can be nested, meaning an <code>effect</code> function can contain another <code>effect</code> function. When an outer <code>effect</code> function depends on reactive data created inside an inner <code>effect</code> function, the inner <code>effect</code> function is automatically tracked, ensuring that the outer <code>effect</code> function is executed when the inner <code>effect</code> function changes.</p>
 <p>This nested structure of effect functions establishes a dependency chain, ensuring that when reactive data changes, all the effect functions dependent on it are triggered, thereby maintaining the responsiveness of the application.</p>
 <p>The “effect stack” in Vue 3’s internal implementation is crucial. Vue uses an effect stack to track the currently executing effect functions, similar to a function call stack. This stack manages the execution order and dependency relationships of effect functions.</p>
@@ -921,6 +909,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// Access obj.foo property within effectFn1</span>
   temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><code>effectFn1</code> is the outer <code>effect</code> function, which depends on the value of <code>obj.foo</code>. It contains an <code>innerEffect</code> within it. The inner <code>effect</code> function, <code>effectFn2</code>, depends on the value of <code>obj.bar</code>. When we modify <code>obj.foo</code>, the outer <code>effect</code> function should be triggered and output the value of <code>obj.foo</code>. When we modify <code>obj.bar</code>, the inner <code>effect</code> function should be triggered and output the value of <code>obj.bar</code>.</p>
 <p>We use the global variable <code>activeEffect</code> to store the effect functions registered through the <code>effect</code> function. This means that at any given time, <code>activeEffect</code> stores only one effect function.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
@@ -942,6 +931,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// Execute the effect function</span>
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>However, by only using a single variable for storage without employing a stack structure, when nested effects occur, the execution of the inner effect function will overwrite the value of <code>activeEffect</code>. It will never be restored to its original value. If there is a reactive data performing dependency collection, even if it is read within the outer effect function, the collected effect functions will all be from the inner effect function. In other words, when I read <code>obj.foo</code>, <code>activeEffect</code> still refers to the value of <code>innerEffect</code>, and only the <code>innerEffect</code> is triggered.</p>
 <p>To solve this issue, we need an effect function stack called <code>effectStack</code>. When an effect function is executed, the current effect function is pushed onto the stack. After the execution of the effect function is completed, it is popped from the stack. The <code>activeEffect</code> is always set to the top effect function on the stack. This ensures that a reactive data will only collect the effect function that directly reads its value, preventing mutual interference:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
@@ -971,10 +961,10 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// Execute the effect function</span>
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <hr>
 <p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
 <pre><code>
-
 </code></pre>
 
     
@@ -1011,13 +1001,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>The concept of reactivity is not difficult to understand. It refers to triggering certain events when JavaScript operates on an object or a value. This is achieved by implementing a reactive system, where operations elicit specific responses.</p>
-<h2><span id="reactive-data-and-side-effect-functions">Reactive Data and Side Effect Functions</span></h2>
-<p>Side effect functions refer to functions that produce side effects. Consider the following code snippet:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>The concept of reactivity is not difficult to understand. It refers to triggering certain events when JavaScript operates on an object or a value. This is achieved by implementing a reactive system, where operations elicit specific responses.</p>
+<h2><span id="reactive-data-and-side-effect-functions">Reactive Data and Side Effect Functions</span></h2><p>Side effect functions refer to functions that produce side effects. Consider the following code snippet:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>When the <code>effect</code> function is executed, it sets the text content of the body. Any function other than <code>effect</code> can read or modify the body’s text content. In other words, the execution of the <code>effect</code> function directly or indirectly affects the execution of other functions, indicating that the <code>effect</code> function has side effects.</p>
 <p>Side effect functions are common and can impact various aspects, such as the effectiveness of “tree shaking” in webpack, a topic we discussed earlier. I won’t delve into this here.</p>
 <p>Side effects can easily occur; for example, if a function modifies a global variable, it creates a side effect, as shown in the following code:</p>
@@ -1026,16 +1015,17 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   val <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Modifying a global variable creates a side effect</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Understanding side effect functions, let’s now discuss reactive data. Suppose a property of an object is read within a side effect function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// The execution of the effect function reads obj.text</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The side effect function <code>effect</code> sets the <code>innerText</code> property of the body element to <code>obj.text</code>. When the value of <code>obj.text</code> changes, we want the side effect function <code>effect</code> to re-execute.</p>
 <p>Our approach is as follows: we want to store the <code>effect</code> function in a bucket when reading the <code>obj.text</code> value, and when setting the <code>obj.text</code> value, we want to retrieve the <code>effect</code> function from the bucket and execute it.</p>
-<h2><span id="basic-implementation-of-reactive-data">Basic Implementation of Reactive Data</span></h2>
-<p>How can we make <code>obj</code> reactive data? By observing, we find that:</p>
+<h2><span id="basic-implementation-of-reactive-data">Basic Implementation of Reactive Data</span></h2><p>How can we make <code>obj</code> reactive data? By observing, we find that:</p>
 <ul>
 <li>When the side effect function <code>effect</code> is executed, it triggers the read operation of the <code>obj.text</code> property.</li>
 <li>When the <code>obj.text</code> value is modified, it triggers the write operation of the <code>obj.text</code> property.</li>
@@ -1057,9 +1047,9 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Here, we create a reactive object based on the Proxy object. We have a <code>proxyMap</code>, which is a container for storing various types of proxies. We define <code>get</code> and <code>set</code> intercept functions to intercept read and write operations.</p>
-<h2><span id="designing-a-comprehensive-reactive-system">Designing a Comprehensive Reactive System</span></h2>
-<p>From the above examples, it’s clear that the workflow of a reactive system is as follows:</p>
+<h2><span id="designing-a-comprehensive-reactive-system">Designing a Comprehensive Reactive System</span></h2><p>From the above examples, it’s clear that the workflow of a reactive system is as follows:</p>
 <ul>
 <li>When a read operation occurs, collect the side effect functions into a “bucket”.</li>
 <li>When a write operation occurs, retrieve the side effect functions from the “bucket” and execute them.</li>
@@ -1090,6 +1080,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>We also need to establish a clear link between side effect functions and the target fields being operated upon. For instance, when reading a property, it doesn’t matter which property is being read; all side effect functions should be collected into the “bucket.” Similarly, when setting a property, regardless of which property is being set, the side effect functions from the “bucket” should be retrieved and executed. There is no explicit connection between side effect functions and the operated fields. The solution is simple: we need to establish a connection between side effect functions and the operated fields. This requires redesigning the data structure of the “bucket” and cannot be as simple as using a Set type for the “bucket.”</p>
 <p>We use <code>WeakMap</code> to implement the bucket for storing effects as discussed earlier. If you are not familiar with the characteristics of the WeakMap class, you can learn more about it <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">here</a>.</p>
 <p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
@@ -1097,6 +1088,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Once we have defined the buckets as above, we can proceed to implement the core part of the reactive system, which is the proxy:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// The core is the proxy</span>
@@ -1114,6 +1106,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>For the previous <code>track</code> and <code>trigger</code> functions:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1163,9 +1156,10 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// Currently, it should be reused for the triggerEffects function</span>
   <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -1201,11 +1195,9 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
 <p>Here is an official link on <a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader usage and examples, including local development and testing of custom loaders</a>.</p>
-<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2>
-<p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
+<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2><p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
 <p>Synchronous loaders can return a single value representing the transformed module.</p>
 <p>Loaders can return one or two values. The first value is a string or buffer containing JavaScript code. The optional second value is a SourceMap, which is a JavaScript object.</p>
 <p>Here’s a simple example of using a loader. It matches all JavaScript files and processes them using <code>loader.js</code>:</p>
@@ -1229,16 +1221,16 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>From the above, we can understand how loaders are used. But this only scratches the surface. What does a specific loader look like?</p>
 <p>For example, a simple loader could be like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 	<span class="token comment">// content is the source content string passed in</span>
   <span class="token keyword">return</span> content
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>A loader is just a node module exposing a function that can only receive one parameter: a string containing the content of the resource file. The function’s return value is the processed content.</p>
-<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2>
-<h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3>
-<p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
+<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2><h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3><p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
 <ul>
 <li>Keep it <strong>simple</strong>.</li>
 <li>Use <strong>chaining</strong>.</li>
@@ -1251,22 +1243,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Avoid <strong>absolute paths</strong>.</li>
 <li>Use <strong>peer dependencies</strong>.</li>
 </ul>
-<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
-<p>First, create the following files in a folder within your webpack project directory:</p>
+<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following files in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/loader/custom-loader.js</code>: The source file for your custom loader.</li>
 <li><code>src/index.js</code>: JavaScript entry file for testing the custom loader.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3>
-<p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
+<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3><p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
 module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// Add a custom comment at the top of the source code</span>
     <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
-<p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1286,9 +1276,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token punctuation">]</span><span class="token punctuation">,</span>
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>This configuration achieves a simple functionality. Now let’s discuss how to test the local loader. There are two ways to do this: one is through <code>Npm link</code> for testing, a convenient method where you can create a symbolic link for local testing. Here is a link to <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>. Another way is to configure the path directly in the project:</p>
-<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
   <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -1298,8 +1288,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4>
-<p>You can also configure it using an array:</p>
+
+<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4><p>You can also configure it using an array:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Look for loaders first in the node_modules directory; if not found, search in the loaders directory</span>
@@ -1308,13 +1298,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3>
-<p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
+
+<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3><p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3>
-<p>Run the following command to build your project:</p>
+
+<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3><p>Run the following command to build your project:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>After the build is complete, you will find the generated <code>bundle.js</code> file in the <code>dist</code> folder. In this file, you can see JavaScript code with a custom comment added at the top.</p>
 <pre class="line-numbers language-none"><code class="language-none">
 
@@ -1342,23 +1333,19 @@ module.exports &#x3D; &#123;
         &#x2F;&#x2F; You can add more plugins here
     ],
 &#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, the <code>HtmlWebpackPlugin</code> is used. It generates a new HTML file based on the specified HTML template and automatically adds the bundled JavaScript file to the generated HTML file.</p>
 <p>A basic webpack plugin consists of the following components:</p>
 <ul>
-<li>
-<p>A JavaScript named function or JavaScript class.</p>
+<li><p>A JavaScript named function or JavaScript class.</p>
 </li>
-<li>
-<p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
+<li><p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
 </li>
-<li>
-<p>Specify an event hook bound to webpack itself.</p>
+<li><p>Specify an event hook bound to webpack itself.</p>
 </li>
-<li>
-<p>Process specific data from webpack’s internal instances.</p>
+<li><p>Process specific data from webpack’s internal instances.</p>
 </li>
-<li>
-<p>Call the callback provided by webpack after the functionality is completed.</p>
+<li><p>Call the callback provided by webpack after the functionality is completed.</p>
 </li>
 </ul>
 <p>A plugin structure looks like this:</p>
@@ -1376,18 +1363,15 @@ module.exports &#x3D; &#123;
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2>
-<p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
 <p>The <code>compiler</code> object is essentially bound to the entire webpack environment. It contains all the environment configurations, including options, loaders, and plugins. When webpack starts, this object is instantiated and it is <code>globally unique</code>. The parameters passed into the <code>apply</code> method are properties of this object.</p>
 <p>The <code>compilation</code> object is created each time resources are built. It represents the current module resources, compiled generated resources, changed files, and tracked dependency status. It also provides many hooks.</p>
-<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2>
-<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3>
-<p>First, create the following file in a folder within your webpack project directory:</p>
+<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2><h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following file in a folder within your webpack project directory:</p>
 <ul>
 <li><code>src/plugins/CustomPlugin.js</code>: Source file for your custom plugin.</li>
 </ul>
-<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3>
-<p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
+<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3><p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
 <span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
     <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1398,8 +1382,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3>
-<p>In the configuration file, use the custom plugin you just created.</p>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>In the configuration file, use the custom plugin you just created.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1414,12 +1398,13 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// You can add more plugins here</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3>
-<p>Now, run the webpack build:</p>
+
+<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3><p>Now, run the webpack build:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -1455,25 +1440,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
 <p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p>
 <p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p>
 <p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p>
 <ul>
-<li>
-<p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client/browser should not attempt to request the original location but use the new location from now on.</p>
+<li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p>
 </li>
-<li>
-<p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client/browser should continue requesting the original URL.</p>
+<li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p>
 </li>
 </ul>
 <p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p>
 <p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p>
-<p>Clearing 301/302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
-<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2>
-<h3><span id="google-chrome">Google Chrome:</span></h3>
-<ol>
+<p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
+<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol>
 <li>Open the Chrome browser.</li>
 <li>Click the three vertical dots in the upper right corner and select “More tools.”</li>
 <li>Choose “Clear browsing data.”</li>
@@ -1482,16 +1462,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear data” button.</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3>
-<ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol>
 <li>Open the Firefox browser.</li>
 <li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li>
 <li>In the “Cookies and Site Data” section, click “Clear Data.”</li>
 <li>Ensure the “Cache” option is checked.</li>
 <li>Click “Clear.”</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge:</span></h3>
-<ol>
+<h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol>
 <li>Open the Edge browser.</li>
 <li>Click the three horizontal dots in the upper right corner and select “Settings.”</li>
 <li>Scroll down and click “View advanced settings.”</li>
@@ -1499,23 +1477,18 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>Check the “Cached images and files” option.</li>
 <li>Click the “Clear” button.</li>
 </ol>
-<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2>
-<h3><span id="windows">Windows:</span></h3>
-<ol>
+<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol>
 <li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li>
-<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS:</span></h3>
-<ol>
+<h3><span id="macos">macOS:</span></h3><ol>
 <li>Open Terminal (find it in Applications &gt; Utilities folder).</li>
 <li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 Then enter your administrator password and press Enter again.</li>
 </ol>
 <p>Please note that clearing browser cache might lead to loss of login sessions on websites. Ensure you have backed up essential information in case you need to log in again.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
