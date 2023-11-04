@@ -3,8 +3,36 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/tags/Webpack/</loc>
-        <lastmod>2023-11-03T14:08:59.531Z</lastmod>
+        <loc>https://ikkkp.github.io/tags/JIT-compiler-JavaScript-WebAssembly/</loc>
+        <lastmod>2023-11-04T02:45:51.733Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/tags/JITcompiler-JavaScript-Wasm/</loc>
+        <lastmod>2023-11-04T02:42:22.646Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/tags/Webpack-Front-end/</loc>
+        <lastmod>2023-11-04T02:42:19.562Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/tags/Build-Rspack/</loc>
+        <lastmod>2023-11-04T02:33:13.268Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/tags/Vue/</loc>
+        <lastmod>2023-11-04T02:31:59.165Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -12,13 +40,6 @@
     <url>
         <loc>https://ikkkp.github.io/tags/Wasm/</loc>
         <lastmod>2023-11-03T14:08:55.145Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/tags/Vue/</loc>
-        <lastmod>2023-11-03T14:08:54.169Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
