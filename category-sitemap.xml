@@ -9,6 +9,20 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/categories/Vue/</loc>
+        <lastmod>2023-11-05T11:08:58.683Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/categories/Wasm/</loc>
+        <lastmod>2023-11-05T05:01:29.486Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/categories/JITcompiler/</loc>
         <lastmod>2023-11-04T02:52:14.771Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -39,20 +53,6 @@
     <url>
         <loc>https://ikkkp.github.io/categories/Build/</loc>
         <lastmod>2023-11-04T02:33:13.268Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Vue/</loc>
-        <lastmod>2023-11-04T02:31:59.165Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Wasm/</loc>
-        <lastmod>2023-11-03T14:08:55.145Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

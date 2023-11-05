@@ -174,6 +174,529 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/10/30/en/vue-reactive-1/" itemprop="url">The Role and Implementation of Vue.js Reactive System</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-30T09:20:32.000Z" itemprop="datePublished">30 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>The concept of reactivity is not difficult to understand. It refers to triggering certain events when JavaScript operates on an object or a value. This is achieved by implementing a reactive system, where operations elicit specific responses.</p>
+<h2><span id="reactive-data-and-side-effect-functions">Reactive Data and Side Effect Functions</span></h2><p>Side effect functions refer to functions that produce side effects. Consider the following code snippet:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>When the <code>effect</code> function is executed, it sets the text content of the body. Any function other than <code>effect</code> can read or modify the body’s text content. In other words, the execution of the <code>effect</code> function directly or indirectly affects the execution of other functions, indicating that the <code>effect</code> function has side effects.</p>
+<p>Side effect functions are common and can impact various aspects, such as the effectiveness of “tree shaking” in webpack, a topic we discussed earlier. I won’t delve into this here.</p>
+<p>Side effects can easily occur; for example, if a function modifies a global variable, it creates a side effect, as shown in the following code:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Global variable</span>
+<span class="token keyword">let</span> val <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  val <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Modifying a global variable creates a side effect</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Understanding side effect functions, let’s now discuss reactive data. Suppose a property of an object is read within a side effect function:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// The execution of the effect function reads obj.text</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The side effect function <code>effect</code> sets the <code>innerText</code> property of the body element to <code>obj.text</code>. When the value of <code>obj.text</code> changes, we want the side effect function <code>effect</code> to re-execute.</p>
+<p>Our approach is as follows: we want to store the <code>effect</code> function in a bucket when reading the <code>obj.text</code> value, and when setting the <code>obj.text</code> value, we want to retrieve the <code>effect</code> function from the bucket and execute it.</p>
+<h2><span id="basic-implementation-of-reactive-data">Basic Implementation of Reactive Data</span></h2><p>How can we make <code>obj</code> reactive data? By observing, we find that:</p>
+<ul>
+<li>When the side effect function <code>effect</code> is executed, it triggers the read operation of the <code>obj.text</code> property.</li>
+<li>When the <code>obj.text</code> value is modified, it triggers the write operation of the <code>obj.text</code> property.</li>
+</ul>
+<p>We need to intercept the read and write operations of an object property.</p>
+<p>Before ES2015, this could only be done using the <code>Object.defineProperty</code> function, which was also the approach used in Vue.js 2. In ES2015 and later, we can use the Proxy object to achieve this, and this is the approach adopted in Vue.js 3.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// The core is the proxy</span>
+  <span class="token comment">// The goal is to detect user get or set actions</span>
+  <span class="token keyword">const</span> existingProxy <span class="token operator">=</span> proxyMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>existingProxy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> existingProxy<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> baseHandlers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Store the created proxy,</span>
+  proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Here, we create a reactive object based on the Proxy object. We have a <code>proxyMap</code>, which is a container for storing various types of proxies. We define <code>get</code> and <code>set</code> intercept functions to intercept read and write operations.</p>
+<h2><span id="designing-a-comprehensive-reactive-system">Designing a Comprehensive Reactive System</span></h2><p>From the above examples, it’s clear that the workflow of a reactive system is as follows:</p>
+<ul>
+<li>When a read operation occurs, collect the side effect functions into a “bucket”.</li>
+<li>When a write operation occurs, retrieve the side effect functions from the “bucket” and execute them.</li>
+</ul>
+<p>Next, I’ll explain the principles through a simple implementation of a reactive system.</p>
+<p>We know that the Proxy object can accept an object with getters and setters for handling get or set operations. Therefore, we can create a <code>baseHandlers</code> to manage getters and setters.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// baseHandlers</span>
+<span class="token keyword">function</span> <span class="token function">createGetter</span><span class="token punctuation">(</span><span class="token parameter">isReadonly <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> shallow <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token function">get</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> res <span class="token operator">=</span> Reflect<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isReadonly<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Collect dependencies when triggering get</span>
+      <span class="token function">track</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token string">"get"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">return</span> res<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">createSetter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token function">set</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">,</span> receiver</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> result <span class="token operator">=</span> Reflect<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Trigger dependencies when setting values</span>
+    <span class="token function">trigger</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token string">"set"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>We also need to establish a clear link between side effect functions and the target fields being operated upon. For instance, when reading a property, it doesn’t matter which property is being read; all side effect functions should be collected into the “bucket.” Similarly, when setting a property, regardless of which property is being set, the side effect functions from the “bucket” should be retrieved and executed. There is no explicit connection between side effect functions and the operated fields. The solution is simple: we need to establish a connection between side effect functions and the operated fields. This requires redesigning the data structure of the “bucket” and cannot be as simple as using a Set type for the “bucket.”</p>
+<p>We use <code>WeakMap</code> to implement the bucket for storing effects as discussed earlier. If you are not familiar with the characteristics of the WeakMap class, you can learn more about it <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">here</a>.</p>
+<p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Map to store different types of proxies</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Once we have defined the buckets as above, we can proceed to implement the core part of the reactive system, which is the proxy:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// The core is the proxy</span>
+  <span class="token comment">// The goal is to detect user get or set actions</span>
+
+  <span class="token keyword">const</span> existingProxy <span class="token operator">=</span> proxyMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>existingProxy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> existingProxy<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  
+  <span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> baseHandlers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Store the created proxy</span>
+  proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>For the previous <code>track</code> and <code>trigger</code> functions:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Trigger track -> target: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>target<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> type:</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>type<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> key:</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 1. Find the corresponding dep based on the target</span>
+  <span class="token comment">// Initialize depsMap if it's the first time</span>
+  <span class="token keyword">let</span> depsMap <span class="token operator">=</span> targetMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>depsMap<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Initialize depsMap logic</span>
+    depsMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Map</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    targetMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> depsMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">let</span> dep <span class="token operator">=</span> depsMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>dep<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    dep <span class="token operator">=</span> <span class="token function">createDep</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    depsMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">trackEffects</span><span class="token punctuation">(</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">trigger</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 1. Collect all deps and put them into deps array,</span>
+  <span class="token comment">// which will be processed later</span>
+  <span class="token keyword">let</span> <span class="token literal-property property">deps</span><span class="token operator">:</span> Array<span class="token operator">&lt;</span>any<span class="token operator">></span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> depsMap <span class="token operator">=</span> targetMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>depsMap<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token comment">// Currently only GET type is implemented</span>
+  <span class="token comment">// for get type, just retrieve it</span>
+  <span class="token keyword">const</span> dep <span class="token operator">=</span> depsMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Collect into deps array</span>
+  deps<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> <span class="token literal-property property">effects</span><span class="token operator">:</span> Array<span class="token operator">&lt;</span>any<span class="token operator">></span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  deps<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">dep</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Destructure dep to get the stored effects</span>
+    effects<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token operator">...</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// The purpose here is to have only one dep that contains all effects</span>
+  <span class="token comment">// Currently, it should be reused for the triggerEffects function</span>
+  <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/29/en/webpack-plugin-design/" itemprop="url">Webpack Custom Loader/Plugin</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-29T06:50:05.000Z" itemprop="datePublished">29 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>A loader is a node module exported as a function. This function is called when transforming resources in the loader. The given function will utilize the <code>Loader API</code> and can be accessed through the <code>this</code> context.</p>
+<p>Here is an official link on <a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader usage and examples, including local development and testing of custom loaders</a>.</p>
+<h2><span id="simple-usage-of-webpack-loader">Simple Usage of Webpack Loader</span></h2><p>When a loader is used in a resource, it can only take one parameter - a string containing the content of the resource file.</p>
+<p>Synchronous loaders can return a single value representing the transformed module.</p>
+<p>Loaders can return one or two values. The first value is a string or buffer containing JavaScript code. The optional second value is a SourceMap, which is a JavaScript object.</p>
+<p>Here’s a simple example of using a loader. It matches all JavaScript files and processes them using <code>loader.js</code>:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">//...</span>
+  <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+        <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token string">'path/to/loader.js'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+              <span class="token comment">/* ... */</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>From the above, we can understand how loaders are used. But this only scratches the surface. What does a specific loader look like?</p>
+<p>For example, a simple loader could be like this:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// content is the source content string passed in</span>
+  <span class="token keyword">return</span> content
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>A loader is just a node module exposing a function that can only receive one parameter: a string containing the content of the resource file. The function’s return value is the processed content.</p>
+<h2><span id="creating-a-custom-webpack-loader">Creating a Custom Webpack Loader</span></h2><h3><span id="guidelines-for-using-custom-loaders">Guidelines for Using Custom Loaders</span></h3><p>When writing loaders, you should follow these guidelines. They are listed in order of importance, and some apply only to specific scenarios. Please read the detailed sections below for more information.</p>
+<ul>
+<li>Keep it <strong>simple</strong>.</li>
+<li>Use <strong>chaining</strong>.</li>
+<li>Output should be <strong>modular</strong>.</li>
+<li>Ensure it’s <strong>stateless</strong>.</li>
+<li>Use <strong>loader utilities</strong>.</li>
+<li>Record <strong>loader dependencies</strong>.</li>
+<li>Resolve <strong>module dependencies</strong>.</li>
+<li>Extract <strong>common code</strong>.</li>
+<li>Avoid <strong>absolute paths</strong>.</li>
+<li>Use <strong>peer dependencies</strong>.</li>
+</ul>
+<h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following files in a folder within your webpack project directory:</p>
+<ul>
+<li><code>src/loader/custom-loader.js</code>: The source file for your custom loader.</li>
+<li><code>src/index.js</code>: JavaScript entry file for testing the custom loader.</li>
+</ul>
+<h3><span id="step-2-write-the-custom-loader">Step 2: Write the Custom Loader</span></h3><p>In the <code>custom-loader.js</code> file, write your custom loader code. This loader adds a comment at the top of each loaded JavaScript file.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
+module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Add a custom comment at the top of the source code</span>
+    <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>Create a Webpack configuration file <code>webpack.config.js</code> in the project root directory. Use the custom loader you just created in the configuration file.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+                <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'custom-loader'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token comment">// Use the custom loader to process .js files</span>
+                <span class="token literal-property property">exclude</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>This configuration achieves a simple functionality. Now let’s discuss how to test the local loader. There are two ways to do this: one is through <code>Npm link</code> for testing, a convenient method where you can create a symbolic link for local testing. Here is a link to <a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>. Another way is to configure the path directly in the project:</p>
+<h4><span id="single-loader-configuration">Single Loader Configuration</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
+  <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">loader</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token string">'path/to/custom-loader.js'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token comment">/* ... */</span><span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4><span id="multiple-loader-configuration">Multiple Loader Configuration</span></h4><p>You can also configure it using an array:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Look for loaders first in the node_modules directory; if not found, search in the loaders directory</span>
+  <span class="token literal-property property">modules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">'node_modules'</span><span class="token punctuation">,</span>
+    path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="step-4-test-the-custom-loader">Step 4: Test the Custom Loader</span></h3><p>In the <code>index.js</code> file, write some JavaScript code, for example:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3><span id="step-5-run-webpack-build">Step 5: Run Webpack Build</span></h3><p>Run the following command to build your project:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>After the build is complete, you will find the generated <code>bundle.js</code> file in the <code>dist</code> folder. In this file, you can see JavaScript code with a custom comment added at the top.</p>
+<pre class="line-numbers language-none"><code class="language-none">
+
+## Simple Usage of Webpack Plugin
+
+Plugins provide complete control over the webpack engine for third-party developers. By introducing custom behaviors into the webpack build process through stage-based build callbacks, developers can customize webpack&#39;s behavior.
+
+Here&#39;s the simplest example:
+
+&#96;&#96;&#96;javascript
+&#x2F;&#x2F; webpack.config.js
+const HtmlWebpackPlugin &#x3D; require(&#39;html-webpack-plugin&#39;);
+
+module.exports &#x3D; &#123;
+    entry: &#39;.&#x2F;src&#x2F;index.js&#39;,
+    output: &#123;
+        filename: &#39;bundle.js&#39;,
+        path: __dirname + &#39;&#x2F;dist&#39;,
+    &#125;,
+    plugins: [
+        new HtmlWebpackPlugin(&#123;
+            template: &#39;.&#x2F;src&#x2F;index.html&#39;, &#x2F;&#x2F; Specify the HTML template file
+            filename: &#39;index.html&#39;, &#x2F;&#x2F; Generated HTML file name
+        &#125;),
+        &#x2F;&#x2F; You can add more plugins here
+    ],
+&#125;;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this example, the <code>HtmlWebpackPlugin</code> is used. It generates a new HTML file based on the specified HTML template and automatically adds the bundled JavaScript file to the generated HTML file.</p>
+<p>A basic webpack plugin consists of the following components:</p>
+<ul>
+<li><p>A JavaScript named function or JavaScript class.</p>
+</li>
+<li><p>Define an <code>apply</code> method on the plugin function’s prototype. The <code>apply</code> method is called when webpack loads the plugin and is passed the <code>compiler</code> object.</p>
+</li>
+<li><p>Specify an event hook bound to webpack itself.</p>
+</li>
+<li><p>Process specific data from webpack’s internal instances.</p>
+</li>
+<li><p>Call the callback provided by webpack after the functionality is completed.</p>
+</li>
+</ul>
+<p>A plugin structure looks like this:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">HelloWorldPlugin</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    compiler<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>done<span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span>
+      <span class="token string">'Hello World Plugin'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">(</span>
+        stats <span class="token comment">/* After binding the done hook, stats is passed as a parameter. */</span>
+      <span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello World!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>The two most important resources in plugin development are the <code>compiler</code> and <code>compilation</code> objects. Plugin development revolves around hooks on these objects.</p>
+<p>The <code>compiler</code> object is essentially bound to the entire webpack environment. It contains all the environment configurations, including options, loaders, and plugins. When webpack starts, this object is instantiated and it is <code>globally unique</code>. The parameters passed into the <code>apply</code> method are properties of this object.</p>
+<p>The <code>compilation</code> object is created each time resources are built. It represents the current module resources, compiled generated resources, changed files, and tracked dependency status. It also provides many hooks.</p>
+<h2><span id="creating-a-custom-webpack-plugin">Creating a Custom Webpack Plugin</span></h2><h3><span id="step-1-create-project-directory-and-files">Step 1: Create Project Directory and Files</span></h3><p>First, create the following file in a folder within your webpack project directory:</p>
+<ul>
+<li><code>src/plugins/CustomPlugin.js</code>: Source file for your custom plugin.</li>
+</ul>
+<h3><span id="step-2-write-the-custom-plugin">Step 2: Write the Custom Plugin</span></h3><p>In the <code>CustomPlugin.js</code> file, write a plugin that outputs a message when the webpack build process is completed.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
+<span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        compiler<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>done<span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span><span class="token string">'CustomPlugin'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+            console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'CustomPlugin: Webpack build process is done!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="step-3-configure-webpack">Step 3: Configure Webpack</span></h3><p>In the configuration file, use the custom plugin you just created.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token keyword">new</span> <span class="token class-name">CustomPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token comment">// You can add more plugins here</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="step-4-run-webpack-build">Step 4: Run Webpack Build</span></h3><p>Now, run the webpack build:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/28/en/301-302-Redirection/" itemprop="url">301/302 Redirection</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-28T08:18:48.000Z" itemprop="datePublished">28 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/http/">http</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>When configuring redirects on a website, especially in the following scenarios, issues can arise:</p>
+<p><strong>Redirecting from HTTP to HTTPS:</strong> Suppose you’ve set up an SSL certificate to upgrade your website from HTTP to HTTPS. If problems occur during this process, rendering the site inaccessible, you might consider reverting to the HTTP version. However, the challenge arises once a permanent 301 redirection is in place. Even if you remove the redirection on the server, browsers retain this information. Consequently, users’ browsers continue to enforce the HTTPS redirection, preventing them from accessing the HTTP version.</p>
+<p><strong>Changing the Website Domain:</strong> When migrating a website from one domain (such as <code>old-domain.com</code>) to another (such as <code>new-domain.com</code>), a permanent 301 redirection is often employed. This informs search engines and browsers that the site has permanently moved to a new domain. However, if complications arise during this process, you may wish to undo the redirection, allowing users to access the old domain again. Unfortunately, due to browser hard caching of 301 redirections, users become permanently redirected to the new domain, unable to revisit the old one.</p>
+<p>To avoid such situations, it is advisable to use a temporary 302 redirection initially, ensuring everything functions correctly. Unlike a 301 redirection, a 302 redirection is not permanently cached by browsers. This means that if necessary, you can revert the redirection without users being permanently locked into the new URL. This approach eliminates the need for users to manually clear their browser caches, enhancing the overall user experience.</p>
+<ul>
+<li><p><strong>301 Redirection:</strong> Indicates that a resource (page) has permanently moved to a new location. The client&#x2F;browser should not attempt to request the original location but use the new location from now on.</p>
+</li>
+<li><p><strong>302 Redirection:</strong> Indicates that the resource is temporarily located elsewhere, and the client&#x2F;browser should continue requesting the original URL.</p>
+</li>
+</ul>
+<p>A 301 redirection is permanent, meaning that even if removed from the server, browsers will perpetually redirect resources to the new domain or HTTPS due to hard caching.</p>
+<p>On the other hand, a 302 redirection is not hard-cached by browsers. If you remove the redirection from your server (website), you can still access the old version.</p>
+<p>Clearing 301&#x2F;302 redirection cache typically involves clearing browser cache or the operating system’s DNS cache. Here’s how to do it on different platforms:</p>
+<h2><span id="clearing-browser-cache-applicable-to-windows-macos-linux">Clearing Browser Cache (Applicable to Windows, macOS, Linux)</span></h2><h3><span id="google-chrome">Google Chrome:</span></h3><ol>
+<li>Open the Chrome browser.</li>
+<li>Click the three vertical dots in the upper right corner and select “More tools.”</li>
+<li>Choose “Clear browsing data.”</li>
+<li>In the popup window, select the “Advanced” tab.</li>
+<li>Set the time range to “All time.”</li>
+<li>Check the “Cached images and files” option.</li>
+<li>Click the “Clear data” button.</li>
+</ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox:</span></h3><ol>
+<li>Open the Firefox browser.</li>
+<li>Click the three horizontal lines in the upper right corner and select “Privacy &amp; Security.”</li>
+<li>In the “Cookies and Site Data” section, click “Clear Data.”</li>
+<li>Ensure the “Cache” option is checked.</li>
+<li>Click “Clear.”</li>
+</ol>
+<h3><span id="microsoft-edge">Microsoft Edge:</span></h3><ol>
+<li>Open the Edge browser.</li>
+<li>Click the three horizontal dots in the upper right corner and select “Settings.”</li>
+<li>Scroll down and click “View advanced settings.”</li>
+<li>In the “Privacy and services” section, click “Clear browsing data.”</li>
+<li>Check the “Cached images and files” option.</li>
+<li>Click the “Clear” button.</li>
+</ol>
+<h2><span id="clearing-operating-systems-dns-cache-applicable-to-windows-macos">Clearing Operating System’s DNS Cache (Applicable to Windows, macOS)</span></h2><h3><span id="windows">Windows:</span></h3><ol>
+<li>Open Command Prompt (search for “cmd” in the Start menu and open it).</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h3><span id="macos">macOS:</span></h3><ol>
+<li>Open Terminal (find it in Applications &gt; Utilities folder).</li>
+<li>Enter the following command and press Enter:<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+Then enter your administrator password and press Enter again.</li>
+</ol>
+<p>Please note that clearing browser cache might lead to loss of login sessions on websites. Ensure you have backed up essential information in case you need to log in again.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/10/27/en/Webpack-optimization-3/" itemprop="url">How to Use `sideEffects` in Webpack</a>
         
     </h1>

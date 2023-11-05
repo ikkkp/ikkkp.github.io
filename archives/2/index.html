@@ -177,6 +177,514 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/10/30/vue-reactive-1/" itemprop="url">Vue.js 响应式系统的作用与实现</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-30T09:20:32.000Z" itemprop="datePublished">2023年10月30日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="引言">引言</span></h2><p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
+<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2><p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>当 effect 函数执行时，它会设置 body 的文本内容，但除了effect 函数之外的任何函数都可以读取或设置 body 的文本内容。也就是说，effect 函数的执行会直接或间接影响其他函数的执行，这时我们说 effect 函数产生了副作用。</p>
+<p>其实副作用函数并不少见，我们前面在讨论webpack的 <code>tree shaking</code> 话题里面涉及到的是否进行数据流处理对 <code>tree shaking</code> 的效果是不可忽略的。这边不再赘述。</p>
+<p>副作用很容易产生，例如一个函数修改了全局变量，这其实也是一个副作用，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 全局变量</span>
+<span class="token keyword">let</span> val <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  val <span class="token operator">=</span> <span class="token number">2</span> <span class="token comment">// 修改全局变量，产生副作用</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>理解了什么是副作用函数，再来说说什么是响应式数据。假设在一个副作用函数中读取了某个对象的属性：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span>
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// effect 函数的执行会读取 obj.text</span>
+  document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>副作用函数 effect 会设置 body 元素的 <code>innerText</code> 属性，其值为 <code>obj.text</code>，当 <code>obj.text</code> 的值发生变化时，我们希望副作用函数 effect 会重新执行。</p>
+<p>那这样我们的思路就变成了：通过一些手段，在读取 <code>obj.text</code> 值的时候可以将effect函数储存进一个bucket里面，而在设置<code>obj.text</code> 值的时候可以在bucket里面把effect拿出来执行。</p>
+<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2><p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
+<ul>
+<li>当副作用函数 effect 执行时，会触发字段 obj.text 的读取操作；</li>
+<li>当修改 obj.text 的值时，会触发字段 obj.text 的设置操作。</li>
+</ul>
+<p>如何拦截一个对象属性的读取和设置操作。</p>
+<p>在 ES2015 之前，只能通过 Object.defineProperty 函数实现，这也是 Vue.js 2 所采用的方式。在 ES2015+ 中，我们可以使用代理对象 Proxy 来实现，这也是 Vue.js 3 所采用的方式。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 核心就是 proxy</span>
+  <span class="token comment">// 目的是可以侦听到用户 get 或者 set 的动作</span>
+  <span class="token keyword">const</span> existingProxy <span class="token operator">=</span> proxyMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>existingProxy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> existingProxy<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> baseHandlers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 把创建好的 proxy 给存起来，</span>
+  proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这样我们就基于 proxy 创建了一个用于存储副作用函数，并且我们使用了一个proxyMap，这是一个可以把各类型的proxy储存起来的容器。我们分别设置了 get 和 set 拦截函数，用于拦截读取和设置操作。</p>
+<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2><p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
+<ul>
+<li><p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
+</li>
+<li><p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
+</li>
+</ul>
+<p>下面通过一个简单的响应式系统实现来讲解原理：</p>
+<p>我们知道proxy对象是可以传入一个具有getter和setter的对象进行get或set操作时处理的函数，因此我们可以创建一个<code>baseHandlers</code>，进行getter和setter的管理。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//baseHandlers</span>
+<span class="token keyword">function</span> <span class="token function">createGetter</span><span class="token punctuation">(</span><span class="token parameter">isReadonly <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> shallow <span class="token operator">=</span> <span class="token boolean">false</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token function">get</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token comment">//Reflect.get方法允许你从一个对象中取属性值。就如同属性访问器语法，但却是通过函数调用来实现</span>
+    <span class="token keyword">const</span> res <span class="token operator">=</span> Reflect<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>isReadonly<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 在触发 get 的时候进行依赖收集</span>
+      <span class="token function">track</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token string">"get"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">return</span> res<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">createSetter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token function">set</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">,</span> receiver</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> result <span class="token operator">=</span> Reflect<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 在触发 set 的时候进行触发依赖</span>
+    <span class="token function">trigger</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> <span class="token string">"set"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
+<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键&#x2F;值对的集合</a></p>
+<p> WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
+<p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//Map存放不同类型的代理</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>定义好了上面的几种bucket，我们开始实现响应式系统最核心的部分，也就是proxy的实现：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 核心就是 proxy</span>
+  <span class="token comment">// 目的是可以侦听到用户 get 或者 set 的动作</span>
+
+  <span class="token keyword">const</span> existingProxy <span class="token operator">=</span> proxyMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>existingProxy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> existingProxy<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  
+  <span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> baseHandlers<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 把创建好的 proxy 给存起来，</span>
+  proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>对于前面的trick和trigger：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">触发 track -> target: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>target<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> type:</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>type<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> key:</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 1. 先基于 target 找到对应的 dep</span>
+  <span class="token comment">// 如果是第一次的话，那么就需要初始化</span>
+  <span class="token keyword">let</span> depsMap <span class="token operator">=</span> targetMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>depsMap<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 初始化 depsMap 的逻辑</span>
+    depsMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Map</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    targetMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> depsMap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">let</span> dep <span class="token operator">=</span> depsMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>dep<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    dep <span class="token operator">=</span> <span class="token function">createDep</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    depsMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">trackEffects</span><span class="token punctuation">(</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">trigger</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 1. 先收集所有的 dep 放到 deps 里面，</span>
+  <span class="token comment">// 后面会统一处理</span>
+  <span class="token keyword">let</span> <span class="token literal-property property">deps</span><span class="token operator">:</span> Array<span class="token operator">&lt;</span>any<span class="token operator">></span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> depsMap <span class="token operator">=</span> targetMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>depsMap<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+  <span class="token comment">// 暂时只实现了 GET 类型</span>
+  <span class="token comment">// get 类型只需要取出来就可以</span>
+  <span class="token keyword">const</span> dep <span class="token operator">=</span> depsMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 最后收集到 deps 内</span>
+  deps<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> <span class="token literal-property property">effects</span><span class="token operator">:</span> Array<span class="token operator">&lt;</span>any<span class="token operator">></span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  deps<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">dep</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 这里解构 dep 得到的是 dep 内部存储的 effect</span>
+    effects<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token operator">...</span>dep<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 这里的目的是只有一个 dep ，这个dep 里面包含所有的 effect</span>
+  <span class="token comment">// 这里的目前应该是为了 triggerEffects 这个函数的复用</span>
+  <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/29/webpack-plugin-design/" itemprop="url">Webpack-自定义 loader/plugin</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-29T06:50:05.000Z" itemprop="datePublished">2023年10月29日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Webpack/">Webpack</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="引言">引言</span></h2><p>loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 <code>Loader API</code>，并通过 this 上下文访问。</p>
+<p>这边贴一个官网链接<a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader的用法和例子，以及自定义loader本地开发测试</a></p>
+<h2><span id="webpack-loader的简单使用">Webpack Loader的简单使用</span></h2><p>当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。</p>
+<p>同步 loader 可以 return 一个代表已转换模块（transformed module）的单一值。</p>
+<p>loader 会返回一个或者两个值。第一个值的类型是 JavaScript 代码的字符串或者 buffer。第二个可选值是 SourceMap，它是个 JavaScript 对象。</p>
+<p>下面是一个简单的loader的用法，他将匹配所有的js文件，并使用loader.js处理</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">//...</span>
+  <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+        <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token string">'path/to/loader.js'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+              <span class="token comment">/* ... */</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>由上面我们可以知道loader的使用方法，但对loader仅停留在使用，那具体的一个loader长什么样呢？</p>
+<p>比如说一个简单的loader是这样的：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// content 就是传入的源内容字符串</span>
+  <span class="token keyword">return</span> content
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>一个 loader 就是一个node模块，其中暴露了一个函数，并只可以接收一个入参，这个参数是一个包含包含资源文件内容的字符串，而函数的返回值就是处理后的内容。</p>
+<h2><span id="自定义webpack-loader">自定义webpack loader</span></h2><h3><span id="自定义loader的用法准则">自定义loader的用法准则</span></h3><p>编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。</p>
+<ul>
+<li>保持 简单 。</li>
+<li>使用 链式 传递。</li>
+<li>模块化 的输出。</li>
+<li>确保 无状态 。</li>
+<li>使用 <code>loader utilities</code> 。</li>
+<li>记录 <code>loader</code> 的依赖 。</li>
+<li>解析 模块依赖关系 。</li>
+<li>提取 通用代码 。</li>
+<li>避免 绝对路径 。</li>
+<li>使用 <code>peer dependencies</code>。</li>
+</ul>
+<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，在一个webpack项目目录中的文件夹中创建以下文件：</p>
+<ul>
+<li><code>src/loader/custom-loader.js</code>：自定义Loader的源文件。</li>
+<li><code>src/index.js</code>：JavaScript入口文件，用于测试自定义Loader。</li>
+</ul>
+<h3><span id="步骤2编写自定义loader">步骤2：编写自定义Loader</span></h3><p>在 <code>custom-loader.js</code> 文件中，编写你的自定义loader代码。这个Loader的作用是将在每个加载的JavaScript文件的顶部添加一个注释。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
+module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 在源代码的顶部添加自定义注释</span>
+    <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在项目根目录下创建Webpack配置文件 <code>webpack.config.js</code>。在配置文件中，使用刚刚编写的自定义Loader。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+                <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'custom-loader'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token comment">// 使用自定义Loader处理.js文件</span>
+                <span class="token literal-property property">exclude</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>功能就简单的进行了一下实现，这里我们主要说一下如何测试调用我们的本地的 loader，方式有两种，一种是通过 <code>Npm link</code> 的方式进行测试，这边贴一个<code>Npm link</code>的链接，大家可以去创建一个软连接进行本地测试，还是挺方便的<a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>。 另外一种就是直接在项目里面进行路径配置：</p>
+<h4><span id="单loader配置方法">单loader配置方法</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
+  <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">loader</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token string">'path/to/custom-loader.js'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token comment">/* ... */</span><span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4><span id="多loader配置方法">多loader配置方法</span></h4><p>当然也可以通过数组的方式进行配置</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
+<span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 这里就是说先去找 node_modules 目录中，如果没有的话再去 loaders 目录查找</span>
+  <span class="token literal-property property">modules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">'node_modules'</span><span class="token punctuation">,</span>
+    path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="步骤4测试自定义loader">步骤4：测试自定义Loader</span></h3><p>在 <code>index.js</code> 文件中，编写一些JavaScript代码，例如：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h3><span id="步骤5运行webpack构建">步骤5：运行Webpack构建</span></h3><p>运行以下命令来构建你的项目：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>构建完成后，你将在 <code>dist</code> 文件夹中找到生成的 <code>bundle.js</code> 文件。在这个文件里面可以看到在顶部添加了自定义注释的JavaScript代码。</p>
+<hr>
+<h2><span id="webpack-plugin的简单使用">Webpack plugin的简单使用</span></h2><p>插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以在 webpack 构建流程中引入自定义的行为。</p>
+<p>比如说最简单的一个例子：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token keyword">new</span> <span class="token class-name">HtmlWebpackPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token string">'./src/index.html'</span><span class="token punctuation">,</span> <span class="token comment">// 指定HTML模板文件</span>
+            <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'index.html'</span><span class="token punctuation">,</span> <span class="token comment">// 生成的HTML文件名</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token comment">// 可以添加更多的插件</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在上面这个例子里面使用了HtmlWebpackPlugin插件，根据指定的HTML模板生成一个新的HTML文件，并将打包后的JavaScript文件自动添加到生成的HTML文件中。</p>
+<p>一个基本的webpack 插件由以下组成：</p>
+<ul>
+<li><p>一个 JavaScript 命名函数或 JavaScript 类。</p>
+</li>
+<li><p>在插件函数的 prototype 上定义一个 apply 方法，apply 方法在 webpack 装载这个插件的时候被调用，并且会传入 compiler 对象。。</p>
+</li>
+<li><p>指定一个绑定到 webpack 自身的事件钩子。</p>
+</li>
+<li><p>处理 webpack 内部实例的特定数据。</p>
+</li>
+<li><p>功能完成后调用 webpack 提供的回调。</p>
+</li>
+</ul>
+<p>一个插件结构如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">class</span> <span class="token class-name">HelloWorldPlugin</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    compiler<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>done<span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span>
+      <span class="token string">'Hello World Plugin'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">(</span>
+        stats <span class="token comment">/* 绑定 done 钩子后，stats 会作为参数传入。 */</span>
+      <span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello World!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>在插件开发中最重要的两个资源就是 compiler 和 compilation 对象。可以说Webpack plugin的开发就是围绕着这两个对象的 hook 进行操作</p>
+<p><code>compiler</code> 对象可以理解为一个和 webpack 环境整体绑定的一个对象，它包含了所有的环境配置，包括 options，loader 和 plugin，当 webpack 启动时，这个对象会被实例化，并且他是<code>全局唯一</code>的，上面我们说到的 apply 方法传入的参数就是它。</p>
+<p><code>compilation</code> 在每次构建资源的过程中都会被创建出来，一个 compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息。它同样也提供了很多的 hook 。</p>
+<h2><span id="自定义webpack-plugin">自定义Webpack plugin</span></h2><h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，还是需要一个webpack项目。我们在这个文件夹中创建以下文件：</p>
+<ul>
+<li><code>src/plugins/CustomPlugin.js</code>：自定义插件的源文件。</li>
+</ul>
+<h3><span id="步骤2编写自定义插件">步骤2：编写自定义插件</span></h3><p>在 <code>CustomPlugin.js</code> 文件中，我们编写了一个插件，并将在Webpack构建结束时输出一条信息。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
+<span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        compiler<span class="token punctuation">.</span>hooks<span class="token punctuation">.</span>done<span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span><span class="token string">'CustomPlugin'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+            console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'CustomPlugin: Webpack build process is done!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在配置文件中，使用上面我们的自定义插件。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
+<span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.js'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token keyword">new</span> <span class="token class-name">CustomPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token comment">// 可以添加更多的插件</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<h3><span id="步骤4运行webpack构建">步骤4：运行Webpack构建</span></h3><p>现在进行Webpack构建：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/10/28/301-302-Redirection/" itemprop="url">301/302-重定向</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-28T08:18:48.000Z" itemprop="datePublished">2023年10月28日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/http/">http</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
+<p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p>
+<p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p>
+<p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p>
+<p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p>
+<p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p>
+<ul>
+<li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
+</li>
+<li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p>
+</li>
+</ul>
+<p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p>
+<p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p>
+<p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
+<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol>
+<li>打开Chrome浏览器。</li>
+<li>点击右上角的三个垂直点，选择“更多工具”。</li>
+<li>选择“清除浏览数据”。</li>
+<li>在弹出的窗口中，选择“高级”选项卡。</li>
+<li>选择“所有时间”作为时间范围。</li>
+<li>勾选“缓存图像和文件”选项。</li>
+<li>点击“清除数据”按钮。</li>
+</ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol>
+<li>打开Firefox浏览器。</li>
+<li>点击右上角的三条水平线，选择“隐私与安全”。</li>
+<li>在“Cookie和站点数据”部分，点击“清除数据”。</li>
+<li>确保勾选了“缓存”选项。</li>
+<li>点击“清除”。</li>
+</ol>
+<h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol>
+<li>打开Edge浏览器。</li>
+<li>点击右上角的三个水平点，选择“设置”。</li>
+<li>滚动至底部，点击“查看高级设置”。</li>
+<li>在“隐私与服务”部分，点击“清除浏览数据”。</li>
+<li>勾选“缓存图像和文件”选项。</li>
+<li>点击“清除”按钮。</li>
+</ol>
+<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol>
+<li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li>
+<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h3><span id="macos">macOS：</span></h3><ol>
+<li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li>
+<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+然后输入管理员密码并再次按下回车键。</li>
+</ol>
+<p>请注意，清除浏览器缓存可能会导致您在网站上的登录状态丢失，所以请确保您已经备份了重要的信息，以防需要重新登录网站。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/10/27/Webpack-optimization-3/" itemprop="url">Webpack 中的 sideEffects 该怎么用</a>
         
     </h1>

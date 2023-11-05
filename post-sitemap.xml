@@ -9,6 +9,104 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/05/vue-renderer-3/</loc>
+        <lastmod>2023-11-05T11:08:58.683Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/05/en/vue-renderer-3/</loc>
+        <lastmod>2023-11-05T11:08:37.172Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/05/en/vue-renderer-2/</loc>
+        <lastmod>2023-11-05T10:21:28.763Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/05/vue-renderer-2/</loc>
+        <lastmod>2023-11-05T10:17:16.826Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/05/vue-renderer-1/</loc>
+        <lastmod>2023-11-05T05:04:41.002Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/05/en/vue-renderer-1/</loc>
+        <lastmod>2023-11-05T05:04:37.101Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/03/wasm-1/</loc>
+        <lastmod>2023-11-05T05:01:29.486Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/04/just-in-time-compilers/</loc>
         <lastmod>2023-11-04T02:52:14.771Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -309,20 +407,6 @@
     <url>
         <loc>https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/</loc>
         <lastmod>2023-11-03T14:08:44.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/11/03/wasm-1/</loc>
-        <lastmod>2023-11-03T13:53:43.619Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
