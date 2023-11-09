@@ -10,7 +10,21 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/11/08/en/hadoop-2/</loc>
-        <lastmod>2023-11-09T02:42:23.988Z</lastmod>
+        <lastmod>2023-11-09T02:43:24.598Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/08/hadoop-2/</loc>
+        <lastmod>2023-11-09T02:43:21.578Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -39,20 +53,6 @@
     <url>
         <loc>https://ikkkp.github.io/2023/11/08/en/Cloud-Computing/</loc>
         <lastmod>2023-11-08T15:34:45.999Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/11/08/hadoop-2/</loc>
-        <lastmod>2023-11-08T14:04:02.330Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
