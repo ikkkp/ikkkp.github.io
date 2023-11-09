@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>Hadoop 2.0体系架构之分布式文件系统Yarn - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2023/11/09/en/hadoop-4/" rel="alternate" hreflang="en" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2023/11/09/hadoop-4/">
+    
+
+
+
+
+
+    <meta name="description" content="Hadoop Yarn 是什么 在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop 2.0体系架构之分布式文件系统Yarn">
+<meta property="og:url" content="https://ikkkp.github.io/2023/11/09/hadoop-4/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="Hadoop Yarn 是什么 在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2023-11-09T04:28:01.000Z">
+<meta property="article:modified_time" content="2023-11-09T06:24:25.090Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Hadoop,Cloud-Computing">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Hadoop 2.0体系架构之分布式文件系统Yarn" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#hadoop-yarn-是什么">1&nbsp;&nbsp;<b>Hadoop Yarn 是什么</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#yarn-架构">2&nbsp;&nbsp;<b>Yarn 架构</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#三个主要组件">2.1&nbsp;&nbsp;三个主要组件</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#resourcemanager">2.1.1&nbsp;&nbsp;ResourceManager</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#applicationmaster">2.1.2&nbsp;&nbsp;ApplicationMaster</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#nodemanager">2.1.3&nbsp;&nbsp;NodeManager</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#提交一个-application-到-yarn-的流程">3&nbsp;&nbsp;<b>提交一个 Application 到 Yarn 的流程</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#yarn-架构典型拓扑">4&nbsp;&nbsp;<b>Yarn 架构典型拓扑</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#yarn-调度策略">5&nbsp;&nbsp;<b>Yarn 调度策略</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/2023/11/09/en/hadoop-4/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Hadoop 2.0体系架构之分布式文件系统Yarn
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-09T04:28:01.000Z" itemprop="datePublished">2023年11月9日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="hadoop-yarn-是什么">Hadoop Yarn 是什么</span></h2>
+<p>在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来的资源管理框架，就是 Yarn 。</p>
+<p>在详细介绍 Yarn 之前，我们先简单聊聊 Yarn ，Yarn 的全称是  <strong>Yet Another Resource Negotiator</strong> ，意思是“另一种资源调度器”，这种命名和“有间客栈”这种可谓是异曲同工之妙。这里多说一句，以前 Java 有一个项目编译工具，叫做 Ant，他的命名也是类似的，叫做 “Another Neat Tool”的缩写，翻译过来是“另一种整理工具”。</p>
+<p>既然都叫做资源调度器了，那么自然，它的功能也是负责资源管理和调度的，接下来，我们就深入到 Yarn 这个东西内部一探究竟吧。</p>
+<h2><span id="yarn-架构">Yarn 架构</span></h2>
+<p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
+<p>① Client：客户端，负责向集群提交作业。</p>
+<p>② ResourceManager：集群主进程，仲裁中心，负责集群资源管理和任务调度。</p>
+<p>③ Scheduler：资源仲裁模块。</p>
+<p>④ ApplicationManager：选定，启动和监管ApplicationMaster。</p>
+<p>⑤ NodeManager：集群从进程，管理监视Containers，执行具体任务。</p>
+<p>⑥ Container：本机资源集合体，如某Container为4个CPU，8GB内存。</p>
+<p>⑦ ApplicationMaster：任务执行和监管中心。</p>
+<h3><span id="三个主要组件">三个主要组件</span></h3>
+<p>再看最上面的图，我们能直观发现的两个主要的组件是 <code>ResourceManager</code> 和 <code>NodeManager</code> ，但其实还有一个 <code>ApplicationMaster</code> 在图中没有直观显示。我们分别来看这三个组件。</p>
+<h4><span id="resourcemanager">ResourceManager</span></h4>
+<p>我们先来说说上图中最中央的那个 ResourceManager（RM）。从名字上我们就能知道这个组件是负责资源管理的，整个系统有且只有一个 RM ，来负责资源的调度。</p>
+<p>它也包含了两个主要的组件：<code>定时调用器(Scheduler)</code>以及<code>应用管理器(ApplicationManager)</code>。</p>
+<p><code>定时调度器(Scheduler)</code>：从本质上来说，定时调度器就是一种策略，或者说一种算法。当 Client 提交一个任务的时候，它会根据所需要的资源以及当前集群的资源状况进行分配。注意，它只负责向应用程序分配资源，并不做监控以及应用程序的状态跟踪。</p>
+<p><code>应用管理器(ApplicationManager)</code>：同样，听名字就能大概知道它是干嘛的。应用管理器就是负责管理 Client 用户提交的应用。上面不是说到定时调度器（Scheduler）不对用户提交的程序监控嘛，其实啊，监控应用的工作正是由应用管理器（ApplicationManager）完成的。</p>
+<h4><span id="applicationmaster">ApplicationMaster</span></h4>
+<p>每当 Client 提交一个 Application 时候，就会新建一个 ApplicationMaster 。由这个 ApplicationMaster 去与 ResourceManager 申请容器资源，获得资源后会将要运行的程序发送到容器上启动，然后进行分布式计算。</p>
+<p>这里可能有些难以理解，为什么是把运行程序发送到容器上去运行？如果以传统的思路来看，是程序运行着不动，然后数据进进出出不停流转。但当数据量大的时候就没法这么玩了，因为海量数据移动成本太大，时间太长。但是中国有一句老话山不过来，我就过去。大数据分布式计算就是这种思想，既然大数据难以移动，那我就把容易移动的应用程序发布到各个节点进行计算呗，这就是大数据分布式计算的思路。</p>
+<h4><span id="nodemanager">NodeManager</span></h4>
+<p>NodeManager 是 ResourceManager 在每台机器的上代理，负责容器的管理，并监控他们的资源使用情况（cpu，内存，磁盘及网络等），以及向 ResourceManager/Scheduler 提供这些资源使用报告。</p>
+<p>Yarn的主要思想是将MRv1版JobTracker的两大功能——资源管理和任务调度，拆分成两个独立的进程：</p>
+<p><img src="/img/yarn-pkg/Yarn2.png" alt="hadoop-Yarn"></p>
+<ul>
+<li>
+<p>Yarn依旧是master/slave结构</p>
+</li>
+<li>
+<p>主进程ResourceManager是整个集群资源仲裁中心</p>
+</li>
+<li>
+<p>从进程NodeManager管理本机资源</p>
+</li>
+<li>
+<p>ResourceManager和从属节点的进程NodeManager组成了Hadoop 2.0的分布式数据计算框架</p>
+</li>
+</ul>
+<h2><span id="提交一个-application-到-yarn-的流程">提交一个 Application 到 Yarn 的流程</span></h2>
+<p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
+<p>这张图简单地标明了提交一个程序所经历的流程，接下来我们来具体说说每一步的过程。</p>
+<ul>
+<li>
+<p>Client 向 Yarn 提交 Application，这里我们假设是一个 MapReduce 作业。</p>
+</li>
+<li>
+<p>ResourceManager 向 NodeManager 通信，为该 Application 分配第一个容器。并在这个容器中运行这个应用程序对应的 ApplicationMaster。</p>
+</li>
+<li>
+<p>ApplicationMaster 启动以后，对 作业（也就是 Application） 进行拆分，拆分 task 出来，这些 task 可以运行在一个或多个容器中。然后向<br>
+ResourceManager 申请要运行程序的容器，并定时向 ResourceManager 发送心跳。</p>
+</li>
+<li>
+<p>申请到容器后，ApplicationMaster 会去和容器对应的 NodeManager 通信，而后将作业分发到对应的 NodeManager 中的容器去运行，这里会将拆分后的 MapReduce 进行分发，对应容器中运行的可能是 Map 任务，也可能是 Reduce 任务。</p>
+</li>
+<li>
+<p>容器中运行的任务会向 ApplicationMaster 发送心跳，汇报自身情况。当程序运行完成后， ApplicationMaster 再向 ResourceManager 注销并释放容器资源。<br>
+以上就是一个作业的大体运行流程。</p>
+</li>
+</ul>
+<p><img src="/img/yarn-pkg/Yarn4.png" alt="hadoop-Yarn"></p>
+<h2><span id="yarn-架构典型拓扑">Yarn 架构典型拓扑</span></h2>
+<p>除了<code>ResourceManager</code>和<code>NodeManager</code>两个实体外，Yarn还包括<code>WebAppProxyServer</code>和<code>JobHistoryServer</code>两个实体。</p>
+<p><img src="/img/yarn-pkg/Yarn5.png" alt="hadoop-Yarn"></p>
+<p><code>JobHistoryServer</code>：管理已完成的Yarn任务</p>
+<ul>
+<li>历史任务的日志和执行时的各种统计信息统一由JobTracker管理</li>
+<li>Yarn将管理历史任务的功能抽象成一独立实体JobHistoryServer</li>
+</ul>
+<p><code>WebAppProxyServer</code>：任务执行时的Web页面代理</p>
+<ul>
+<li>通过使用代理，不仅进一步降低了ResourceManager的压力，还能降低Yarn受到的Web攻击</li>
+<li>负责监管具体MapReduce任务执行全过程，将从Container那里收集过的任务执行信息汇总并显示到一个Web界面上</li>
+</ul>
+<h2><span id="yarn-调度策略">Yarn 调度策略</span></h2>
+<p><strong>容量调度算法</strong><br>
+<code>CapacityScheduler</code>是一种多用户多任务调度策略，它以队列为单位划分任务，以<code>Container</code>为单位分配资源</p>
+<p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
+<p><strong>公平调度策略</strong><br>
+<code>FairScheduler</code>是一种允许多个<code>Yarn</code>任务公平使用集群资源的可插拔式调度策略</p>
+<p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Hadoop-Cloud-Computing/">#Hadoop,Cloud-Computing</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2023/11/09/hadoop-3/">Hadoop 2.0体系架构之分布式文件系统HDFS</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2023/11/09/en/hadoop-4/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>

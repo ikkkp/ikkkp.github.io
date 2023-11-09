@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/09/en/hadoop-4/</loc>
+        <lastmod>2023-11-09T06:58:03.856Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/09/hadoop-4/</loc>
+        <lastmod>2023-11-09T06:24:25.090Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/09/en/hadoop-3/</loc>
         <lastmod>2023-11-09T04:15:12.848Z</lastmod>
         <changefreq>weekly</changefreq>
