@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>Hadoop 2.0体系架构之分布式文件系统HDFS - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2023/11/09/en/hadoop-3/" rel="alternate" hreflang="en" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2023/11/09/hadoop-3/">
+    
+
+
+
+
+
+    <meta name="description" content="HDFS设计原则设计目标存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。  采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。  运行于商业硬件上: Hadoop不需要特别贵的、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop 2.0体系架构之分布式文件系统HDFS">
+<meta property="og:url" content="https://ikkkp.github.io/2023/11/09/hadoop-3/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="HDFS设计原则设计目标存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。  采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。  运行于商业硬件上: Hadoop不需要特别贵的、">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2023-11-09T02:45:27.000Z">
+<meta property="article:modified_time" content="2023-11-09T04:12:34.609Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Hadoop,Cloud-Computing">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Hadoop 2.0体系架构之分布式文件系统HDFS" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#hdfs设计原则">1&nbsp;&nbsp;<b>HDFS设计原则</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#设计目标">1.1&nbsp;&nbsp;设计目标</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#hdfs不适合的应用类型">1.2&nbsp;&nbsp;HDFS不适合的应用类型</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs定位">2&nbsp;&nbsp;<b>HDFS定位</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs体系架构">3&nbsp;&nbsp;<b>HDFS体系架构</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs核心概念">4&nbsp;&nbsp;<b>HDFS核心概念</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#blocks">4.1&nbsp;&nbsp;Blocks</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#namenode-amp-datanode">4.2&nbsp;&nbsp;Namenode &amp;amp; Datanode</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#namenode">4.2.1&nbsp;&nbsp;Namenode</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#datanode">4.2.2&nbsp;&nbsp;Datanode</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#经典hdfs体系架构">5&nbsp;&nbsp;<b>经典HDFS体系架构</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#一般拓扑">5.1&nbsp;&nbsp;一般拓扑</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#商用拓扑">5.2&nbsp;&nbsp;商用拓扑</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#命令行接口">6&nbsp;&nbsp;<b>命令行接口</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#数据流读写流程">7&nbsp;&nbsp;<b>数据流（读写流程）</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#读文件">7.1&nbsp;&nbsp;读文件</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#写文件">7.2&nbsp;&nbsp;写文件</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs内部特性">8&nbsp;&nbsp;<b>HDFS内部特性</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#数据冗余">9&nbsp;&nbsp;<b>数据冗余</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#副本存放">10&nbsp;&nbsp;<b>副本存放</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#副本选择">10.1&nbsp;&nbsp;副本选择</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#心跳检测">10.2&nbsp;&nbsp;心跳检测</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#数据完整性检测">10.3&nbsp;&nbsp;数据完整性检测</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#简单一致性模型-流式数据访问">10.4&nbsp;&nbsp;简单一致性模型、流式数据访问</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#客户端缓存">10.5&nbsp;&nbsp;客户端缓存</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/2023/11/09/en/hadoop-3/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Hadoop 2.0体系架构之分布式文件系统HDFS
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-09T02:45:27.000Z" itemprop="datePublished">2023年11月9日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="hdfs设计原则">HDFS设计原则</span></h2><h3><span id="设计目标">设计目标</span></h3><p><strong>存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。</strong></p>
+<ul>
+<li><p>采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作<br>分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。</p>
+</li>
+<li><p>运行于商业硬件上: Hadoop不需要特别贵的、reliable的（可靠的）机器，可运行于普通商用机器（可以从多家供应商采购） ，商用机器不代表低端机器。在集群中（尤其是大的集群），节点失败率是比较高的HDFS的目标是确保集群在节点失败的时候不会让用户感觉到明显的中断。</p>
+</li>
+</ul>
+<h3><span id="hdfs不适合的应用类型">HDFS不适合的应用类型</span></h3><p>有些场景不适合使用HDFS来存储数据。下面列举几个：</p>
+<ol>
+<li><p><strong>低延时的数据访问</strong><br>对延时要求在毫秒级别的应用，不适合采用HDFS。HDFS是为高吞吐数据传输设计的,因此可能牺牲延时HBase更适合低延时的数据访问。</p>
+</li>
+<li><p><strong>大量小文件</strong><br>文件的元数据（如目录结构，文件block的节点列表，<code>block-node mapping</code>）保存在NameNode的内存中， 整个文件系统的文件数量会受限于NameNode的内存大小。<br>经验而言，一个文件&#x2F;目录&#x2F;文件块一般占有150字节的元数据内存空间。如果有100万个文件，每个文件占用1个文件块，则需要大约300M的内存。因此十亿级别的文件数量在现有商用机器上难以支持。</p>
+</li>
+<li><p><strong>多方读写，需要任意的文件修改</strong><br>HDFS采用追加（append-only）的方式写入数据。不支持文件任意offset的修改。不支持多个写入器（writer）</p>
+</li>
+</ol>
+<h2><span id="hdfs定位">HDFS定位</span></h2><p>为提高扩展性，HDFS采用了master&#x2F;slave架构来构建分布式存储集群，这种架构很容易向集群中任意添加或删除slave。</p>
+<p>HDFS是Hadoop生态系统中的一个重要组件，它是一个分布式文件系统，旨在存储大量数据，并提供高吞吐量的数据访问。HDFS的设计目标是将数据存储在廉价的硬件上，并提供高容错性。它通过将数据分散到集群中的多个节点上来实现这一目标。HDFS的定位是作为一个批处理系统，适用于大规模数据的离线处理。</p>
+<p>HDFS的主要特点包括：</p>
+<ul>
+<li>高容错性：HDFS将数据分散到多个节点上，因此即使某个节点出现故障，数据仍然可以通过其他节点进行访问。</li>
+<li>高吞吐量：HDFS的设计目标是支持大规模数据的批处理，因此它提供了高吞吐量的数据访问。</li>
+<li>适用于大文件：HDFS适用于存储大文件，因为它将文件分成多个块进行存储，并将这些块分散到多个节点上。</li>
+<li>流式数据访问：HDFS支持流式数据访问，这意味着它可以高效地处理大量的数据流。</li>
+</ul>
+<p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
+<h2><span id="hdfs体系架构">HDFS体系架构</span></h2><p>HDFS采用master&#x2F;slave体系来构建分布式存储服务，提高了HDFS的可扩展性又简化了架构设计。<br>HDFS里将文件分块存储，优化存储颗粒度。namenode统一管理所有slave机器datanode存储空间，datanode以块为单位存储实际的数据。真正的文件I&#x2F;O操作时客户端直接和datanode交互。</p>
+<h2><span id="hdfs核心概念">HDFS核心概念</span></h2><h3><span id="blocks">Blocks</span></h3><p>物理磁盘中有块的概念，磁盘的物理Block是磁盘操作最小的单元，读写操作均以Block为最小单元，一般为512 Byte。文件系统在物理Block之上抽象了另一层概念，文件系统Block物理磁盘Block的整数倍。通常为几KB。Hadoop提供的df、fsck这类运维工具都是在文件系统的Block级别上进行操作。</p>
+<p>HDFS的Block块比一般单机文件系统大得多，默认为128M。HDFS的文件被拆分成block-sized的chunk，chunk作为独立单元存储。比Block小的文件不会占用整个Block，只会占据实际大小。例如， 如果一个文件大小为1M，则在HDFS中只会占用1M的空间，而不是128M。</p>
+<p>HDFS的Block为什么这么大？<br>是为了最小化查找（seek）时间，控制定位文件与传输文件所用的时间比例。假设定位到Block所需的时间为10ms，磁盘传输速度为100M&#x2F;s。如果要将定位到Block所用时间占传输时间的比例控制1%，则Block大小需要约100M。<br>但是如果Block设置过大，在MapReduce任务中，Map或者Reduce任务的个数 如果小于集群机器数量，会使得作业运行效率很低。</p>
+<p>Block抽象的好处 </p>
+<ul>
+<li>Block的拆分使得单个文件大小可以大于整个磁盘的容量，构成文件的Block可以分布在整个集群， 理论上，单个文件可以占据集群中所有机器的磁盘。 </li>
+<li>Block的抽象也简化了存储系统，对于Block，无需关注其权限，所有者等内容（这些内容都在文件级别上进行控制）。 </li>
+<li>Block作为容错和高可用机制中的副本单元，即以Block为单位进行复制。</li>
+</ul>
+<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>整个HDFS集群由Namenode和Datanode构成<code>master-worker（主从）</code>模式。Namenode负责构建命名空间，管理文件的元数据等，而Datanode负责实际存储数据，负责读写工作。</p>
+<h4><span id="namenode">Namenode</span></h4><p>Namenode存放文件系统树及所有文件、目录的元数据。元数据持久化为2种形式：</p>
+<ul>
+<li>namespace image</li>
+<li>edit log</li>
+</ul>
+<p>但是持久化数据中不包括Block所在的节点列表，及文件的Block分布在集群中的哪些节点上，这些信息是在系统重启的时候重新构建（通过Datanode汇报的Block信息）。<br>在HDFS中，Namenode可能成为集群的单点故障，Namenode不可用时，整个文件系统是不可用的。HDFS针对单点故障提供了2种解决机制： </p>
+<ol>
+<li><p>备份持久化元数据<br>将文件系统的元数据同时写到多个文件系统， 例如同时将元数据写到本地文件系统及NFS。这些备份操作都是同步的、原子的。</p>
+</li>
+<li><p>Secondary Namenode<br>Secondary节点定期合并主Namenode的namespace image和edit log， 避免edit log过大，通过创建检查点checkpoint来合并。它会维护一个合并后的namespace image副本， 可用于在Namenode完全崩溃时恢复数据。下图为Secondary Namenode的管理界面：</p>
+</li>
+</ol>
+<p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
+<p>Secondary Namenode通常运行在另一台机器，因为合并操作需要耗费大量的CPU和内存。其数据落后于Namenode，因此当Namenode完全崩溃时，会出现数据丢失。 通常做法是拷贝NFS中的备份元数据到Second，将其作为新的主Namenode。<br>在HA（High Availability高可用性）中可以运行一个Hot Standby，作为热备份，在Active Namenode故障之后，替代原有Namenode成为Active Namenode。</p>
+<h4><span id="datanode">Datanode</span></h4><p>数据节点负责存储和提取Block，读写请求可能来自namenode，也可能直接来自客户端。数据节点周期性向Namenode汇报自己节点上所存储的Block相关信息。</p>
+<p><img src="/img/HDFS/HDFS3.jpg" alt="hadoop-HDFS"></p>
+<h2><span id="经典hdfs体系架构">经典HDFS体系架构</span></h2><p><strong>NameNode负责管理文件系统的元数据信息，而DataNode则负责存储文件块的实际数据。</strong> 这种分工使得HDFS能够高效地存储和管理大规模数据。</p>
+<p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
+<p>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</p>
+<p>因此，NameNode和DataNode在HDFS体系架构中扮演着不同的角色。</p>
+<p>作用上的区别是什么？</p>
+<p>HDFS是Hadoop分布式文件系统的缩写，是Hadoop生态系统中的一个重要组件。HDFS的体系架构包括一个NameNode和多个DataNode。NameNode是HDFS的主节点，负责管理文件系统的命名空间、文件的元数据信息以及文件块的位置信息。而DataNode则是HDFS的从节点，负责存储文件块的实际数据。</p>
+<p><strong>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</strong></p>
+<p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
+<h3><span id="一般拓扑">一般拓扑</span></h3><p>只有单个NameNode节点，使用SecondaryNameNode或BackupNode节点实时获取NameNode元数据信息，备份元数据。</p>
+<p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
+<h3><span id="商用拓扑">商用拓扑</span></h3><p>有两个NameNode节点，并使用ZooKeeper实现NameNode节点间的热切换。</p>
+<p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
+<h2><span id="命令行接口">命令行接口</span></h2><p>HDFS提供了各种交互方式，例如通过Java API、HTTP、shell命令行的。命令行的交互主要通过hadoop fs来操作。例如：</p>
+<blockquote>
+<p>hadoop fs -copyFromLocal &#x2F;&#x2F; 从本地复制文件到HDFS<br> hadoop fs mkdir &#x2F;&#x2F; 创建目录<br> hadoop fs -ls  &#x2F;&#x2F; 列出文件列表</p>
+</blockquote>
+<p>Hadoop中，文件和目录的权限类似于POSIX模型，包括读、写、执行3种权限：</p>
+<p>读权限（r）：用于读取文件或者列出目录中的内容<br>写权限（w）：对于文件，就是文件的写权限。目录的写权限指在该目录下创建或者删除文件（目录）的权限。<br>执行权限（x）：文件没有所谓的执行权限，被忽略。对于目录，执行权限用于访问器目录下的内容。</p>
+<p>每个文件或目录都有owner，group，mode三个属性:</p>
+<p>owner：指文件的所有者<br>group：为权限组<br>mode：由所有者权限、文件所属的组中组员的权限、非所有者非组员的权限组成。</p>
+<p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
+<h2><span id="数据流读写流程">数据流（读写流程）</span></h2><h3><span id="读文件">读文件</span></h3><p>大致读文件的流程如下：</p>
+<p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
+<ol>
+<li><p>客户端传递一个文件Path给FileSystem的open方法</p>
+</li>
+<li><p>DFS采用RPC远程获取文件最开始的几个block的datanode地址。Namenode会根据网络拓扑结构决定返回哪些节点（前提是节点有block副本），如果客户端本身是Datanode并且节点上刚好有block副本，直接从本地读取。</p>
+</li>
+<li><p>客户端使用open方法返回的FSDataInputStream对象读取数据（调用read方法）</p>
+</li>
+<li><p>DFSInputStream（FSDataInputStream实现了改类）连接持有第一个block的、最近的节点，反复调用read方法读取数据</p>
+</li>
+<li><p>第一个block读取完毕之后，寻找下一个block的最佳datanode，读取数据。如果有必要，DFSInputStream会联系Namenode获取下一批Block 的节点信息（存放于内存，不持久化），这些寻址过程对客户端都是不可见的。</p>
+</li>
+<li><p>数据读取完毕，客户端调用close方法关闭流对象</p>
+</li>
+</ol>
+<p>在读数据过程中，如果与Datanode的通信发生错误，DFSInputStream对象会尝试从下一个最佳节点读取数据，并且记住该失败节点， 后续Block的读取不会再连接该节点 </p>
+<p>读取一个Block之后，DFSInputStram会进行检验和验证，如果Block损坏，尝试从其他节点读取数据，并且将损坏的block汇报给Namenode。 </p>
+<p>客户端连接哪个datanode获取数据，是由namenode来指导的，这样可以支持大量并发的客户端请求，namenode尽可能将流量均匀分布到整个集群。 </p>
+<p>Block的位置信息是存储在namenode的内存中，因此相应位置请求非常高效，不会成为瓶颈。</p>
+<h3><span id="写文件">写文件</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
+<p>步骤分解 </p>
+<ol>
+<li><p>客户端调用DistributedFileSystem的create方法</p>
+</li>
+<li><p>DistributedFileSystem远程RPC调用Namenode在文件系统的命名空间中创建一个新文件，此时该文件没有关联到任何block。 这个过程中，Namenode会做很多校验工作，例如是否已经存在同名文件，是否有权限，如果验证通过，返回一个FSDataOutputStream对象。 如果验证不通过，抛出异常到客户端。</p>
+</li>
+<li><p>客户端写入数据的时候，DFSOutputStream分解为packets（数据包），并写入到一个数据队列中，该队列由DataStreamer消费。</p>
+</li>
+<li><p>DateStreamer负责请求Namenode分配新的block存放的数据节点。这些节点存放同一个Block的副本，构成一个管道。 DataStreamer将packet写入到管道的第一个节点，第一个节点存放好packet之后，转发给下一个节点，下一个节点存放 之后继续往下传递。</p>
+</li>
+<li><p>DFSOutputStream同时维护一个ack queue队列，等待来自datanode确认消息。当管道上的所有datanode都确认之后，packet从ack队列中移除。</p>
+</li>
+<li><p>数据写入完毕，客户端close输出流。将所有的packet刷新到管道中，然后安心等待来自datanode的确认消息。全部得到确认之后告知Namenode文件是完整的。 Namenode此时已经知道文件的所有Block信息（因为DataStreamer是请求Namenode分配block的），只需等待达到最小副本数要求，然后返回成功信息给客户端。</p>
+</li>
+</ol>
+<p>Namenode如何决定副本存在哪个Datanode？</p>
+<p>HDFS的副本的存放策略是可靠性、写带宽、读带宽之间的权衡。默认策略如下：</p>
+<p>第一个副本放在客户端相同的机器上，如果机器在集群之外，随机选择一个（但是会尽可能选择容量不是太慢或者当前操作太繁忙的）</p>
+<p>第二个副本随机放在不同于第一个副本的机架上。</p>
+<p>第三个副本放在跟第二个副本同一机架上，但是不同的节点上，满足条件的节点中随机选择。</p>
+<p>更多的副本在整个集群上随机选择，虽然会尽量避免太多副本在同一机架上。 </p>
+<p>副本的位置确定之后，在建立写入管道的时候，会考虑网络拓扑结构。下面是可能的一个存放策略：</p>
+<p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
+<p>这样选择很好的平衡了可靠性、读写性能</p>
+<ul>
+<li><p>可靠性：Block分布在两个机架上</p>
+</li>
+<li><p>写带宽：写入管道的过程只需要跨越一个交换机</p>
+</li>
+<li><p>读带宽：可以从两个机架中任选一个读取</p>
+</li>
+</ul>
+<h2><span id="hdfs内部特性">HDFS内部特性</span></h2><h2><span id="数据冗余">数据冗余</span></h2><ul>
+<li><p>HDFS将每个文件存储成一系列数据块（Block），默认块大小为64MB（可配置）。</p>
+</li>
+<li><p>为了容错，文件的所有数据块都会有副本（副本数量即复制因子，可配置）。</p>
+</li>
+<li><p>HDFS的文件都是一次性写入的，并且严格限制为任何时候都只有一个写用户。</p>
+</li>
+</ul>
+<h2><span id="副本存放">副本存放</span></h2><ul>
+<li><p>HDFS集群一般运行在多个机架上，不同机架上机器的通信需要通过交换机。</p>
+</li>
+<li><p>HDFS采用机架感知（Rack-aware）的策略来改进数据的可靠性、可用性和网络带宽的利用率。</p>
+</li>
+<li><p>机架的错误远比节点的错误少，这个策略可以防止整个机架失效时数据丢失，提高数据的可靠性和可用性，又能保证性能。</p>
+</li>
+</ul>
+<h3><span id="副本选择">副本选择</span></h3><ul>
+<li><p>HDFS会尽量使用离程序最近的副本来满足用户请求，这样可以减少总带宽消耗和读延时。</p>
+</li>
+<li><p>HDFS的架构支持数据均衡策略。</p>
+</li>
+</ul>
+<h3><span id="心跳检测">心跳检测</span></h3><ul>
+<li><p>NameNode周期性地从集群中的每个DataNode接受心跳包和块报告，收到心跳包说明该DataNode工作正常。</p>
+</li>
+<li><p>NameNode会标记最近没有心跳的DataNode为宕机，不会发给它们任何新的I&#x2F;O请求。</p>
+</li>
+<li><p>NameNode会不断检测这些需要复制的数据块，并在需要的时候重新复制。</p>
+</li>
+</ul>
+<h3><span id="数据完整性检测">数据完整性检测</span></h3><ul>
+<li><p>多种原因可能造成从DataNode获取的数据块有损坏。</p>
+</li>
+<li><p>HDFS客户端软件实现了对HDFS文件内容的校验和检查（Checksum）。</p>
+</li>
+<li><p>DataNode获得的数据块对应的校验和隐藏文件中的不同，客户端就会判定数据块有损坏，将从其他DataNode获取该数据块的副本。</p>
+</li>
+</ul>
+<h3><span id="简单一致性模型-流式数据访问">简单一致性模型、流式数据访问</span></h3><ul>
+<li><p>HDFS的应用程序一般对文件实行一次写、多次读的访问模式。</p>
+</li>
+<li><p>文件一旦创建、写入和关闭之后就不需要再更改了。</p>
+</li>
+<li><p>这样就简化了数据一致性问题，高吞吐量的数据访问才成为可能；运行在HDFS上的应用主要以流式读为主，做批量处理；更注重数据访问的高吞吐量。</p>
+</li>
+</ul>
+<h3><span id="客户端缓存">客户端缓存</span></h3><ul>
+<li><p>客户端创建文件的请求不是立即到达NameNode，HDFS客户端先把数据缓存到本地的一个临时文件，程序的写操作透明地重定向到这个临时文件。</p>
+</li>
+<li><p>当这个临时文件累积的数据超过一个块的大小（64MB）时，客户端才会联系NameNode。</p>
+</li>
+<li><p>如果NameNode在文件关闭之前死机，那么文件将会丢失。</p>
+</li>
+<li><p>如果不采用客户端缓存，网络速度和拥塞都会对输出产生很大的影响。</p>
+</li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Hadoop-Cloud-Computing/">#Hadoop,Cloud-Computing</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2023/11/08/hadoop-2/">hadoop之MapReduce工作原理</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2023/11/09/en/hadoop-3/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>

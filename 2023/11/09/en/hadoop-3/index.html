@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="en">
+<head>
+    <meta charset="utf-8">
+<title>Hadoop 2.0 Architecture - Distributed File System HDFS - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2023/11/09/hadoop-3/" rel="alternate" hreflang="zh-TW" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2023/11/09/en/hadoop-3/">
+    
+
+
+
+
+
+    <meta name="description" content="HDFS Design PrinciplesDesign GoalsStore very large files: “very large” here means several hundred M, G, or even TB.  Adopt a stream-based data access method: HDFS is based on the assumption that the m">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hadoop 2.0 Architecture - Distributed File System HDFS">
+<meta property="og:url" content="https://ikkkp.github.io/2023/11/09/en/hadoop-3/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="HDFS Design PrinciplesDesign GoalsStore very large files: “very large” here means several hundred M, G, or even TB.  Adopt a stream-based data access method: HDFS is based on the assumption that the m">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2023-11-09T02:45:27.000Z">
+<meta property="article:modified_time" content="2023-11-09T04:15:12.848Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Hadoop,Cloud-Computing">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Hadoop 2.0 Architecture - Distributed File System HDFS" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/en">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/en/archives">Archive</a>
+            
+            <a class="navbar-item "
+               href="/en/categories">Categories</a>
+            
+            <a class="navbar-item "
+               href="/en/abouts">About</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="Table of Contents">
+                    Table of Contents
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#hdfs-design-principles">1&nbsp;&nbsp;<b>HDFS Design Principles</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#design-goals">1.1&nbsp;&nbsp;Design Goals</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#application-types-not-suitable-for-hdfs">1.2&nbsp;&nbsp;Application Types Not Suitable for HDFS</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs-positioning">2&nbsp;&nbsp;<b>HDFS Positioning</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#hdfs-architecture">3&nbsp;&nbsp;<b>HDFS Architecture</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#blocks">3.1&nbsp;&nbsp;Blocks</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#namenode-amp-datanode">3.2&nbsp;&nbsp;Namenode &amp;amp; Datanode</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#internal-features-of-hdfs">4&nbsp;&nbsp;<b>Internal Features of HDFS</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#data-redundancy">5&nbsp;&nbsp;<b>Data Redundancy</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#replica-placement">6&nbsp;&nbsp;<b>Replica Placement</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#replica-selection">6.1&nbsp;&nbsp;Replica Selection</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#heartbeat-detection">6.2&nbsp;&nbsp;Heartbeat Detection</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#data-integrity-check">6.3&nbsp;&nbsp;Data Integrity Check</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#classic-hdfs-architecture">7&nbsp;&nbsp;<b>Classic HDFS Architecture</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#general-topology">7.1&nbsp;&nbsp;General Topology</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#commercial-topology">7.2&nbsp;&nbsp;Commercial Topology</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#command-line-interface">8&nbsp;&nbsp;<b>Command Line Interface</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#data-flow-read-and-write-process">9&nbsp;&nbsp;<b>Data Flow (Read and Write Process)</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#read-file">9.1&nbsp;&nbsp;Read File</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#write-file">9.2&nbsp;&nbsp;Write File</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#internal-features-of-hdfs">10&nbsp;&nbsp;<b>Internal Features of HDFS</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#data-redundancy">11&nbsp;&nbsp;<b>Data Redundancy</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#replica-placement">12&nbsp;&nbsp;<b>Replica Placement</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#replica-selection">12.1&nbsp;&nbsp;Replica Selection</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#heartbeat-detection">12.2&nbsp;&nbsp;Heartbeat Detection</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#data-integrity-check">12.3&nbsp;&nbsp;Data Integrity Check</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#simple-consistency-model-stream-data-access">12.4&nbsp;&nbsp;Simple Consistency Model, Stream Data Access</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#client-cache">12.5&nbsp;&nbsp;Client Cache</a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+               <a class="navbar-item" href="/2023/11/09/hadoop-3/">中文</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Hadoop 2.0 Architecture - Distributed File System HDFS
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-09T02:45:27.000Z" itemprop="datePublished">9 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/en/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2><h3><span id="design-goals">Design Goals</span></h3><p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
+<ul>
+<li><p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
+</li>
+<li><p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
+</li>
+</ul>
+<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3><p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
+<ol>
+<li><p><strong>Low-latency data access</strong><br>Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
+</li>
+<li><p><strong>A large number of small files</strong><br>The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file&#x2F;directory&#x2F;file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
+</li>
+<li><p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
+</li>
+</ol>
+<h2><span id="hdfs-positioning">HDFS Positioning</span></h2><p>To improve scalability, HDFS uses a master&#x2F;slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
+<p>HDFS is an important component of the Hadoop ecosystem. It is a distributed file system designed to store large amounts of data and provide high-throughput data access. HDFS is designed to store data on inexpensive hardware and provide high fault tolerance. It achieves this goal by distributing data to multiple nodes in the cluster. HDFS is positioned as a batch processing system suitable for offline processing of large-scale data.</p>
+<p>The main features of HDFS include:</p>
+<ul>
+<li>High fault tolerance: HDFS distributes data to multiple nodes, so even if a node fails, data can still be accessed through other nodes.</li>
+<li>High throughput: HDFS is designed to support batch processing of large-scale data, so it provides high-throughput data access.</li>
+<li>Suitable for large files: HDFS is suitable for storing large files because it divides files into multiple blocks for storage and distributes these blocks to multiple nodes.</li>
+<li>Stream data access: HDFS supports stream data access, which means it can efficiently process large amounts of data streams.</li>
+</ul>
+<p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
+<h2><span id="hdfs-architecture">HDFS Architecture</span></h2><p>HDFS uses a master&#x2F;slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read&#x2F;write operations.</p>
+<h3><span id="blocks">Blocks</span></h3><p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
+<p>Why are HDFS blocks so large?<br>To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M&#x2F;s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
+<p>Benefits of block abstraction</p>
+<ul>
+<li>The splitting of blocks allows a single file size to be larger than the capacity of the entire disk, and the blocks that make up the file can be distributed across the entire cluster. In theory, a single file can occupy the disk of all machines in the cluster.</li>
+<li>Block abstraction also simplifies the storage system, without worrying about its permissions, owner, and other content (these contents are controlled at the file level).</li>
+<li>Blocks are the unit of replication in fault tolerance and high availability mechanisms.</li>
+</ul>
+<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
+<ul>
+<li>Namespace image</li>
+<li>Edit log</li>
+</ul>
+<p>However, the persistent data does not include the node list where the block is located and which nodes the file blocks are distributed to in the cluster. This information is reconstructed when the system is restarted (through the block information reported by the Datanode). In HDFS, the Namenode may become a single point of failure for the cluster. When the Namenode is unavailable, the entire file system is unavailable. HDFS provides two solutions to single point of failure:</p>
+<ol>
+<li><p>Backup persistent metadata<br>Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
+</li>
+<li><p>Secondary Namenode<br>The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
+</li>
+</ol>
+<p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
+<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
+</li>
+<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
+</li>
+<li><p>HDFS files are written once and strictly limited to only one write user at any time.</p>
+</li>
+</ul>
+<h2><span id="replica-placement">Replica Placement</span></h2><ul>
+<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
+</li>
+<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
+</li>
+<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
+</li>
+</ul>
+<h3><span id="replica-selection">Replica Selection</span></h3><ul>
+<li><p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
+</li>
+<li><p>The HDFS architecture supports data balancing strategies.</p>
+</li>
+</ul>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
+<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
+</li>
+<li><p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I&#x2F;O requests.</p>
+</li>
+<li><p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
+</li>
+</ul>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
+<li>For various reasons, the data block obtained from the DataNode may be corrupted.</li>
+</ul>
+<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2><p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
+<p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
+<p>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</p>
+<p>Therefore, the NameNode and DataNode play different roles in the HDFS architecture.</p>
+<p>What is the difference in function?</p>
+<p>HDFS is an abbreviation for Hadoop Distributed File System, an important component of the Hadoop ecosystem. The HDFS architecture includes one NameNode and multiple DataNodes. The NameNode is the master node of HDFS, responsible for managing the namespace of the file system, the metadata information of the file, and the location information of the file blocks. The DataNode is the slave node of HDFS, responsible for storing the actual data of the file blocks.</p>
+<p><strong>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</strong></p>
+<p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
+<h3><span id="general-topology">General Topology</span></h3><p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
+<p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
+<h3><span id="commercial-topology">Commercial Topology</span></h3><p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
+<p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
+<h2><span id="command-line-interface">Command Line Interface</span></h2><p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
+<blockquote>
+<p>hadoop fs -copyFromLocal &#x2F;&#x2F; Copy files from local to HDFS<br> hadoop fs mkdir &#x2F;&#x2F; Create a directory<br> hadoop fs -ls  &#x2F;&#x2F; List file list</p>
+</blockquote>
+<p>In Hadoop, the permissions of files and directories are similar to the POSIX model, including three permissions: read, write, and execute.</p>
+<p>Read permission (r): Used to read files or list the contents of a directory<br>Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
+<p>Each file or directory has three attributes: owner, group, and mode:</p>
+<p>Owner: Refers to the owner of the file<br>Group: For permission groups<br>Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
+<p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
+<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2><h3><span id="read-file">Read File</span></h3><p>The rough process of reading a file is as follows:</p>
+<p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
+<ol>
+<li><p>The client passes a file Path to the FileSystem’s open method.</p>
+</li>
+<li><p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
+</li>
+<li><p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
+</li>
+<li><p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
+</li>
+<li><p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
+</li>
+<li><p>After the data is read, the client calls the close method to close the stream object.</p>
+</li>
+</ol>
+<p>During the data reading process, if communication with the DataNode fails, the DFSInputStream object will try to read data from the next best node and remember the failed node, and subsequent block reads will not connect to the node.</p>
+<p>After reading a Block, DFSInputStram performs checksum verification. If the Block is damaged, it tries to read data from other nodes and reports the damaged block to the NameNode.</p>
+<p>Which DataNode does the client connect to get the data block is guided by the NameNode, which can support a large number of concurrent client requests, and the NameNode evenly distributes traffic to the entire cluster as much as possible.</p>
+<p>The location information of the Block is stored in the memory of the NameNode, so the corresponding location request is very efficient and will not become a bottleneck.</p>
+<h3><span id="write-file">Write File</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
+<p>Step breakdown</p>
+<ol>
+<li><p>The client calls the create method of DistributedFileSystem.</p>
+</li>
+<li><p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
+</li>
+<li><p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
+</li>
+<li><p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
+</li>
+<li><p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
+</li>
+<li><p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
+</li>
+</ol>
+<p>How does the Namenode determine which DataNode the replica is on?</p>
+<p>The storage strategy of HDFS replicas is a trade-off between reliability, write bandwidth, and read bandwidth. The default strategy is as follows:</p>
+<p>The first replica is placed on the machine where the client is located. If the machine is outside the cluster, a random one is selected (but it will try to choose a capacity that is not too slow or too busy).</p>
+<p>The second replica is randomly placed on a rack different from the first replica.</p>
+<p>The third replica is placed on the same rack as the second replica, but on a different node, and a random selection is made from the nodes that meet the conditions.</p>
+<p>More replicas are randomly selected throughout the cluster, although too many replicas are avoided on the same rack as much as possible.</p>
+<p>After the location of the replica is determined, when establishing the write pipeline, the network topology structure is considered. The following is a possible storage strategy:</p>
+<p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
+<p>This selection balances reliability, read and write performance well.</p>
+<ul>
+<li><p>Reliability: Blocks are distributed on two racks.</p>
+</li>
+<li><p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
+</li>
+<li><p>Read bandwidth: You can choose one of the two racks to read from.</p>
+</li>
+</ul>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
+<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
+</li>
+<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
+</li>
+<li><p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
+</li>
+</ul>
+<h2><span id="replica-placement">Replica Placement</span></h2><ul>
+<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
+</li>
+<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
+</li>
+<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
+</li>
+</ul>
+<h3><span id="replica-selection">Replica Selection</span></h3><ul>
+<li><p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
+</li>
+<li><p>HDFS architecture supports data balancing strategies.</p>
+</li>
+</ul>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
+<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
+</li>
+<li><p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I&#x2F;O requests.</p>
+</li>
+<li><p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
+</li>
+</ul>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
+<li><p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
+</li>
+<li><p>HDFS client software implements checksum verification of HDFS file content.</p>
+</li>
+<li><p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
+</li>
+</ul>
+<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3><ul>
+<li><p>HDFS applications generally access files in a write-once, read-many mode.</p>
+</li>
+<li><p>Once a file is created, written, and closed, it does not need to be changed again.</p>
+</li>
+<li><p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
+</li>
+</ul>
+<h3><span id="client-cache">Client Cache</span></h3><ul>
+<li><p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
+</li>
+<li><p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
+</li>
+<li><p>If the NameNode crashes before the file is closed, the file will be lost.</p>
+</li>
+<li><p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
+</li>
+</ul>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Hadoop-Cloud-Computing/">#Hadoop,Cloud-Computing</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2023/11/08/en/hadoop-2/">MapReduce Working Principle in Hadoop</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">Comments</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>English</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2023/11/09/hadoop-3/" class="dropdown-item">
+                    中文
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>
