@@ -9,6 +9,20 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/categories/Webpack/Front-end/</loc>
+        <lastmod>2023-11-10T03:38:14.050Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/categories/Webpack/</loc>
+        <lastmod>2023-11-10T03:38:14.050Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/categories/Hadoop/Cloud-Computing/</loc>
         <lastmod>2023-11-09T06:58:03.856Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -53,13 +67,6 @@
     <url>
         <loc>https://ikkkp.github.io/categories/JIT-compiler/</loc>
         <lastmod>2023-11-04T02:45:51.733Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Webpack/</loc>
-        <lastmod>2023-11-04T02:42:19.562Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

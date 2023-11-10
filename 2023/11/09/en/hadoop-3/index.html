@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="HDFS Design Principles Design Goals Store very large files: “very large” here means several hundred M, G, or even TB.   Adopt a stream-based data access method: HDFS is based on the assumption that th">
+    <meta name="description" content="HDFS Design PrinciplesDesign GoalsStore very large files: “very large” here means several hundred M, G, or even TB.  Adopt a stream-based data access method: HDFS is based on the assumption that the m">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hadoop 2.0 Architecture - Distributed File System HDFS">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/09/en/hadoop-3/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="HDFS Design Principles Design Goals Store very large files: “very large” here means several hundred M, G, or even TB.   Adopt a stream-based data access method: HDFS is based on the assumption that th">
+<meta property="og:description" content="HDFS Design PrinciplesDesign GoalsStore very large files: “very large” here means several hundred M, G, or even TB.  Adopt a stream-based data access method: HDFS is based on the assumption that the m">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-09T02:45:27.000Z">
@@ -346,35 +346,23 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2>
-<h3><span id="design-goals">Design Goals</span></h3>
-<p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
+        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2><h3><span id="design-goals">Design Goals</span></h3><p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
 <ul>
-<li>
-<p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
+<li><p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
 </li>
-<li>
-<p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
+<li><p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
 </li>
 </ul>
-<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3>
-<p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
+<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3><p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
 <ol>
-<li>
-<p><strong>Low-latency data access</strong><br>
-Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
+<li><p><strong>Low-latency data access</strong><br>Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
 </li>
-<li>
-<p><strong>A large number of small files</strong><br>
-The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file/directory/file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
+<li><p><strong>A large number of small files</strong><br>The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file&#x2F;directory&#x2F;file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
 </li>
-<li>
-<p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>
-HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
+<li><p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
 </li>
 </ol>
-<h2><span id="hdfs-positioning">HDFS Positioning</span></h2>
-<p>To improve scalability, HDFS uses a master/slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
+<h2><span id="hdfs-positioning">HDFS Positioning</span></h2><p>To improve scalability, HDFS uses a master&#x2F;slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
 <p>HDFS is an important component of the Hadoop ecosystem. It is a distributed file system designed to store large amounts of data and provide high-throughput data access. HDFS is designed to store data on inexpensive hardware and provide high fault tolerance. It achieves this goal by distributing data to multiple nodes in the cluster. HDFS is positioned as a batch processing system suitable for offline processing of large-scale data.</p>
 <p>The main features of HDFS include:</p>
 <ul>
@@ -384,88 +372,62 @@ HDFS writes data in an append-only manner. It does not support arbitrary offset 
 <li>Stream data access: HDFS supports stream data access, which means it can efficiently process large amounts of data streams.</li>
 </ul>
 <p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
-<h2><span id="hdfs-architecture">HDFS Architecture</span></h2>
-<p>HDFS uses a master/slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read/write operations.</p>
-<h3><span id="blocks">Blocks</span></h3>
-<p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
-<p>Why are HDFS blocks so large?<br>
-To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M/s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
+<h2><span id="hdfs-architecture">HDFS Architecture</span></h2><p>HDFS uses a master&#x2F;slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read&#x2F;write operations.</p>
+<h3><span id="blocks">Blocks</span></h3><p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
+<p>Why are HDFS blocks so large?<br>To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M&#x2F;s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
 <p>Benefits of block abstraction</p>
 <ul>
 <li>The splitting of blocks allows a single file size to be larger than the capacity of the entire disk, and the blocks that make up the file can be distributed across the entire cluster. In theory, a single file can occupy the disk of all machines in the cluster.</li>
 <li>Block abstraction also simplifies the storage system, without worrying about its permissions, owner, and other content (these contents are controlled at the file level).</li>
 <li>Blocks are the unit of replication in fault tolerance and high availability mechanisms.</li>
 </ul>
-<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3>
-<p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
+<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
 <ul>
 <li>Namespace image</li>
 <li>Edit log</li>
 </ul>
 <p>However, the persistent data does not include the node list where the block is located and which nodes the file blocks are distributed to in the cluster. This information is reconstructed when the system is restarted (through the block information reported by the Datanode). In HDFS, the Namenode may become a single point of failure for the cluster. When the Namenode is unavailable, the entire file system is unavailable. HDFS provides two solutions to single point of failure:</p>
 <ol>
-<li>
-<p>Backup persistent metadata<br>
-Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
+<li><p>Backup persistent metadata<br>Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
 </li>
-<li>
-<p>Secondary Namenode<br>
-The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
+<li><p>Secondary Namenode<br>The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
 </li>
 </ol>
 <p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2>
-<h2><span id="data-redundancy">Data Redundancy</span></h2>
-<ul>
-<li>
-<p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
+<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
 </li>
-<li>
-<p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
+<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
 </li>
-<li>
-<p>HDFS files are written once and strictly limited to only one write user at any time.</p>
+<li><p>HDFS files are written once and strictly limited to only one write user at any time.</p>
 </li>
 </ul>
-<h2><span id="replica-placement">Replica Placement</span></h2>
-<ul>
-<li>
-<p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
+<h2><span id="replica-placement">Replica Placement</span></h2><ul>
+<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
 </li>
-<li>
-<p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
+<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
 </li>
-<li>
-<p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
+<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
 </li>
 </ul>
-<h3><span id="replica-selection">Replica Selection</span></h3>
-<ul>
-<li>
-<p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
+<h3><span id="replica-selection">Replica Selection</span></h3><ul>
+<li><p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
 </li>
-<li>
-<p>The HDFS architecture supports data balancing strategies.</p>
+<li><p>The HDFS architecture supports data balancing strategies.</p>
 </li>
 </ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3>
-<ul>
-<li>
-<p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
+<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
 </li>
-<li>
-<p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I/O requests.</p>
+<li><p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I&#x2F;O requests.</p>
 </li>
-<li>
-<p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
+<li><p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
 </li>
 </ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3>
-<ul>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
 <li>For various reasons, the data block obtained from the DataNode may be corrupted.</li>
 </ul>
-<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2>
-<p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
+<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2><p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
 <p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
 <p>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</p>
 <p>Therefore, the NameNode and DataNode play different roles in the HDFS architecture.</p>
@@ -473,77 +435,53 @@ The Secondary node periodically merges the namespace image and edit log of the m
 <p>HDFS is an abbreviation for Hadoop Distributed File System, an important component of the Hadoop ecosystem. The HDFS architecture includes one NameNode and multiple DataNodes. The NameNode is the master node of HDFS, responsible for managing the namespace of the file system, the metadata information of the file, and the location information of the file blocks. The DataNode is the slave node of HDFS, responsible for storing the actual data of the file blocks.</p>
 <p><strong>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</strong></p>
 <p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
-<h3><span id="general-topology">General Topology</span></h3>
-<p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
+<h3><span id="general-topology">General Topology</span></h3><p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
 <p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
-<h3><span id="commercial-topology">Commercial Topology</span></h3>
-<p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
+<h3><span id="commercial-topology">Commercial Topology</span></h3><p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
 <p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
-<h2><span id="command-line-interface">Command Line Interface</span></h2>
-<p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
+<h2><span id="command-line-interface">Command Line Interface</span></h2><p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
 <blockquote>
-<p>hadoop fs -copyFromLocal // Copy files from local to HDFS<br>
-hadoop fs mkdir // Create a directory<br>
-hadoop fs -ls  // List file list</p>
+<p>hadoop fs -copyFromLocal &#x2F;&#x2F; Copy files from local to HDFS<br> hadoop fs mkdir &#x2F;&#x2F; Create a directory<br> hadoop fs -ls  &#x2F;&#x2F; List file list</p>
 </blockquote>
 <p>In Hadoop, the permissions of files and directories are similar to the POSIX model, including three permissions: read, write, and execute.</p>
-<p>Read permission ®: Used to read files or list the contents of a directory<br>
-Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>
-Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
+<p>Read permission (r): Used to read files or list the contents of a directory<br>Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
 <p>Each file or directory has three attributes: owner, group, and mode:</p>
-<p>Owner: Refers to the owner of the file<br>
-Group: For permission groups<br>
-Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
+<p>Owner: Refers to the owner of the file<br>Group: For permission groups<br>Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
 <p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2>
-<h3><span id="read-file">Read File</span></h3>
-<p>The rough process of reading a file is as follows:</p>
+<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2><h3><span id="read-file">Read File</span></h3><p>The rough process of reading a file is as follows:</p>
 <p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
 <ol>
-<li>
-<p>The client passes a file Path to the FileSystem’s open method.</p>
+<li><p>The client passes a file Path to the FileSystem’s open method.</p>
 </li>
-<li>
-<p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
+<li><p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
 </li>
-<li>
-<p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
+<li><p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
 </li>
-<li>
-<p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
+<li><p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
 </li>
-<li>
-<p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
+<li><p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
 </li>
-<li>
-<p>After the data is read, the client calls the close method to close the stream object.</p>
+<li><p>After the data is read, the client calls the close method to close the stream object.</p>
 </li>
 </ol>
 <p>During the data reading process, if communication with the DataNode fails, the DFSInputStream object will try to read data from the next best node and remember the failed node, and subsequent block reads will not connect to the node.</p>
 <p>After reading a Block, DFSInputStram performs checksum verification. If the Block is damaged, it tries to read data from other nodes and reports the damaged block to the NameNode.</p>
 <p>Which DataNode does the client connect to get the data block is guided by the NameNode, which can support a large number of concurrent client requests, and the NameNode evenly distributes traffic to the entire cluster as much as possible.</p>
 <p>The location information of the Block is stored in the memory of the NameNode, so the corresponding location request is very efficient and will not become a bottleneck.</p>
-<h3><span id="write-file">Write File</span></h3>
-<p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
+<h3><span id="write-file">Write File</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
 <p>Step breakdown</p>
 <ol>
-<li>
-<p>The client calls the create method of DistributedFileSystem.</p>
+<li><p>The client calls the create method of DistributedFileSystem.</p>
 </li>
-<li>
-<p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
+<li><p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
 </li>
-<li>
-<p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
+<li><p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
 </li>
-<li>
-<p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
+<li><p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
 </li>
-<li>
-<p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
+<li><p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
 </li>
-<li>
-<p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
+<li><p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
 </li>
 </ol>
 <p>How does the Namenode determine which DataNode the replica is on?</p>
@@ -556,99 +494,67 @@ Mode: Consists of the owner’s permissions, the permissions of the members of t
 <p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
 <p>This selection balances reliability, read and write performance well.</p>
 <ul>
-<li>
-<p>Reliability: Blocks are distributed on two racks.</p>
+<li><p>Reliability: Blocks are distributed on two racks.</p>
 </li>
-<li>
-<p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
+<li><p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
 </li>
-<li>
-<p>Read bandwidth: You can choose one of the two racks to read from.</p>
+<li><p>Read bandwidth: You can choose one of the two racks to read from.</p>
 </li>
 </ul>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2>
-<h2><span id="data-redundancy">Data Redundancy</span></h2>
-<ul>
-<li>
-<p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
+<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
 </li>
-<li>
-<p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
+<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
 </li>
-<li>
-<p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
+<li><p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
 </li>
 </ul>
-<h2><span id="replica-placement">Replica Placement</span></h2>
-<ul>
-<li>
-<p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
+<h2><span id="replica-placement">Replica Placement</span></h2><ul>
+<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
 </li>
-<li>
-<p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
+<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
 </li>
-<li>
-<p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
+<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
 </li>
 </ul>
-<h3><span id="replica-selection">Replica Selection</span></h3>
-<ul>
-<li>
-<p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
+<h3><span id="replica-selection">Replica Selection</span></h3><ul>
+<li><p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
 </li>
-<li>
-<p>HDFS architecture supports data balancing strategies.</p>
+<li><p>HDFS architecture supports data balancing strategies.</p>
 </li>
 </ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3>
-<ul>
-<li>
-<p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
+<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
 </li>
-<li>
-<p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I/O requests.</p>
+<li><p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I&#x2F;O requests.</p>
 </li>
-<li>
-<p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
+<li><p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
 </li>
 </ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3>
-<ul>
-<li>
-<p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
+<li><p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
 </li>
-<li>
-<p>HDFS client software implements checksum verification of HDFS file content.</p>
+<li><p>HDFS client software implements checksum verification of HDFS file content.</p>
 </li>
-<li>
-<p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
+<li><p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
 </li>
 </ul>
-<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3>
-<ul>
-<li>
-<p>HDFS applications generally access files in a write-once, read-many mode.</p>
+<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3><ul>
+<li><p>HDFS applications generally access files in a write-once, read-many mode.</p>
 </li>
-<li>
-<p>Once a file is created, written, and closed, it does not need to be changed again.</p>
+<li><p>Once a file is created, written, and closed, it does not need to be changed again.</p>
 </li>
-<li>
-<p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
+<li><p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
 </li>
 </ul>
-<h3><span id="client-cache">Client Cache</span></h3>
-<ul>
-<li>
-<p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
+<h3><span id="client-cache">Client Cache</span></h3><ul>
+<li><p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
 </li>
-<li>
-<p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
+<li><p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
 </li>
-<li>
-<p>If the NameNode crashes before the file is closed, the file will be lost.</p>
+<li><p>If the NameNode crashes before the file is closed, the file will be lost.</p>
 </li>
-<li>
-<p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
+<li><p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
 </li>
 </ul>
 
