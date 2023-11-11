@@ -9,6 +9,20 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/11/vue-renderer-4/</loc>
+        <lastmod>2023-11-11T08:42:25.873Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/10/Webpack-optimization-4/</loc>
         <lastmod>2023-11-10T09:47:21.893Z</lastmod>
         <changefreq>weekly</changefreq>

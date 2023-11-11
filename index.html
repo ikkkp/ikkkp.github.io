@@ -177,6 +177,92 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/11/vue-renderer-4/" itemprop="url">vue-renderer 渲染器的核心 Diff 算法</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-11T08:28:57.000Z" itemprop="datePublished">2023年11月11日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>渲染器的核心就是 Diff 算法。简单来说，当新旧 vnode 的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较的算法就叫作 Diff 算法。我们知道，操作 DOM 的性能开销通常比较大，而渲染器的核心 Diff 算法就是为了解决这个问题而诞生的。</p>
+<h2><span id="减少-dom-操作的性能开销">减少 DOM 操作的性能开销</span></h2><p>核心 Diff 只关心新旧虚拟节点都存在一组子节点的情况。针对两组子节点的更新，我们之前采用了一种简单直接的手段，即卸载全部旧子节点，再挂载全部新子节点。这么做的确可以完成更新，但由于没有复用任何 DOM 元素，所以会产生极大的性能开销。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 旧 vnode</span>
+<span class="token keyword">const</span> oldNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'1'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'2'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'3'</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 新 vnode</span>
+<span class="token keyword">const</span> newNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'4'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'5'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'6'</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>按照之前的做法，当更新子节点时，我们需要执行 6 次 DOM 操作：</p>
+<ul>
+<li>卸载所有旧子节点，需要 3 次 DOM 删除操作；</li>
+<li>挂载所有新子节点，需要 3 次 DOM 添加操作。</li>
+</ul>
+<p>但是，通过观察上面新旧 vnode 的子节点，可以发现：更新前后的所有子节点都是 p 标签，即标签元素不变；只有 p 标签的子节点（文本节点）会发生变化。</p>
+<p>例如，oldVNode 的第一个子节点是一个 p 标签，且该 p 标签的子节点类型是文本节点，内容是 ‘1’。而 newVNode 的第一个子节点也是一个 p 标签，它的子节点的类型也是文本节点，内容是 ‘4’。可以发现，更新前后改变的只有 p 标签文本节点的内容。</p>
+<p>所以，最理想的更新方式是，直接更新这个 p 标签的文本节点的内容。这样只需要一次 DOM 操作，即可完成一个 p 标签更新。新旧虚拟节点都有 3 个 p标签作为子节点，所以一共只需要 3 次 DOM 操作就可以完成全部节点的更新。相比原来需要执行 6 次 DOM 操作才能完成更新的方式，其性能提升了一倍。</p>
+<p>按照这个思路，我们可以重新实现两组子节点的更新逻辑，如下面 patchChildren 函数的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchChildren</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> n2<span class="token punctuation">.</span>children <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 省略部分代码</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>Array<span class="token punctuation">.</span><span class="token function">isArray</span><span class="token punctuation">(</span>n2<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 重新实现两组子节点的更新方式</span>
+    <span class="token comment">// 新旧 children</span>
+    <span class="token keyword">const</span> oldChildren <span class="token operator">=</span> n1<span class="token punctuation">.</span>children
+    <span class="token keyword">const</span> newChildren <span class="token operator">=</span> n2<span class="token punctuation">.</span>children
+    <span class="token comment">// 遍历旧的 children</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> oldChildren<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 调用 patch 函数逐个更新子节点</span>
+      <span class="token function">patch</span><span class="token punctuation">(</span>oldChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> newChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 省略部分代码</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>在这段代码中，oldChildren 和 newChildren 分别是旧的一组子节点和新的一组子节点。我们遍历前者，并将两者中对应位置的节点分别传递给 patch 函数进行更新。patch 函数在执行更新时，发现新旧子节点只有文本内容不同，因此只会更新其文本节点的内容。这样，我们就成功地将 6 次 DOM 操作减少为 3 次。其中菱形代表新子节点，矩形代表旧子节点，圆形代表真实 DOM 节点。</p>
+<p><img src="/img/vue-render/render-diff1.png" alt="render-diff"></p>
+<p>这种做法虽然能够减少 DOM 操作次数，但问题也很明显。在上面的代码中，我们通过遍历旧的一组子节点，并假设新的一组子节点的数量与之相同，只有在这种情况下，这段代码才能正确地工作。但是，新旧两组子节点的数量未必相同。当新的一组子节点的数量少于旧的一组子节点的数量时，意味着有些节点在更新后应该被卸载。</p>
+<p><img src="/img/vue-render/render-diff2.png" alt="render-diff"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/10/Webpack-optimization-4/" itemprop="url">Webpack HMR 原理解析</a>
         
     </h1>
@@ -1675,107 +1761,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 <span class="token function">customRenderer</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>上面的代码片我们通过<code>createRenderer</code>函数创建了一个自定义渲染器，并通过配置项(<code>customRendererOptions</code>)传递操作DOM的API。渲染器在执行时，根据配置项中的API来完成相应的操作。通过这种方式，我们实现了一个通用的、不依赖于特定平台的渲染器。在实际应用中，可以根据不同的平台需求，通过配置不同的API，实现跨平台的渲染能力。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/04/just-in-time-compilers/" itemprop="url">JIT (just-in-time) compiler 是怎么工作的</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-04T02:05:22.000Z" itemprop="datePublished">2023年11月4日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/JITcompiler/">JITcompiler</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>在谈到JIT前，还是需要对编译过程有一些简单的了解。</p>
-<p>在编译原理中，把源代码翻译成机器指令，一般要经过以下几个重要步骤：</p>
-<p><img src="/img/just-in-time/JIT1.png" alt="JIT (just-in-time) compiler"></p>
-<h2><span id="jit简介">JIT简介</span></h2><p><strong>JIT是just in time的缩写，也就是即时编译。</strong> 通过JIT技术，能够做到Java程序执行速度的加速。那么，是怎么做到的呢？</p>
-<p>我们都知道，Java是一门解释型语言（或者说是半编译，半解释型语言）。Java通过编译器javac先将源程序编译成与平台无关的Java字节码文件（.class），再由JVM解释执行字节码文件，从而做到平台无关。 但是，有利必有弊。对字节码的解释执行过程实质为：JVM先将字节码翻译为对应的机器指令，然后执行机器指令。很显然，这样经过解释执行，其执行速度必然不如直接执行二进制字节码文件。</p>
-<p>而为了提高执行速度，便引入了 JIT 技术。当JVM发现某个方法或代码块运行特别频繁的时候，就会认为这是<code>“热点代码”（Hot Spot Code）</code>。然后JIT会把部分“热点代码”编译成本地机器相关的机器码，并进行优化，然后再把编译后的机器码缓存起来，以备下次使用。</p>
-<p><img src="/img/just-in-time/JIT2.webp" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="hot-spot编译">Hot Spot编译</span></h3><p>当 JVM 执行代码时，它并不是立即开始编译代码的。这主要有两个原因：</p>
-<p>首先，如果这段代码本身在将来只会被执行一次，那么从本质上看，编译就是在浪费精力。因为将代码翻译成 java 字节码相对于编译这段代码并执行代码来说，要快很多。</p>
-<p>当然，如果一段代码频繁的调用方法，或是一个循环，也就是这段代码被多次执行，那么编译就非常值得了。因此，编译器具有的这种权衡能力会首先执行解释后的代码，然后再去分辨哪些方法会被频繁调用来保证其本身的编译。<strong>Hot Spot VM 采用了 JIT compile 技术，将运行频率很高的字节码直接编译为机器指令执行以提高性能</strong> ，所以当字节码被 JIT 编译为机器码的时候，要说它是编译执行的也可以。也就是说，运行时，部分代码可能由 JIT 翻译为目标机器指令（以 method 为翻译单位，还会保存起来，第二次执行就不用翻译了）直接执行。</p>
-<p>第二个原因是最优化，当 JVM 执行某一方法或遍历循环的次数越多，就会更加了解代码结构，那么 JVM 在编译代码的时候就做出相应的优化。</p>
-<h2><span id="javascript-编译-jit-just-in-time-compiler-是怎么工作的">JavaScript 编译 - JIT (just-in-time) compiler 是怎么工作的</span></h2><p>大体来说，有两种方式可以将程序翻译成机器可执行的指令，使用编译器 (Compiler) 或者是 解释器 (Interpreter)。</p>
-<h3><span id="解释器">解释器</span></h3><p>解释器是边翻译，边执行。</p>
-<p>优缺点</p>
-<ul>
-<li>优点：快速执行，不需要等待编译</li>
-<li>缺点：相同的代码可能被翻译多次，比如循环内部的代码</li>
-</ul>
-<p><img src="/img/just-in-time/JIT3.png" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="编译器">编译器</span></h3><p>而编译器则是提前将结果翻译出来，并生成一个可执行程序。 </p>
-<p>优缺点</p>
-<ul>
-<li>优点：不需要重复编译，并且可以在编译时对代码做优化</li>
-<li>缺点：需要提前编译</li>
-</ul>
-<p><img src="/img/just-in-time/JIT4.png" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="jit">JIT</span></h3><p>JavaScript 刚出现的时候，是一个典型的解释型语言，因此运行速度极慢，后来浏览器引入了 JIT compiler，大幅提高了 JavaScript 的运行速度。</p>
-<blockquote>
-<p>原理：They added a new part to the JavaScript engine, called a monitor (aka a profiler). That monitor watches the code as it runs, and makes a note of how many times it is run and what types are used.</p>
-</blockquote>
-<p>简单来说，浏览器在 JavaScript engine 中加入了一个 monitor，用来观察运行的代码。并记录下每段代码运行的次数和代码中的变量的类型。</p>
-<p>那么问题来了，为什么这样做能提高运行速度？</p>
-<p>后面的所有内容都以下面这个函数的运行为例：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">arraySum</span><span class="token punctuation">(</span><span class="token parameter">arr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">var</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    sum <span class="token operator">+=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>1st step - Interpreter</strong></p>
-<p>一开始只是简单的使用解释器执行，当某一行代码被执行了几次，这行代码会被打上 Warm 的标签；当某一行代码被执行了很多次，这行代码会被打上 Hot 的标签</p>
-<p><strong>2nd step - Baseline compiler</strong></p>
-<p>被打上 Warm 标签的代码会被传给<code>Baseline Compiler</code>编译且储存，同时按照<code>行数 (Line number)</code> 和<code>变量类型 (Variable type) </code>被索引（为什么会引入变量类型做索引很重要，后面会讲）</p>
-<p>当发现执行的代码命中索引，会直接取出编译后的代码执行，从而不需要重复编译已经编译过的代码</p>
-<p><strong>3rd step - Optimizing compiler</strong></p>
-<p>被打上 Hot 标签的代码会被传给<code> Optimizing compiler</code>，这里会对这部分带码做更优化的编译。怎么样做更优化的编译呢？关键点就在这里，没有别的办法，只能用概率模型做一些合理的 <code>假设 (Assumptions)</code>。<br>比如我们上面的循环中的代码 sum +&#x3D; arr[i]，尽管这里只是简单的 + 运算和赋值，但是因为 JavaScript 的动态类型 (Dynamic typing)，对应的编译结果有很多种可能（这个角度能很明显的暴露动态类型的缺点）</p>
-<p>比如:</p>
-<p>sum 是 Int，arr 是 Array，i 是 Int，这里的 + 就是加法运算，对应其中一种编译结果</p>
-<p>sum 是 string，arr 是 Array，i 是 Int，这里的 + 就是字符串拼接，并且需要把 i 转换为 string 类型<br>…</p>
-<p>下面的图可以看出，这么简单的一行代码对应有 2^4 &#x3D; 16 种可能的编译结果</p>
-<p><img src="/img/just-in-time/JIT5.png" alt="JIT (just-in-time) compiler"></p>
-<p>前面第二步的 Baseline compiler 做的就是这件事，所以上面说编译后的代码需要使用<code>line number</code>和<code>variable type</code>一起做索引，因为不同的 variable type 对应不同的编译结果。</p>
-<p>如果代码是 “Warm” 的，JIT 的任务也就到此为止，后面每次执行的时候，需要先判断类型，再使用对应类型的编译结果就好。</p>
-<p>但是上面我们说，当代码变成 “hot” 的时候，会做更多的优化。这里的优化其实指的就是 JIT 直接假设一个前提，比如这里我们直接假设 sum 是 Int，i 也是 Int，arr 是 Array，于是就只用一种编译结果就好了。</p>
-<p>实际上，在执行前会做类型检查，看是假设是否成立，如果不成立执行就会被打回<code>interpreter</code>或者<code>baseline compiler</code>的版本，这个操作叫做<code> &quot;反优化 (deoptimization)&quot;</code>。</p>
-<p>可以看出，只要假设的成功率足够高，那么代码的执行速度就会快。但是如果假设的成功率很低，那么会导致比没有任何优化的时候还要慢（因为要经历<code>optimize =&gt; deoptimize</code>的过程）</p>
-<h2><span id="结论">结论</span></h2><p>简而言之，这就是 JIT运行时所做的事情。它通过监控正在运行的代码并发送要优化的热代码路径，使 JavaScript 运行得更快。这使得大多数 JavaScript 应用程序的性能提高了许多倍。</p>
-<p>然而，即使有了这些改进，JavaScript 的性能仍然无法预测。为了使速度更快，JIT 在运行时增加了一些开销，包括：</p>
-<p><strong>优化和反优化</strong></p>
-<ul>
-<li><p>用于监视器和发生信息丢失时恢复信息的内存</p>
-</li>
-<li><p>用于存储函数的基线和优化版本的内存</p>
-</li>
-<li><p>这里还有改进的空间：可以消除开销，使性能更加可预测。</p>
-</li>
-</ul>
 
     
     </div>
