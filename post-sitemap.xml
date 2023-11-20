@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/20/en/ModernWeb-Debugging1/</loc>
+        <lastmod>2023-11-20T13:35:51.779Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/20/ModernWeb-Debugging1/</loc>
+        <lastmod>2023-11-20T13:25:32.932Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/11/vue-renderer-4/</loc>
         <lastmod>2023-11-11T08:42:25.873Z</lastmod>
         <changefreq>weekly</changefreq>

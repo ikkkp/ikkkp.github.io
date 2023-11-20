@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>標籤: Chrome,devtools - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/en/tags/Chrome-devtools/" rel="alternate" hreflang="en" />
+            
+    
+
+
+    
+    <meta name="description" content="Huli 的技術部落格，寫關於前端、JavaScript、資安以及各種技術議題。A tech blog about frotn-end and security">
+    
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/tags/Chrome-devtools/">
+    
+
+
+
+
+
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Huangzl&#39;s blog">
+<meta property="og:url" content="https://ikkkp.github.io/tags/Chrome-devtools/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:author" content="Huangzl">
+<meta name="twitter:card" content="summary_large_image">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Huangzl&#39;s blog" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            
+            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/en/tags/Chrome-devtools/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section section-heading">
+    <div class="container">
+        <div class="content">
+            <h5>#Chrome,devtools</h5>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/11/20/ModernWeb-Debugging1/" itemprop="url">ModernWeb-有关于Chrome本地代码调试的简单记录</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-20T11:06:50.000Z" itemprop="datePublished">2023年11月20日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Chrome/">Chrome</a><span>></span><a class="article-category-link" href="/categories/Chrome/devtools/">devtools</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="引言">引言</span></h2><p>自从上周去开了个前端的会议之后，对于前端的一些新技术有了一些新的认识，其中就有关于Chrome本地代码调试的一些新的认识，所以这里就简单的记录一下。这边先贴一个链接：<a target="_blank" rel="noopener" href="https://www.youtube.com/@ChromeDevs">youtube-ChromeDevs</a></p>
+<p>这边要先感谢下<code>chrome的devtools团队</code>，他们的工作真的是太棒了，但是在 <code>jecfish</code> 的前端会议技术分享之前我却并不知道有这么多友好的web调试工具和性能测试手段，所以这里就简单的记录一下，大家要是有兴趣的话可以去看看上面的链接，里面有很多有用的东西，也欢迎给他们团队贴贴关注。</p>
+<p>下面将先给出本章的大纲，然后再逐步展开。</p>
+<p><img src="/img/ModernWeb/modernWeb1.jpg" alt="ModernWeb"></p>
+<h2><span id="本地代码调试">本地代码调试</span></h2><p>这边的内容将是有关于本地代码调试，主要是有关于<code>source-map</code>的一些内容，这边将会有一些简单的介绍，然后再给出一些简单的例子。</p>
+<h3><span id="对源代码映射source-map的需求">对源代码映射source-map的需求</span></h3><iframe width="865" height="486" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<p>这边先给出一个链接：<a target="_blank" rel="noopener" href="https://web.dev/articles/source-maps?hl=zh-cn">source-map</a></p>
+<p>这个链接是jecfish写的有关于source-map的一些内容要是大家有兴趣的话，可以去里面看看，要是文章太长大家看不下去的话，可以直接看下面的内容。</p>
+<p>今天，我们要讨论的是源代码映射，这是一种现代 Web 开发中的重要工具，可大幅简化调试工作。在本文中，我们将探讨源代码映射的基础知识、源代码映射的生成方式以及源代码映射如何改善调试体验。</p>
+<p>好嘟，要进入source-map的学习认知，我们得先要对Modern Web有一个最基本的认识。那我们来看看当我说到Modern Web的时候我们该聊些什么？</p>
+<p><img src="/img/ModernWeb/modernWeb3.jpg" alt="ModernWeb"></p>
+<p>我们可以看到控制台打印了一些BaseOn Css样式的一些内容，但我们今天虽然并不准备着重讲这个console的Css样式，但你依然可以在console定义一些样式让你的console打印的更漂亮！</p>
+<p><img src="/img/ModernWeb/modernWeb4.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb5.jpg" alt="ModernWeb"></p>
+<p>时隔15年的时间，我们可以看到chrome开发者模式的调试工具从原来的寥寥几种，到现在的丰富多彩，这其中的变化是非常大的，所以我们今天就来聊聊这32种调试工具在chrome之中具体的应用。</p>
+<p><img src="/img/ModernWeb/modernWeb6.jpg" alt="ModernWeb"></p>
+<p><strong>我们知道浏览器只认识HTML &lt;&#x2F;&gt; CSS {;} JavaScript (,) Wasm（当然是现在浏览器引擎默认都内置了对Wasm模块的支持） 这几种语言，但是我们的前端框架却异常的丰富</strong> ，涉及到的语言：ts、less、sass，框架：Vue、React，Meta 框架：nust.js、next.js，这些框架都是在我们的前端代码中使用的，但是浏览器并不认识这些语言，所以我们需要将这些语言转换成浏览器认识的语言。</p>
+<p>我们正在构建更复杂的 Web 应用，您的开发工作流可能会涉及到使用各种工具。例如：</p>
+<ul>
+<li>模板语言和 HTML 预处理器：Pug、Nunjucks、Markdown。</li>
+<li>CSS 预处理器：SCSS、LESS、PostCSS。</li>
+<li>JavaScript 框架：Angular、React、Vue、Svelte。</li>
+<li>JavaScript 元框架：Next.js、Nuxt、Astro。</li>
+<li>高级编程语言：TypeScript、Dart、CoffeeScript。<br>等等。这个名单还在不断加长！</li>
+</ul>
+<p><img src="/img/ModernWeb/modernWeb7.png" alt="ModernWeb"></p>
+<p><strong>这些工具需要一个构建流程，以将代码转译为浏览器可以理解的标准 HTML、JavaScript 和 CSS。</strong>此外，为了优化性能，通常的做法是压缩（例如，使用 Terser 缩减和破坏 JavaScript）和合并这些文件，以缩减其大小并提高 Web 效率。</p>
+<p>而将这众多的模板语言和预处理器、元框架转化成浏览器可以看得懂的 HTML、JavaScript 和 CSS，这个过程就是编译，而编译的过程中就会产生一些中间代码，这些中间代码就是我们的源代码映射，这个 <strong>源代码映射</strong> 就是我们今天要讲的内容。</p>
+<p>例如，使用构建工具，我们可以将以下 TypeScript 文件转译并压缩为一行 JavaScript。这个demo在github上面也有：<a target="_blank" rel="noopener" href="https://github.com/jecfish/parcel-demo">parcel-demo</a></p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">/* A TypeScript demo: example.ts */</span>
+
+document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'button'</span><span class="token punctuation">)</span><span class="token operator">?.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> num<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> greet<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'Hello'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> HTMLParagraphElement<span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>greet<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>num<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+  <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>压缩版本如下所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">/* A compressed JavaScript version of the TypeScript demo: example.min.js  */</span>
+
+document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"button"</span><span class="token punctuation">)</span><span class="token operator">?.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"click"</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">=></span><span class="token punctuation">&#123;</span><span class="token keyword">const</span> e<span class="token operator">=</span>Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span><span class="token number">101</span><span class="token operator">*</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"p"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText<span class="token operator">=</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Hello, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>e<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span>console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>不过，这项优化会增加调试难度。如果压缩代码将所有内容放在一行中，并且变量名称较短，则很难查明问题的根源。这正是源映射的用武之地，它们会将编译后的代码映射回原始代码。</p>
+<p><img src="/img/ModernWeb/modernWeb8.jpg" alt="ModernWeb"></p>
+<p>我们现在来具体看一个例子，这个例子是一个用ts代码写的简单的click事件触发的xhr，其中报了404错误。</p>
+<p><img src="/img/ModernWeb/modernWeb9.jpg" alt="ModernWeb"></p>
+<p>哎？发生什么事了，注意看红色箭头处，看来我们浏览器看得懂ts代码？</p>
+<p><img src="/img/ModernWeb/modernWeb10.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb11.jpg" alt="ModernWeb"></p>
+<p>其实不然，看着这贴着的这张图，其实这个ts是从main.js里面解析过来的</p>
+<h3><span id="了解源代码映射source-map">了解源代码映射source-map</span></h3><p><img src="/img/ModernWeb/modernWeb12.jpg" alt="ModernWeb"></p>
+<p>这些源映射文件包含关于已编译代码如何映射到原始代码的基本信息，让开发者能够轻松地进行调试。下面是一个源映射的示例。</p>
+<pre class="line-numbers language-none"><code class="language-none">&#123;
+  &quot;mappings&quot;: &quot;AAAAA,SAASC,cAAc,WAAWC, ...&quot;,
+  &quot;sources&quot;: [&quot;src&#x2F;script.ts&quot;],
+  &quot;sourcesContent&quot;: [&quot;document.querySelector(&#39;button&#39;)...&quot;],
+  &quot;names&quot;: [&quot;document&quot;,&quot;querySelector&quot;, ...],
+  &quot;version&quot;: 3,
+  &quot;file&quot;: &quot;example.min.js.map&quot;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>要了解其中每个字段，您可以阅读<a target="_blank" rel="noopener" href="https://bit.ly/sourcemap">源映射规范</a>或这篇关于<a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/sourcemaps/?hl=zh-cn#the-anatomy-of-a-source-map">源映射剖析</a>的经典文章。</p>
+<p>源映射最重要的方面是 mappings 字段。它使用 VLQ base 64 编码字符串将已编译文件中的行和位置映射到对应的原始文件。可使用 <a target="_blank" rel="noopener" href="https://sokra.github.io/source-map-visualization/">source-map-visualization</a> 和<a target="_blank" rel="noopener" href="https://evanw.github.io/source-map-visualization/">来源映射可视化</a>等来源映射可视化工具直观呈现此映射。</p>
+<p><img src="/img/ModernWeb/modernWeb13.png" alt="ModernWeb"></p>
+<p>左侧的生成的列会显示压缩内容，而原始列会显示原始来源。</p>
+<p>可视化工具会以颜色代码对 original 列中的每一行以及 generated 列中的相应代码进行颜色编码。</p>
+<p>mapping 部分显示了已解码的代码映射。例如，条目 65-&gt; 2:2 表示：</p>
+<ul>
+<li>生成的代码：const 一词在压缩内容中的位置 65 处开始。</li>
+<li>原始代码：const 一词从原始内容中的第 2 行和第 2 列开始。</li>
+</ul>
+<p>这样一来，开发者便可以快速识别缩减后的代码与原始代码之间的关系，从而使调试过程更加顺畅。</p>
+<p>浏览器开发者工具应用这些源代码映射，帮助您直接在浏览器中更快地查明调试问题。</p>
+<p><img src="/img/ModernWeb/modernWeb14.png" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb15.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb16.jpg" alt="ModernWeb"></p>
+<h3><span id="devtools-怎么知道该隐藏啥source-maps">DevTools 怎么知道该隐藏啥？Source maps</span></h3><p><img src="/img/ModernWeb/modernWeb17.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb18.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb19.jpg" alt="ModernWeb"></p>
+<h2><span id="实用的chrome调试技巧">实用的chrome调试技巧</span></h2><h3><span id="请求">请求</span></h3><p><img src="/img/ModernWeb/modernWeb20.jpg" alt="ModernWeb"></p>
+<p>你可以在Network面板中查看请求的详细信息，包括请求头、响应头、请求体、响应体、Cookies、Timing等等。</p>
+<p>同时，devTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/overrides/">devtools&#x2F;overrides</a> 也提供了通过本地覆盖，可以覆盖 HTTP 响应标头和Web 内容（包括XHR 和获取请求）来模拟远程资源，即使您无权访问它们。这使您可以对更改进行原型设计，而无需等待后端支持它们。本地覆盖还允许您在页面加载期间保留在 DevTools 中所做的更改。</p>
+<p>这个东西在什么情况特别有用呢？</p>
+<p>比如说，前端向后端发起的请求，后端返回的结果，可能还未进行跨域的处理（当然跨域的处理在后端做），那前端拿到的这个结果其实已经访问成功了，拿到了正确的数据，但是由于浏览器的安全策略，将此文件报告为不可信赖，这个时候我们就可以通过本地覆盖，来模拟后端返回的结果，这样就可以在前端进行调试了。</p>
+<p>或者说有些数据在后端还未修改，前端拿到的数据是旧的，那我要干巴巴跟后端工程师小眼瞪大眼等着他们把数据改好了我们再进行工作嘛？这样实在是有点蠢hhhhh，我们可以通过重写content进行修改，这样就可以在前端进行调试了。</p>
+<p><img src="/img/ModernWeb/modernWeb21.jpg" alt="ModernWeb"></p>
+<p>那这个devtools&#x2F;overrides确实是有点牛逼的，那它是怎么运行的：</p>
+<ul>
+<li>当您在 DevTools 中进行更改时，DevTools 会将修改后的文件的副本保存到您指定的文件夹中。</li>
+<li>当您重新加载页面时，DevTools 会提供本地修改后的文件，而不是网络资源。</li>
+</ul>
+<h4><span id="覆盖网页内容">覆盖网页内容</span></h4><h5><span id="设置文件夹"><strong>设置文件夹</strong></span></h5><ul>
+<li>设置本地覆盖。</li>
+<li>对文件进行更改并将其保存在 DevTools 中。</li>
+</ul>
+<p>例如，您可以在“源”中编辑文件，或在“元素” &gt; “样式”中编辑 CSS，除非 CSS 位于HTML 文件中。</p>
+<p>DevTools 保存修改后的文件，在<strong>Sources &gt; Overrides</strong> 中列出它们，并在相关面板和窗格中显示已保存。被覆盖文件旁边的图标：<strong>Elements &gt; Styles、Network</strong> 和<strong>Sources &gt; Overrides</strong> 。</p>
+<h5><span id="覆盖-xhr-或获取请求以模拟远程资源"><strong>覆盖 XHR 或获取请求以模拟远程资源</strong></span></h5><p>通过本地覆盖，您不需要访问后端，也不必等待它支持您的更改。即时模拟和实验：</p>
+<ul>
+<li>设置本地覆盖。</li>
+<li>在Network中，过滤XHR&#x2F;fetch requests，找到您需要的请求，右键单击它，然后选择Override content。</li>
+<li>对获取的数据进行更改并保存文件。</li>
+<li>刷新。 刷新页面并观察应用的更改。</li>
+</ul>
+<p>要了解此工作流程，请观看以下视频：</p>
+<p><video class="screenshot" width="800" height="704" style="--vid-width: 800; --vid-height: 704" muted loop controls> <source src="https://storage.googleapis.com/web-dev-uploads/video/NJdAV9UgKuN8AhoaPBquL7giZQo1/TNcd8DCxoK6OmHQqJjKT.mp4" type="video/mp4"> </video></p>
+<h4><span id="覆盖-http-响应标头">覆盖 HTTP 响应标头</span></h4><p>在“网络”面板中，您可以覆盖 HTTP 响应标头，而无需访问 Web 服务器。</p>
+<p>通过响应标头覆盖，您可以在本地对各种标头进行原型修复，包括但不限于：</p>
+<ul>
+<li>跨源资源共享 (CORS) 标头</li>
+<li>权限-策略标头</li>
+<li>跨源隔离标头</li>
+<li>要覆盖响应标头：</li>
+</ul>
+<p>设置本地覆盖并检查。</p>
+<p>转到Network，找到请求，右键单击它，然后选择Override headers。DevTools 将带您进入<strong>标头&gt;响应标头编辑器</strong> 。</p>
+<p><img src="/img/ModernWeb/headers.avif" alt="ModernWeb"></p>
+<h3><span id="录制器有利于调试和测试">录制器，有利于调试和测试</span></h3><p>基于Chrome DevTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/extend-recorder/#export-json">Recorder</a> 的自定义和自动化用户流</p>
+<p><img src="/img/ModernWeb/modernWeb22.jpg" alt="ModernWeb"></p>
+<p>编写自动化测试并不是开发人员生活中最有趣的事情。作为开发人员，事实上确实需要功能、修复错误并改善世界！然而，当我们的工作流程中没有自动化测试时，从长远来看，事情可能会变得相当“错误”。所以，我们也认为编写自动化测试很重要。</p>
+<p>使用Chrome DevTools 中的<a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/recorder/">Recorder</a> 面板，您可以录制和重放用户流程，通过不同的第三方扩展和库将其导出为各种格式（例如测试脚本），使用 Puppeteer Replay 库自定义用户流程，并将其与您现有的工作流程。</p>
+<p>在这篇博文中，我们将讨论：</p>
+<ul>
+<li>如何以编程方式导出和重放用户流。</li>
+<li>如何借助 Puppeteer Replay 自定义用户流程。</li>
+<li>如何与您的<a target="_blank" rel="noopener" href="https://www.redhat.com/en/topics/devops/what-is-ci-cd">CI&#x2F;CD</a>工作流程集成。</li>
+</ul>
+<iframe width="865" height="486" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null"></iframe>
+
+
+<h4><span id="以编程方式导出用户流并重播">以编程方式导出用户流并重播</span></h4><p>默认情况下，Recorder 使您能够将这些录音导出为<a target="_blank" rel="noopener" href="https://pptr.dev/">Puppeteer</a>或<a target="_blank" rel="noopener" href="https://github.com/puppeteer/replay">Puppeteer Replay</a>脚本，或者导出为纯 JSON 文件。</p>
+<p><img src="/img/ModernWeb/record.avif" alt="ModernWeb"></p>
+<h4><span id="使用-puppeteer-replay-进行重播">使用 Puppeteer Replay 进行重播</span></h4><p>将用户流导出为 JSON 文件后，您可以选择将其导入回记录器面板并重播，或使用外部库来重播。Puppeteer Replay库是可用的库之一。</p>
+<img width="800" height="450" src="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format" sizes="(min-width:800px) 800px,calc(100vw - 48px)" srcset="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=200 200w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=228 228w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=260 260w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=296 296w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=338 338w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=385 385w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=439 439w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=500 500w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=571 571w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=650 650w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=741 741w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=845 845w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=964 964w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1098 1098w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1252 1252w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1428 1428w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1600 1600w" alt="重播扩展允许扩展向 DevTools 添加面板来配置重播并显示重播结果。" loading="lazy" decoding="async">
+
+<p>Puppeteer Replay 是一个库，可帮助您重播用户流程。它是一个基于 Puppeteer 的库，它允许您在浏览器中重播用户流程，而无需编写任何代码。您可以使用 Puppeteer Replay 重播您的用户流程，以确保您的应用程序在不同的环境中运行良好。</p>
+<h4><span id="与-cix2fcd-管道集成">与 CI&#x2F;CD 管道集成</span></h4><p>有多种方法可以做到这一点，并且有很多工具。以下是使用GitHub Actions自动执行此过程的示例：</p>
+<pre class="line-numbers language-none"><code class="language-none"># .github&#x2F;node.js.yml
+
+name: Replay recordings
+
+on:
+  push:
+    branches: [ &quot;main&quot; ]
+  schedule:
+    - cron: &#39;30 12 * * *&#39; # daily 12:30pm
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions&#x2F;checkout@v3
+    - name: Use Node.js
+      uses: actions&#x2F;setup-node@v3
+      with:
+        node-version: 18.x
+        cache: &#39;npm&#39;
+    - run: npm install puppeteer
+    - run: npm run replay-all
+    - run: npm run start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在此示例中，我们将在以下情况下重播用户流：</p>
+<p>新的变更推送到main分支<br>每天中午 12:30<br>除了 GitHub Actions 之外，您还可以与您最喜欢的云提供商集成。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+    
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/en/tags/Chrome-devtools/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>
