@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-20T11:06:50.000Z">
-<meta property="article:modified_time" content="2023-11-20T13:25:32.932Z">
+<meta property="article:modified_time" content="2023-11-22T02:27:15.971Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Chrome,devtools">
 <meta name="twitter:card" content="summary_large_image">
@@ -274,7 +274,7 @@
 <p>下面将先给出本章的大纲，然后再逐步展开。</p>
 <p><img src="/img/ModernWeb/modernWeb1.jpg" alt="ModernWeb"></p>
 <h2><span id="本地代码调试">本地代码调试</span></h2><p>这边的内容将是有关于本地代码调试，主要是有关于<code>source-map</code>的一些内容，这边将会有一些简单的介绍，然后再给出一些简单的例子。</p>
-<h3><span id="对源代码映射source-map的需求">对源代码映射source-map的需求</span></h3><iframe width="865" height="486" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<h3><span id="对源代码映射source-map的需求">对源代码映射source-map的需求</span></h3><iframe width="100%" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 <p>这边先给出一个链接：<a target="_blank" rel="noopener" href="https://web.dev/articles/source-maps?hl=zh-cn">source-map</a></p>
 <p>这个链接是jecfish写的有关于source-map的一些内容要是大家有兴趣的话，可以去里面看看，要是文章太长大家看不下去的话，可以直接看下面的内容。</p>
@@ -376,7 +376,7 @@ document<span class="token punctuation">.</span><span class="token function">que
 <li>刷新。 刷新页面并观察应用的更改。</li>
 </ul>
 <p>要了解此工作流程，请观看以下视频：</p>
-<p><video class="screenshot" width="800" height="704" style="--vid-width: 800; --vid-height: 704" muted loop controls> <source src="https://storage.googleapis.com/web-dev-uploads/video/NJdAV9UgKuN8AhoaPBquL7giZQo1/TNcd8DCxoK6OmHQqJjKT.mp4" type="video/mp4"> </video></p>
+<p><video class="screenshot" width="100%" style="--vid-width: 800; --vid-height: 704" muted loop controls> <source src="https://storage.googleapis.com/web-dev-uploads/video/NJdAV9UgKuN8AhoaPBquL7giZQo1/TNcd8DCxoK6OmHQqJjKT.mp4" type="video/mp4"> </video></p>
 <h4><span id="覆盖-http-响应标头">覆盖 HTTP 响应标头</span></h4><p>在“网络”面板中，您可以覆盖 HTTP 响应标头，而无需访问 Web 服务器。</p>
 <p>通过响应标头覆盖，您可以在本地对各种标头进行原型修复，包括但不限于：</p>
 <ul>
@@ -398,13 +398,13 @@ document<span class="token punctuation">.</span><span class="token function">que
 <li>如何借助 Puppeteer Replay 自定义用户流程。</li>
 <li>如何与您的<a target="_blank" rel="noopener" href="https://www.redhat.com/en/topics/devops/what-is-ci-cd">CI&#x2F;CD</a>工作流程集成。</li>
 </ul>
-<iframe width="865" height="486" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null"></iframe>
+<iframe width="100%" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null"></iframe>
 
 
 <h4><span id="以编程方式导出用户流并重播">以编程方式导出用户流并重播</span></h4><p>默认情况下，Recorder 使您能够将这些录音导出为<a target="_blank" rel="noopener" href="https://pptr.dev/">Puppeteer</a>或<a target="_blank" rel="noopener" href="https://github.com/puppeteer/replay">Puppeteer Replay</a>脚本，或者导出为纯 JSON 文件。</p>
 <p><img src="/img/ModernWeb/record.avif" alt="ModernWeb"></p>
 <h4><span id="使用-puppeteer-replay-进行重播">使用 Puppeteer Replay 进行重播</span></h4><p>将用户流导出为 JSON 文件后，您可以选择将其导入回记录器面板并重播，或使用外部库来重播。Puppeteer Replay库是可用的库之一。</p>
-<img width="800" height="450" src="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format" sizes="(min-width:800px) 800px,calc(100vw - 48px)" srcset="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=200 200w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=228 228w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=260 260w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=296 296w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=338 338w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=385 385w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=439 439w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=500 500w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=571 571w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=650 650w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=741 741w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=845 845w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=964 964w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1098 1098w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1252 1252w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1428 1428w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1600 1600w" alt="重播扩展允许扩展向 DevTools 添加面板来配置重播并显示重播结果。" loading="lazy" decoding="async">
+<img width="100%" src="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format" sizes="(min-width:800px) 800px,calc(100vw - 48px)" srcset="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=200 200w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=228 228w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=260 260w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=296 296w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=338 338w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=385 385w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=439 439w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=500 500w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=571 571w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=650 650w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=741 741w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=845 845w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=964 964w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1098 1098w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1252 1252w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1428 1428w,https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format&amp;w=1600 1600w" alt="重播扩展允许扩展向 DevTools 添加面板来配置重播并显示重播结果。" loading="lazy" decoding="async">
 
 <p>Puppeteer Replay 是一个库，可帮助您重播用户流程。它是一个基于 Puppeteer 的库，它允许您在浏览器中重播用户流程，而无需编写任何代码。您可以使用 Puppeteer Replay 重播您的用户流程，以确保您的应用程序在不同的环境中运行良好。</p>
 <h4><span id="与-cix2fcd-管道集成">与 CI&#x2F;CD 管道集成</span></h4><p>有多种方法可以做到这一点，并且有很多工具。以下是使用GitHub Actions自动执行此过程的示例：</p>

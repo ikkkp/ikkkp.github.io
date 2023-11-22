@@ -9,8 +9,8 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/20/en/ModernWeb-Debugging1/</loc>
-        <lastmod>2023-11-20T13:35:51.779Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/11/10/en/Webpack-optimization-4/</loc>
+        <lastmod>2023-11-22T02:29:23.951Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -24,7 +24,21 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/11/20/ModernWeb-Debugging1/</loc>
-        <lastmod>2023-11-20T13:25:32.932Z</lastmod>
+        <lastmod>2023-11-22T02:27:15.971Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/20/en/ModernWeb-Debugging1/</loc>
+        <lastmod>2023-11-22T02:26:18.693Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -53,20 +67,6 @@
     <url>
         <loc>https://ikkkp.github.io/2023/11/10/Webpack-optimization-4/</loc>
         <lastmod>2023-11-10T09:47:21.893Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/11/10/en/Webpack-optimization-4/</loc>
-        <lastmod>2023-11-10T07:25:22.407Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

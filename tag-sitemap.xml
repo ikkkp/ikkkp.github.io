@@ -3,8 +3,15 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/tags/Webpack-Front-end/</loc>
+        <lastmod>2023-11-22T02:29:23.951Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/tags/Chrome-devtools/</loc>
-        <lastmod>2023-11-20T13:35:51.779Z</lastmod>
+        <lastmod>2023-11-22T02:27:15.971Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -12,13 +19,6 @@
     <url>
         <loc>https://ikkkp.github.io/tags/Vue/</loc>
         <lastmod>2023-11-11T08:42:25.873Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/tags/Webpack-Front-end/</loc>
-        <lastmod>2023-11-10T09:47:21.893Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
