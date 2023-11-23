@@ -9,8 +9,8 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/22/2023-11-22-Writing/</loc>
-        <lastmod>2023-11-22T15:56:48.141Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/11/24/en/2023-11-24-Writing/</loc>
+        <lastmod>2023-11-23T16:23:19.429Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -24,7 +24,35 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/11/22/en/2023-11-22-Writing/</loc>
-        <lastmod>2023-11-22T15:56:38.141Z</lastmod>
+        <lastmod>2023-11-23T16:23:01.594Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/24/2023-11-24-Writing/</loc>
+        <lastmod>2023-11-23T16:22:30.168Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/22/2023-11-22-Writing/</loc>
+        <lastmod>2023-11-22T15:56:48.141Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
