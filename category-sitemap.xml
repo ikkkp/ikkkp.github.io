@@ -9,6 +9,13 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/categories/Vue/</loc>
+        <lastmod>2023-11-28T16:34:43.149Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/categories/Essay/</loc>
         <lastmod>2023-11-23T16:23:19.429Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -39,13 +46,6 @@
     <url>
         <loc>https://ikkkp.github.io/categories/Chrome/</loc>
         <lastmod>2023-11-22T02:27:15.971Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Vue/</loc>
-        <lastmod>2023-11-11T08:42:25.873Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
