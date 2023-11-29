@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html class="has-navbar-fixed-top" lang="zh-tw">
+<html class="has-navbar-fixed-top" lang="en">
 <head>
     <meta charset="utf-8">
-<title>Vue 2/3 共存开发的思路 - Huangzl&#39;s blog</title>
+<title>Approach for Coexistence Development of Vue 2/3 - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="https://ikkkp.github.io/2023/11/28/en/vue5/" rel="alternate" hreflang="en" />
+<link href="https://ikkkp.github.io/2023/11/28/vue5/" rel="alternate" hreflang="zh-TW" />
             
     
 
@@ -16,23 +16,23 @@
 
 
     
-<link rel="canonical" href="https://ikkkp.github.io/2023/11/28/vue5/">
+<link rel="canonical" href="https://ikkkp.github.io/2023/11/28/en/vue5/">
     
 
 
 
 
 
-    <meta name="description" content="前言2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括• 安全更新• 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，">
+    <meta name="description" content="IntroductionAfter December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility. Evan announced t">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Vue 2&#x2F;3 共存开发的思路">
-<meta property="og:url" content="https://ikkkp.github.io/2023/11/28/vue5/index.html">
+<meta property="og:title" content="Approach for Coexistence Development of Vue 2&#x2F;3">
+<meta property="og:url" content="https://ikkkp.github.io/2023/11/28/en/vue5/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括• 安全更新• 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，">
-<meta property="og:locale" content="zh_TW">
+<meta property="og:description" content="IntroductionAfter December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility. Evan announced t">
+<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-28T15:40:22.000Z">
-<meta property="article:modified_time" content="2023-11-29T01:30:39.356Z">
+<meta property="article:modified_time" content="2023-11-29T01:34:40.871Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Vue">
 <meta name="twitter:card" content="summary_large_image">
@@ -40,7 +40,7 @@
 
 
 
-<link rel="alternative" href="/atom.xml" title="Vue 2/3 共存开发的思路" type="application/atom+xml">
+<link rel="alternative" href="/atom.xml" title="Approach for Coexistence Development of Vue 2/3" type="application/atom+xml">
 
 
 
@@ -107,7 +107,7 @@
 <nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-brand">
-            <a class="navbar-item navbar-logo" href="/">
+            <a class="navbar-item navbar-logo" href="/en">
                 
                     
                     Huangzl&#39;s blog
@@ -124,16 +124,13 @@
         <div class="navbar-menu navbar-start">
             
             <a class="navbar-item "
-               href="/archives">文章列表</a>
+               href="/en/archives">Archive</a>
             
             <a class="navbar-item "
-               href="/categories">分類</a>
+               href="/en/categories">Categories</a>
             
             <a class="navbar-item "
-               href="/recommend">推薦閱讀</a>
-            
-            <a class="navbar-item "
-               href="/abouts">關於我</a>
+               href="/en/abouts">About</a>
             
         </div>
         
@@ -141,77 +138,77 @@
             
             
             <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
-                <a class="navbar-item" title="目錄">
-                    目錄
+                <a class="navbar-item" title="Table of Contents">
+                    Table of Contents
                 </a>
                 <div class="navbar-dropdown">
                     
                     
                     
                     
-                    <a class="navbar-item" href="#前言">1&nbsp;&nbsp;<b>前言</b></a>
+                    <a class="navbar-item" href="#introduction">1&nbsp;&nbsp;<b>Introduction</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#通用代码">1.1&nbsp;&nbsp;通用代码</a>
+                    <a class="navbar-item" href="#universal-code">1.1&nbsp;&nbsp;Universal Code</a>
                     
                     
                     
-                    <a class="navbar-item" href="#使用分支">1.2&nbsp;&nbsp;使用分支</a>
+                    <a class="navbar-item" href="#using-branches">1.2&nbsp;&nbsp;Using Branches</a>
                     
                     
                     
-                    <a class="navbar-item" href="#构建脚本">1.3&nbsp;&nbsp;构建脚本</a>
+                    <a class="navbar-item" href="#build-scripts">1.3&nbsp;&nbsp;Build Scripts</a>
                     
                     
                     <hr class="navbar-divider">
                     
                     
-                    <a class="navbar-item" href="#vue-2x2f3-共存开发的思路">2&nbsp;&nbsp;<b>Vue 2/3 共存开发的思路</b></a>
+                    <a class="navbar-item" href="#approach-for-coexistence-development-of-vue-2x2f3">2&nbsp;&nbsp;<b>Approach for Coexistence Development of Vue 2/3</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#同时支持-vue-2x2f3-项目">2.1&nbsp;&nbsp;同时⽀持 Vue 2/3 项⽬</a>
+                    <a class="navbar-item" href="#simultaneous-support-for-vue-2x2f3-projects">2.1&nbsp;&nbsp;Simultaneous Support for Vue 2/3 Projects</a>
                     
                     
                     
-                    <a class="navbar-item" href="#vue-2x2f3-项目存在的可能场景">2.1.1&nbsp;&nbsp;Vue 2/3 项⽬存在的可能场景</a>
+                    <a class="navbar-item" href="#possible-scenarios-for-vue-2x2f3-projects">2.1.1&nbsp;&nbsp;Possible Scenarios for Vue 2/3 Projects</a>
                     
                     
                     
-                    <a class="navbar-item" href="#解决方案">2.2&nbsp;&nbsp;解决⽅案</a>
+                    <a class="navbar-item" href="#solutions">2.2&nbsp;&nbsp;Solutions</a>
                     
                     
                     
-                    <a class="navbar-item" href="#1-vue-2x2f3-项目共存">2.2.1&nbsp;&nbsp;1. Vue 2/3 项⽬共存</a>
+                    <a class="navbar-item" href="#1-coexistence-of-vue-2x2f3-projects">2.2.1&nbsp;&nbsp;1. Coexistence of Vue 2/3 Projects</a>
                     
                     
                     
-                    <a class="navbar-item" href="#2-jessicasachsx2fpetite-方案">2.2.2&nbsp;&nbsp;2. JessicaSachs/petite 方案</a>
+                    <a class="navbar-item" href="#2-jessicasachsx2fpetite-solution">2.2.2&nbsp;&nbsp;2. JessicaSachs/petite Solution</a>
                     
                     
                     
-                    <a class="navbar-item" href="#3-vue-bridge-方案">2.2.3&nbsp;&nbsp;3. vue-bridge 方案</a>
+                    <a class="navbar-item" href="#3-vue-bridge-solution">2.2.3&nbsp;&nbsp;3. vue-bridge Solution</a>
                     
                     
                     
-                    <a class="navbar-item" href="#4-vue-demi-方案">2.2.4&nbsp;&nbsp;4. vue-demi 方案</a>
+                    <a class="navbar-item" href="#4-vue-demi-solution">2.2.4&nbsp;&nbsp;4. vue-demi Solution</a>
                     
                     
                     
-                    <a class="navbar-item" href="#vue-2-应用中引入-vue-3-组件">2.3&nbsp;&nbsp;Vue 2 应⽤中引⼊ Vue 3 组件</a>
+                    <a class="navbar-item" href="#importing-vue-3-components-in-a-vue-2-application">2.3&nbsp;&nbsp;Importing Vue 3 Components in a Vue 2 Application</a>
                     
                 </div>
             </div>
             
             
-            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
                 <i class="fab fa-twitter"></i>
                 
             </a>
                
-            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-en.xml">
                 
                 <i class="fas fa-rss"></i>
                 
@@ -230,7 +227,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/2023/11/28/en/vue5/">English</a>
+               <a class="navbar-item" href="/2023/11/28/vue5/">中文</a>
             
             
 
@@ -242,52 +239,54 @@
     <div class="container">
       
       <div data-nosnippet class="self-notice">
-        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+        If you have any thoughts on my blog or articles and you want to let me know, you can either post a comment below(public) or tell me via this <a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
       </div>
       
     <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            Vue 2/3 共存开发的思路
+            Approach for Coexistence Development of Vue 2/3
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-28T15:40:22.000Z" itemprop="datePublished">2023年11月28日</time>
+            <time datetime="2023-11-28T15:40:22.000Z" itemprop="datePublished">28 November 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
             <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
         </span>
         
         
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
         
     </div>
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括<br>• 安全更新<br>• 浏览器兼容</p>
-<p>Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，<strong>是否有可能使我们的库同时支持 Vue 2 和 3 ？</strong></p>
-<h3><span id="通用代码">通用代码</span></h3><p>最简单的方法是编写适用于<strong>两个版本的通用代码</strong> ，无需任何额外的修改，就像人们对Python 2 和 3所做的那样。简单并不意味着容易。编写此类组件需要避免<strong>Vue 3 中新引入的内容</strong> 以及<strong>Vue 2 中弃用的内容</strong> 。换句话说，您不能使用：</p>
+        <h2><span id="introduction">Introduction</span></h2><p>After December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility.</p>
+<p>Evan announced that the first RC of Vue 3 will be released in mid-July. This article suggests that library&#x2F;plugin authors start migrating their support to Vue 3. However, due to significant changes in API and behavior, is it possible to make our libraries support both Vue 2 and 3 simultaneously?</p>
+<h3><span id="universal-code">Universal Code</span></h3><p>The simplest approach is to write <strong>universal code that works for both versions</strong>, without any additional modifications, similar to what people have done with Python 2 and 3. However, simplicity does not mean it’s easy. Writing such components requires avoiding <strong>newly introduced features in Vue 3</strong> and <strong>deprecated features in Vue 2</strong>. In other words, you cannot use:</p>
 <ul>
-<li>合成API</li>
-<li>.sync .native修饰语</li>
-<li>过滤器</li>
-<li>3rd 方供应商对象</li>
+<li>Composition API</li>
+<li>.sync and .native modifiers</li>
+<li>Filters</li>
+<li>3rd-party vendor objects</li>
 </ul>
-<h3><span id="使用分支">使用分支</span></h3><p>核心团队成员对此问题的回复建议使用不同的分支来分隔对每个定位版本的支持。我认为这对于现有和成熟的库来说是一个很好的解决方案，因为它们的代码库通常更稳定，并且版本目标优化可能需要它们具有更好的代码隔离。</p>
-<p>这样做的缺点是您需要维护两个代码库，这会使您的工作量增加一倍。对于小型库或想要支持两个版本的新库来说，进行两次错误修复或功能补充是不理想的。我不建议在项目一开始就使用这种方法。</p>
-<h3><span id="构建脚本">构建脚本</span></h3><p>在VueUse中，编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。有了这个，我可以编写一次代码并使库支持两个 Vue 版本。它的问题是我需要在每个版本上构建两次并引导用户安装相应的插件版本（@vue&#x2F;composition-api对于Vue 2则需要手动安装）。</p>
-<h2><span id="vue-2x2f3-共存开发的思路">Vue 2&#x2F;3 共存开发的思路</span></h2><h3><span id="同时支持-vue-2x2f3-项目">同时⽀持 Vue 2&#x2F;3 项⽬</span></h3><h4><span id="vue-2x2f3-项目存在的可能场景">Vue 2&#x2F;3 项⽬存在的可能场景</span></h4><p><strong>渐进式迁移：</strong> 如果有一个较大的 Vue 2 项目，但是想要逐步迁移到 Vue 3，可以选择在项目中同时引入 Vue 3，然后逐步将 Vue 2 组件迁移到 Vue 3。</p>
-<p><strong>依赖库和插件兼容性：</strong> 如果项目依赖于一些 Vue 2 的插件或库，而这些插件或库还没有升级到 Vue 3，可能需要同时使用 Vue 2 和 Vue 3 以确保兼容性。</p>
-<p><strong>新功能采用 Vue 3：</strong> 可能希望项目中使用 Vue 3 来利用其新功能和性能优势，同时保留 Vue 2 用于旧的组件或功能。</p>
-<p><strong>项⽬融合者：</strong> 公司内部基于体验要求，需要 Vue 2&#x2F;3项⽬呈现在同⼀⻚⾯中</p>
-<p><strong>内部组件资产维护者：</strong> 需要在 Vue 2&#x2F;3 的项⽬都⽀持，且能⼒必须⼀致</p>
-<p><strong>⽼项⽬应⽤开发者：</strong> 需要⽤到⼀个第三⽅图表组件，但只有 Vue 3 版本，⽽⾮ Vue 2 版本</p>
-<h3><span id="解决方案">解决⽅案</span></h3><h4><span id="1-vue-2x2f3-项目共存">1. Vue 2&#x2F;3 项⽬共存</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
-<p>直接通过 Vue 3 的 createApp 创建⼀个 Vue 3 的根实例，然后通过 Vue 2 的 mount ⽅法挂载到 Vue 2 的根实例上，这样就可以在 Vue 2 的项⽬中使⽤ Vue 3 的组件。</p>
-<p>相关的代码仓库贴在这里，大家自取：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
+<h3><span id="using-branches">Using Branches</span></h3><p>The response from core team members suggests using different branches to separate support for each targeted version. This is a good solution for existing and mature libraries, as their codebases are usually more stable, and version targeting optimizations may require better code isolation.</p>
+<p>The downside of this approach is that you need to maintain two codebases, which doubles your workload. It is not ideal for small libraries or new libraries that want to support both versions and avoid duplicating bug fixes or feature additions. I do not recommend using this approach from the beginning of a project.</p>
+<h3><span id="build-scripts">Build Scripts</span></h3><p>In VueUse, I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags, <code>vue2</code> and <code>vue3</code>, to differentiate the support for different versions. With this, I can write the code once and make the library support both Vue versions. The issue is that I need to build twice on each version and guide users to install the corresponding plugin versions (manually install <code>@vue/composition-api</code> for Vue 2).</p>
+<h2><span id="approach-for-coexistence-development-of-vue-2x2f3">Approach for Coexistence Development of Vue 2&#x2F;3</span></h2><h3><span id="simultaneous-support-for-vue-2x2f3-projects">Simultaneous Support for Vue 2&#x2F;3 Projects</span></h3><h4><span id="possible-scenarios-for-vue-2x2f3-projects">Possible Scenarios for Vue 2&#x2F;3 Projects</span></h4><p><strong>Progressive Migration:</strong> If there is a large Vue 2 project but you want to gradually migrate to Vue 3, you can choose to introduce Vue 3 into the project and then gradually migrate Vue 2 components to Vue 3.</p>
+<p><strong>Compatibility with Dependency Libraries and Plugins:</strong> If the project depends on some Vue 2 plugins or libraries that have not been upgraded to Vue 3 yet, it may be necessary to use both Vue 2 and Vue 3 to ensure compatibility.</p>
+<p><strong>Adopting Vue 3 for New Features:</strong> You may want to use Vue 3 in the project to take advantage of its new features and performance benefits while still keeping Vue 2 for old components or features.</p>
+<p><strong>Project Integration:</strong> Based on experience requirements within the company, there is a need to present Vue 2&#x2F;3 projects on the same page.</p>
+<p><strong>Internal Component Asset Maintainer:</strong> Support is needed for both Vue 2 and 3 projects, and the capabilities must be consistent.</p>
+<p><strong>Legacy Application Developer:</strong> Need to use a third-party chart component, but only the Vue 3 version is available, not the Vue 2 version.</p>
+<h3><span id="solutions">Solutions</span></h3><h4><span id="1-coexistence-of-vue-2x2f3-projects">1. Coexistence of Vue 2&#x2F;3 Projects</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
+<p>Directly create a Vue 3 root instance using <code>createApp</code> and mount it to the Vue 2 root instance using the <code>mount</code> method. This allows using Vue 3 components in a Vue 2 project.</p>
+<p>The related code repository can be found here: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
 <p><img src="/img/vue5/vue5-2.jpg" alt="vue-5"></p>
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 3 项⽬</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span> createApp <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
@@ -303,7 +302,7 @@
   <span class="token function-variable function">render</span><span class="token operator">:</span> h <span class="token operator">=></span> <span class="token function">h</span><span class="token punctuation">(</span>App <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">$mount</span><span class="token punctuation">(</span><span class="token string">'#vue2'</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>这一个思路重要的是我们采用配置vite.config.ts解决不同模块的编译问题：编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。但是它的问题其实是需要在每个版本上引导用户安装相应的插件版本。这对于开发者处理包冲突问题并不是很友好。</p>
+<p>The important thing about this approach is that we use the <code>vite.config.ts</code> to solve the compilation problem of different modules: I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags <code>vue2</code> and <code>vue3</code> to differentiate the support for different versions. But the issue is that it requires guiding users to install the corresponding plugin versions on each version. This is not very friendly for developers to deal with package conflicts.</p>
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> path <span class="token keyword">from</span> <span class="token string">'path'</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineConfig <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vite'</span>
 <span class="token keyword">import</span> Vue2 <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue2'</span>
@@ -326,19 +325,19 @@
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>这样我们属于是将Vue2和Vue3单独做成了两个独立的包，然后在vite.config.ts中配置了不同的编译规则，这样就可以在同一个页面中使用Vue2和Vue3。</p>
-<h4><span id="2-jessicasachsx2fpetite-方案">2. JessicaSachs&#x2F;petite 方案</span></h4><p>先来简单介绍一下<a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>：</p>
+<p>Here we have separated Vue 2 and Vue 3 into two independent packages and configured different compilation rules in vite.config.ts, allowing us to use Vue 2 and Vue 3 in the same page.</p>
+<h4><span id="2-jessicasachsx2fpetite-solution">2. JessicaSachs&#x2F;petite Solution</span></h4><p>Let’s briefly introduce <a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>:</p>
 <blockquote>
-<p><strong>Petite是一个为Vue组件作者构建的主观GitHub模板。</strong> 它设置了开发、文档和测试通用SFC组件所需的工具，并与Vue 2.7运行时向后兼容。</p>
+<p><strong>Petite is a subjective GitHub template built for Vue component authors.</strong> It sets up the tools needed for developing, documenting, and testing common SFC components and is backward compatible with Vue 2.7 runtime.</p>
 </blockquote>
-<p>这是通过一些运行时辅助函数和一个非常主观的单体库结构实现的。</p>
-<p>Petite设置了Vite、Volar、Linting、Vitepress、TypeScript和Testing，这样您就可以选择编写Vue 3风格的代码，同时轻松保持对Vue 2.x用户的向后兼容性。</p>
-<p>而这也意味着您将在 npm 上发布软件包的两个版本，而不是为了支持 Vue 2 或 Vue 3 而中断主要版本。</p>
-<p><strong>这样做的缺点是您的用户在升级和更改导入时需要安装新版本。</strong> 好处是您可以更轻松地编写向后兼容的代码并为用户提供定期升级。此外，您还可以拆分仅 Vue 2 和仅 Vue 3 的依赖项。</p>
-<p>如果您在通用代码中使用lodash，您将需要在工作区根目录中运行后pnpm build，每个包 ( lib-vue3、lib-vue2) 应独立部署。</p>
-<h4><span id="3-vue-bridge-方案">3. vue-bridge 方案</span></h4><h4><span id="4-vue-demi-方案">4. vue-demi 方案</span></h4><p>仓库实例：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
-<p>Vue Demi是一个开发实用程序，允许您为 Vue 2 和 3 编写通用 Vue 库。无需担心用户安装的版本。</p>
-<p>当您要创建 Vue 插件&#x2F;库时，只需安装vue-demi为依赖项并从中导入与 Vue 相关的任何内容即可。像往常一样发布你的插件&#x2F;库，你的包将变得通用！</p>
+<p>This is achieved through some runtime helper functions and a very opinionated monolithic library structure.</p>
+<p>Petite sets up Vite, Volar, Linting, Vitepress, TypeScript, and Testing, allowing you to choose to write Vue 3-style code while easily maintaining backward compatibility with Vue 2.x users.</p>
+<p>This also means that you will be publishing two versions of your package on npm instead of breaking major versions to support Vue 2 or Vue 3.</p>
+<p><strong>The downside of this approach is that your users will need to install the new version when upgrading and changing imports.</strong> The benefit is that you can write backward-compatible code more easily and provide regular updates for users. Additionally, you can also separate dependencies for Vue 2-only and Vue 3-only.</p>
+<p>If you use lodash in your shared code, you will need to run <code>pnpm build</code> in the workspace root directory, and each package (lib-vue3, lib-vue2) should be deployed independently.</p>
+<h4><span id="3-vue-bridge-solution">3. vue-bridge Solution</span></h4><h4><span id="4-vue-demi-solution">4. vue-demi Solution</span></h4><p>Repository example: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
+<p>Vue Demi is a development utility that allows you to write universal Vue libraries for both Vue 2 and 3 without worrying about the version installed by the user.</p>
+<p>When creating a Vue plugin&#x2F;library, simply install vue-demi as a dependency and import any Vue-related content from it. Publish your plugin&#x2F;library as usual, and your package will become universal!</p>
 <pre class="line-numbers language-none"><code class="language-none">&#123;
   &quot;dependencies&quot;: &#123;
     &quot;vue-demi&quot;: &quot;latest&quot;
@@ -347,30 +346,30 @@
 
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> Vue<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> reactive<span class="token punctuation">,</span> ref <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>在底层，它使用了postinstallnpm hook。安装所有包后，脚本将开始检查已安装的 Vue 版本，并将导出重定向到基于本地 Vue 版本。使用 Vue 2 时，@vue&#x2F;composition-api如果未安装，它也会自动安装。</p>
-<p>所需要注意的有关于库&#x2F;组件的点：</p>
-<p><strong>库&#x2F;组件</strong></p>
+<p>At the underlying level, it uses the postinstall npm hook. After installing all the packages, the script will start checking the installed Vue version and redirect the exports based on the local Vue version. When using Vue 2, it will also automatically install @vue&#x2F;composition-api if it is not already installed.</p>
+<p>Points to note about libraries&#x2F;components:</p>
+<p><strong>Libraries&#x2F;Components</strong></p>
 <ul>
-<li>单仓库 - 多个包构建</li>
-<li>依赖管理</li>
-<li>alias 别名配置<ul>
-<li>npm 包名</li>
-<li>构建工具配置</li>
+<li>Single repository - Multiple package builds</li>
+<li>Dependency management</li>
+<li>Alias configuration<ul>
+<li>NPM package names</li>
+<li>Build tool configuration</li>
 </ul>
 </li>
 </ul>
-<h3><span id="vue-2-应用中引入-vue-3-组件">Vue 2 应⽤中引⼊ Vue 3 组件</span></h3><p><strong>会有组件互操作的限制</strong></p>
+<h3><span id="importing-vue-3-components-in-a-vue-2-application">Importing Vue 3 Components in a Vue 2 Application</span></h3><p><strong>There are limitations to component interoperability</strong></p>
 <ul>
-<li>context 共享</li>
-<li>scoped slots</li>
-<li>事件</li>
+<li>Shared context</li>
+<li>Scoped slots</li>
+<li>Events</li>
 </ul>
-<p><strong>Vue 2 应⽤中引⼊ Vue 3 组件的思路</strong></p>
+<p><strong>Approach for importing Vue 3 components in a Vue 2 application</strong></p>
 <ul>
-<li>Vue 3 可以有多个全局实例</li>
-<li>前提：Vue 2 升级到 2.7、Vue CLI 移除部分过时插件</li>
-<li>互操作层：Custom Elements</li>
-<li>构建⼯具：Vite</li>
+<li>Vue 3 can have multiple global instances</li>
+<li>Prerequisite: Upgrade Vue 2 to 2.7, remove outdated plugins from Vue CLI</li>
+<li>Interoperability layer: Custom Elements</li>
+<li>Build tool: Vite</li>
 </ul>
 
     
@@ -378,7 +377,7 @@
     
     <div class="columns is-variable is-1 is-multiline is-mobile">
     
-        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Vue/">#Vue</a></span>
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Vue/">#Vue</a></span>
     
     </div>
     
@@ -389,7 +388,7 @@
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">
             
-            <a href="/2023/11/24/2023-11-24-Writing/">2023-11-24-随笔</a>
+            <a href="/2023/11/24/en/2023-11-24-Writing/">2023-11-24-随笔</a>
             
         </span>
     </div>
@@ -400,7 +399,7 @@
 
 
 <div class="comments">
-    <h3 class="title is-4">評論</h3>
+    <h3 class="title is-4">Comments</h3>
     <script src="https://utteranc.es/client.js"
         repo="aszx87410/huli-blog"
         issue-term="title"
@@ -444,7 +443,7 @@
                 <span class="icon">
                     <i class="fas fa-globe"></i>
                 </span>
-                <span>中文</span>
+                <span>English</span>
                 <span class="icon is-small">
             <i class="fas fa-angle-down" aria-hidden="true"></i>
           </span>
@@ -454,8 +453,8 @@
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/2023/11/28/en/vue5/" class="dropdown-item">
-                    English
+                <a href="/2023/11/28/vue5/" class="dropdown-item">
+                    中文
                 </a>
             
             </div>

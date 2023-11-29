@@ -174,6 +174,146 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/28/en/vue5/" itemprop="url">Approach for Coexistence Development of Vue 2/3</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-28T15:40:22.000Z" itemprop="datePublished">28 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>After December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility.</p>
+<p>Evan announced that the first RC of Vue 3 will be released in mid-July. This article suggests that library&#x2F;plugin authors start migrating their support to Vue 3. However, due to significant changes in API and behavior, is it possible to make our libraries support both Vue 2 and 3 simultaneously?</p>
+<h3><span id="universal-code">Universal Code</span></h3><p>The simplest approach is to write <strong>universal code that works for both versions</strong>, without any additional modifications, similar to what people have done with Python 2 and 3. However, simplicity does not mean it’s easy. Writing such components requires avoiding <strong>newly introduced features in Vue 3</strong> and <strong>deprecated features in Vue 2</strong>. In other words, you cannot use:</p>
+<ul>
+<li>Composition API</li>
+<li>.sync and .native modifiers</li>
+<li>Filters</li>
+<li>3rd-party vendor objects</li>
+</ul>
+<h3><span id="using-branches">Using Branches</span></h3><p>The response from core team members suggests using different branches to separate support for each targeted version. This is a good solution for existing and mature libraries, as their codebases are usually more stable, and version targeting optimizations may require better code isolation.</p>
+<p>The downside of this approach is that you need to maintain two codebases, which doubles your workload. It is not ideal for small libraries or new libraries that want to support both versions and avoid duplicating bug fixes or feature additions. I do not recommend using this approach from the beginning of a project.</p>
+<h3><span id="build-scripts">Build Scripts</span></h3><p>In VueUse, I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags, <code>vue2</code> and <code>vue3</code>, to differentiate the support for different versions. With this, I can write the code once and make the library support both Vue versions. The issue is that I need to build twice on each version and guide users to install the corresponding plugin versions (manually install <code>@vue/composition-api</code> for Vue 2).</p>
+<h2><span id="approach-for-coexistence-development-of-vue-2x2f3">Approach for Coexistence Development of Vue 2&#x2F;3</span></h2><h3><span id="simultaneous-support-for-vue-2x2f3-projects">Simultaneous Support for Vue 2&#x2F;3 Projects</span></h3><h4><span id="possible-scenarios-for-vue-2x2f3-projects">Possible Scenarios for Vue 2&#x2F;3 Projects</span></h4><p><strong>Progressive Migration:</strong> If there is a large Vue 2 project but you want to gradually migrate to Vue 3, you can choose to introduce Vue 3 into the project and then gradually migrate Vue 2 components to Vue 3.</p>
+<p><strong>Compatibility with Dependency Libraries and Plugins:</strong> If the project depends on some Vue 2 plugins or libraries that have not been upgraded to Vue 3 yet, it may be necessary to use both Vue 2 and Vue 3 to ensure compatibility.</p>
+<p><strong>Adopting Vue 3 for New Features:</strong> You may want to use Vue 3 in the project to take advantage of its new features and performance benefits while still keeping Vue 2 for old components or features.</p>
+<p><strong>Project Integration:</strong> Based on experience requirements within the company, there is a need to present Vue 2&#x2F;3 projects on the same page.</p>
+<p><strong>Internal Component Asset Maintainer:</strong> Support is needed for both Vue 2 and 3 projects, and the capabilities must be consistent.</p>
+<p><strong>Legacy Application Developer:</strong> Need to use a third-party chart component, but only the Vue 3 version is available, not the Vue 2 version.</p>
+<h3><span id="solutions">Solutions</span></h3><h4><span id="1-coexistence-of-vue-2x2f3-projects">1. Coexistence of Vue 2&#x2F;3 Projects</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
+<p>Directly create a Vue 3 root instance using <code>createApp</code> and mount it to the Vue 2 root instance using the <code>mount</code> method. This allows using Vue 3 components in a Vue 2 project.</p>
+<p>The related code repository can be found here: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
+<p><img src="/img/vue5/vue5-2.jpg" alt="vue-5"></p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 3 项⽬</span>
+<span class="token keyword">import</span> <span class="token punctuation">&#123;</span> createApp <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
+<span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
+
+<span class="token function">createApp</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">mount</span><span class="token punctuation">(</span><span class="token string">'#vue3'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 2 项⽬</span>
+<span class="token keyword">import</span> Vue <span class="token keyword">from</span> <span class="token string">'vue2'</span>
+<span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
+
+<span class="token keyword">new</span> <span class="token class-name">Vue</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+  <span class="token function-variable function">render</span><span class="token operator">:</span> h <span class="token operator">=></span> <span class="token function">h</span><span class="token punctuation">(</span>App <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">$mount</span><span class="token punctuation">(</span><span class="token string">'#vue2'</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>The important thing about this approach is that we use the <code>vite.config.ts</code> to solve the compilation problem of different modules: I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags <code>vue2</code> and <code>vue3</code> to differentiate the support for different versions. But the issue is that it requires guiding users to install the corresponding plugin versions on each version. This is not very friendly for developers to deal with package conflicts.</p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> path <span class="token keyword">from</span> <span class="token string">'path'</span>
+<span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineConfig <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vite'</span>
+<span class="token keyword">import</span> Vue2 <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue2'</span>
+<span class="token keyword">import</span> Vue3 <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
+<span class="token keyword">import</span> Inspect <span class="token keyword">from</span> <span class="token string">'vite-plugin-inspect'</span>
+<span class="token keyword">import</span> compiler <span class="token keyword">from</span> <span class="token string">'vue2/compiler-sfc'</span>
+
+<span class="token keyword">const</span> src <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'src'</span><span class="token punctuation">)</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token function">defineConfig</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+  plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token function">Vue3</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+      include<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">vue3[/\\].*\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">Vue2</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+      include<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">vue2[/\\].*\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      compiler<span class="token operator">:</span> compiler <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token function">Inspect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Here we have separated Vue 2 and Vue 3 into two independent packages and configured different compilation rules in vite.config.ts, allowing us to use Vue 2 and Vue 3 in the same page.</p>
+<h4><span id="2-jessicasachsx2fpetite-solution">2. JessicaSachs&#x2F;petite Solution</span></h4><p>Let’s briefly introduce <a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>:</p>
+<blockquote>
+<p><strong>Petite is a subjective GitHub template built for Vue component authors.</strong> It sets up the tools needed for developing, documenting, and testing common SFC components and is backward compatible with Vue 2.7 runtime.</p>
+</blockquote>
+<p>This is achieved through some runtime helper functions and a very opinionated monolithic library structure.</p>
+<p>Petite sets up Vite, Volar, Linting, Vitepress, TypeScript, and Testing, allowing you to choose to write Vue 3-style code while easily maintaining backward compatibility with Vue 2.x users.</p>
+<p>This also means that you will be publishing two versions of your package on npm instead of breaking major versions to support Vue 2 or Vue 3.</p>
+<p><strong>The downside of this approach is that your users will need to install the new version when upgrading and changing imports.</strong> The benefit is that you can write backward-compatible code more easily and provide regular updates for users. Additionally, you can also separate dependencies for Vue 2-only and Vue 3-only.</p>
+<p>If you use lodash in your shared code, you will need to run <code>pnpm build</code> in the workspace root directory, and each package (lib-vue3, lib-vue2) should be deployed independently.</p>
+<h4><span id="3-vue-bridge-solution">3. vue-bridge Solution</span></h4><h4><span id="4-vue-demi-solution">4. vue-demi Solution</span></h4><p>Repository example: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
+<p>Vue Demi is a development utility that allows you to write universal Vue libraries for both Vue 2 and 3 without worrying about the version installed by the user.</p>
+<p>When creating a Vue plugin&#x2F;library, simply install vue-demi as a dependency and import any Vue-related content from it. Publish your plugin&#x2F;library as usual, and your package will become universal!</p>
+<pre class="line-numbers language-none"><code class="language-none">&#123;
+  &quot;dependencies&quot;: &#123;
+    &quot;vue-demi&quot;: &quot;latest&quot;
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> Vue<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> reactive<span class="token punctuation">,</span> ref <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>At the underlying level, it uses the postinstall npm hook. After installing all the packages, the script will start checking the installed Vue version and redirect the exports based on the local Vue version. When using Vue 2, it will also automatically install @vue&#x2F;composition-api if it is not already installed.</p>
+<p>Points to note about libraries&#x2F;components:</p>
+<p><strong>Libraries&#x2F;Components</strong></p>
+<ul>
+<li>Single repository - Multiple package builds</li>
+<li>Dependency management</li>
+<li>Alias configuration<ul>
+<li>NPM package names</li>
+<li>Build tool configuration</li>
+</ul>
+</li>
+</ul>
+<h3><span id="importing-vue-3-components-in-a-vue-2-application">Importing Vue 3 Components in a Vue 2 Application</span></h3><p><strong>There are limitations to component interoperability</strong></p>
+<ul>
+<li>Shared context</li>
+<li>Scoped slots</li>
+<li>Events</li>
+</ul>
+<p><strong>Approach for importing Vue 3 components in a Vue 2 application</strong></p>
+<ul>
+<li>Vue 3 can have multiple global instances</li>
+<li>Prerequisite: Upgrade Vue 2 to 2.7, remove outdated plugins from Vue CLI</li>
+<li>Interoperability layer: Custom Elements</li>
+<li>Build tool: Vite</li>
+</ul>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/24/en/2023-11-24-Writing/" itemprop="url">2023-11-24-随笔</a>
         
     </h1>
@@ -1392,128 +1532,6 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
 <p>In February 2011, Cisco Systems officially joined OpenStack and focused on developing OpenStack’s network services.</p>
 <h2><span id="technical-background-of-cloud-computing">Technical Background of Cloud Computing</span></h2><p>Cloud computing is the commercial implementation of concepts in computer science such as parallel computing, distributed computing, and grid computing.</p>
 <p>Cloud computing is the result of the mixed evolution and improvement of technologies such as virtualization, utility computing, Infrastructure as a Service (IaaS), Platform as a Service (PaaS), and Software as a Service (SaaS).</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/05/en/vue-renderer-3/" itemprop="url">Handling Event Rendering in Vue</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-05T10:21:48.000Z" itemprop="datePublished">5 November 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by addressing the first question, which is how to describe events in virtual nodes. Events can be considered as special attributes, so we can agree that any attribute starting with the string “on” in the vnode.props object should be treated as an event. For example:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Describe events using onXxx</span>
-    <span class="token function-variable function">onClick</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'clicked'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Once we have resolved how events are described in virtual nodes, let’s see how to add events to DOM elements. This is very simple, just call the <code>addEventListener</code> function in the <code>patchProps</code> method to bind the event, as shown in the following code:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Match attributes starting with on as events</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Get the corresponding event name based on the attribute name, e.g., onClick ---> click</span>
-    <span class="token keyword">const</span> name <span class="token operator">=</span> key<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toLowerCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    
-    <span class="token comment">// Remove the previously bound event handler</span>
-    prevValue <span class="token operator">&amp;&amp;</span> el<span class="token punctuation">.</span><span class="token function">removeEventListener</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> prevValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// Bind the new event handler</span>
-    el<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> nextValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token operator">===</span> <span class="token string">'class'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling class attribute logic)</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">shouldSetAsProps</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> nextValue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling other attribute logic)</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling other attribute logic)</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In fact, the event update mechanism can be further optimized to avoid multiple calls to <code>removeEventListener</code> and <code>addEventListener</code>.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">const</span> name <span class="token operator">=</span> key<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toLowerCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">let</span> invoker <span class="token operator">=</span> el<span class="token punctuation">.</span>__vei <span class="token operator">||</span> <span class="token punctuation">(</span>el<span class="token punctuation">.</span>__vei <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>nextValue<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token comment">// If there is no invoker, create a fake invoker function</span>
-        invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-          invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span>
-      
-      <span class="token comment">// Assign the actual event handler to the value property of the invoker function</span>
-      invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">.</span>value <span class="token operator">=</span> nextValue<span class="token punctuation">;</span>
-
-      <span class="token comment">// Bind the invoker function as the event handler</span>
-      el<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// If the new event handler does not exist and the previously bound invoker exists, remove the binding</span>
-      el<span class="token punctuation">.</span><span class="token function">removeEventListener</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      invoker<span class="token punctuation">[</span>name<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token operator">===</span> <span class="token string">'class'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling class attribute logic)</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">shouldSetAsProps</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> nextValue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling other attribute logic)</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Omitted code (handling other attribute logic)</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Looking at the above code, event binding is divided into two steps. First, read the corresponding invoker from <code>el._vei</code>. If invoker does not exist, create a fake invoker function and cache it in <code>el._vei</code>. Assign the actual event handler to the <code>invoker.value</code> property, and then bind the fake invoker function as the event handler to the element. When the event is triggered, the fake event handler is executed, indirectly invoking the actual event handler <code>invoker.value(e)</code>.</p>
-<p>When updating events, since <code>el._vei</code> already exists, we only need to modify the value of <code>invoker.value</code> to the new event handler.</p>
-<p>This way, updating events can avoid a call to <code>removeEventListener</code>, improving performance. However, the current implementation still has issues. The problem is that <code>el._vei</code> currently caches only one event handler at a time. This means that if an element binds multiple events simultaneously, event override will occur.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Describe events using onXxx</span>
-    <span class="token function-variable function">onClick</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'clicked'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token function-variable function">onContextmenu</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'contextmenu'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-<span class="token comment">// Assume renderer is your renderer object</span>
-renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>When the renderer tries to render the vnode provided in the above code, it first binds the <code>click</code> event and then binds the <code>contextmenu</code> event. The <code>contextmenu</code> event handler bound later will override the <code>click</code> event handler. To solve the event override problem, we need to redesign the data structure of <code>el._vei</code>. We should design <code>el._vei</code> as an object, where the keys are event names and the values are corresponding event handler functions. This way, event override issues will be resolved.</p>
-<p>Based on the code snippet you provided, this code is mainly used for handling attribute updates on DOM elements, including the logic for event binding and unbinding. In this code, it uses an <code>el._vei</code> object to cache event handler functions.</p>
 
     
     </div>

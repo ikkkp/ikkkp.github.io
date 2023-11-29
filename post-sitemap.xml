@@ -9,8 +9,22 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/28/en/vue5/</loc>
+        <lastmod>2023-11-29T01:34:40.871Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/28/vue5/</loc>
-        <lastmod>2023-11-28T16:34:43.149Z</lastmod>
+        <lastmod>2023-11-29T01:30:39.356Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
