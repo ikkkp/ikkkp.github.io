@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2023/11/29/en/Custom-Elements/</loc>
+        <lastmod>2023-11-29T02:45:32.809Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/29/Custom-Elements/</loc>
+        <lastmod>2023-11-29T02:43:04.532Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2023/11/28/en/vue5/</loc>
         <lastmod>2023-11-29T01:34:40.871Z</lastmod>
         <changefreq>weekly</changefreq>

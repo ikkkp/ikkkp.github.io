@@ -174,6 +174,157 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/10/31/en/vue-effect/" itemprop="url">Nested Effects and Effect Stack</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-10-31T02:09:08.000Z" itemprop="datePublished">31 October 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>Effect functions can be nested. But why is this design choice made?</p>
+<h2><span id="nested-effects">Nested Effects</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+    <span class="token comment">/* ... */</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In the code above, <code>effectFn1</code> is nested within <code>effectFn2</code>. The execution of <code>effectFn1</code> will trigger the execution of <code>effectFn2</code>. So, when do we encounter nested effects? Take Vue.js, for example; Vue.js’s rendering function is executed within an effect.</p>
+<p>When components are nested, for instance, when the Foo component renders the Bar component:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar component</span>
+<span class="token keyword">const</span> Bar <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// Foo component renders the Bar component</span>
+<span class="token keyword">const</span> Foo <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token operator">&lt;</span>Bar <span class="token operator">/</span><span class="token operator">></span> <span class="token punctuation">&#125;</span><span class="token comment">// JSX syntax</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Nested effects occur in this scenario. It can be visualized as follows:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  Foo<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment">// Nested</span>
+  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>effect</code> function can be nested, meaning an <code>effect</code> function can contain another <code>effect</code> function. When an outer <code>effect</code> function depends on reactive data created inside an inner <code>effect</code> function, the inner <code>effect</code> function is automatically tracked, ensuring that the outer <code>effect</code> function is executed when the inner <code>effect</code> function changes.</p>
+<p>This nested structure of effect functions establishes a dependency chain, ensuring that when reactive data changes, all the effect functions dependent on it are triggered, thereby maintaining the responsiveness of the application.</p>
+<p>The “effect stack” in Vue 3’s internal implementation is crucial. Vue uses an effect stack to track the currently executing effect functions, similar to a function call stack. This stack manages the execution order and dependency relationships of effect functions.</p>
+<p>Now, let’s consider an example of a nested <code>effect</code> function without using a stack structure. However, it cannot achieve the desired nesting functionality. Let’s assume we have two reactive data, <code>count1</code> and <code>count2</code>, where the value of <code>count2</code> depends on the value of <code>count1</code>. We can use nested <code>effect</code> functions to establish this dependency relationship.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Original data</span>
+<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Proxy object</span>
+<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Reading property: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> target<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Global variables</span>
+<span class="token keyword">let</span> temp1<span class="token punctuation">,</span> temp2<span class="token punctuation">;</span>
+
+<span class="token comment">// effectFn1 is nested within effectFn2</span>
+<span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn1 executed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn2 executed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// Access obj.bar property within effectFn2</span>
+    temp2 <span class="token operator">=</span> obj<span class="token punctuation">.</span>bar<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Access obj.foo property within effectFn1</span>
+  temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>effectFn1</code> is the outer <code>effect</code> function, which depends on the value of <code>obj.foo</code>. It contains an <code>innerEffect</code> within it. The inner <code>effect</code> function, <code>effectFn2</code>, depends on the value of <code>obj.bar</code>. When we modify <code>obj.foo</code>, the outer <code>effect</code> function should be triggered and output the value of <code>obj.foo</code>. When we modify <code>obj.bar</code>, the inner <code>effect</code> function should be triggered and output the value of <code>obj.bar</code>.</p>
+<p>We use the global variable <code>activeEffect</code> to store the effect functions registered through the <code>effect</code> function. This means that at any given time, <code>activeEffect</code> stores only one effect function.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
+<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Define the effect function</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Call the cleanup function; specific implementation needs to be provided based on requirements</span>
+    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// Assign the effect function to activeEffect</span>
+    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
+    <span class="token comment">// Execute the effect function</span>
+    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// Store the dependencies of the current effect function in effectFn.deps (Needs to be implemented based on the actual logic)</span>
+    effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment">// Set dependencies collection based on the actual logic</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// Execute the effect function</span>
+  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>However, by only using a single variable for storage without employing a stack structure, when nested effects occur, the execution of the inner effect function will overwrite the value of <code>activeEffect</code>. It will never be restored to its original value. If there is a reactive data performing dependency collection, even if it is read within the outer effect function, the collected effect functions will all be from the inner effect function. In other words, when I read <code>obj.foo</code>, <code>activeEffect</code> still refers to the value of <code>innerEffect</code>, and only the <code>innerEffect</code> is triggered.</p>
+<p>To solve this issue, we need an effect function stack called <code>effectStack</code>. When an effect function is executed, the current effect function is pushed onto the stack. After the execution of the effect function is completed, it is popped from the stack. The <code>activeEffect</code> is always set to the top effect function on the stack. This ensures that a reactive data will only collect the effect function that directly reads its value, preventing mutual interference:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
+<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
+
+<span class="token comment">// Effect stack</span>
+<span class="token keyword">const</span> effectStack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Call the cleanup function; specific implementation needs to be provided based on requirements</span>
+    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
+
+    <span class="token comment">// Push the current effect function onto the stack</span>
+    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// After the execution of the current effect function is completed, pop it from the stack, and restore activeEffect to its previous value</span>
+    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Initialize the dependencies collection of the effect function</span>
+  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Execute the effect function</span>
+  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
+<pre><code>
+</code></pre>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/10/30/en/vue-reactive-1/" itemprop="url">The Role and Implementation of Vue.js Reactive System</a>
         
     </h1>
