@@ -32,7 +32,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-29T02:13:58.000Z">
-<meta property="article:modified_time" content="2023-11-29T02:45:32.809Z">
+<meta property="article:modified_time" content="2023-12-02T13:18:09.334Z">
 <meta property="article:author" content="Huangzl">
 <meta property="article:tag" content="Vue,Front-end">
 <meta name="twitter:card" content="summary_large_image">
@@ -329,19 +329,21 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">.</span><span class="token function">rule</span><span class="token punctuation">(</span><span class="token string">'vue'</span><span class="token punctuation">)</span>
       <span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span>
       <span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span><span class="token parameter">options</span> <span class="token operator">=></span> <span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-        <span class="token operator">...</span>options<span class="token punctuation">,</span>
+        <span class="token operator">...</span>options<span class="token punctuation">,</span> 
+
+        
         <span class="token literal-property property">compilerOptions</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
           <span class="token comment">// treat any tag that starts with ion- as custom elements</span>
           <span class="token function-variable function">isCustomElement</span><span class="token operator">:</span> <span class="token parameter">tag</span> <span class="token operator">=></span> tag<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'ion-'</span><span class="token punctuation">)</span>
         <span class="token punctuation">&#125;</span>
       <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3><p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
 <p><strong>Defining Custom Elements</strong></p>
 <p>Vue supports creating custom elements using the same Vue component API with the <code>defineCustomElement</code> method. This method takes the same parameters as <code>defineComponent</code> but returns an extended custom element constructor <code>HTMLElement</code>:</p>
-<p>Template:</p>
+<p>Template:0</p>
 <pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;my-vue-element&gt;&lt;&#x2F;my-vue-element&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineCustomElement <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
@@ -405,7 +407,9 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
     
     
     <div class="columns is-mobile is-multiline article-nav">
-        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2023/12/05/en/Event-Bubbling/">Bubbling and Capturing</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">

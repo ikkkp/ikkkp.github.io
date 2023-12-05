@@ -181,6 +181,184 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/05/en/Event-Bubbling/" itemprop="url">Bubbling and Capturing</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-05T07:46:41.000Z" itemprop="datePublished">5 December 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/en/categories/Vue/Front-end/">Front-end</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="preface">Preface</span></h2><p><strong>Let’s start with an example.</strong></p>
+<p>A handler is assigned to the <code>&lt;div&gt;</code>, but if you click on any nested tags (e.g., <code>&lt;em&gt;</code> or <code>&lt;code&gt;</code>), the handler will also run:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'The handler!'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>If you click on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>EM<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>, the handler on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>DIV<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> runs.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<blockquote>
+<p>So, if you click on EM, the handler on DIV runs.</p>
+</blockquote>
+<h2><span id="bubbling">Bubbling</span></h2><p>The bubbling principle is straightforward.</p>
+<p><strong>When an event occurs on an element, it first runs the handler on that element, then runs the handler on its parent element, and continues up to handlers on other ancestors.</strong></p>
+<p>Suppose we have 3 layers of nesting <code>FORM &gt; DIV &gt; P</code>, each with its own handler:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+  <span class="token selector">body *</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">margin</span><span class="token punctuation">:</span> 10px<span class="token punctuation">;</span>
+    <span class="token property">border</span><span class="token punctuation">:</span> 1px solid blue<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'form'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>FORM
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>DIV
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Now, what happens if you click on <code>&lt;p&gt;</code>?</strong></p>
+<ol>
+<li><p>First, the handler runs on <code>&lt;p&gt;</code>.</p>
+</li>
+<li><p>Then, it runs on <code>&lt;div&gt;</code>.</p>
+</li>
+<li><p>Then, it runs on <code>&lt;form&gt;</code>.</p>
+</li>
+<li><p>Finally, it runs on the document.</p>
+</li>
+</ol>
+<p><strong>This behavior is called “event bubbling” because it bubbles up from the element like a bubble.</strong></p>
+<p>So, if we click on <code>&lt;p&gt;</code>, we will see 3 alerts: p → div → form.</p>
+<h3><span id="eventtarget">event.target</span></h3><p>The handler on a parent element can always access detailed information about where the event actually occurred.</p>
+<p><strong>The element that triggered the event, the deepest nested one, is called the target element, and it can be accessed through <code>event.target</code>.</strong></p>
+<p>Note the difference with <code>this</code> (which equals <code>event.currentTarget</code>):</p>
+<ul>
+<li><p><code>this</code> is the “current” element at the time the handler is running, and it remains the same.</p>
+</li>
+<li><p><code>event.target</code> is the “target” element when the event happens, and it can be any element; it changes during the bubbling process.</p>
+</li>
+</ul>
+<p>Let’s illustrate this with an example!</p>
+<p><strong>For instance, if we have a handler <code>form.onclick</code>, it can “capture” all clicks inside the form. Regardless of where the click happens, it will bubble up to <code>&lt;form&gt;</code> and run the handler.</strong></p>
+<p>Note: Here, all events are bound to the form instead of individual elements.</p>
+<p>In the <code>form.onclick</code> handler:</p>
+<ul>
+<li><code>this</code> (&#x3D;<code>event.currentTarget</code>) is the <code>&lt;form&gt;</code> element because the handler runs on it.</li>
+<li><code>event.target</code> is the actual clicked element inside the form.</li>
+</ul>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">HTML</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+
+  A click shows both <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>event.target<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> and <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>this<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> to compare:
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">background-color</span><span class="token punctuation">:</span> green<span class="token punctuation">;</span>
+      <span class="token property">position</span><span class="token punctuation">:</span> relative<span class="token punctuation">;</span>
+      <span class="token property">width</span><span class="token punctuation">:</span> 150px<span class="token punctuation">;</span>
+      <span class="token property">height</span><span class="token punctuation">:</span> 150px<span class="token punctuation">;</span>
+      <span class="token property">text-align</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+      <span class="token property">cursor</span><span class="token punctuation">:</span> pointer<span class="token punctuation">;</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>FORM
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">background-color</span><span class="token punctuation">:</span> blue<span class="token punctuation">;</span>
+      <span class="token property">position</span><span class="token punctuation">:</span> absolute<span class="token punctuation">;</span>
+      <span class="token property">top</span><span class="token punctuation">:</span> 25px<span class="token punctuation">;</span>
+      <span class="token property">left</span><span class="token punctuation">:</span> 25px<span class="token punctuation">;</span>
+      <span class="token property">width</span><span class="token punctuation">:</span> 100px<span class="token punctuation">;</span>
+      <span class="token property">height</span><span class="token punctuation">:</span> 100px<span class="token punctuation">;</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>DIV
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">style</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value css language-css"><span class="token property">background-color</span><span class="token punctuation">:</span> red<span class="token punctuation">;</span>
+      <span class="token property">position</span><span class="token punctuation">:</span> absolute<span class="token punctuation">;</span>
+      <span class="token property">top</span><span class="token punctuation">:</span> 25px<span class="token punctuation">;</span>
+      <span class="token property">left</span><span class="token punctuation">:</span> 25px<span class="token punctuation">;</span>
+      <span class="token property">width</span><span class="token punctuation">:</span> 50px<span class="token punctuation">;</span>
+      <span class="token property">height</span><span class="token punctuation">:</span> 50px<span class="token punctuation">;</span>
+      <span class="token property">line-height</span><span class="token punctuation">:</span> 50px<span class="token punctuation">;</span>
+      <span class="token property">margin</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    form<span class="token operator">=</span>document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'form'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    form<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Output the event target and the current element</span>
+      <span class="token comment">// (this=the current element=form, event.target=the clicked element)</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"target = "</span> <span class="token operator">+</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>tagName <span class="token operator">+</span> <span class="token string">", this="</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>tagName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
+
+## Stopping Bubbling
+Bubbling events ascend from the target element. Usually, they rise all the way up to `<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>`, then to the document object, and some events even reach the window, calling all handlers on their way.
+
+However, any handler can decide that the event has been fully processed and stop the bubbling.
+
+The method used to stop bubbling is `event.stopPropagation()`.
+
+For example, if you click `<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span><span class="token punctuation">></span></span>`, the `body.onclick` here won't work:
+
+```html
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">the bubbling doesn't reach here</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<div onclick="alert(`the bubbling doesn't reach here`)" style="width:150px;height:50px;background-color:red">
+  <button onclick="event.stopPropagation()">Click me</button>
+</div>
+
+<h2><span id="capturing">Capturing</span></h2><p><strong>Another phase of event handling is called “capturing.”</strong></p>
+<p>The DOM event standard describes the three phases of event propagation:</p>
+<ol>
+<li>Capturing phase — The event travels down the hierarchy of elements (from the window).</li>
+<li>Target phase — The event reaches the target element.</li>
+<li>Bubbling phase — The event starts to bubble up from the element.</li>
+</ol>
+<p>Below is an illustration of clicking on <code>&lt;td&gt;</code> in a table, taken from the specification:</p>
+<p><img src="/img/event-bubbling/eventbubling1.jpg" alt="Event-Bubbling"></p>
+<p>In other words: Clicking on <code>&lt;td&gt;</code>, the event first descends through the ancestor chain to the element (capturing phase), then reaches the target (target phase), and finally ascends (bubbling phase), calling handlers along the way.</p>
+<p>So far, we have only discussed bubbling because the capturing phase is rarely used. Typically, we don’t see it.</p>
+<p>Handlers added with <code>on&lt;event&gt;</code> attributes or using HTML attributes or with <code>addEventListener(event, handler)</code> with two arguments have no knowledge of capturing; they run only in the second and third phases.</p>
+<h2><span id="summary">Summary</span></h2><p><strong>When an event occurs — the element nested deepest where the event happened is marked as the “target element” (<code>event.target</code>).</strong></p>
+<ul>
+<li>Then, the event moves down from the document root to the <code>event.target</code>, invoking handlers assigned with <code>addEventListener(..., true)</code> (where <code>true</code> is a shorthand for <code>&#123;capture: true&#125;</code>).</li>
+<li>Next, the handler on the target element itself is called.</li>
+<li>Finally, the event bubbles up from <code>event.target</code> to the root, calling handlers assigned with <code>on&lt;event&gt;</code>, HTML attributes, and <code>addEventListener</code> without a third parameter or with <code>false</code>&#x2F;<code>&#123;capture: false&#125;</code>.</li>
+</ul>
+<p><strong>Each handler has access to properties of the <code>event</code> object:</strong></p>
+<ul>
+<li><code>event.target</code> — The element deepest in the hierarchy that triggered the event.</li>
+<li><code>event.currentTarget</code> (&#x3D;<code>this</code>) — The current element handling the event (the one with the handler).</li>
+<li><code>event.eventPhase</code> — The current phase (capturing&#x3D;1, target&#x3D;2, bubbling&#x3D;3).</li>
+</ul>
+<p>Any event handler can stop the event by calling <code>event.stopPropagation()</code>, but it’s not recommended because we might not be sure if we genuinely don’t need the event to bubble up for other purposes.</p>
+<p>The capturing phase is rarely used, and usually, events are handled during the bubbling phase. There’s a reason for this logic.</p>
+<p>Event handlers work the same way. Code that sets a handler on a specific element gains the most detailed information about that element. A handler specific to a <code>&lt;td&gt;</code> might be perfectly tailored for that <code>&lt;td&gt;</code>, knowing all about it. So, it should get the chance first. Then, its immediate parent also knows context-specific details but fewer, and so on, until handling general concepts and running the last handler on the topmost element.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/29/en/Custom-Elements/" itemprop="url">Vue Components and Web Components Custom Elements</a>
         
     </h1>
@@ -279,19 +457,21 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">.</span><span class="token function">rule</span><span class="token punctuation">(</span><span class="token string">'vue'</span><span class="token punctuation">)</span>
       <span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span>
       <span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span><span class="token parameter">options</span> <span class="token operator">=></span> <span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-        <span class="token operator">...</span>options<span class="token punctuation">,</span>
+        <span class="token operator">...</span>options<span class="token punctuation">,</span> 
+
+        
         <span class="token literal-property property">compilerOptions</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
           <span class="token comment">// treat any tag that starts with ion- as custom elements</span>
           <span class="token function-variable function">isCustomElement</span><span class="token operator">:</span> <span class="token parameter">tag</span> <span class="token operator">=></span> tag<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'ion-'</span><span class="token punctuation">)</span>
         <span class="token punctuation">&#125;</span>
       <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3><p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
 <p><strong>Defining Custom Elements</strong></p>
 <p>Vue supports creating custom elements using the same Vue component API with the <code>defineCustomElement</code> method. This method takes the same parameters as <code>defineComponent</code> but returns an extended custom element constructor <code>HTMLElement</code>:</p>
-<p>Template:</p>
+<p>Template:0</p>
 <pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;my-vue-element&gt;&lt;&#x2F;my-vue-element&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineCustomElement <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>

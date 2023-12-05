@@ -174,6 +174,72 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/08/en/hadoop-1/" itemprop="url">Understanding Hadoop in One Article</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-08T07:12:04.000Z" itemprop="datePublished">8 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/en/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="what-is-hadoop">What is Hadoop?</span></h2><p>Hadoop is a distributed system infrastructure developed by the Apache Foundation. It is a software framework that combines a storage system and a computing framework. It mainly solves the problem of storing and computing massive data and is the cornerstone of big data technology. Hadoop processes data in a reliable, efficient, and scalable way. Users can develop distributed programs on Hadoop without understanding the underlying details of the distributed system. Users can easily develop and run applications that process massive data on Hadoop.</p>
+<h2><span id="what-problems-can-hadoop-solve">What problems can Hadoop solve?</span></h2><ul>
+<li><p><strong>Massive data storage</strong></p>
+<p>HDFS has high fault tolerance and is designed to be deployed on low-cost hardware. It provides high throughput for accessing data and is suitable for applications with large data sets. It consists of n machines running DataNode and one machine running NameNode (another standby). Each DataNode manages a portion of the data, and NameNode is responsible for managing the information (metadata) of the entire HDFS cluster.</p>
+</li>
+<li><p><strong>Resource management, scheduling, and allocation</strong></p>
+<p><code>Apache Hadoop YARN</code> (Yet Another Resource Negotiator) is a new Hadoop resource manager. It is a general resource management system and scheduling platform that provides unified resource management and scheduling for upper-layer applications. Its introduction has brought huge benefits to the cluster in terms of utilization, unified resource management, and data sharing.</p>
+</li>
+</ul>
+<h2><span id="the-origin-of-hadoop">The origin of Hadoop</span></h2><p><img src="/img/hadoop/hadoop1.png" alt="hadoop"></p>
+<h2><span id="the-core-architecture-of-hadoop">The core architecture of Hadoop</span></h2><p>The core of Hadoop is HDFS and MapReduce. HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data.</p>
+<h3><span id="hdfs">HDFS</span></h3><p><img src="/img/hadoop/hadoop2.png" alt="hadoop"></p>
+<p>The entire HDFS has three important roles: <strong>NameNode</strong>, <strong>DataNode</strong>, and <strong>Client</strong>.</p>
+<p>Typical master-slave architecture, using TCP&#x2F;IP communication.</p>
+<ul>
+<li><p><strong>NameNode:</strong> The master node of the distributed file system, responsible for managing the namespace of the file system, cluster configuration information, and storage block replication. The NameNode stores the metadata of the file system in memory, including file information, block information for each file, and information about each block in the DataNode.</p>
+</li>
+<li><p><strong>DataNode:</strong> The slave node of the distributed file system, which is the basic unit of file storage. It stores blocks in the local file system and saves the metadata of the blocks. It also periodically sends information about all existing blocks to the NameNode.</p>
+</li>
+<li><p><strong>Client:</strong> Splits files, accesses HDFS, interacts with the NameNode to obtain file location information, and interacts with the DataNode to read and write data.</p>
+</li>
+</ul>
+<p>There is also the concept of a block: a block is the basic read and write unit in HDFS. Files in HDFS are stored as blocks, which are replicated to multiple DataNodes. The size of a block (usually 64MB) and the number of replicated blocks are determined by the client when the file is created.</p>
+<h3><span id="mapreduce">MapReduce</span></h3><p>MapReduce is a distributed computing model that divides large data sets (greater than 1TB) into many small data blocks, and then performs parallel processing on various nodes in the cluster, and finally aggregates the results. The MapReduce calculation process can be divided into two stages: the Map stage and the Reduce stage.</p>
+<ul>
+<li><p><strong>Map stage:</strong> The input data is divided into several small data blocks, and then multiple Map tasks process them in parallel. Each Map task outputs the processing result as several key-value pairs.</p>
+</li>
+<li><p><strong>Reduce stage:</strong> The output results of the Map stage are grouped according to the keys in the key-value pairs, and then multiple Reduce tasks process them in parallel. Each Reduce task outputs the processing result as several key-value pairs.</p>
+</li>
+</ul>
+<h2><span id="summary">Summary</span></h2><p>Hadoop is a distributed system infrastructure that mainly solves the problem of storing and computing massive data. Its core is HDFS and MapReduce, where HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data. In addition, Hadoop also has an important component-YARN, which is a general resource management system and scheduling platform that provides unified resource management and scheduling for upper-layer applications.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/08/en/Cloud-Computing/" itemprop="url">Cloud Computing and Its Applications</a>
         
     </h1>
@@ -1243,149 +1309,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
-<hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/31/en/vue-watch-computed/" itemprop="url">vue-watch-computed</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">31 October 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
-<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2><p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>However, in certain cases, we want the side-effect function to execute only when needed, not immediately. A typical scenario is with computed properties. To achieve this delayed execution, we can add a <code>lazy</code> property to the <code>options</code> object and set it to <code>true</code>. When <code>lazy</code> is <code>true</code>, the side-effect function is not executed during initialization but only when necessary. The modified code looks like this:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
-  <span class="token comment">// This function will not execute immediately</span>
-  <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token comment">// options</span>
-  <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In the implementation, the side-effect function <code>effectFn</code> is returned as the result of the <code>effect</code> function. This means that when we call the <code>effect</code> function, we get the corresponding side-effect function and can manually execute it when needed. This mechanism gives us more control, allowing us to decide when to trigger the execution of the side-effect function rather than executing it immediately.</p>
-<p>This design pattern is particularly suitable for specific scenarios like computed properties. In computed properties, we might want to trigger the side-effect function’s execution at a specific moment rather than immediately during initialization. By returning the side-effect function from the <code>effect</code> function, we can flexibly control when the side-effect function is executed to meet different requirements in various scenarios.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Set options and dependencies for the side-effect function</span>
-  effectFn<span class="token punctuation">.</span>options <span class="token operator">=</span> options<span class="token punctuation">;</span>
-  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Execute the side-effect function only if it's not lazy</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token comment">// Return the side-effect function as the result</span>
-  <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this code, the <code>effect</code> function’s second parameter is an <code>options</code> object, where the <code>lazy</code> property is set to <code>true</code>. This means that the side-effect function passed to <code>effect</code> will be executed only when necessary, such as when accessing a computed property. The <code>lazy</code> property allows us to control the immediate execution of the side-effect function.</p>
-<p>Now that we have achieved lazy computation through computed properties, how do we implement data caching?</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// value is used to cache the last computed value</span>
-  <span class="token keyword">let</span> value<span class="token punctuation">;</span>
-  <span class="token comment">// dirty flag indicates whether a recalculation is needed; if true, it means "dirty" and needs computation</span>
-  <span class="token keyword">let</span> dirty <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> effectFn <span class="token operator">=</span> <span class="token function">effect</span><span class="token punctuation">(</span>getter<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">get</span> <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Compute the value only if it's "dirty," and cache the computed value in the value variable</span>
-      <span class="token keyword">if</span> <span class="token punctuation">(</span>dirty<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        value <span class="token operator">=</span> <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">// Set dirty to false, so the cached value can be used directly next time</span>
-        dirty <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span>
-      <span class="token keyword">return</span> value<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>With lazy computation resolved, the <code>value</code> is calculated only when it is truly needed, executing <code>effectFn</code> only when necessary. Additionally, a <code>dirty</code> flag is introduced to indicate whether the current computation needs to be recalculated. If <code>dirty</code> is <code>true</code>, the <code>value</code> is recalculated, and the <code>dirty</code> flag is set to <code>false</code> so that the cached value can be used directly next time.</p>
-<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2><p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Data changed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-<span class="token comment">// Modifying the reactive data triggers the execution of the callback function</span>
-obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Suppose <code>obj</code> is a reactive data, watched using the <code>watch</code> function with a provided callback function. When modifying the reactive data’s value, the callback function is triggered. In fact, the implementation of <code>watch</code> essentially utilizes the <code>effect</code> and the <code>options.scheduler</code> option, as shown in the following code:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-<span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-<span class="token comment">// The scheduler function is executed when obj.foo's value changes</span>
-<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In a side-effect function accessing the reactive data <code>obj.foo</code>, based on the previous discussion, we know that this establishes a connection between the side-effect function and the reactive data. When the reactive data changes, the side-effect function is re-executed. However, there is an exception: if the side-effect function has a <code>scheduler</code> option, when the reactive data changes, the <code>scheduler</code> function is executed instead of directly triggering the side-effect function. From this perspective, the <code>scheduler</code> function acts as a callback function, and the implementation of <code>watch</code> utilizes this characteristic.</p>
-<p>Below is the simplest implementation of the <code>watch</code> function:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// The watch function receives two parameters: source (reactive data) and cb (callback function)</span>
-<span class="token keyword">function</span> <span class="token function">watch</span><span class="token punctuation">(</span><span class="token parameter">source<span class="token punctuation">,</span> cb</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span>
-    <span class="token comment">// Trigger a read operation to establish a connection</span>
-    <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> source<span class="token punctuation">.</span>foo<span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">scheduler</span><span class="token operator">:</span> <span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-      <span class="token comment">// Call the callback function cb when the data changes</span>
-      <span class="token function-variable function">fn</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-        <span class="token function">cb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
-<p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
 <hr>
 <p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 

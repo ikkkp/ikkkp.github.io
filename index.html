@@ -177,6 +177,172 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/05/Event-Bubbling/" itemprop="url">冒泡和捕获</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-05T07:46:41.000Z" itemprop="datePublished">2023年12月5日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/categories/Vue/Front-end/">Front-end</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p><strong>让我们从一个示例开始。</strong></p>
+<p>处理程序（handler）被分配给了 <code>&lt;div&gt;</code>，但是如果你点击任何嵌套的标签（例如 <code>&lt;em&gt;</code> 或 <code>&lt;code&gt;</code>），该处理程序也会运行：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'The handler!'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>If you click on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>EM<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>, the handler on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>DIV<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> runs.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<blockquote>
+<p>So, if you click on EM, the handler on DIV runs.</p>
+</blockquote>
+<h2><span id="冒泡">冒泡</span></h2><p>冒泡（bubbling）原理很简单。</p>
+<p><strong>当一个事件发生在一个元素上，它会首先运行在该元素上的处理程序，然后运行其父元素上的处理程序，然后一直向上到其他祖先上的处理程序。</strong></p>
+<p>假设我们有 3 层嵌套 <code>FORM &gt; DIV &gt; P</code> ，它们各自拥有一个处理程序：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+  <span class="token selector">body *</span> <span class="token punctuation">&#123;</span>
+    <span class="token property">margin</span><span class="token punctuation">:</span> 10px<span class="token punctuation">;</span>
+    <span class="token property">border</span><span class="token punctuation">:</span> 1px solid blue<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'form'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>FORM
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>DIV
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>现在，如果你点击 <code>&lt;p&gt;</code>，那么会发生什么？</strong></p>
+<ol>
+<li><p>首先，处理程序在 <code>&lt;p&gt;</code> 上运行。</p>
+</li>
+<li><p>然后，它在 <code>&lt;div&gt;</code> 上运行。</p>
+</li>
+<li><p>然后，它在 <code>&lt;form&gt;</code> 上运行。</p>
+</li>
+<li><p>最后，它在 document 上运行。</p>
+</li>
+</ol>
+<p><strong>这种行为被称为“事件冒泡”，因为它像气泡一样从元素冒出来。</strong></p>
+<p>因此，如果我们点击 <code>&lt;p&gt;</code>，那么我们将看到 3 个 alert：p → div → form。</p>
+<h3><span id="eventtarget">event.target</span></h3><p>父元素上的处理程序始终可以获取事件实际发生位置的详细信息。</p>
+<p><strong>引发事件的那个嵌套层级最深的元素被称为目标元素,可以通过 event.target 访问。</strong></p>
+<p>注意与 this（&#x3D;event.currentTarget）之间的区别：</p>
+<ul>
+<li><p><code>this</code> 是在处理程序运行时的“当前”元素，它始终相同。</p>
+</li>
+<li><p><code>event.target</code> 是在事件发生时的“目标”元素，它可以是任何元素，它在冒泡过程中改变。</p>
+</li>
+</ul>
+<p>那我们来举个例子吧！</p>
+<p><strong>例如，如果我们有一个处理程序 form.onclick，那么它可以“捕获”表单内的所有点击。无论点击发生在哪里，它都会冒泡到 <code>&lt;form&gt;</code> 并运行处理程序。</strong></p>
+<p>注意哈！这边是将所有的事件都绑定到了 form 上，而不是每个元素上。</p>
+<p>在 form.onclick 处理程序中：</p>
+<p>this（&#x3D;event.currentTarget）是 <code>&lt;form&gt;</code> 元素，因为处理程序在它上面运行。<br>event.target 是表单中实际被点击的元素。</p>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+
+<p>  A click shows both <code>event.target</code> and <code>this</code> to compare:</p>
+  <form style="   background-color: green;
+      position: relative;
+      width: 150px;
+      height: 150px;
+      text-align: center;
+      cursor: pointer;">FORM
+    <div style="background-color: blue;
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      width: 100px;
+      height: 100px;">DIV
+      <p style="background-color: red;
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      margin: 0;">P</p>
+    </div>
+  </form>
+
+  <script>
+    form=document.querySelector('form');
+    form.onclick = function(event) {
+      // 输出事件目标和当前元素
+      // （this=事件当前元素=form，event.target=事件目标=实际点击的元素）
+      alert("target = " + event.target.tagName + ", this=" + this.tagName);
+    };
+  </script>
+</body>
+</html>
+
+<h2><span id="停止冒泡">停止冒泡</span></h2><p>冒泡事件从目标元素开始向上冒泡。通常，它会一直上升到 <code>&lt;html&gt;</code>，然后再到 document 对象，有些事件甚至会到达 window，它们会调用路径上所有的处理程序。</p>
+<p>但是任意处理程序都可以决定事件已经被完全处理，并停止冒泡。</p>
+<p>用于停止冒泡的方法是 event.stopPropagation()。</p>
+<p>例如，如果你点击 <code>&lt;button&gt;</code>，这里的 body.onclick 不会工作：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">the bubbling doesn't reach here</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<div onclick="alert(`the bubbling doesn't reach here`)" style="width:150px;height:50px;background-color:red">
+  <button onclick="event.stopPropagation()">Click me</button>
+</div>
+
+<h2><span id="捕获">捕获</span></h2><p><strong>事件处理的另一个阶段被称为“捕获（capturing）”。</strong></p>
+<p>DOM 事件标准描述了事件传播的 3 个阶段：</p>
+<ol>
+<li>捕获阶段（Capturing phase）—— 事件（从 Window）向下走近元素。</li>
+<li>目标阶段（Target phase）—— 事件到达目标元素。</li>
+<li>冒泡阶段（Bubbling phase）—— 事件从元素上开始冒泡。</li>
+</ol>
+<p>下面是在表格中点击 <code>&lt;td&gt;</code> 的图片，摘自规范：</p>
+<p><img src="/img/event-bubbling/eventbubling1.jpg" alt="Event-Bubbling"></p>
+<p>也就是说：点击 <code>&lt;td&gt;</code>，事件首先通过祖先链向下到达元素（捕获阶段），然后到达目标（目标阶段），最后上升（冒泡阶段），在途中调用处理程序。</p>
+<p>之前，我们只讨论了冒泡，因为捕获阶段很少被使用。通常我们看不到它。</p>
+<p>使用 on<code>&lt;event&gt;</code> 属性或使用 HTML 特性（attribute）或使用两个参数的 addEventListener(event, handler) 添加的处理程序，对捕获一无所知，它们仅在第二阶段和第三阶段运行。</p>
+<h2><span id="总结">总结</span></h2><p><strong>当一个事件发生时 —— 发生该事件的嵌套最深的元素被标记为“目标元素”（event.target）。</strong></p>
+<ul>
+<li>然后，事件从文档根节点向下移动到 event.target，并在途中调用分配了 addEventListener(…, true) 的处理程序（true 是 {capture: true} 的一个简写形式）。</li>
+<li>然后，在目标元素自身上调用处理程序。</li>
+<li>然后，事件从 event.target 冒泡到根，调用使用 on<code>&lt;event&gt;</code>、HTML 特性（attribute）和没有第三个参数的，或者第三个参数为 false&#x2F;{capture:false} 的addEventListener 分配的处理程序。</li>
+</ul>
+<p><strong>每个处理程序都可以访问 event 对象的属性：</strong></p>
+<ul>
+<li>event.target —— 引发事件的层级最深的元素。</li>
+<li>event.currentTarget（&#x3D;this）—— 处理事件的当前元素（具有处理程序的元素）</li>
+<li>event.eventPhase —— 当前阶段（capturing&#x3D;1，target&#x3D;2，bubbling&#x3D;3）。</li>
+</ul>
+<p>任何事件处理程序都可以通过调用 event.stopPropagation() 来停止事件，但不建议这样做，因为我们不确定是否确实不需要冒泡上来的事件，也许是用于完全不同的事情。</p>
+<p>捕获阶段很少使用，通常我们会在冒泡时处理事件。这背后有一个逻辑。</p>
+<p>事件处理程序也是如此。在特定元素上设置处理程序的代码，了解有关该元素最详尽的信息。特定于 <td> 的处理程序可能恰好适合于该 </td><td>，这个处理程序知道关于该元素的所有信息。所以该处理程序应该首先获得机会。然后，它的直接父元素也了解相关上下文，但了解的内容会少一些，以此类推，直到处理一般性概念并运行最后一个处理程序的最顶部的元素为止。</td></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/29/Custom-Elements/" itemprop="url">Vue Components 和 Web 组件Custom Elements</a>
         
     </h1>
@@ -1453,198 +1619,6 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
 
 
     
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/08/hadoop-2/" itemprop="url">hadoop之MapReduce工作原理</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-08T07:48:11.000Z" itemprop="datePublished">2023年11月8日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="mapreduce-定义">MapReduce 定义</span></h2><p>MapReduce 是一个分布式运算程序的编程框架，是用户开发“基于hadoop的数据分析应用”的核心框架，其核心功能是将用户编写的业务逻辑代码和自带默认组件整合成一个完整的分布式运算程序，并发运行在一个hadoop集群上。</p>
-<h2><span id="mapreduce-产生缘由">MapReduce 产生缘由</span></h2><p>为什么需要MapReduce？</p>
-<ul>
-<li>海量数据在单机上处理因为硬件资源限制，无法胜任。</li>
-<li>而一旦将单机版程序扩展到集群来分布式运行，将极大增加程序的复杂度和开发难度。</li>
-<li>引入MapReduce框架后，开发人员可以将绝大部分工作集中在业务逻辑的开发上，而将分布式计算中的复杂性交由框架来处理。</li>
-</ul>
-<p>设想一个海量数据场景下的wordcount需求：</p>
-<ul>
-<li>单机版：内存受限，磁盘受限，运算能力受限</li>
-<li>分布式：文件分布式存储（HDFS）、运算逻辑需要至少分成2个阶段（一个阶段独立并发，一个阶段汇聚）、运算程序如何分发、程序如何分配运算任务（切片）、两阶段的程序如何启动？如何协调？、整个程序运行过程中的监控？容错？重试？</li>
-</ul>
-<p>可见在程序由单机版扩成分布式时，会引入大量的复杂工作。</p>
-<h2><span id="mapreduce与yarn的关系">MapReduce与Yarn的关系</span></h2><p>Yarn 是一个资源调度平台，负责为运算程序提供服务器运算资源，相当于一个分布式的操作系统平台。而MapReduce等运算程序则相当于运行于操作系统之上的应用程序。</p>
-<p>YARN的重要概念：</p>
-<ol>
-<li><p>yarn并不清楚用户提交的程序的运行机制；</p>
-</li>
-<li><p>yarn只提供运算资源的调度（用户程序向yarn申请资源，yarn就负责分配资源）；</p>
-</li>
-<li><p>yarn中的主管角色叫ResourceManager；</p>
-</li>
-<li><p>yarn中具体提供运算资源的角色叫NodeManager；</p>
-</li>
-<li><p>这样一来，yarn其实就与运行的用户程序完全解耦，就意味着yarn上可以运行各种类型的分布式运算程序（MapReduce只是其中的一种），比如MapReduce、storm程序，spark程序，tez……；</p>
-</li>
-<li><p>所以，spark、storm等运算框架都可以整合在yarn上运行，只要他们各自的框架中有符合yarn规范的资源请求机制即可；</p>
-</li>
-<li><p>Yarn就成为一个通用的资源调度平台，从此，企业中以前存在的各种运算集群都可以整合在一个物理集群上，提高资源利用率，方便数据共享。</p>
-</li>
-</ol>
-<h2><span id="mapreduce-工作原理">MapReduce 工作原理</span></h2><p>严格说起来MapReduce并不是一种算法， 而是一个计算思想。它由map和reduce两个阶段组成。</p>
-<h3><span id="mapreduce-进程">MapReduce 进程</span></h3><p>为了提高开发效率，可以将分布式程序中的公共功能封装成框架，让开发人员可以将精力集中于业务逻辑。</p>
-<p>而MapReduce就是这样一个分布式程序的通用框架，整体结构如下（在分布式运行时有三类实例进程）：</p>
-<ul>
-<li>MRAppMaster：负责整个程序的过程调度及状态协调</li>
-<li>MapTask：负责map阶段的整个数据处理流程</li>
-<li>ReduceTask：负责reduce阶段的整个数据处理流程</li>
-</ul>
-<h3><span id="mapreduce-运行机制">MapReduce 运行机制</span></h3><p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
-<p>流程描述如下：</p>
-<ol>
-<li><p>一个MR程序启动的时候，最先启动的是MRAppMaster，MRAppMaster启动后根据本次job的描述信息，计算出需要的MapTask实例数量，然后向集群申请机器启动相应数量的MapTask进程；</p>
-</li>
-<li><p>MapTask进程启动之后，根据给定的数据切片范围进行数据处理，主体流程为：</p>
-<ul>
-<li>利用客户指定的inputformat来获取RecordReader读取数据，形成输入KV对；</li>
-<li>将输入KV对传递给客户定义的map()方法，做逻辑运算，并将map()方法输出的KV对收集到缓存；</li>
-<li>将缓存中的KV对按照K分区排序后不断溢写到磁盘文件。</li>
-</ul>
-</li>
-<li><p>MRAppMaster监控到所有MapTask进程任务完成之后，会根据客户指定的参数启动相应数量的ReduceTask进程，并告知ReduceTask进程要处理的数据范围（数据分区）；</p>
-</li>
-<li><p>ReduceTask进程启动之后，根据MRAppMaster告知的待处理数据所在位置，从若干台MapTask运行所在机器上获取到若干个MapTask输出结果文件，并在本地进行重新归并排序，然后按照相同key的KV为一个组，调用客户定义的reduce()方法进行逻辑运算，并收集运算输出的结果KV，然后调用客户指定的outputformat将结果数据输出到外部存储。</p>
-</li>
-</ol>
-<p>我们来举个例子。</p>
-<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>上图是一个统计词频的任务。</p>
-<ol>
-<li><p>Hadoop将输入数据切成若干个分片，并将每个split（分割）交给一个map task（Map任务）处理。</p>
-</li>
-<li><p>Mapping之后，相当于得出这个task里面，每个词以及它出现的次数。</p>
-</li>
-<li><p>shuffle（拖移）将相同的词放在一起，并对它们进行排序，分成若干个分片。</p>
-</li>
-<li><p>根据这些分片，进行reduce（归约）。</p>
-</li>
-<li><p>统计出reduce task的结果，输出到文件。</p>
-</li>
-</ol>
-<p>在MapReduce里，为了完成上面这些过程，需要两个角色：JobTracker和TaskTracker。</p>
-<p><img src="/img/hadoop/hadoop5.webp" alt="hadoop"></p>
-<p>JobTracker用于调度和管理其它的TaskTracker。JobTracker可以运行于集群中任一台计算机上。TaskTracker 负责执行任务，必须运行于 DataNode 上。</p>
-<p>现在这边给出一个简单的mapreduce实现示例：</p>
-<p>用于统计输入文件中每个单词的出现次数。</p>
-<ol>
-<li><p><strong>导入必要的包：</strong></p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>conf<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>fs<span class="token punctuation">.</span></span><span class="token class-name">Path</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IntWritable</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">LongWritable</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">Text</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span></span><span class="token class-name">Job</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span></span><span class="token class-name">Mapper</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span></span><span class="token class-name">Reducer</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>input<span class="token punctuation">.</span></span><span class="token class-name">FileInputFormat</span></span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>output<span class="token punctuation">.</span></span><span class="token class-name">FileOutputFormat</span></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-</li>
-<li><p><strong>定义Mapper类：</strong></p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyMapper</span> <span class="token keyword">extends</span> <span class="token class-name">Mapper</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">LongWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">LongWritable</span> key<span class="token punctuation">,</span> <span class="token class-name">Text</span> value<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
-        <span class="token class-name">String</span> line <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">// 将每行文本拆分为单词，然后发送到Reducer</span>
-        <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> words <span class="token operator">=</span> line<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"\\s+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">String</span> word <span class="token operator">:</span> words<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            context<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Text</span><span class="token punctuation">(</span>word<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntWritable</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Mapper类的作用是将输入的文本数据拆分成单词，然后为每个单词输出一个键-值对（单词, 1）。</p>
-</li>
-<li><p><strong>定义Reducer类：</strong></p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyReduce</span> <span class="token keyword">extends</span> <span class="token class-name">Reducer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">Text</span> key<span class="token punctuation">,</span> <span class="token class-name">Iterable</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> values<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token comment">// 对相同单词的出现次数进行累加</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">IntWritable</span> value <span class="token operator">:</span> values<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            sum <span class="token operator">+=</span> value<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-        <span class="token comment">// 输出单词和其出现的总次数</span>
-        context<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntWritable</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Reducer类的作用是接收来自Mapper的键-值对，对相同键的值进行累加，然后输出单词和其总出现次数。</p>
-</li>
-<li><p><strong>主函数（main方法）：</strong></p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">InterruptedException</span><span class="token punctuation">,</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">ClassNotFoundException</span> <span class="token punctuation">&#123;</span>
-    <span class="token class-name">Configuration</span> conf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Configuration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token class-name">Job</span> job <span class="token operator">=</span> <span class="token class-name">Job</span><span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span>conf<span class="token punctuation">,</span> <span class="token string">"word count"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    job<span class="token punctuation">.</span><span class="token function">setJarByClass</span><span class="token punctuation">(</span>word<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    job<span class="token punctuation">.</span><span class="token function">setMapperClass</span><span class="token punctuation">(</span><span class="token class-name">MyMapper</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    job<span class="token punctuation">.</span><span class="token function">setMapOutputKeyClass</span><span class="token punctuation">(</span><span class="token class-name">Text</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    job<span class="token punctuation">.</span><span class="token function">setMapOutputValueClass</span><span class="token punctuation">(</span><span class="token class-name">IntWritable</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    job<span class="token punctuation">.</span><span class="token function">setReducerClass</span><span class="token punctuation">(</span><span class="token class-name">MyReduce</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    job<span class="token punctuation">.</span><span class="token function">setOutputKeyClass</span><span class="token punctuation">(</span><span class="token class-name">Text</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    job<span class="token punctuation">.</span><span class="token function">setOutputValueClass</span><span class="token punctuation">(</span><span class="token class-name">IntWritable</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">// 设置输入路径和输出路径</span>
-    <span class="token class-name">FileInputFormat</span><span class="token punctuation">.</span><span class="token function">addInputPath</span><span class="token punctuation">(</span>job<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Path</span><span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token class-name">FileOutputFormat</span><span class="token punctuation">.</span><span class="token function">setOutputPath</span><span class="token punctuation">(</span>job<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Path</span><span class="token punctuation">(</span>args<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">// 提交作业并等待完成</span>
-    job<span class="token punctuation">.</span><span class="token function">waitForCompletion</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-<p><img src="/img/hadoop/hadoop6.png" alt="hadoop"></p>
-<p>在整个Hadoop架构中，计算框架起到承上启下的作用，一方面可以操作HDFS中的数据，另一方面可以被封装，提供Hive、Pig这样的上层组件的调用。</p>
-<p>我们简单介绍一下其中几个比较重要的组件。</p>
-<p>HBase：来源于Google的BigTable；是一个高可靠性、高性能、面向列、可伸缩的分布式数据库。</p>
-<p>Hive：是一个数据仓库工具，可以将结构化的数据文件映射为一张数据库表，通过类SQL语句快速实现简单的MapReduce统计，不必开发专门的MapReduce应用，十分适合数据仓库的统计分析。</p>
-<p>Pig：是一个基于Hadoop的大规模数据分析工具，它提供的SQL-LIKE语言叫Pig Latin，该语言的编译器会把类SQL的数据分析请求转换为一系列经过优化处理的MapReduce运算。</p>
-<p>ZooKeeper：来源于Google的Chubby；它主要是用来解决分布式应用中经常遇到的一些数据管理问题，简化分布式应用协调及其管理的难度。</p>
-<p>Ambari：Hadoop管理工具，可以快捷地监控、部署、管理集群。</p>
-<p>Sqoop：用于在Hadoop与传统的数据库间进行数据的传递。</p>
-<p>Mahout：一个可扩展的机器学习和数据挖掘库。</p>
-<p>Hadoop的优点和应用</p>
-<p>总的来看，Hadoop有以下优点：</p>
-<p>高可靠性：这个是由它的基因决定的。它的基因来自Google。Google最擅长的事情，就是“垃圾利用”。Google起家的时候就是穷，买不起高端服务器，所以，特别喜欢在普通电脑上部署这种大型系统。虽然硬件不可靠，但是系统非常可靠。</p>
-<p>高扩展性：Hadoop是在可用的计算机集群间分配数据并完成计算任务的，这些集群可以方便地进行扩展。说白了，想变大很容易。</p>
-<p>高效性：Hadoop能够在节点之间动态地移动数据，并保证各个节点的动态平衡，因此处理速度非常快。</p>
-<p>高容错性：Hadoop能够自动保存数据的多个副本，并且能够自动将失败的任务重新分配。这个其实也算是高可靠性。</p>
-<p>低成本：Hadoop是开源的，依赖于社区服务，使用成本比较低。</p>
-<p>基于这些优点，Hadoop适合应用于大数据存储和大数据分析的应用，适合于服务器几千台到几万台的集群运行，支持PB级的存储容量。</p>
-<p>Hadoop的应用非常广泛，包括：搜索、日志处理、推荐系统、数据分析、视频图像分析、数据保存等，都可以使用它进行部署。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
     
         
 <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
@@ -1661,6 +1635,8 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
         <li><a class="pagination-link" href="/archives/2/">2</a></li>
         
         <li><a class="pagination-link" href="/archives/3/">3</a></li>
+        
+        <li><a class="pagination-link" href="/archives/4/">4</a></li>
         
     </ul>
 </nav>
