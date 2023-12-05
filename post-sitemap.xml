@@ -9,8 +9,22 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/12/05/en/Event-Bubbling/</loc>
-        <lastmod>2023-12-05T08:33:31.564Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/12/05/en/Event-Delegation/</loc>
+        <lastmod>2023-12-05T15:09:20.254Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/05/Event-Delegation/</loc>
+        <lastmod>2023-12-05T15:04:40.430Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -24,7 +38,21 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/12/05/Event-Bubbling/</loc>
-        <lastmod>2023-12-05T08:26:29.025Z</lastmod>
+        <lastmod>2023-12-05T14:50:32.246Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/05/en/Event-Bubbling/</loc>
+        <lastmod>2023-12-05T08:33:31.564Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 

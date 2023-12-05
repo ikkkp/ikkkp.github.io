@@ -181,6 +181,374 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/05/en/Event-Delegation/" itemprop="url">Browser Event Delegation</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-05T14:26:41.000Z" itemprop="datePublished">5 December 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/en/categories/Vue/Front-end/">Front-end</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="preface">Preface</span></h2><p>Capturing and bubbling allow us to implement one of the most powerful event handling patterns, namely the <strong>Event Delegation</strong> pattern.</p>
+<p>The idea is that if we have many elements being handled in a similar way, we don’t need to assign a handler for each element — instead, we place a single handler on their common ancestor.</p>
+<p>In the handler, we access <code>event.target</code> to see where the event actually occurred and handle it accordingly.</p>
+<h2><span id="introduction-to-event-delegation">Introduction to Event Delegation</span></h2><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">HTML</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/css<span class="token punctuation">"</span></span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>stylesheet<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>bagua.css<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>table</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>bagua-table<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>th</span> <span class="token attr-name">colspan</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>3<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>Bagua<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span> Chart: Direction, Element, Color, Meaning<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>th</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>nw<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>Northwest<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Metal
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Silver
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Elders
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>n<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>North<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Water
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Blue
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Change
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>ne<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>Northeast<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Earth
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Yellow
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Direction
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>w<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>West<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Metal
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Gold
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Youth
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>c<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>Center<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>All
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Purple
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Harmony
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>e<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>East<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Wood
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Blue
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Future
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>tr</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sw<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>Southwest<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Earth
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Brown
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Tranquility
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>s<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>South<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Fire
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Orange
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Fame
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>td</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>se<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>strong</span><span class="token punctuation">></span></span>Southeast<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>strong</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Wood
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Green
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>Romance
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>td</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>tr</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>table</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">let</span> table <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'bagua-table'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> selectedTd<span class="token punctuation">;</span>
+
+    table<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">let</span> target <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">;</span>
+
+      <span class="token keyword">while</span> <span class="token punctuation">(</span>target <span class="token operator">!=</span> <span class="token keyword">this</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>target<span class="token punctuation">.</span>tagName <span class="token operator">==</span> <span class="token string">'TD'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          <span class="token function">highlight</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        target <span class="token operator">=</span> target<span class="token punctuation">.</span>parentNode<span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">function</span> <span class="token function">highlight</span><span class="token punctuation">(</span><span class="token parameter">node</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>selectedTd<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+      selectedTd <span class="token operator">=</span> node<span class="token punctuation">;</span>
+      selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+    <span class="token selector">#bagua-table th</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">text-align</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+      <span class="token property">font-weight</span><span class="token punctuation">:</span> bold<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table td</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">width</span><span class="token punctuation">:</span> 150px<span class="token punctuation">;</span>
+      <span class="token property">white-space</span><span class="token punctuation">:</span> nowrap<span class="token punctuation">;</span>
+      <span class="token property">text-align</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+      <span class="token property">vertical-align</span><span class="token punctuation">:</span> bottom<span class="token punctuation">;</span>
+      <span class="token property">padding-top</span><span class="token punctuation">:</span> 5px<span class="token punctuation">;</span>
+      <span class="token property">padding-bottom</span><span class="token punctuation">:</span> 12px<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .nw</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #999<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .n</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #03f<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .ne</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #ff6<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .w</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #ff0<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .c</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #60c<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .e</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #09f<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .sw</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #963<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .s</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #f60<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .se</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> #0c3<span class="token punctuation">;</span>
+      <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token selector">#bagua-table .highlight</span> <span class="token punctuation">&#123;</span>
+      <span class="token property">background</span><span class="token punctuation">:</span> red<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2><span id="dynamic-event-handling-with-event-delegation">Dynamic Event Handling with Event Delegation</span></h2><p>This table has 9 cells, but it could have 99 or 9999 cells, and it wouldn’t matter. Our task is to highlight the clicked <code>&lt;td&gt;</code> when the user clicks on it.</p>
+<p>Instead of assigning an <code>onclick</code> handler to each <code>&lt;td&gt;</code> (potentially many), we can set a “catch-all” handler on the <code>&lt;table&gt;</code> element. It uses <code>event.target</code> to determine the clicked element and highlights it.</p>
+<p>The JavaScript code is as follows:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> selectedTd<span class="token punctuation">;</span>
+
+table<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> target <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">;</span> <span class="token comment">// Where was the click?</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>target<span class="token punctuation">.</span>tagName <span class="token operator">!=</span> <span class="token string">'TD'</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// Not on TD? We don't care then</span>
+
+  <span class="token function">highlight</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Highlight it</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">highlight</span><span class="token punctuation">(</span><span class="token parameter">td</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>selectedTd<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  selectedTd <span class="token operator">=</span> td<span class="token punctuation">;</span>
+  selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Highlight the new td</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>This code doesn’t care how many cells are in the table. We can dynamically add&#x2F;remove <code>&lt;td&gt;</code>, and highlighting still works.</strong></p>
+<p>However, there is a flaw. Clicks might not happen on the <code>&lt;td&gt;</code> itself but inside it.</p>
+<p>In our example, if we inspect the HTML internals, we can see nested tags within <code>&lt;td&gt;</code>, such as <code>&lt;strong&gt;</code>:</p>
+<p>In the <code>table.onclick</code> handler, we should accept such <code>event.target</code> and determine if the click occurred inside a <code>&lt;td&gt;</code>.</p>
+<p>Here is the improved code:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">table<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> td <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span><span class="token function">closest</span><span class="token punctuation">(</span><span class="token string">'td'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (1)</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>td<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// (2)</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>td<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// (3)</span>
+
+  <span class="token function">highlight</span><span class="token punctuation">(</span>td<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (4)</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Explanation:</p>
+<ul>
+<li><p><code>elem.closest(selector)</code> method returns the closest ancestor that matches the selector. In our case, we look for <code>&lt;td&gt;</code> starting from the target element.</p>
+</li>
+<li><p>If <code>event.target</code> is not within any <code>&lt;td&gt;</code>, the call returns immediately, as there’s nothing to do here.</p>
+</li>
+<li><p>For nested tables, <code>event.target</code> might be a <code>&lt;td&gt;</code> but outside the current table. So, we check if it’s a <code>&lt;td&gt;</code> within our table. If yes, we highlight it.</p>
+</li>
+</ul>
+<h2><span id="delegation-example-actions-in-markup">Delegation Example: Actions in Markup</span></h2><p>Event delegation has other uses, like handling actions in markup.</p>
+<p>For instance, let’s say we want to create a menu with buttons for “Save,” “Load,” and “Search.” There’s an object with methods like save, load, and search. How do we match them?</p>
+<p>The initial idea might be to assign a separate handler for each button. <strong>But there’s a more elegant solution.</strong> We can add a handler to the entire menu and add a <code>data-action</code> attribute to buttons with method calls:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">data-action</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>save<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Click to Save<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>The handler reads the attribute and executes the corresponding method. The working example is as follows:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>div id<span class="token operator">=</span><span class="token string">"menu"</span><span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"save"</span><span class="token operator">></span>Save<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"load"</span><span class="token operator">></span>Load<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"search"</span><span class="token operator">></span>Search<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>script<span class="token operator">></span>
+  <span class="token keyword">class</span> <span class="token class-name">Menu</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">elem</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>_elem <span class="token operator">=</span> elem<span class="token punctuation">;</span>
+      elem<span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">onClick</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (*)</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">save</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'saving'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">load</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'loading'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">search</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'searching'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">onClick</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">let</span> action <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>action<span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>action<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">this</span><span class="token punctuation">[</span>action<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">new</span> <span class="token class-name">Menu</span><span class="token punctuation">(</span>menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>menu<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">data-action</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>save<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Save<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">data-action</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>load<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Load<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">data-action</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>search<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Search<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">class</span> <span class="token class-name">Menu</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">elem</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>_elem <span class="token operator">=</span> elem<span class="token punctuation">;</span>
+        elem<span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">onClick</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (*)</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token function">save</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'saving'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token function">load</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'loading'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token function">search</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'searching'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+
+      <span class="token function">onClick</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">let</span> action <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>action<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>action<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+          <span class="token keyword">this</span><span class="token punctuation">[</span>action<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">new</span> <span class="token class-name">Menu</span><span class="token punctuation">(</span>menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>Please note that <code>this.onClick</code> is bound to <code>this</code> in (*) line. This is crucial because otherwise, the inner <code>this</code> would refer to the DOM element (<code>elem</code>) instead of the Menu object, and <code>this[action]</code> wouldn’t be what we need.</strong></p>
+<p>So, what benefits does delegation bring us here?</p>
+<ul>
+<li>We don’t need to write code to assign a handler for each button. Just create a method and place it in the markup.</li>
+<li>The HTML structure is very flexible, and we can add&#x2F;remove buttons at any time.</li>
+</ul>
+<p>We could also use classes like <code>.action-save</code>, <code>.action-load</code>, but the <code>data-action</code> attribute is more semantically meaningful. We can also use it in CSS rules.</p>
+<h2><span id="behavior-pattern">“Behavior” Pattern</span></h2><p><strong>We can also use event delegation to add “behavior” in a declarative way to elements with specific attributes and classes.</strong></p>
+<p>The behavior pattern consists of two parts:</p>
+<ul>
+<li>We add custom attributes to elements describing their behavior.</li>
+<li>A document-wide handler tracks events and executes the behavior if the event occurs on an element with a specific attribute.</li>
+</ul>
+<h3><span id="behavior-counter">Behavior: Counter</span></h3><p>For example, the <code>data-counter</code> attribute here adds a “click to increase” behavior to buttons.</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>counter <span class="token operator">!=</span> <span class="token keyword">undefined</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">// If this attribute exists...</span>
+      event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<body>
+Counter: <input type="button" value="1" data-counter>
+One more counter: <input type="button" value="2" data-counter>
+
+<script>
+  document.addEventListener('click', function(event) {
+
+    if (event.target.dataset.counter != undefined) { // If this attribute exists...
+      event.target.value++;
+    }
+
+  });
+
+</script>
+</body>
+
+<h2><span id="summary">Summary</span></h2><p><strong>Event delegation is really cool! It’s one of the most useful patterns for DOM events.</strong></p>
+<p>It’s commonly used to add the same handling for many similar elements, but not limited to that.</p>
+<h3><span id="algorithm">Algorithm</span></h3><ul>
+<li>Place a handler on the container.</li>
+<li>In the handler — check the source element <code>event.target</code>.</li>
+<li>If the event happens within an element of interest, handle it.</li>
+</ul>
+<h3><span id="benefits">Benefits</span></h3><ul>
+<li>Simplifies initialization and saves memory: No need to add many handlers.</li>
+<li>Less code: When adding or removing elements, no need to add&#x2F;remove handlers.</li>
+<li>DOM modifications: We can use <code>innerHTML</code>, etc., to add&#x2F;remove elements in batches.</li>
+</ul>
+<h3><span id="event-delegation-limitations">Event Delegation Limitations</span></h3><p>Firstly, events must bubble. Some events do not bubble. Also, low-level handlers should not use <code>event.stopPropagation()</code>.<br>Secondly, delegation might increase CPU load as the container-level handler responds to events anywhere in the container, regardless of whether we are interested in that event. However, the load is usually negligible, so we don’t consider it.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/05/en/Event-Bubbling/" itemprop="url">Bubbling and Capturing</a>
         
     </h1>
@@ -1526,149 +1894,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
-<hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/31/en/vue-watch-computed/" itemprop="url">vue-watch-computed</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">31 October 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
-<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2><p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>However, in certain cases, we want the side-effect function to execute only when needed, not immediately. A typical scenario is with computed properties. To achieve this delayed execution, we can add a <code>lazy</code> property to the <code>options</code> object and set it to <code>true</code>. When <code>lazy</code> is <code>true</code>, the side-effect function is not executed during initialization but only when necessary. The modified code looks like this:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
-  <span class="token comment">// This function will not execute immediately</span>
-  <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token comment">// options</span>
-  <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In the implementation, the side-effect function <code>effectFn</code> is returned as the result of the <code>effect</code> function. This means that when we call the <code>effect</code> function, we get the corresponding side-effect function and can manually execute it when needed. This mechanism gives us more control, allowing us to decide when to trigger the execution of the side-effect function rather than executing it immediately.</p>
-<p>This design pattern is particularly suitable for specific scenarios like computed properties. In computed properties, we might want to trigger the side-effect function’s execution at a specific moment rather than immediately during initialization. By returning the side-effect function from the <code>effect</code> function, we can flexibly control when the side-effect function is executed to meet different requirements in various scenarios.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Set options and dependencies for the side-effect function</span>
-  effectFn<span class="token punctuation">.</span>options <span class="token operator">=</span> options<span class="token punctuation">;</span>
-  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Execute the side-effect function only if it's not lazy</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token comment">// Return the side-effect function as the result</span>
-  <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this code, the <code>effect</code> function’s second parameter is an <code>options</code> object, where the <code>lazy</code> property is set to <code>true</code>. This means that the side-effect function passed to <code>effect</code> will be executed only when necessary, such as when accessing a computed property. The <code>lazy</code> property allows us to control the immediate execution of the side-effect function.</p>
-<p>Now that we have achieved lazy computation through computed properties, how do we implement data caching?</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// value is used to cache the last computed value</span>
-  <span class="token keyword">let</span> value<span class="token punctuation">;</span>
-  <span class="token comment">// dirty flag indicates whether a recalculation is needed; if true, it means "dirty" and needs computation</span>
-  <span class="token keyword">let</span> dirty <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> effectFn <span class="token operator">=</span> <span class="token function">effect</span><span class="token punctuation">(</span>getter<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">get</span> <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Compute the value only if it's "dirty," and cache the computed value in the value variable</span>
-      <span class="token keyword">if</span> <span class="token punctuation">(</span>dirty<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        value <span class="token operator">=</span> <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">// Set dirty to false, so the cached value can be used directly next time</span>
-        dirty <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span>
-      <span class="token keyword">return</span> value<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>With lazy computation resolved, the <code>value</code> is calculated only when it is truly needed, executing <code>effectFn</code> only when necessary. Additionally, a <code>dirty</code> flag is introduced to indicate whether the current computation needs to be recalculated. If <code>dirty</code> is <code>true</code>, the <code>value</code> is recalculated, and the <code>dirty</code> flag is set to <code>false</code> so that the cached value can be used directly next time.</p>
-<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2><p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Data changed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-<span class="token comment">// Modifying the reactive data triggers the execution of the callback function</span>
-obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Suppose <code>obj</code> is a reactive data, watched using the <code>watch</code> function with a provided callback function. When modifying the reactive data’s value, the callback function is triggered. In fact, the implementation of <code>watch</code> essentially utilizes the <code>effect</code> and the <code>options.scheduler</code> option, as shown in the following code:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-<span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-<span class="token comment">// The scheduler function is executed when obj.foo's value changes</span>
-<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In a side-effect function accessing the reactive data <code>obj.foo</code>, based on the previous discussion, we know that this establishes a connection between the side-effect function and the reactive data. When the reactive data changes, the side-effect function is re-executed. However, there is an exception: if the side-effect function has a <code>scheduler</code> option, when the reactive data changes, the <code>scheduler</code> function is executed instead of directly triggering the side-effect function. From this perspective, the <code>scheduler</code> function acts as a callback function, and the implementation of <code>watch</code> utilizes this characteristic.</p>
-<p>Below is the simplest implementation of the <code>watch</code> function:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// The watch function receives two parameters: source (reactive data) and cb (callback function)</span>
-<span class="token keyword">function</span> <span class="token function">watch</span><span class="token punctuation">(</span><span class="token parameter">source<span class="token punctuation">,</span> cb</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span>
-    <span class="token comment">// Trigger a read operation to establish a connection</span>
-    <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> source<span class="token punctuation">.</span>foo<span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">scheduler</span><span class="token operator">:</span> <span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-      <span class="token comment">// Call the callback function cb when the data changes</span>
-      <span class="token function-variable function">fn</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-        <span class="token function">cb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
-<p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
 <hr>
 <p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
