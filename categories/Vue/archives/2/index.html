@@ -203,11 +203,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
+        <h2><span id="引言">引言</span></h2><p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">创建对象代理 Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">内置的对象 Reflect</a></p>
-<p>当我们讨论编程语言中的&quot;基本语义&quot;时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
+<p>当我们讨论编程语言中的”基本语义”时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
 <ol>
 <li>读取属性值：<code>obj.foo</code> （读取属性<code>foo</code>的值）</li>
 <li>设置属性值：<code>obj.foo = newValue</code> （设置属性<code>foo</code>的值）</li>
@@ -215,9 +214,9 @@
 <p>在上述代码中，<code>Proxy</code>对象允许我们拦截（或者说重定义）这些基本语义的操作。<code>Proxy</code>的构造函数接受两个参数：被代理的对象和一个包含拦截器（也称为夹子或陷阱）的对象。在拦截器对象中，我们可以定义<code>get</code>方法来拦截读取属性操作，定义<code>set</code>方法来拦截设置属性操作。这样，我们就可以在这些操作发生时执行自定义的逻辑。</p>
 <p>关于<code>Reflect</code>对象，它是JavaScript的一个全局对象，提供了与<code>Proxy</code>拦截器方法一一对应的方法。这些<code>Reflect</code>方法提供了默认的操作行为。例如，<code>Reflect.get(target, key)</code>方法提供了访问对象属性的默认行为，与直接使用<code>target[key]</code>是等价的。同时，<code>Reflect</code>方法还可以接受第三个参数，用来指定函数调用时的<code>this</code>值。</p>
 <p>理解这些基本语义操作以及如何使用<code>Proxy</code>和<code>Reflect</code>来拦截和处理这些操作，是理解JavaScript中响应式数据（Reactive Data）实现的关键。在响应式数据中，我们可以利用<code>Proxy</code>和<code>Reflect</code>来追踪对象属性的读取和修改，从而实现数据的响应式更新。</p>
-<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2>
-<p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
+<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2><p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>在这里，<code>obj.foo</code> 是一个读取属性的基本语义操作，<code>obj.foo = newValue</code> 是一个设置属性的基本语义操作。</p>
 <p>现在，我们可以使用 <code>Proxy</code> 来拦截这些基本语义的操作。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -235,11 +234,11 @@
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// 输出：读取属性 foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// 输出：设置属性 foo 为 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面的代码中，我们创建了一个 <code>handler</code> 对象，其中定义了 <code>get</code> 和 <code>set</code> 方法，用来拦截属性的读取和设置。然后，我们使用 <code>Proxy</code> 构造函数创建了一个代理对象 <code>proxyObj</code>，它会拦截 <code>obj</code> 对象上的读取和设置操作。当我们访问 <code>proxyObj.foo</code> 时，会触发 <code>get</code> 方法，输出相应的信息。当我们设置 <code>proxyObj.foo</code> 的值时，会触发 <code>set</code> 方法，同样输出相应的信息。</p>
 <p>这样，<code>Proxy</code> 允许我们在基本语义操作发生时执行自定义的逻辑，而不需要直接操作原始对象。在实际应用中，这种能力可以用来实现响应式数据、数据验证、日志记录等功能。</p>
 <p>当我们使用 <code>Proxy</code> 拦截对象属性的读取操作时，我们需要特别注意访问器属性（accessor properties）的情况，因为访问器属性使用 getter 函数来定义，而这个函数内部的 <code>this</code> 关键字会根据调用方式而变化。</p>
-<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2>
-<p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
+<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2><p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
 <p>解决这个问题的方法是使用 <code>Reflect.get(target, key, receiver)</code> 来代替 <code>target[key]</code>。这样，<code>Reflect.get</code> 的第三个参数 <code>receiver</code> 就能正确地指向代理对象，而不是原始对象。这样一来，在访问器属性的 getter 函数内部，<code>this</code> 关键字就会指向代理对象，从而建立了正确的响应关系。</p>
 <p>以下是使用 <code>Reflect.get</code> 的修正代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -257,10 +256,10 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// 触发副作用函数的重新执行</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>我们可以再看一个简单一点的示例：</p>
 <p>当使用代理对象时，<code>receiver</code>参数主要用于确保在代理的拦截函数内部，<code>this</code>指向代理对象，从而建立响应式联系。下面我将对比使用<code>receiver</code>参数和不使用的情况，以便更清楚地理解它的作用。</p>
-<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -275,9 +274,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，我们使用了<code>receiver</code>参数传递给<code>Reflect.get</code>，确保在<code>get</code>拦截函数内部，<code>this</code>指向代理对象<code>proxy</code>。当你访问<code>proxy.foo</code>时，<code>get</code>拦截函数被触发，并且<code>this</code>指向<code>proxy</code>对象。</p>
-<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -294,6 +293,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，我们没有使用<code>receiver</code>参数。由于没有传递<code>receiver</code>参数，<code>this</code>在<code>get</code>拦截函数内部指向的是原始对象<code>data</code>。虽然代理对象<code>proxy</code>被使用，但<code>get</code>拦截函数内部的<code>this</code>并不指向<code>proxy</code>，而是指向原始对象<code>data</code>。因此，这种情况下，响应式联系不会得到建立。</p>
 <p>虽然说两个函数的输出是一致的，但显然没有使用<code>receiver</code>参数时响应式联系不会得到建立。也就是说在effect函数里面，对象不会得到正确的响应。</p>
 
@@ -329,8 +329,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
+        <h2><span id="引言">引言</span></h2><p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
 <p>例如，考虑以下的异步代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -342,10 +341,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出 undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个例子中，<code>fetchData</code> 函数是异步的，它在1秒后将数据赋给 <code>data</code> 变量。但是，由于 JavaScript 是单线程的，<code>fetchData</code> 函数会在主线程的事件队列中等待1秒，而在这1秒内，<code>console.log(data)</code> 语句会立即执行，此时 <code>data</code> 的值为 <code>undefined</code>，因为 <code>fetchData</code> 函数还未完成执行。</p>
 <p>在异步编程中，由于代码的非阻塞性质，会出现类似的竞态条件问题。在处理异步操作时，我们需要小心确保数据的一致性和正确性，避免在异步操作完成前就去访问或修改相关数据。</p>
-<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2>
-<p>那么竞态问题跟我们响应式有什么联系呢？</p>
+<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2><p>那么竞态问题跟我们响应式有什么联系呢？</p>
 <p>举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -354,6 +353,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// 将请求结果赋值给 data</span>
 finalData <span class="token operator">=</span> res
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这段代码中，我们使用 watch 观测 obj 对象的变化，每次 obj对象发生变化都会发送网络请求，例如请求接口数据，等数据请求成功之后，将结果赋值给 finalData 变量。观察上面的代码，乍一看似乎没什么问题。但仔细思考会发现这段代码会发生竞态问题。假设我们第一次修改 obj 对象的某个字段值，这会导致回调函数执行，同时发送了第一次请求 A。随着时间的推移，在请求 A 的结果返回之前，我们对 obj 对象的某个字段值进行了第二次修改，这会导致发送第二次请求 B。此时请求 A 和请求 B 都在进行中，那么哪一个请求会先返回结果呢？我们不确定，如果请求B 先于请求 A 返回结果，就会导致最终 finalData 中存储的是 A 请求的结果</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="对比"></p>
 <p>但由于请求 B 是后发送的，因此我们认为请求 B 返回的数据才是“最新”的，而请求 A 则应该被视为“过期”的，所以我们希望变量finalData 存储的值应该是由请求 B 返回的结果，而非请求 A 返回的结果。</p>
@@ -377,6 +377,7 @@ finalData <span class="token operator">=</span> res
     <span class="token comment">// 后续操作...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>如上面的代码所示，在发送请求之前，我们定义了 expired 标志变量，用来标识当前副作用函数的执行是否过期；接着调用onInvalidate 函数注册了一个过期回调，当该副作用函数的执行过期时将 expired 标志变量设置为 true；最后只有当没有过期时才采用请求结果，这样就可以有效地避免上述问题了。</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="对比"></p>
 
@@ -412,13 +413,12 @@ finalData <span class="token operator">=</span> res
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
-<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2>
-<p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
+        <h2><span id="引言">引言</span></h2><p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
+<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2><p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>然而，在某些情况下，我们希望副作用函数在需要的时候才执行，而不是立即执行。一个典型的例子是计算属性。为了实现这种延迟执行的效果，我们可以在<code>options</code>中添加一个<code>lazy</code>属性，并将其设置为<code>true</code>。当<code>lazy</code>为<code>true</code>时，副作用函数不会在初始化时立即执行，而是在需要的时候才执行。修正后的代码如下所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// 这个函数不会立即执行</span>
@@ -430,6 +430,7 @@ finalData <span class="token operator">=</span> res
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>具体实现中，我们将副作用函数<code>effectFn</code>作为<code>effect</code>函数的返回值返回。这意味着，当我们调用<code>effect</code>函数时，我们会得到对应的副作用函数，并且可以在需要的时候手动执行它。这种机制赋予了我们更多的控制权，允许我们决定何时触发副作用函数的执行，而不是立即执行它。</p>
 <p>这种设计模式特别适用于特定场景，例如计算属性。在计算属性中，我们可能希望在特定时刻触发副作用函数的执行，而不是在初始化时立即执行。通过将副作用函数作为<code>effect</code>函数的返回值，我们能够灵活地控制副作用函数的执行时机，以满足不同场景的需求。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -454,6 +455,7 @@ finalData <span class="token operator">=</span> res
   <span class="token comment">// 将副作用函数作为返回值返回</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在这个代码中，<code>effect</code>函数的第二个参数是一个<code>options</code>对象，其中<code>lazy</code>属性被设置为<code>true</code>。这意味着传递给<code>effect</code>的副作用函数会在需要的时候才执行，例如在计算属性被访问时。这种延迟执行的特性使得<code>effect</code>函数非常适合用于实现计算属性等场景。</p>
 <p>在上述代码中，我们通过<code>options</code>参数的<code>lazy</code>属性控制副作用函数的立即执行。如果<code>options.lazy</code>为<code>true</code>，副作用函数将被延迟执行，直到手动触发为止。</p>
 <p>现在我们通过计算属性实现了lazy懒加载，那么数据缓存该怎么实现呢。</p>
@@ -481,14 +483,15 @@ finalData <span class="token operator">=</span> res
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>解决了懒计算的问题，只有在真正需要计算<code>value</code>的时候，才会执行<code>effectFn</code>。同时，它还引入了一个<code>dirty</code>标志，用于标识当前的计算是否需要重新进行。如果<code>dirty</code>为<code>true</code>，则重新计算<code>value</code>的值，并将<code>dirty</code>标志设置为<code>false</code>，以便下一次访问时可以直接使用缓存的值。</p>
-<h2><span id="watch-的实现原理">watch 的实现原理</span></h2>
-<p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
+<h2><span id="watch-的实现原理">watch 的实现原理</span></h2><p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'数据变了'</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// 修改响应数据的值，会导致回调函数执行</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>假设 obj 是一个响应数据，使用 watch 函数观测它，并传递一个回调函数，当修改响应式数据的值时，会触发该回调函数执行。实际上，watch 的实现本质上就是利用了 effect 以及options.scheduler 选项，如以下代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -497,6 +500,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// 当 obj.foo 的值变化时，会执行 scheduler 调度函数</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在一个副作用函数中访问响应式数据 obj.foo，通过前面的介绍，我们知道这会在副作用函数与响应式数据之间建立联系，当响应式数据变化时，会触发副作用函数重新执行。但有一个例外，即如果副作用函数存在 scheduler 选项，当响应式数据发生变化时，会触发 scheduler 调度函数执行，而非直接触发副作用函数执行。从这个角度来看，其实 scheduler 调度函数就相当于一个回调函数，而watch 的实现就是利用了这个特点。</p>
 <p>下面是最简单的 watch 函数的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// watch 函数接收两个参数，source 是响应式数据，cb 是回调函数</span>
@@ -559,6 +563,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span>
 
 <span class="token comment">// 输出: 数据变化了</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>我们首先定义了一个原始的数据对象data，其中有一个属性foo，初始值为1。接着，我们使用Proxy创建了一个代理对象obj，该代理对象会拦截对data的操作。</p>
 <p>当你调用obj.foo++时，会触发Proxy的set拦截器。在set拦截器中，我们首先将属性值设置到目标对象上，然后调用watch函数，并传入obj和一个回调函数。在watch函数中，我们使用了一个假设的effect函数（实际开发中可能是框架提供的响应式函数），这个函数用于监听数据的变化。在watch函数中，我们传入了source.foo的读取操作，以及一个包含scheduler和fn属性的配置对象。scheduler可以用于定义调度逻辑（在示例中为空函数），fn则是一个当数据变化时会被调用的回调函数。</p>
 <p>当obj.foo++执行时，set拦截器触发，watch函数被调用。</p>
@@ -595,13 +600,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
-<h2><span id="嵌套的-effect">嵌套的 effect</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <h2><span id="引言">引言</span></h2><p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
+<h2><span id="嵌套的-effect">嵌套的 effect</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
     <span class="token comment">/* ... */</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effectFn1 的执行会导致 effectFn2 的执行。那么，什么场景下会出现嵌套的 effect 呢？拿 Vue.js 来说，实际上 Vue.js 的渲染函数就是在一个 effect 中执行的.</p>
 <p>当组件发生嵌套时，例如 Foo 组件渲染了 Bar 组件：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar 组件</span>
@@ -621,9 +625,10 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>effect函数可以嵌套使用，也就是说，一个effect函数内部可以包含另一个effect函数。当外部effect函数依赖于内部effect函数创建的响应式数据时，内部effect函数会被自动追踪，确保外部effect函数在内部effect函数发生变化时得以执行。</p>
 <p>这种嵌套的effect函数用于创建依赖关系链，确保当某个响应式数据变化时，所有依赖于它的effect函数都能够被触发执行，从而保持应用的响应性。</p>
-<p>而&quot;effect 栈&quot;，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
+<p>而”effect 栈”，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
 <p>现在有一个不使用栈结构的嵌套的<code>effect</code>函数的例子，但是他并不能实现嵌套的功能。假设我们有两个响应式数据<code>count1</code>和<code>count2</code>，其中<code>count2</code>的值依赖于<code>count1</code>的值。我们可以使用嵌套的<code>effect</code>函数来实现这种依赖关系。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 原始数据</span>
 <span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
@@ -652,6 +657,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// 在 effectFn1 中读取 obj.foo 属性</span>
   temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><code>effectFn1</code>是外部的<code>effect</code>函数，它依赖于<code>obj.foo</code>的值，并且在内部包含了一个<code>innerEffect</code>，内部的<code>effect</code>函数依赖于<code>obj.bar</code>的值。当我们修改<code>obj.foo</code>时，我们希望外部的<code>effect</code>函数被触发执行，并且输出<code>obj.foo</code>的值，然后触发内部的依赖函数。当我们修改<code>obj.bar</code>时，内部的<code>effect</code>函数被触发执行，并且输出<code>obj.bar</code>的值。</p>
 <p>我们用全局变量 activeEffect 来存储通过 effect 函数注册的副作用函数，这意味着同一时刻 activeEffect 所存储的副作用函数只能有一个。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
@@ -703,6 +709,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+
     
     </div>
     
@@ -735,13 +742,12 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
-<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2>
-<p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
+        <h2><span id="引言">引言</span></h2><p>响应式这一个概念应该不难理解，就是js在对某一个对象或者某一个值进行操作时，我们希望通过实现一个响应式系统达到触发某些事件，也就是对操作的相应。</p>
+<h2><span id="响应式数据与副作用函数">响应式数据与副作用函数</span></h2><p>副作用函数指的是会产生副作用的函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token string">'hello vue3'</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>当 effect 函数执行时，它会设置 body 的文本内容，但除了effect 函数之外的任何函数都可以读取或设置 body 的文本内容。也就是说，effect 函数的执行会直接或间接影响其他函数的执行，这时我们说 effect 函数产生了副作用。</p>
 <p>其实副作用函数并不少见，我们前面在讨论webpack的 <code>tree shaking</code> 话题里面涉及到的是否进行数据流处理对 <code>tree shaking</code> 的效果是不可忽略的。这边不再赘述。</p>
 <p>副作用很容易产生，例如一个函数修改了全局变量，这其实也是一个副作用，如下面的代码所示：</p>
@@ -750,16 +756,17 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   val <span class="token operator">=</span> <span class="token number">2</span> <span class="token comment">// 修改全局变量，产生副作用</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>理解了什么是副作用函数，再来说说什么是响应式数据。假设在一个副作用函数中读取了某个对象的属性：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'hello world'</span> <span class="token punctuation">&#125;</span>
 <span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// effect 函数的执行会读取 obj.text</span>
   document<span class="token punctuation">.</span>body<span class="token punctuation">.</span>innerText <span class="token operator">=</span> obj<span class="token punctuation">.</span>text
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>副作用函数 effect 会设置 body 元素的 <code>innerText</code> 属性，其值为 <code>obj.text</code>，当 <code>obj.text</code> 的值发生变化时，我们希望副作用函数 effect 会重新执行。</p>
 <p>那这样我们的思路就变成了：通过一些手段，在读取 <code>obj.text</code> 值的时候可以将effect函数储存进一个bucket里面，而在设置<code>obj.text</code> 值的时候可以在bucket里面把effect拿出来执行。</p>
-<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2>
-<p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
+<h2><span id="响应式数据的基本实现">响应式数据的基本实现</span></h2><p>如何才能让 obj 变成响应式数据呢？通过观察我们能发现：</p>
 <ul>
 <li>当副作用函数 effect 执行时，会触发字段 obj.text 的读取操作；</li>
 <li>当修改 obj.text 的值时，会触发字段 obj.text 的设置操作。</li>
@@ -782,14 +789,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>这样我们就基于 proxy 创建了一个用于存储副作用函数，并且我们使用了一个proxyMap，这是一个可以把各类型的proxy储存起来的容器。我们分别设置了 get 和 set 拦截函数，用于拦截读取和设置操作。</p>
-<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2>
-<p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
+<h2><span id="设计一个完善的响应系统">设计一个完善的响应系统</span></h2><p>从上面的示例不难看出，一个响应系统的工作流程如下：</p>
 <ul>
-<li>
-<p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
+<li><p>当读取操作发生时，将副作用函数收集到“桶”中；</p>
 </li>
-<li>
-<p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
+<li><p>当设置操作发生时，从“桶”中取出副作用函数并执行。</p>
 </li>
 </ul>
 <p>下面通过一个简单的响应式系统实现来讲解原理：</p>
@@ -820,15 +824,15 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>
-例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
-<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键/值对的集合</a></p>
-<p>WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
+<p>我们还需要在副作用函数与被操作的目标字段之间建立明确的联系。<br>例如当读取属性时，无论读取的是哪一个属性，其实都一样，都会把副作用函数收集到“桶”里；当设置属性时，无论设置的是哪一个属性，也都会把“桶”里的副作用函数取出并执行。副作用函数与被操作的字段之间没有明确的联系。解决方法很简单，只需要在副作用函数与被操作的字段之间建立联系即可，这就需要我们重新设计“桶”的数据结构，而不能简单地使用一个Set 类型的数据作为“桶”了。</p>
+<p>我们通过<code>WeakMap</code>来实现刚才上面我们说的储存effect的bucket。不了解WeakMap类的特性的可以看下<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap">WeakMap 对象是一组键&#x2F;值对的集合</a></p>
+<p> WeakMap 的键是原始对象 target，WeakMap 的值是一个Map 实例，而 Map 的键是原始对象 target 的 key，Map 的值是一个由副作用函数组成的 Set。</p>
 <p><img src="/img/vue-reactive-1/WeakMap.png" alt="WeakMap"></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//Map存放不同类型的代理</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> reactiveMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> readonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">export</span> <span class="token keyword">const</span> shallowReadonlyMap <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">WeakMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>定义好了上面的几种bucket，我们开始实现响应式系统最核心的部分，也就是proxy的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createReactiveObject</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> proxyMap<span class="token punctuation">,</span> baseHandlers</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 核心就是 proxy</span>
@@ -846,6 +850,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   proxyMap<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> proxy<span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token keyword">return</span> proxy<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>对于前面的trick和trigger：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">track</span><span class="token punctuation">(</span><span class="token parameter">target<span class="token punctuation">,</span> type<span class="token punctuation">,</span> key</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">isTracking</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -895,6 +900,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
   <span class="token comment">// 这里的目前应该是为了 triggerEffects 这个函数的复用</span>
   <span class="token function">triggerEffects</span><span class="token punctuation">(</span><span class="token function">createDep</span><span class="token punctuation">(</span>effects<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 
     
     </div>
