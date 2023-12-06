@@ -203,16 +203,15 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>捕获和冒泡允许我们实现最强大的事件处理模式之一，即 <strong>事件委托</strong> 模式。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>捕获和冒泡允许我们实现最强大的事件处理模式之一，即 <strong>事件委托</strong> 模式。</p>
 <p>这个想法是，如果我们有许多以类似方式处理的元素，那么就不必为每个元素分配一个处理程序 —— 而是将单个处理程序放在它们的共同祖先上。</p>
 <p>在处理程序中，我们获取 <code>event.target</code> 以查看事件实际发生的位置并进行处理。</p>
-<h2><span id="事件委托简介">事件委托简介</span></h2><!DOCTYPE HTML>
+<h2><span id="事件委托简介">事件委托简介</span></h2>
+<!DOCTYPE HTML>
 <html>
-
 <body>
   <link type="text/css" rel="stylesheet" href="bagua.css">
-
-
   <table id="bagua-table">
     <tr>
       <th colspan="3"><em>Bagua</em> Chart: Direction, Element, Color, Meaning</th>
@@ -268,9 +267,7 @@
         <br>Romance
       </td>
     </tr>
-
   </table>
-
   <script>
     let table = document.getElementById('bagua-table');
 
@@ -296,7 +293,6 @@
       selectedTd.classList.add('highlight');
     }
   </script>
-
   <style>
       #bagua-table th {
       text-align: center;
@@ -358,11 +354,8 @@
       background: red;
     }
   </style>
-
 </body>
-
 </html>
-
 <p>该表格有 9 个单元格（cell），但可以有 99 个或 9999 个单元格，这都不重要。</p>
 <p>我们的任务是在点击时高亮显示被点击的单元格 <code>&lt;td&gt;</code>。</p>
 <p>与其为每个 <code>&lt;td&gt;</code>（可能有很多）分配一个 onclick 处理程序 —— 我们可以在<code>&lt;table&gt;</code>元素上设置一个“捕获所有”的处理程序。</p>
@@ -385,8 +378,7 @@ table<span class="token punctuation">.</span><span class="token function-variabl
   selectedTd <span class="token operator">=</span> td<span class="token punctuation">;</span>
   selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 高亮显示新的 td</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>此代码不会关心在表格中有多少个单元格。我们可以随时动态添加&#x2F;移除 <code>&lt;td&gt;</code>，高亮显示仍然有效。</strong></p>
+<p><strong>此代码不会关心在表格中有多少个单元格。我们可以随时动态添加/移除 <code>&lt;td&gt;</code>，高亮显示仍然有效。</strong></p>
 <p>尽管如此，但还是存在缺陷。</p>
 <p><img src="/img/event-bubbling/eventbubling2.jpg" alt="Event-Bubbling"></p>
 <p>点击可能不是发生在 <code>&lt;td&gt;</code> 上，而是发生在其内部。</p>
@@ -402,17 +394,20 @@ table<span class="token punctuation">.</span><span class="token function-variabl
 
   <span class="token function">highlight</span><span class="token punctuation">(</span>td<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (4)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>解释：</p>
 <ul>
-<li><p>elem.closest(selector) 方法返回与 selector 匹配的最近的祖先。在我们的例子中，我们从源元素开始向上寻找 <code>&lt;td&gt;</code>。</p>
+<li>
+<p>elem.closest(selector) 方法返回与 selector 匹配的最近的祖先。在我们的例子中，我们从源元素开始向上寻找 <code>&lt;td&gt;</code>。</p>
 </li>
-<li><p>如果 event.target 不在任何 <code>&lt;td&gt;</code> 中，那么调用将立即返回，因为这里没有什么事儿可做。</p>
+<li>
+<p>如果 event.target 不在任何 <code>&lt;td&gt;</code> 中，那么调用将立即返回，因为这里没有什么事儿可做。</p>
 </li>
-<li><p>对于嵌套的表格，event.target 可能是一个 <code>&lt;td&gt;</code>，但位于当前表格之外。因此我们需要检查它是否是我们的表格中的 <code>&lt;td&gt;</code>。如果是的话，就高亮显示它。</p>
+<li>
+<p>对于嵌套的表格，event.target 可能是一个 <code>&lt;td&gt;</code>，但位于当前表格之外。因此我们需要检查它是否是我们的表格中的 <code>&lt;td&gt;</code>。如果是的话，就高亮显示它。</p>
 </li>
 </ul>
-<h2><span id="委托示例标记中的行为">委托示例：标记中的行为</span></h2><p>事件委托还有其他用途。<strong>（译注：本节标题中的“标记中的行为”即 action in markup）</strong></p>
+<h2><span id="委托示例标记中的行为">委托示例：标记中的行为</span></h2>
+<p>事件委托还有其他用途。<strong>（译注：本节标题中的“标记中的行为”即 action in markup）</strong></p>
 <p>例如，我们想要编写一个有“保存”、“加载”和“搜索”等按钮的菜单。并且，这里有一个具有 save、load 和 search 等方法的对象。如何匹配它们？</p>
 <p>第一个想法可能是为每个按钮分配一个单独的处理程序。<strong>但是有一个更优雅的解决方案。</strong> 我们可以为整个菜单添加一个处理程序，并为具有方法调用的按钮添加 data-action 特性（attribute）：</p>
 <blockquote>
@@ -455,15 +450,12 @@ table<span class="token punctuation">.</span><span class="token function-variabl
   <span class="token keyword">new</span> <span class="token class-name">Menu</span><span class="token punctuation">(</span>menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
 <body>
 <div id="menu">
   <button data-action="save">Save</button>
   <button data-action="load">Load</button>
   <button data-action="search">Search</button>
 </div>
-
 <script>
   class Menu {
     constructor(elem) {
@@ -494,23 +486,23 @@ table<span class="token punctuation">.</span><span class="token function-variabl
   new Menu(menu);
 </script>
 </body>
-
 <br>
-
 <p><strong>请注意，this.onClick 在 (*) 行中被绑定到了 this。这很重要，因为否则内部的 this 将引用 DOM 元素（elem），而不是 Menu 对象，那样的话，this[action] 将不是我们所需要的。</strong></p>
 <p>那么，这里的委托给我们带来了什么好处？</p>
 <ul>
 <li>我们不需要编写代码来为每个按钮分配一个处理程序。只需要创建一个方法并将其放入标记（markup）中即可。</li>
-<li>HTML 结构非常灵活，我们可以随时添加&#x2F;移除按钮。</li>
+<li>HTML 结构非常灵活，我们可以随时添加/移除按钮。</li>
 </ul>
 <p>我们也可以使用 .action-save，.action-load 类，但 data-action 特性（attribute）在语义上更好。我们也可以在 CSS 规则中使用它。</p>
-<h2><span id="行为模式">“行为”模式</span></h2><p><strong>我们还可以使用事件委托将“行为（behavior）”以 声明方式 添加到具有特殊特性（attribute）和类的元素中。</strong></p>
+<h2><span id="行为模式">“行为”模式</span></h2>
+<p><strong>我们还可以使用事件委托将“行为（behavior）”以 声明方式 添加到具有特殊特性（attribute）和类的元素中。</strong></p>
 <p>行为模式分为两个部分：</p>
 <ul>
 <li>我们将自定义特性添加到描述其行为的元素。</li>
 <li>用文档范围级的处理程序追踪事件，如果事件发生在具有特定特性的元素上 —— 则执行行为（action）。</li>
 </ul>
-<h3><span id="行为计数器">行为：计数器</span></h3><p>例如，这里的特性 data-counter 给按钮添加了一个“点击增加”的行为。</p>
+<h3><span id="行为计数器">行为：计数器</span></h3>
+<p>例如，这里的特性 data-counter 给按钮添加了一个“点击增加”的行为。</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
   document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 
@@ -520,11 +512,9 @@ table<span class="token punctuation">.</span><span class="token function-variabl
 
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <body>
 Counter: <input type="button" value="1" data-counter>
 One more counter: <input type="button" value="2" data-counter>
-
 <script>
   document.addEventListener('click', function(event) {
 
@@ -536,365 +526,24 @@ One more counter: <input type="button" value="2" data-counter>
 
 </script>
 </body>
-
-
-<h2><span id="总结">总结</span></h2><p><strong>事件委托真的很酷！这是 DOM 事件最有用的模式之一。</strong></p>
+<h2><span id="总结">总结</span></h2>
+<p><strong>事件委托真的很酷！这是 DOM 事件最有用的模式之一。</strong></p>
 <p>它通常用于为许多相似的元素添加相同的处理，但不仅限于此。</p>
-<h3><span id="算法">算法</span></h3><ul>
+<h3><span id="算法">算法</span></h3>
+<ul>
 <li>在容器（container）上放一个处理程序。</li>
 <li>在处理程序中 —— 检查源元素 event.target。</li>
 <li>如果事件发生在我们感兴趣的元素内，那么处理该事件。</li>
 </ul>
-<h3><span id="好处">好处</span></h3><ul>
+<h3><span id="好处">好处</span></h3>
+<ul>
 <li>简化初始化并节省内存：无需添加许多处理程序。</li>
-<li>更少的代码：添加或移除元素时，无需添加&#x2F;移除处理程序。</li>
-<li>DOM 修改 ：我们可以使用 innerHTML 等，来批量添加&#x2F;移除元素。</li>
+<li>更少的代码：添加或移除元素时，无需添加/移除处理程序。</li>
+<li>DOM 修改 ：我们可以使用 innerHTML 等，来批量添加/移除元素。</li>
 </ul>
-<h3><span id="事件委托也有其局限性">事件委托也有其局限性</span></h3><p>首先，事件必须冒泡。而有些事件不会冒泡。此外，低级别的处理程序不应该使用 <code>event.stopPropagation()</code>。<br>其次，委托可能会增加 CPU 负载，因为容器级别的处理程序会对容器中任意位置的事件做出反应，而不管我们是否对该事件感兴趣。但是，通常负载可以忽略不计，所以我们不考虑它。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/12/05/Event-Bubbling/" itemprop="url">浏览器事件的冒泡和捕获</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-12-05T07:46:41.000Z" itemprop="datePublished">2023年12月5日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/categories/Vue/Front-end/">Front-end</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="前言">前言</span></h2><p><strong>让我们从一个示例开始。</strong></p>
-<p>处理程序（handler）被分配给了 <code>&lt;div&gt;</code>，但是如果你点击任何嵌套的标签（例如 <code>&lt;em&gt;</code> 或 <code>&lt;code&gt;</code>），该处理程序也会运行：</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'The handler!'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>If you click on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>EM<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>, the handler on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>DIV<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> runs.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<blockquote>
-<p>So, if you click on EM, the handler on DIV runs.</p>
-</blockquote>
-<h2><span id="冒泡">冒泡</span></h2><p>冒泡（bubbling）原理很简单。</p>
-<p><strong>当一个事件发生在一个元素上，它会首先运行在该元素上的处理程序，然后运行其父元素上的处理程序，然后一直向上到其他祖先上的处理程序。</strong></p>
-<p>假设我们有 3 层嵌套 <code>FORM &gt; DIV &gt; P</code> ，它们各自拥有一个处理程序：</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
-  <span class="token selector">body *</span> <span class="token punctuation">&#123;</span>
-    <span class="token property">margin</span><span class="token punctuation">:</span> 10px<span class="token punctuation">;</span>
-    <span class="token property">border</span><span class="token punctuation">:</span> 1px solid blue<span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
-
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'form'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>FORM
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>DIV
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>现在，如果你点击 <code>&lt;p&gt;</code>，那么会发生什么？</strong></p>
-<ol>
-<li><p>首先，处理程序在 <code>&lt;p&gt;</code> 上运行。</p>
-</li>
-<li><p>然后，它在 <code>&lt;div&gt;</code> 上运行。</p>
-</li>
-<li><p>然后，它在 <code>&lt;form&gt;</code> 上运行。</p>
-</li>
-<li><p>最后，它在 document 上运行。</p>
-</li>
-</ol>
-<p><strong>这种行为被称为“事件冒泡”，因为它像气泡一样从元素冒出来。</strong></p>
-<p>因此，如果我们点击 <code>&lt;p&gt;</code>，那么我们将看到 3 个 alert：p → div → form。</p>
-<h3><span id="eventtarget">event.target</span></h3><p>父元素上的处理程序始终可以获取事件实际发生位置的详细信息。</p>
-<p><strong>引发事件的那个嵌套层级最深的元素被称为目标元素,可以通过 event.target 访问。</strong></p>
-<p>注意与 this（&#x3D;event.currentTarget）之间的区别：</p>
-<ul>
-<li><p><code>this</code> 是在处理程序运行时的“当前”元素，它始终相同。</p>
-</li>
-<li><p><code>event.target</code> 是在事件发生时的“目标”元素，它可以是任何元素，它在冒泡过程中改变。</p>
-</li>
-</ul>
-<p>那我们来举个例子吧！</p>
-<p><strong>例如，如果我们有一个处理程序 form.onclick，那么它可以“捕获”表单内的所有点击。无论点击发生在哪里，它都会冒泡到 <code>&lt;form&gt;</code> 并运行处理程序。</strong></p>
-<p>注意哈！这边是将所有的事件都绑定到了 form 上，而不是每个元素上。</p>
-<p>在 form.onclick 处理程序中：</p>
-<p>this（&#x3D;event.currentTarget）是 <code>&lt;form&gt;</code> 元素，因为处理程序在它上面运行。<br>event.target 是表单中实际被点击的元素。</p>
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="utf-8">
-</head>
-<body>
-
-<p>  A click shows both <code>event.target</code> and <code>this</code> to compare:</p>
-  <form style="   background-color: green;
-      position: relative;
-      width: 150px;
-      height: 150px;
-      text-align: center;
-      cursor: pointer;">FORM
-    <div style="background-color: blue;
-      position: absolute;
-      top: 25px;
-      left: 25px;
-      width: 100px;
-      height: 100px;">DIV
-      <p style="background-color: red;
-      position: absolute;
-      top: 25px;
-      left: 25px;
-      width: 50px;
-      height: 50px;
-      line-height: 50px;
-      margin: 0;">P</p>
-    </div>
-  </form>
-
-  <script>
-    form=document.querySelector('form');
-    form.onclick = function(event) {
-      // 输出事件目标和当前元素
-      // （this=事件当前元素=form，event.target=事件目标=实际点击的元素）
-      alert("target = " + event.target.tagName + ", this=" + this.tagName);
-    };
-  </script>
-</body>
-</html>
-
-<h2><span id="停止冒泡">停止冒泡</span></h2><p>冒泡事件从目标元素开始向上冒泡。通常，它会一直上升到 <code>&lt;html&gt;</code>，然后再到 document 对象，有些事件甚至会到达 window，它们会调用路径上所有的处理程序。</p>
-<p>但是任意处理程序都可以决定事件已经被完全处理，并停止冒泡。</p>
-<p>用于停止冒泡的方法是 event.stopPropagation()。</p>
-<p>例如，如果你点击 <code>&lt;button&gt;</code>，这里的 body.onclick 不会工作：</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">the bubbling doesn't reach here</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<div onclick="alert(`the bubbling doesn't reach here`)" style="width:150px;height:50px;background-color:red">
-  <button onclick="event.stopPropagation()">Click me</button>
-</div>
-
-<h2><span id="捕获">捕获</span></h2><p><strong>事件处理的另一个阶段被称为“捕获（capturing）”。</strong></p>
-<p>DOM 事件标准描述了事件传播的 3 个阶段：</p>
-<ol>
-<li>捕获阶段（Capturing phase）—— 事件（从 Window）向下走近元素。</li>
-<li>目标阶段（Target phase）—— 事件到达目标元素。</li>
-<li>冒泡阶段（Bubbling phase）—— 事件从元素上开始冒泡。</li>
-</ol>
-<p>下面是在表格中点击 <code>&lt;td&gt;</code> 的图片，摘自规范：</p>
-<p><img src="/img/event-bubbling/eventbubling1.jpg" alt="Event-Bubbling"></p>
-<p>也就是说：点击 <code>&lt;td&gt;</code>，事件首先通过祖先链向下到达元素（捕获阶段），然后到达目标（目标阶段），最后上升（冒泡阶段），在途中调用处理程序。</p>
-<p>之前，我们只讨论了冒泡，因为捕获阶段很少被使用。通常我们看不到它。</p>
-<p>使用 on<code>&lt;event&gt;</code> 属性或使用 HTML 特性（attribute）或使用两个参数的 addEventListener(event, handler) 添加的处理程序，对捕获一无所知，它们仅在第二阶段和第三阶段运行。</p>
-<h2><span id="总结">总结</span></h2><p><strong>当一个事件发生时 —— 发生该事件的嵌套最深的元素被标记为“目标元素”（event.target）。</strong></p>
-<ul>
-<li>然后，事件从文档根节点向下移动到 event.target，并在途中调用分配了 addEventListener(…, true) 的处理程序（true 是 {capture: true} 的一个简写形式）。</li>
-<li>然后，在目标元素自身上调用处理程序。</li>
-<li>然后，事件从 event.target 冒泡到根，调用使用 on<code>&lt;event&gt;</code>、HTML 特性（attribute）和没有第三个参数的，或者第三个参数为 false&#x2F;{capture:false} 的addEventListener 分配的处理程序。</li>
-</ul>
-<p><strong>每个处理程序都可以访问 event 对象的属性：</strong></p>
-<ul>
-<li>event.target —— 引发事件的层级最深的元素。</li>
-<li>event.currentTarget（&#x3D;this）—— 处理事件的当前元素（具有处理程序的元素）</li>
-<li>event.eventPhase —— 当前阶段（capturing&#x3D;1，target&#x3D;2，bubbling&#x3D;3）。</li>
-</ul>
-<p>任何事件处理程序都可以通过调用 event.stopPropagation() 来停止事件，但不建议这样做，因为我们不确定是否确实不需要冒泡上来的事件，也许是用于完全不同的事情。</p>
-<p>捕获阶段很少使用，通常我们会在冒泡时处理事件。这背后有一个逻辑。</p>
-<p>事件处理程序也是如此。在特定元素上设置处理程序的代码，了解有关该元素最详尽的信息。特定于 <td> 的处理程序可能恰好适合于该 </td><td>，这个处理程序知道关于该元素的所有信息。所以该处理程序应该首先获得机会。然后，它的直接父元素也了解相关上下文，但了解的内容会少一些，以此类推，直到处理一般性概念并运行最后一个处理程序的最顶部的元素为止。</td></p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/29/Custom-Elements/" itemprop="url">Vue Components 和 Web 组件Custom Elements</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-29T02:13:58.000Z" itemprop="datePublished">2023年11月29日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/categories/Vue/Front-end/">Front-end</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="前言">前言</span></h2><p>Web 组件是一组 Web 原生 API 的总称，允许开发人员创建可重用的自定义元素。</p>
-<p>Vue 和 Web Components 主要是互补技术。无论是将自定义元素集成到现有的 Vue 应用程序中，还是使用 Vue 构建和分发自定义元素，Vue 对使用和创建自定义元素都有出色的支持。</p>
-<h2><span id="什么是custom-elements">什么是Custom Elements</span></h2><p>Web 组件的一个关键特性是创建自定义元素：即由 Web 开发人员定义行为的 HTML 元素，扩展了浏览器中可用的元素集。</p>
-<p>Custom Elements有两种类型的自定义元素：</p>
-<ul>
-<li><strong>自定义内置元素（Customized built-in element）</strong> 继承自标准的 HTML 元素，例如 HTMLImageElement 或 HTMLParagraphElement。它们的实现定义了标准元素的行为。</li>
-<li><strong>独立自定义元素（Autonomous custom element）</strong> 继承自 HTML 元素基类 HTMLElement。你必须从头开始实现它们的行为。</li>
-</ul>
-<h3><span id="自定义元素生命周期回调">自定义元素生命周期回调</span></h3><p>当然Custom Elements也有自定义元素生命周期回调</p>
-<p><strong>一旦你的自定义元素被注册，当页面中的代码以特定方式与你的自定义元素交互时，浏览器将调用你的类的某些方法。</strong> 通过提供这些方法的实现，规范称之为生命周期回调，你可以运行代码来响应这些事件。</p>
-<p>自定义元素生命周期回调包括：</p>
-<ul>
-<li>connectedCallback()：每当元素添加到文档中时调用。规范建议开发人员尽可能在此回调中实现自定义元素的设定，而不是在构造函数中实现。</li>
-<li>disconnectedCallback()：每当元素从文档中移除时调用。</li>
-<li>adoptedCallback()：每当元素被移动到新文档中时调用。</li>
-<li>attributeChangedCallback()：在属性更改、添加、移除或替换时调用。有关此回调的更多详细信息，请参见响应属性变化。</li>
-</ul>
-<p>以下是一个记录这些生命周期事件的最小自定义元素示例：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 为这个元素创建类</span>
-<span class="token keyword">class</span> <span class="token class-name">MyCustomElement</span> <span class="token keyword">extends</span> <span class="token class-name">HTMLElement</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">static</span> observedAttributes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">"color"</span><span class="token punctuation">,</span> <span class="token string">"size"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 必须首先调用 super 方法</span>
-    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token function">connectedCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"自定义元素添加至页面。"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token function">disconnectedCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"自定义元素从页面中移除。"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token function">adoptedCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"自定义元素移动至新页面。"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token function">attributeChangedCallback</span><span class="token punctuation">(</span><span class="token parameter">name<span class="token punctuation">,</span> oldValue<span class="token punctuation">,</span> newValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">属性 </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>name<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> 已变更。</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
-
-customElements<span class="token punctuation">.</span><span class="token function">define</span><span class="token punctuation">(</span><span class="token string">"my-custom-element"</span><span class="token punctuation">,</span> MyCustomElement<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="在-vue-中使用自定义元素">在 Vue 中使用自定义元素​</span></h2><p>在 Vue 应用程序中使用自定义元素在很大程度上与使用原生 HTML 元素相同，但需要记住以下几点：</p>
-<h3><span id="跳过组件解析">跳过组件解析​</span></h3><p><strong>默认情况下，Vue 会尝试将非原生 HTML 标签解析为已注册的 Vue 组件，然后再将其渲染为自定义元素。</strong> 这将导致 Vue 在开发过程中发出“无法解析组件”警告。为了让 Vue 知道某些元素应该被视为自定义元素并跳过组件解析，我们可以指定compilerOptions.isCustomElement选项。</p>
-<p>如果您使用 Vue 进行构建设置，则该选项应通过构建配置传递，因为它是编译时选项。</p>
-<p>浏览器内配置示例:</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F; Only works if using in-browser compilation.
-&#x2F;&#x2F; If using build tools, see config examples below.
-app.config.compilerOptions.isCustomElement &#x3D; (tag) &#x3D;&gt; tag.includes(&#39;-&#39;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>Vite 配置示例​</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vite.config.js</span>
-<span class="token keyword">import</span> vue <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
-
-<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token function">vue</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">compilerOptions</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-          <span class="token comment">// treat all tags with a dash as custom elements</span>
-          <span class="token function-variable function">isCustomElement</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token parameter">tag</span><span class="token punctuation">)</span> <span class="token operator">=></span> tag<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'-'</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#125;</span>
-      <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-  <span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Vue CLI 配置示例​</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vue.config.js</span>
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token function-variable function">chainWebpack</span><span class="token operator">:</span> <span class="token parameter">config</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    config<span class="token punctuation">.</span>module
-      <span class="token punctuation">.</span><span class="token function">rule</span><span class="token punctuation">(</span><span class="token string">'vue'</span><span class="token punctuation">)</span>
-      <span class="token punctuation">.</span><span class="token function">use</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span>
-      <span class="token punctuation">.</span><span class="token function">tap</span><span class="token punctuation">(</span><span class="token parameter">options</span> <span class="token operator">=></span> <span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-        <span class="token operator">...</span>options<span class="token punctuation">,</span>
-        <span class="token literal-property property">compilerOptions</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-          <span class="token comment">// treat any tag that starts with ion- as custom elements</span>
-          <span class="token function-variable function">isCustomElement</span><span class="token operator">:</span> <span class="token parameter">tag</span> <span class="token operator">=></span> tag<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'ion-'</span><span class="token punctuation">)</span>
-        <span class="token punctuation">&#125;</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="使用-vue-构建自定义元素">使用 Vue 构建自定义元素​</span></h3><p>自定义元素的主要好处是它们可以与任何框架一起使用，甚至可以在没有框架的情况下使用。这使得它们非常适合分发最终消费者可能不使用相同前端堆栈的组件，或者当您希望将最终应用程序与其使用的组件的实现细节隔离时。</p>
-<p><strong>定义自定义元素​</strong><br>Vue 支持通过该方法使用完全相同的 Vue 组件 API 创建自定义元素defineCustomElement。该方法接受与 相同的参数defineComponent，但返回一个扩展的自定义元素构造函数HTMLElement：</p>
-<p>模板</p>
-<pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;my-vue-element&gt;&lt;&#x2F;my-vue-element&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineCustomElement <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
-
-<span class="token keyword">const</span> MyVueElement <span class="token operator">=</span> <span class="token function">defineCustomElement</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-  <span class="token comment">// normal Vue component options here</span>
-  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">emits</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">...</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span>
-
-  <span class="token comment">// defineCustomElement only: CSS to be injected into shadow root</span>
-  <span class="token literal-property property">styles</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/* inlined css */</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-
-<span class="token comment">// Register the custom element.</span>
-<span class="token comment">// After registration, all `&lt;my-vue-element>` tags</span>
-<span class="token comment">// on the page will be upgraded.</span>
-customElements<span class="token punctuation">.</span><span class="token function">define</span><span class="token punctuation">(</span><span class="token string">'my-vue-element'</span><span class="token punctuation">,</span> MyVueElement<span class="token punctuation">)</span>
-
-<span class="token comment">// You can also programmatically instantiate the element:</span>
-<span class="token comment">// (can only be done after registration)</span>
-document<span class="token punctuation">.</span>body<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>
-  <span class="token keyword">new</span> <span class="token class-name">MyVueElement</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-    <span class="token comment">// initial props (optional)</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>当我们谈论自定义元素和Vue组件时，实际上在讨论构建网页应用程序时使用的两种不同方式。<strong>自定义元素是一种Web标准，就像HTML元素一样，而Vue组件是Vue.js框架提供的一种更高级的构建方式。</strong></p>
-<p>有人认为只使用自定义元素是更“未来”的方式，但这段文字指出这种看法过于简单。它列举了一些原因，说明为什么Vue组件模型更为实用。其中一些关键点包括：</p>
-<p>Vue组件提供了更多功能，如方便的模板系统、管理状态的方法，以及在服务器上渲染组件的高效方式。这些功能对于构建复杂的应用程序是必要的。</p>
-<p>Vue组件支持强大的组合机制，而自定义元素在这方面有一些局限。这意味着使用Vue，你更容易构建灵活而强大的组件结构。使用Vue，你能够借助一个成熟的框架和庞大的社区，而不必自己构建和维护一套内部框架。</p>
-<p>自定义元素和 Vue 组件之间确实存在一定程度的功能重叠：它们都允许我们定义具有数据传递、事件发出和生命周期管理的可重用组件。然而，Web 组件 API 的级别相对较低且简单。要构建实际的应用程序，我们需要一些该平台未涵盖的附加功能：</p>
-<ul>
-<li><p>声明性且高效的模板系统；</p>
-</li>
-<li><p>反应式状态管理系统，有利于跨组件逻辑提取和重用；</p>
-</li>
-<li><p>一种在服务器上渲染组件并在客户端 (SSR) 上进行组合的高性能方法，这对于 SEO 和LCP 等 Web Vitals 指标非常重要。原生自定义元素 SSR 通常涉及在 Node.js 中模拟 DOM，然后序列化变异的 DOM，而 Vue SSR 会尽可能编译为字符串连接，这更加高效。</p>
-</li>
-</ul>
-<h3><span id="definecustomelement-api-vue-组件转化"><code>defineCustomElement</code> API Vue 组件转化</span></h3><p>使用 <code>defineCustomElement</code> API 将 Vue 组件转化为可以注册的自定义元素类有一些好处：</p>
-<ol>
-<li><p><strong>跨框架集成：</strong> 通过将 Vue 组件转化为自定义元素类，你可以在不同的前端框架和库中使用这个组件。这种方式使得你的组件更具通用性，可以与其他技术栈集成。</p>
-</li>
-<li><p><strong>独立使用：</strong> 将 Vue 组件注册为自定义元素后，它可以独立于 Vue 应用使用。这意味着你可以在没有整个 Vue 应用的情况下使用该组件，以及在不同的构建系统和模块系统中引入它。</p>
-</li>
-<li><p><strong>逐步迁移：</strong> 如果你的应用是逐步迁移到 Vue 的，你可以通过将某些组件转化为自定义元素来实现渐进式迁移。这使得你可以逐步地将 Vue 组件引入到一个已经存在的项目中，而无需一次性重写整个应用。</p>
-</li>
-<li><p><strong>Web Components 标准兼容性：</strong> 将 Vue 组件注册为自定义元素使其与 Web Components 标准兼容。这意味着你可以利用 Web Components 生态系统的其他工具和库，使你的组件更具互操作性。</p>
-</li>
-</ol>
-<p>也就是说defineCustomElement API 的作用是将 Vue 组件编译为可以在浏览器中使用的自定义元素（Custom Element）。这意味着你不需要依赖 Vue 编译器在浏览器端实时编译 Vue 组件。</p>
-<p>在使用 defineCustomElement API 时，Vue 组件会被提前编译成原生的自定义元素，这样就可以在浏览器中直接使用，而无需在运行时进行编译。</p>
-<p>总体而言，通过使用 <code>defineCustomElement</code> API，你可以将 Vue 组件与自定义元素相结合，从而在更广泛的上下文中使用和共享这些组件，提高了组件的可复用性和灵活性。这在跨端组件开发集成上有很大的好处，你大可以先将组件开发成自定义元素，然后再在不同的端中使用。一个很典型的例子是我们之前提到的vue2和vue3的集成实现，这意味着你只需要将vue3的组件编译成自定义元素，然后在vue2中使用即可。</p>
+<h3><span id="事件委托也有其局限性">事件委托也有其局限性</span></h3>
+<p>首先，事件必须冒泡。而有些事件不会冒泡。此外，低级别的处理程序不应该使用 <code>event.stopPropagation()</code>。<br>
+其次，委托可能会增加 CPU 负载，因为容器级别的处理程序会对容器中任意位置的事件做出反应，而不管我们是否对该事件感兴趣。但是，通常负载可以忽略不计，所以我们不考虑它。</p>
 
     
     </div>
