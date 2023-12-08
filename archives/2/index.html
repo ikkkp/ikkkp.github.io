@@ -177,6 +177,409 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/11/vue-renderer-4/" itemprop="url">vue-renderer 渲染器的核心 Diff 算法</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-11T08:28:57.000Z" itemprop="datePublished">2023年11月11日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2>
+<p>渲染器的核心就是 Diff 算法。简单来说，当新旧 vnode 的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较的算法就叫作 Diff 算法。我们知道，操作 DOM 的性能开销通常比较大，而渲染器的核心 Diff 算法就是为了解决这个问题而诞生的。</p>
+<h2><span id="减少-dom-操作的性能开销">减少 DOM 操作的性能开销</span></h2>
+<p>核心 Diff 只关心新旧虚拟节点都存在一组子节点的情况。针对两组子节点的更新，我们之前采用了一种简单直接的手段，即卸载全部旧子节点，再挂载全部新子节点。这么做的确可以完成更新，但由于没有复用任何 DOM 元素，所以会产生极大的性能开销。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 旧 vnode</span>
+<span class="token keyword">const</span> oldNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'1'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'2'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'3'</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 新 vnode</span>
+<span class="token keyword">const</span> newNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'4'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'5'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'6'</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>按照之前的做法，当更新子节点时，我们需要执行 6 次 DOM 操作：</p>
+<ul>
+<li>卸载所有旧子节点，需要 3 次 DOM 删除操作；</li>
+<li>挂载所有新子节点，需要 3 次 DOM 添加操作。</li>
+</ul>
+<p>但是，通过观察上面新旧 vnode 的子节点，可以发现：更新前后的所有子节点都是 p 标签，即标签元素不变；只有 p 标签的子节点（文本节点）会发生变化。</p>
+<p>例如，oldVNode 的第一个子节点是一个 p 标签，且该 p 标签的子节点类型是文本节点，内容是 ‘1’。而 newVNode 的第一个子节点也是一个 p 标签，它的子节点的类型也是文本节点，内容是 ‘4’。可以发现，更新前后改变的只有 p 标签文本节点的内容。</p>
+<p>所以，最理想的更新方式是，直接更新这个 p 标签的文本节点的内容。这样只需要一次 DOM 操作，即可完成一个 p 标签更新。新旧虚拟节点都有 3 个 p标签作为子节点，所以一共只需要 3 次 DOM 操作就可以完成全部节点的更新。相比原来需要执行 6 次 DOM 操作才能完成更新的方式，其性能提升了一倍。</p>
+<p>按照这个思路，我们可以重新实现两组子节点的更新逻辑，如下面 patchChildren 函数的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchChildren</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> n2<span class="token punctuation">.</span>children <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 省略部分代码</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>Array<span class="token punctuation">.</span><span class="token function">isArray</span><span class="token punctuation">(</span>n2<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 重新实现两组子节点的更新方式</span>
+    <span class="token comment">// 新旧 children</span>
+    <span class="token keyword">const</span> oldChildren <span class="token operator">=</span> n1<span class="token punctuation">.</span>children
+    <span class="token keyword">const</span> newChildren <span class="token operator">=</span> n2<span class="token punctuation">.</span>children
+    <span class="token comment">// 遍历旧的 children</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> oldChildren<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 调用 patch 函数逐个更新子节点</span>
+      <span class="token function">patch</span><span class="token punctuation">(</span>oldChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> newChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 省略部分代码</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在这段代码中，oldChildren 和 newChildren 分别是旧的一组子节点和新的一组子节点。我们遍历前者，并将两者中对应位置的节点分别传递给 patch 函数进行更新。patch 函数在执行更新时，发现新旧子节点只有文本内容不同，因此只会更新其文本节点的内容。这样，我们就成功地将 6 次 DOM 操作减少为 3 次。其中菱形代表新子节点，矩形代表旧子节点，圆形代表真实 DOM 节点。</p>
+<p><img src="img/vue-render/render-diff1.png" alt="render-diff"></p>
+<p>这种做法虽然能够减少 DOM 操作次数，但问题也很明显。在上面的代码中，我们通过遍历旧的一组子节点，并假设新的一组子节点的数量与之相同，只有在这种情况下，这段代码才能正确地工作。但是，新旧两组子节点的数量未必相同。当新的一组子节点的数量少于旧的一组子节点的数量时，意味着有些节点在更新后应该被卸载。</p>
+<p><img src="img/vue-render/render-diff2.png" alt="render-diff"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/11/10/Webpack-optimization-4/" itemprop="url">Webpack HMR 原理解析</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-10T02:15:11.000Z" itemprop="datePublished">2023年11月10日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/FE/">FE</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2>
+<p>Hot Module Replacement（以下简称 HMR）是 Webpack 发展至今一大特性 ，当你对代码进行修改并保存后，Webpack 将对代码重新打包，并将新的模块发送到浏览器端，浏览器通过新的模块替换老的模块，这样在不刷新浏览器的前提下就能够对应用进行更新。</p>
+<p>例如，在开发 Web 页面过程中，当你点击按钮，出现一个弹窗的时候，发现弹窗标题没有对齐，这时候你修改 CSS 样式，然后保存，在浏览器没有刷新的前提下，标题样式发生了改变。感觉就像在 Chrome 的开发者工具中直接修改元素样式一样。</p>
+<h2><span id="模块热替换hot-module-replacement">模块热替换(hot module replacement)</span></h2>
+<p><code>模块热替换(HMR - hot module replacement)</code>功能会在应用程序运行过程中，替换、添加或删除 模块，而无需重新加载整个页面。主要是通过以下几种方式，来显著加快开发速度：</p>
+<ul>
+<li>
+<p>保留在完全重新加载页面期间丢失的应用程序状态。</p>
+</li>
+<li>
+<p>只更新变更内容，以节省宝贵的开发时间。</p>
+</li>
+<li>
+<p>在源代码中 CSS/JS 产生修改时，会立刻在浏览器中进行更新，这几乎相当于在浏览器 devtools 直接更改样式。</p>
+</li>
+</ul>
+<h2><span id="为什么需要-hmr">为什么需要 HMR</span></h2>
+<p>在 webpack HMR 功能之前，已经有很多 live reload 的工具或库，比如 <a target="_blank" rel="noopener" href="https://tapiov.net/live-server/">live-server</a>，这些库监控文件的变化，然后通知浏览器端刷新页面，那么我们为什么还需要 HMR 呢？答案其实在上文中已经提及一些。</p>
+<ul>
+<li>
+<p>live reload 工具并不能够保存应用的状态（states），当刷新页面后，应用之前状态丢失，还是上文中的例子，点击按钮出现弹窗，当浏览器刷新后，弹窗也随即消失，要恢复到之前状态，还需再次点击按钮。而 webapck HMR 则不会刷新浏览器，而是运行时对模块进行热替换，保证了应用状态不会丢失，提升了开发效率。</p>
+</li>
+<li>
+<p>在古老的开发流程中，我们可能需要手动运行命令对代码进行打包，并且打包后再手动刷新浏览器页面，而这一系列重复的工作都可以通过 HMR 工作流来自动化完成，让更多的精力投入到业务中，而不是把时间浪费在重复的工作上。</p>
+</li>
+<li>
+<p>HMR 兼容市面上大多前端框架或库，比如 <a target="_blank" rel="noopener" href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a>，<a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-loader">Vue-loader</a>，能够监听 React 或者 Vue 组件的变化，实时将最新的组件更新到浏览器端。Elm Hot Loader 支持通过 webpack 对 Elm 语言代码进行转译并打包，当然它也实现了 HMR 功能。</p>
+</li>
+</ul>
+<h2><span id="hmr-的工作原理图解">HMR 的工作原理图解</span></h2>
+<p>初识 HMR 的时候觉得其很神奇，一直有一些疑问萦绕在脑海。</p>
+<ul>
+<li>
+<p>webpack 可以将不同的模块打包成 bundle 文件或者几个 chunk 文件，但是当我通过 webpack HMR 进行开发的过程中，我并没有在我的 dist 目录中找到 webpack 打包好的文件，它们去哪呢？</p>
+</li>
+<li>
+<p>通过查看 webpack-dev-server 的 package.json 文件，我们知道其依赖于 webpack-dev-middleware 库，那么 webpack-dev-middleware 在 HMR 过程中扮演什么角色？</p>
+</li>
+<li>
+<p>使用 HMR 的过程中，通过 Chrome 开发者工具我知道浏览器是通过 websocket 和 webpack-dev-server 进行通信的，但是 websocket 的 message 中并没有发现新模块代码。打包后的新模块又是通过什么方式发送到浏览器端的呢？为什么新的模块不通过 websocket 随消息一起发送到浏览器端呢？</p>
+</li>
+<li>
+<p>浏览器拿到最新的模块代码，HMR 又是怎么将老的模块替换成新的模块，在替换的过程中怎样处理模块之间的依赖关系？</p>
+</li>
+<li>
+<p>当模块的热替换过程中，如果替换模块失败，有什么回退机制吗？</p>
+</li>
+</ul>
+<p>带着上面的问题，于是决定深入到 webpack 源码，寻找 HMR 底层的奥秘。</p>
+<p><img src="/img/webpack-optimization/HMR1.png" alt="webpack-optimization"></p>
+<p>图一：HMR 工作流程图解</p>
+<p>上图是<code>webpack</code> 配合 <code>webpack-dev-server</code> 进行应用开发的模块热更新流程图。</p>
+<p>上图底部红色框内是服务端，而上面的橙色框是浏览器端。</p>
+<p>绿色的方框是 <code>webpack</code> 代码控制的区域。蓝色方框是 <code>webpack-dev-server</code> 代码控制的区域，洋红色的方框是文件系统，文件修改后的变化就发生在这，而青色的方框是应用本身。</p>
+<p>上图显示了我们修改代码到模块热更新完成的一个周期，通过深绿色的阿拉伯数字符号已经将 HMR 的整个过程标识了出来。</p>
+<ul>
+<li>
+<p>第一步，在 webpack 的 watch 模式下，文件系统中某一个文件发生修改，webpack 监听到文件变化，根据配置文件对模块重新编译打包，并将打包后的代码通过简单的 JavaScript 对象保存在内存中。</p>
+</li>
+<li>
+<p>第二步是 webpack-dev-server 和 webpack 之间的接口交互，而在这一步，主要是 dev-server 的中间件 webpack-dev-middleware 和 webpack 之间的交互，webpack-dev-middleware 调用 webpack 暴露的 API对代码变化进行监控，并且告诉 webpack，将代码打包到内存中。</p>
+</li>
+<li>
+<p>第三步是 webpack-dev-server 对文件变化的一个监控，这一步不同于第一步，并不是监控代码变化重新打包。当我们在配置文件中配置了devServer.watchContentBase 为 true 的时候，Server 会监听这些配置文件夹中静态文件的变化，变化后会通知浏览器端对应用进行 live reload。注意，这儿是浏览器刷新，和 HMR 是两个概念。</p>
+</li>
+<li>
+<p>第四步也是 webpack-dev-server 代码的工作，该步骤主要是通过 sockjs（webpack-dev-server 的依赖）在浏览器端和服务端之间建立一个 websocket 长连接，将 webpack 编译打包的各个阶段的状态信息告知浏览器端，同时也包括第三步中 Server 监听静态文件变化的信息。浏览器端根据这些 socket 消息进行不同的操作。当然服务端传递的最主要信息还是新模块的 hash 值，后面的步骤根据这一 hash 值来进行模块热替换。</p>
+</li>
+</ul>
+<p><code>webpack-dev-server/client</code> 端并不能够请求更新的代码，也不会执行热更模块操作，而把这些工作又交回给了 <code>webpack</code> ，<code>webpack/hot/dev-server</code> 的工作就是根据<br>
+<code>webpack-dev-server/client</code> 传给它的信息以及 <code>dev-server</code> 的配置决定是刷新浏览器呢还是进行模块热更新。当然如果仅仅是刷新浏览器，也就没有后面那些步骤了。</p>
+<p><code>HotModuleReplacement.runtime</code> 是客户端 HMR 的中枢，它接收到上一步传递给他的新模块的 hash 值，它通过 JsonpMainTemplate.runtime 向 server 端发送 Ajax 请求，服务端返回一个 json，该 json 包含了所有要更新的模块的 hash 值，获取到更新列表后，该模块再次通过 jsonp 请求，获取到最新的模块代码。这就是上图中 7、8、9 步骤。</p>
+<p>而第 10 步是决定 HMR 成功与否的关键步骤，在该步骤中，HotModulePlugin 将会对新旧模块进行对比，决定是否更新模块，在决定更新模块后，检查模块之间的依赖关系，更新模块的同时更新模块间的依赖引用。</p>
+<p>最后一步，当 HMR 失败后，回退到 live reload 操作，也就是进行浏览器刷新来获取最新打包代码。</p>
+<h2><span id="运用-hmr-的简单例子">运用 HMR 的简单例子</span></h2>
+<p>在上一个部分，通过一张 HMR 流程图，简要的说明了 HMR 进行模块热更新的过程。当然你可能感觉还是很迷糊，对上面出现的一些英文名词也可能比较陌生（上面这些英文名词代表着代码仓库或者仓库中的文件模块），没关系，在这一部分，我将通过一个最简单最纯粹的例子，通过分析 wepack及 webpack-dev-server 源码详细说明各个库在 HMR 过程中的具体职责。</p>
+<p>这边我通过一个简单的vue例子示例一下，这边贴一个仓库的连接<a target="_blank" rel="noopener" href="https://github.com/ikkkp/webpack-vue-demo">github.com/ikkkp/webpack-vue-demo</a></p>
+<p>在开始这个例子之前简单对这个仓库文件进行下说明，仓库中包含文件如下：</p>
+<p><img src="/img/webpack-optimization/HMR5.jpg" alt="webpack-optimization"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
+    VueLoaderPlugin
+<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> webpack <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'webpack'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 引入 webpack</span>
+<span class="token keyword">const</span> AutoImport <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-auto-import/webpack'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> Components <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/webpack'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
+    ElementPlusResolver
+<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/resolvers'</span><span class="token punctuation">)</span>
+
+<span class="token comment">/**
+* @description 
+* @version 1.0
+* @author Huangzl
+* @fileName webpack.base.config.js
+* @date 2023/11/10 11:00:59
+*/</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">main</span><span class="token operator">:</span> <span class="token string">'./src/main'</span><span class="token punctuation">,</span>
+        <span class="token comment">//单页应用开发模式禁用多入口</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">modules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">'node_modules'</span><span class="token punctuation">,</span>
+            path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'./src/loader'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[id].[fullhash].js'</span><span class="token punctuation">,</span> <span class="token comment">// 使用 [fullhash] 替代 [hash]，这是新版本 webpack 的写法</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'./'</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'vue-loader'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.css$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token string">'style-loader'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'css-loader'</span><span class="token punctuation">,</span>
+                    <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                        <span class="token literal-property property">importLoaders</span><span class="token operator">:</span> <span class="token number">1</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+                <span class="token string">'postcss-loader'</span>
+            <span class="token punctuation">]</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'babel-loader'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'company-loader'</span><span class="token punctuation">,</span>
+                <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                    <span class="token literal-property property">sign</span><span class="token operator">:</span> <span class="token string">'we-doctor@2021'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">exclude</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.(ico|png|jpg|gif|svg|eot|woff|woff2|ttf)$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'file-loader'</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'[name].[ext]?[hash]'</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token keyword">new</span> <span class="token class-name">HtmlWebpackPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token string">'./public/index.html'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token keyword">new</span> <span class="token class-name">VueLoaderPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token keyword">new</span> <span class="token class-name">webpack<span class="token punctuation">.</span>DefinePlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token constant">BASE_URL</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token string">'./'</span><span class="token punctuation">)</span> <span class="token comment">// 这里定义了 BASE_URL 为根路径 '/'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">AutoImport</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">Components</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">splitChunks</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">chunks</span><span class="token operator">:</span> <span class="token string">'all'</span><span class="token punctuation">,</span> <span class="token comment">// 只处理异步模块</span>
+            <span class="token literal-property property">maxSize</span><span class="token operator">:</span> <span class="token number">20000000</span><span class="token punctuation">,</span> <span class="token comment">// 设置最大的chunk大小为2MB</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>值得一提的是，在上面的配置中并没有配置 HotModuleReplacementPlugin，原因在于当我们设置 devServer.hot 为 true 后，并且在package.json 文件中添加如下的 script 脚本：</p>
+<blockquote>
+<p>“start”: “webpack-dev-server --hot --open”</p>
+</blockquote>
+<p>添加 —hot 配置项后，devServer 会告诉 webpack 自动引入 HotModuleReplacementPlugin 插件，而不用我们再手动引入了。</p>
+<p>上面给的是webpack.base.config.js的内容，我们下面通过修改App.vue的内容进行:</p>
+<blockquote>
+<p>- &lt;div&gt;hello&lt;/div&gt; // 将 hello 字符串修改为 hello world<br>
++ &lt;div&gt;hello world&lt;/div&gt;</p>
+</blockquote>
+<p><strong>第一步：webpack 对文件系统进行 watch 打包到内存中</strong></p>
+<p>webpack-dev-middleware 调用 webpack 的 api 对文件系统 watch，当 hello.js 文件发生改变后，webpack 重新对文件进行编译打包，然后保存到内存中。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">var</span> watching <span class="token operator">=</span> compiler<span class="token punctuation">.</span><span class="token function">watch</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span>watchOptions<span class="token punctuation">,</span> share<span class="token punctuation">.</span>handleCompilerCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    context<span class="token punctuation">.</span>watching <span class="token operator">=</span> watching<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>你可能会疑问了，为什么 webpack 没有将文件直接打包到 output.path 目录下呢？文件又去了哪儿？原来 webpack 将 bundle.js 文件打包到了内存中，不生成文件的原因就在于访问内存中的代码比访问文件系统中的文件更快，而且也减少了代码写入文件的开销，这一切都归功于memory-fs，memory-fs 是 webpack-dev-middleware 的一个依赖库，webpack-dev-middleware 将 webpack 原本的 outputFileSystem 替换成了MemoryFileSystem 实例，这样代码就将输出到内存中。webpack-dev-middleware 中该部分源码如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
+<span class="token keyword">var</span> isMemoryFs <span class="token operator">=</span> <span class="token operator">!</span>compiler<span class="token punctuation">.</span>compilers <span class="token operator">&amp;&amp;</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token keyword">instanceof</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>isMemoryFs<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>首先判断当前 fileSystem 是否已经是 MemoryFileSystem 的实例，如果不是，用 MemoryFileSystem 的实例替换 compiler 之前的 outputFileSystem。这样 bundle.js 文件代码就作为一个简单 javascript 对象保存在了内存中，当浏览器请求 bundle.js 文件时，devServer就直接去内存中找到上面保存的 javascript 对象返回给浏览器端。</p>
+<p><strong>第二步：devServer 通知浏览器端文件发生改变</strong></p>
+<p>在这一阶段，sockjs 是服务端和浏览器端之间的桥梁，在启动 devServer 的时候，sockjs 在服务端和浏览器端建立了一个 webSocket 长连接，以便将 webpack 编译和打包的各个阶段状态告知浏览器，最关键的步骤还是 webpack-dev-server 调用 webpack api 监听 compile的 done 事件，当compile 完成后，webpack-dev-server通过 _sendStatus 方法将编译打包后的新模块 hash 值发送到浏览器端。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-server/lib/Server.js</span>
+compiler<span class="token punctuation">.</span><span class="token function">plugin</span><span class="token punctuation">(</span><span class="token string">'done'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">stats</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// stats.hash 是最新打包文件的 hash 值</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_sendStats</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>sockets<span class="token punctuation">,</span> stats<span class="token punctuation">.</span><span class="token function">toJson</span><span class="token punctuation">(</span>clientStats<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_stats <span class="token operator">=</span> stats<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">...</span>
+<span class="token class-name">Server</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">_sendStats</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">sockets<span class="token punctuation">,</span> stats<span class="token punctuation">,</span> force</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>force <span class="token operator">&amp;&amp;</span> stats <span class="token operator">&amp;&amp;</span>
+  <span class="token punctuation">(</span><span class="token operator">!</span>stats<span class="token punctuation">.</span>errors <span class="token operator">||</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> stats<span class="token punctuation">.</span>assets <span class="token operator">&amp;&amp;</span>
+  stats<span class="token punctuation">.</span>assets<span class="token punctuation">.</span><span class="token function">every</span><span class="token punctuation">(</span><span class="token parameter">asset</span> <span class="token operator">=></span> <span class="token operator">!</span>asset<span class="token punctuation">.</span>emitted<span class="token punctuation">)</span>
+  <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'still-ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+  <span class="token comment">// 调用 sockWrite 方法将 hash 值通过 websocket 发送到浏览器端</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'hash'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>hash<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'errors'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span> 
+  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>warnings<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'warnings'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>warnings<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>      <span class="token keyword">else</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>第三步：webpack-dev-server/client 接收到服务端消息做出响应</strong></p>
+<p>可能你又会有疑问，我并没有在业务代码里面添加接收 websocket 消息的代码，也没有在 webpack.config.js 中的 entry 属性中添加新的入口文件，那么 bundle.js 中接收 websocket 消息的代码从哪来的呢？原来是 webpack-dev-server 修改了webpack 配置中的 entry 属性，在里面添加了 webpack-dev-client 的代码，这样在最后的 bundle.js 文件中就会有接收 websocket 消息的代码了。</p>
+<p>webpack-dev-server/client 当接收到 type 为 hash 消息后会将 hash 值暂存起来，当接收到 type 为 ok 的消息后对应用执行 reload 操作，如下图所示，hash 消息是在 ok 消息之前。</p>
+<p><img src="/img/webpack-optimization/HMR3.jpg" alt="webpack-optimization"></p>
+<p>在 reload 操作中，webpack-dev-server/client 会根据 hot 配置决定是刷新浏览器还是对代码进行热更新（HMR）。</p>
+<p>首先将 hash 值暂存到 currentHash 变量，当接收到 ok 消息后，对 App 进行 reload。如果配置了模块热更新，就调用 webpack/hot/emitter 将最新 hash 值发送给 webpack，然后将控制权交给 webpack 客户端代码。如果没有配置模块热更新，就直接调用 location.reload 方法刷新页面。</p>
+<p><strong>第四步：webpack 接收到最新 hash 值验证并请求模块代码</strong></p>
+<p>在这一步，其实是 webpack 中三个模块（三个文件，后面英文名对应文件路径）之间配合的结果，首先是 <code>webpack/hot/dev-server</code>（以下简称 dev-server） 监听第三步 <code>webpack-dev-server/client</code> 发送的 <code>webpackHotUpdate</code> 消息，调用 webpack/lib/HotModuleReplacement.runtime（简称 HMR runtime）中的 check 方法，检测是否有新的更新，在 check 过程中会利用 webpack/lib/JsonpMainTemplate.runtime（简称 jsonp runtime）中的两个方法 <code>hotDownloadUpdateChunk</code> 和 <code>hotDownloadManifest</code> ， 第二个方法是调用 AJAX 向服务端请求是否有更新的文件，如果有将发更新的文件列表返回浏览器端，而第一个方法是通过 jsonp 请求最新的模块代码，然后将代码返回给 <code>HMR runtime</code>，<code>HMR runtime</code> 会根据返回的新模块代码做进一步处理，可能是刷新页面，也可能是对模块进行热更新。</p>
+<p><img src="/img/webpack-optimization/HMR4.jpg" alt="webpack-optimization"></p>
+<p>值得注意的是，两次请求的都是使用上一次的 hash 值拼接的请求文件名，hotDownloadManifest 方法返回的是最新的 hash 值，hotDownloadUpdateChunk 方法返回的就是最新 hash 值对应的代码块。然后将新的代码块返回给 HMR runtime，进行模块热更新</p>
+<p><strong>第五步：HotModuleReplacement.runtime 对模块进行热更新</strong></p>
+<p>这一步是整个模块热更新（HMR）的关键步骤，而且模块热更新都是发生在HMR runtime 中的 hotApply 方法中</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack/lib/HotModuleReplacement.runtime</span>
+<span class="token keyword">function</span> <span class="token function">hotApply</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// ...</span>
+    <span class="token keyword">var</span> idx<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> queue <span class="token operator">=</span> outdatedModules<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span>queue<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        moduleId <span class="token operator">=</span> queue<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        module <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// ...</span>
+        <span class="token comment">// remove module from cache</span>
+        <span class="token keyword">delete</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// when disposing there is no need to call dispose handler</span>
+        <span class="token keyword">delete</span> outdatedDependencies<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// remove "parents" references from all children</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span>j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> module<span class="token punctuation">.</span>children<span class="token punctuation">.</span>length<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">var</span> child <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>module<span class="token punctuation">.</span>children<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>child<span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+            idx <span class="token operator">=</span> child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>moduleId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>idx <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span>idx<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+    <span class="token comment">// insert new code</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>moduleId <span class="token keyword">in</span> appliedUpdate<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function">hasOwnProperty</span><span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>appliedUpdate<span class="token punctuation">,</span> moduleId<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            modules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span> <span class="token operator">=</span> appliedUpdate<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>从上面 hotApply 方法可以看出，模块热替换主要分三个阶段，第一个阶段是找出 <code>outdatedModules</code> 和 <code>outdatedDependencies</code>，这儿我没有贴这部分代码，有兴趣可以自己阅读源码。第二个阶段从缓存中删除过期的模块和依赖，如下：</p>
+<blockquote>
+<p>delete installedModules[moduleId];<br>
+delete outdatedDependencies[moduleId];</p>
+</blockquote>
+<p>第三个阶段是将新的模块添加到 modules 中，当下次调用 <strong>webpack_require</strong> (webpack 重写的 require 方法)方法的时候，就是获取到了新的模块代码了。</p>
+<p>模块热更新的错误处理，如果在热更新过程中出现错误，热更新将回退到刷新浏览器，这部分代码在 dev-server 代码中，简要代码如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">check</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">updatedModules</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>updatedModules<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">err</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">var</span> status <span class="token operator">=</span> module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"abort"</span><span class="token punctuation">,</span> <span class="token string">"fail"</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>status<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>dev-server 先验证是否有更新，没有代码更新的话，重载浏览器。如果在 hotApply 的过程中出现 abort 或者 fail 错误，也进行重载浏览器。</p>
+<p><img src="/img/webpack-optimization/2-core.jpg" alt="webpack-optimization"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/09/hadoop-4/" itemprop="url">Hadoop 2.0体系架构之分布式文件系统Yarn</a>
         
     </h1>
@@ -196,10 +599,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="hadoop-yarn-是什么">Hadoop Yarn 是什么</span></h2><p>在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来的资源管理框架，就是 Yarn 。</p>
+        <h2><span id="hadoop-yarn-是什么">Hadoop Yarn 是什么</span></h2>
+<p>在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来的资源管理框架，就是 Yarn 。</p>
 <p>在详细介绍 Yarn 之前，我们先简单聊聊 Yarn ，Yarn 的全称是  <strong>Yet Another Resource Negotiator</strong> ，意思是“另一种资源调度器”，这种命名和“有间客栈”这种可谓是异曲同工之妙。这里多说一句，以前 Java 有一个项目编译工具，叫做 Ant，他的命名也是类似的，叫做 “Another Neat Tool”的缩写，翻译过来是“另一种整理工具”。</p>
 <p>既然都叫做资源调度器了，那么自然，它的功能也是负责资源管理和调度的，接下来，我们就深入到 Yarn 这个东西内部一探究竟吧。</p>
-<h2><span id="yarn-架构">Yarn 架构</span></h2><p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
+<h2><span id="yarn-架构">Yarn 架构</span></h2>
+<p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
 <p>① Client：客户端，负责向集群提交作业。</p>
 <p>② ResourceManager：集群主进程，仲裁中心，负责集群资源管理和任务调度。</p>
 <p>③ Scheduler：资源仲裁模块。</p>
@@ -207,42 +612,59 @@
 <p>⑤ NodeManager：集群从进程，管理监视Containers，执行具体任务。</p>
 <p>⑥ Container：本机资源集合体，如某Container为4个CPU，8GB内存。</p>
 <p>⑦ ApplicationMaster：任务执行和监管中心。</p>
-<h3><span id="三个主要组件">三个主要组件</span></h3><p>再看最上面的图，我们能直观发现的两个主要的组件是 <code>ResourceManager</code> 和 <code>NodeManager</code> ，但其实还有一个 <code>ApplicationMaster</code> 在图中没有直观显示。我们分别来看这三个组件。</p>
-<h4><span id="resourcemanager">ResourceManager</span></h4><p>我们先来说说上图中最中央的那个 ResourceManager（RM）。从名字上我们就能知道这个组件是负责资源管理的，整个系统有且只有一个 RM ，来负责资源的调度。</p>
+<h3><span id="三个主要组件">三个主要组件</span></h3>
+<p>再看最上面的图，我们能直观发现的两个主要的组件是 <code>ResourceManager</code> 和 <code>NodeManager</code> ，但其实还有一个 <code>ApplicationMaster</code> 在图中没有直观显示。我们分别来看这三个组件。</p>
+<h4><span id="resourcemanager">ResourceManager</span></h4>
+<p>我们先来说说上图中最中央的那个 ResourceManager（RM）。从名字上我们就能知道这个组件是负责资源管理的，整个系统有且只有一个 RM ，来负责资源的调度。</p>
 <p>它也包含了两个主要的组件：<code>定时调用器(Scheduler)</code>以及<code>应用管理器(ApplicationManager)</code>。</p>
 <p><code>定时调度器(Scheduler)</code>：从本质上来说，定时调度器就是一种策略，或者说一种算法。当 Client 提交一个任务的时候，它会根据所需要的资源以及当前集群的资源状况进行分配。注意，它只负责向应用程序分配资源，并不做监控以及应用程序的状态跟踪。</p>
 <p><code>应用管理器(ApplicationManager)</code>：同样，听名字就能大概知道它是干嘛的。应用管理器就是负责管理 Client 用户提交的应用。上面不是说到定时调度器（Scheduler）不对用户提交的程序监控嘛，其实啊，监控应用的工作正是由应用管理器（ApplicationManager）完成的。</p>
-<h4><span id="applicationmaster">ApplicationMaster</span></h4><p>每当 Client 提交一个 Application 时候，就会新建一个 ApplicationMaster 。由这个 ApplicationMaster 去与 ResourceManager 申请容器资源，获得资源后会将要运行的程序发送到容器上启动，然后进行分布式计算。</p>
+<h4><span id="applicationmaster">ApplicationMaster</span></h4>
+<p>每当 Client 提交一个 Application 时候，就会新建一个 ApplicationMaster 。由这个 ApplicationMaster 去与 ResourceManager 申请容器资源，获得资源后会将要运行的程序发送到容器上启动，然后进行分布式计算。</p>
 <p>这里可能有些难以理解，为什么是把运行程序发送到容器上去运行？如果以传统的思路来看，是程序运行着不动，然后数据进进出出不停流转。但当数据量大的时候就没法这么玩了，因为海量数据移动成本太大，时间太长。但是中国有一句老话山不过来，我就过去。大数据分布式计算就是这种思想，既然大数据难以移动，那我就把容易移动的应用程序发布到各个节点进行计算呗，这就是大数据分布式计算的思路。</p>
-<h4><span id="nodemanager">NodeManager</span></h4><p>NodeManager 是 ResourceManager 在每台机器的上代理，负责容器的管理，并监控他们的资源使用情况（cpu，内存，磁盘及网络等），以及向 ResourceManager&#x2F;Scheduler 提供这些资源使用报告。</p>
+<h4><span id="nodemanager">NodeManager</span></h4>
+<p>NodeManager 是 ResourceManager 在每台机器的上代理，负责容器的管理，并监控他们的资源使用情况（cpu，内存，磁盘及网络等），以及向 ResourceManager/Scheduler 提供这些资源使用报告。</p>
 <p>Yarn的主要思想是将MRv1版JobTracker的两大功能——资源管理和任务调度，拆分成两个独立的进程：</p>
 <p><img src="/img/yarn-pkg/Yarn2.png" alt="hadoop-Yarn"></p>
 <ul>
-<li><p>Yarn依旧是master&#x2F;slave结构</p>
+<li>
+<p>Yarn依旧是master/slave结构</p>
 </li>
-<li><p>主进程ResourceManager是整个集群资源仲裁中心</p>
+<li>
+<p>主进程ResourceManager是整个集群资源仲裁中心</p>
 </li>
-<li><p>从进程NodeManager管理本机资源</p>
+<li>
+<p>从进程NodeManager管理本机资源</p>
 </li>
-<li><p>ResourceManager和从属节点的进程NodeManager组成了Hadoop 2.0的分布式数据计算框架</p>
+<li>
+<p>ResourceManager和从属节点的进程NodeManager组成了Hadoop 2.0的分布式数据计算框架</p>
 </li>
 </ul>
-<h2><span id="提交一个-application-到-yarn-的流程">提交一个 Application 到 Yarn 的流程</span></h2><p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
+<h2><span id="提交一个-application-到-yarn-的流程">提交一个 Application 到 Yarn 的流程</span></h2>
+<p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
 <p>这张图简单地标明了提交一个程序所经历的流程，接下来我们来具体说说每一步的过程。</p>
 <ul>
-<li><p>Client 向 Yarn 提交 Application，这里我们假设是一个 MapReduce 作业。</p>
+<li>
+<p>Client 向 Yarn 提交 Application，这里我们假设是一个 MapReduce 作业。</p>
 </li>
-<li><p>ResourceManager 向 NodeManager 通信，为该 Application 分配第一个容器。并在这个容器中运行这个应用程序对应的 ApplicationMaster。</p>
+<li>
+<p>ResourceManager 向 NodeManager 通信，为该 Application 分配第一个容器。并在这个容器中运行这个应用程序对应的 ApplicationMaster。</p>
 </li>
-<li><p>ApplicationMaster 启动以后，对 作业（也就是 Application） 进行拆分，拆分 task 出来，这些 task 可以运行在一个或多个容器中。然后向<br>ResourceManager 申请要运行程序的容器，并定时向 ResourceManager 发送心跳。</p>
+<li>
+<p>ApplicationMaster 启动以后，对 作业（也就是 Application） 进行拆分，拆分 task 出来，这些 task 可以运行在一个或多个容器中。然后向<br>
+ResourceManager 申请要运行程序的容器，并定时向 ResourceManager 发送心跳。</p>
 </li>
-<li><p>申请到容器后，ApplicationMaster 会去和容器对应的 NodeManager 通信，而后将作业分发到对应的 NodeManager 中的容器去运行，这里会将拆分后的 MapReduce 进行分发，对应容器中运行的可能是 Map 任务，也可能是 Reduce 任务。</p>
+<li>
+<p>申请到容器后，ApplicationMaster 会去和容器对应的 NodeManager 通信，而后将作业分发到对应的 NodeManager 中的容器去运行，这里会将拆分后的 MapReduce 进行分发，对应容器中运行的可能是 Map 任务，也可能是 Reduce 任务。</p>
 </li>
-<li><p>容器中运行的任务会向 ApplicationMaster 发送心跳，汇报自身情况。当程序运行完成后， ApplicationMaster 再向 ResourceManager 注销并释放容器资源。<br>以上就是一个作业的大体运行流程。</p>
+<li>
+<p>容器中运行的任务会向 ApplicationMaster 发送心跳，汇报自身情况。当程序运行完成后， ApplicationMaster 再向 ResourceManager 注销并释放容器资源。<br>
+以上就是一个作业的大体运行流程。</p>
 </li>
 </ul>
 <p><img src="/img/yarn-pkg/Yarn4.png" alt="hadoop-Yarn"></p>
-<h2><span id="yarn-架构典型拓扑">Yarn 架构典型拓扑</span></h2><p>除了<code>ResourceManager</code>和<code>NodeManager</code>两个实体外，Yarn还包括<code>WebAppProxyServer</code>和<code>JobHistoryServer</code>两个实体。</p>
+<h2><span id="yarn-架构典型拓扑">Yarn 架构典型拓扑</span></h2>
+<p>除了<code>ResourceManager</code>和<code>NodeManager</code>两个实体外，Yarn还包括<code>WebAppProxyServer</code>和<code>JobHistoryServer</code>两个实体。</p>
 <p><img src="/img/yarn-pkg/Yarn5.png" alt="hadoop-Yarn"></p>
 <p><code>JobHistoryServer</code>：管理已完成的Yarn任务</p>
 <ul>
@@ -254,9 +676,12 @@
 <li>通过使用代理，不仅进一步降低了ResourceManager的压力，还能降低Yarn受到的Web攻击</li>
 <li>负责监管具体MapReduce任务执行全过程，将从Container那里收集过的任务执行信息汇总并显示到一个Web界面上</li>
 </ul>
-<h2><span id="yarn-调度策略">Yarn 调度策略</span></h2><p><strong>容量调度算法</strong><br><code>CapacityScheduler</code>是一种多用户多任务调度策略，它以队列为单位划分任务，以<code>Container</code>为单位分配资源</p>
+<h2><span id="yarn-调度策略">Yarn 调度策略</span></h2>
+<p><strong>容量调度算法</strong><br>
+<code>CapacityScheduler</code>是一种多用户多任务调度策略，它以队列为单位划分任务，以<code>Container</code>为单位分配资源</p>
 <p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
-<p><strong>公平调度策略</strong><br><code>FairScheduler</code>是一种允许多个<code>Yarn</code>任务公平使用集群资源的可插拔式调度策略</p>
+<p><strong>公平调度策略</strong><br>
+<code>FairScheduler</code>是一种允许多个<code>Yarn</code>任务公平使用集群资源的可插拔式调度策略</p>
 <p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
 
     
@@ -291,23 +716,37 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="hdfs设计原则">HDFS设计原则</span></h2><h3><span id="设计目标">设计目标</span></h3><p><strong>存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。</strong></p>
+        <h2><span id="hdfs设计原则">HDFS设计原则</span></h2>
+<h3><span id="设计目标">设计目标</span></h3>
+<p><strong>存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。</strong></p>
 <ul>
-<li><p>采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作<br>分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。</p>
+<li>
+<p>采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作<br>
+分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。</p>
 </li>
-<li><p>运行于商业硬件上: Hadoop不需要特别贵的、reliable的（可靠的）机器，可运行于普通商用机器（可以从多家供应商采购） ，商用机器不代表低端机器。在集群中（尤其是大的集群），节点失败率是比较高的HDFS的目标是确保集群在节点失败的时候不会让用户感觉到明显的中断。</p>
+<li>
+<p>运行于商业硬件上: Hadoop不需要特别贵的、reliable的（可靠的）机器，可运行于普通商用机器（可以从多家供应商采购） ，商用机器不代表低端机器。在集群中（尤其是大的集群），节点失败率是比较高的HDFS的目标是确保集群在节点失败的时候不会让用户感觉到明显的中断。</p>
 </li>
 </ul>
-<h3><span id="hdfs不适合的应用类型">HDFS不适合的应用类型</span></h3><p>有些场景不适合使用HDFS来存储数据。下面列举几个：</p>
+<h3><span id="hdfs不适合的应用类型">HDFS不适合的应用类型</span></h3>
+<p>有些场景不适合使用HDFS来存储数据。下面列举几个：</p>
 <ol>
-<li><p><strong>低延时的数据访问</strong><br>对延时要求在毫秒级别的应用，不适合采用HDFS。HDFS是为高吞吐数据传输设计的,因此可能牺牲延时HBase更适合低延时的数据访问。</p>
+<li>
+<p><strong>低延时的数据访问</strong><br>
+对延时要求在毫秒级别的应用，不适合采用HDFS。HDFS是为高吞吐数据传输设计的,因此可能牺牲延时HBase更适合低延时的数据访问。</p>
 </li>
-<li><p><strong>大量小文件</strong><br>文件的元数据（如目录结构，文件block的节点列表，<code>block-node mapping</code>）保存在NameNode的内存中， 整个文件系统的文件数量会受限于NameNode的内存大小。<br>经验而言，一个文件&#x2F;目录&#x2F;文件块一般占有150字节的元数据内存空间。如果有100万个文件，每个文件占用1个文件块，则需要大约300M的内存。因此十亿级别的文件数量在现有商用机器上难以支持。</p>
+<li>
+<p><strong>大量小文件</strong><br>
+文件的元数据（如目录结构，文件block的节点列表，<code>block-node mapping</code>）保存在NameNode的内存中， 整个文件系统的文件数量会受限于NameNode的内存大小。<br>
+经验而言，一个文件/目录/文件块一般占有150字节的元数据内存空间。如果有100万个文件，每个文件占用1个文件块，则需要大约300M的内存。因此十亿级别的文件数量在现有商用机器上难以支持。</p>
 </li>
-<li><p><strong>多方读写，需要任意的文件修改</strong><br>HDFS采用追加（append-only）的方式写入数据。不支持文件任意offset的修改。不支持多个写入器（writer）</p>
+<li>
+<p><strong>多方读写，需要任意的文件修改</strong><br>
+HDFS采用追加（append-only）的方式写入数据。不支持文件任意offset的修改。不支持多个写入器（writer）</p>
 </li>
 </ol>
-<h2><span id="hdfs定位">HDFS定位</span></h2><p>为提高扩展性，HDFS采用了master&#x2F;slave架构来构建分布式存储集群，这种架构很容易向集群中任意添加或删除slave。</p>
+<h2><span id="hdfs定位">HDFS定位</span></h2>
+<p>为提高扩展性，HDFS采用了master/slave架构来构建分布式存储集群，这种架构很容易向集群中任意添加或删除slave。</p>
 <p>HDFS是Hadoop生态系统中的一个重要组件，它是一个分布式文件系统，旨在存储大量数据，并提供高吞吐量的数据访问。HDFS的设计目标是将数据存储在廉价的硬件上，并提供高容错性。它通过将数据分散到集群中的多个节点上来实现这一目标。HDFS的定位是作为一个批处理系统，适用于大规模数据的离线处理。</p>
 <p>HDFS的主要特点包括：</p>
 <ul>
@@ -317,34 +756,50 @@
 <li>流式数据访问：HDFS支持流式数据访问，这意味着它可以高效地处理大量的数据流。</li>
 </ul>
 <p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
-<h2><span id="hdfs体系架构">HDFS体系架构</span></h2><p>HDFS采用master&#x2F;slave体系来构建分布式存储服务，提高了HDFS的可扩展性又简化了架构设计。<br>HDFS里将文件分块存储，优化存储颗粒度。namenode统一管理所有slave机器datanode存储空间，datanode以块为单位存储实际的数据。真正的文件I&#x2F;O操作时客户端直接和datanode交互。</p>
-<h2><span id="hdfs核心概念">HDFS核心概念</span></h2><h3><span id="blocks">Blocks</span></h3><p>物理磁盘中有块的概念，磁盘的物理Block是磁盘操作最小的单元，读写操作均以Block为最小单元，一般为512 Byte。文件系统在物理Block之上抽象了另一层概念，文件系统Block物理磁盘Block的整数倍。通常为几KB。Hadoop提供的df、fsck这类运维工具都是在文件系统的Block级别上进行操作。</p>
+<h2><span id="hdfs体系架构">HDFS体系架构</span></h2>
+<p>HDFS采用master/slave体系来构建分布式存储服务，提高了HDFS的可扩展性又简化了架构设计。<br>
+HDFS里将文件分块存储，优化存储颗粒度。namenode统一管理所有slave机器datanode存储空间，datanode以块为单位存储实际的数据。真正的文件I/O操作时客户端直接和datanode交互。</p>
+<h2><span id="hdfs核心概念">HDFS核心概念</span></h2>
+<h3><span id="blocks">Blocks</span></h3>
+<p>物理磁盘中有块的概念，磁盘的物理Block是磁盘操作最小的单元，读写操作均以Block为最小单元，一般为512 Byte。文件系统在物理Block之上抽象了另一层概念，文件系统Block物理磁盘Block的整数倍。通常为几KB。Hadoop提供的df、fsck这类运维工具都是在文件系统的Block级别上进行操作。</p>
 <p>HDFS的Block块比一般单机文件系统大得多，默认为128M。HDFS的文件被拆分成block-sized的chunk，chunk作为独立单元存储。比Block小的文件不会占用整个Block，只会占据实际大小。例如， 如果一个文件大小为1M，则在HDFS中只会占用1M的空间，而不是128M。</p>
-<p>HDFS的Block为什么这么大？<br>是为了最小化查找（seek）时间，控制定位文件与传输文件所用的时间比例。假设定位到Block所需的时间为10ms，磁盘传输速度为100M&#x2F;s。如果要将定位到Block所用时间占传输时间的比例控制1%，则Block大小需要约100M。<br>但是如果Block设置过大，在MapReduce任务中，Map或者Reduce任务的个数 如果小于集群机器数量，会使得作业运行效率很低。</p>
-<p>Block抽象的好处 </p>
+<p>HDFS的Block为什么这么大？<br>
+是为了最小化查找（seek）时间，控制定位文件与传输文件所用的时间比例。假设定位到Block所需的时间为10ms，磁盘传输速度为100M/s。如果要将定位到Block所用时间占传输时间的比例控制1%，则Block大小需要约100M。<br>
+但是如果Block设置过大，在MapReduce任务中，Map或者Reduce任务的个数 如果小于集群机器数量，会使得作业运行效率很低。</p>
+<p>Block抽象的好处</p>
 <ul>
-<li>Block的拆分使得单个文件大小可以大于整个磁盘的容量，构成文件的Block可以分布在整个集群， 理论上，单个文件可以占据集群中所有机器的磁盘。 </li>
-<li>Block的抽象也简化了存储系统，对于Block，无需关注其权限，所有者等内容（这些内容都在文件级别上进行控制）。 </li>
+<li>Block的拆分使得单个文件大小可以大于整个磁盘的容量，构成文件的Block可以分布在整个集群， 理论上，单个文件可以占据集群中所有机器的磁盘。</li>
+<li>Block的抽象也简化了存储系统，对于Block，无需关注其权限，所有者等内容（这些内容都在文件级别上进行控制）。</li>
 <li>Block作为容错和高可用机制中的副本单元，即以Block为单位进行复制。</li>
 </ul>
-<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>整个HDFS集群由Namenode和Datanode构成<code>master-worker（主从）</code>模式。Namenode负责构建命名空间，管理文件的元数据等，而Datanode负责实际存储数据，负责读写工作。</p>
-<h4><span id="namenode">Namenode</span></h4><p>Namenode存放文件系统树及所有文件、目录的元数据。元数据持久化为2种形式：</p>
+<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3>
+<p>整个HDFS集群由Namenode和Datanode构成<code>master-worker（主从）</code>模式。Namenode负责构建命名空间，管理文件的元数据等，而Datanode负责实际存储数据，负责读写工作。</p>
+<h4><span id="namenode">Namenode</span></h4>
+<p>Namenode存放文件系统树及所有文件、目录的元数据。元数据持久化为2种形式：</p>
 <ul>
 <li>namespace image</li>
 <li>edit log</li>
 </ul>
-<p>但是持久化数据中不包括Block所在的节点列表，及文件的Block分布在集群中的哪些节点上，这些信息是在系统重启的时候重新构建（通过Datanode汇报的Block信息）。<br>在HDFS中，Namenode可能成为集群的单点故障，Namenode不可用时，整个文件系统是不可用的。HDFS针对单点故障提供了2种解决机制： </p>
+<p>但是持久化数据中不包括Block所在的节点列表，及文件的Block分布在集群中的哪些节点上，这些信息是在系统重启的时候重新构建（通过Datanode汇报的Block信息）。<br>
+在HDFS中，Namenode可能成为集群的单点故障，Namenode不可用时，整个文件系统是不可用的。HDFS针对单点故障提供了2种解决机制：</p>
 <ol>
-<li><p>备份持久化元数据<br>将文件系统的元数据同时写到多个文件系统， 例如同时将元数据写到本地文件系统及NFS。这些备份操作都是同步的、原子的。</p>
+<li>
+<p>备份持久化元数据<br>
+将文件系统的元数据同时写到多个文件系统， 例如同时将元数据写到本地文件系统及NFS。这些备份操作都是同步的、原子的。</p>
 </li>
-<li><p>Secondary Namenode<br>Secondary节点定期合并主Namenode的namespace image和edit log， 避免edit log过大，通过创建检查点checkpoint来合并。它会维护一个合并后的namespace image副本， 可用于在Namenode完全崩溃时恢复数据。下图为Secondary Namenode的管理界面：</p>
+<li>
+<p>Secondary Namenode<br>
+Secondary节点定期合并主Namenode的namespace image和edit log， 避免edit log过大，通过创建检查点checkpoint来合并。它会维护一个合并后的namespace image副本， 可用于在Namenode完全崩溃时恢复数据。下图为Secondary Namenode的管理界面：</p>
 </li>
 </ol>
 <p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
-<p>Secondary Namenode通常运行在另一台机器，因为合并操作需要耗费大量的CPU和内存。其数据落后于Namenode，因此当Namenode完全崩溃时，会出现数据丢失。 通常做法是拷贝NFS中的备份元数据到Second，将其作为新的主Namenode。<br>在HA（High Availability高可用性）中可以运行一个Hot Standby，作为热备份，在Active Namenode故障之后，替代原有Namenode成为Active Namenode。</p>
-<h4><span id="datanode">Datanode</span></h4><p>数据节点负责存储和提取Block，读写请求可能来自namenode，也可能直接来自客户端。数据节点周期性向Namenode汇报自己节点上所存储的Block相关信息。</p>
+<p>Secondary Namenode通常运行在另一台机器，因为合并操作需要耗费大量的CPU和内存。其数据落后于Namenode，因此当Namenode完全崩溃时，会出现数据丢失。 通常做法是拷贝NFS中的备份元数据到Second，将其作为新的主Namenode。<br>
+在HA（High Availability高可用性）中可以运行一个Hot Standby，作为热备份，在Active Namenode故障之后，替代原有Namenode成为Active Namenode。</p>
+<h4><span id="datanode">Datanode</span></h4>
+<p>数据节点负责存储和提取Block，读写请求可能来自namenode，也可能直接来自客户端。数据节点周期性向Namenode汇报自己节点上所存储的Block相关信息。</p>
 <p><img src="/img/HDFS/HDFS3.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="经典hdfs体系架构">经典HDFS体系架构</span></h2><p><strong>NameNode负责管理文件系统的元数据信息，而DataNode则负责存储文件块的实际数据。</strong> 这种分工使得HDFS能够高效地存储和管理大规模数据。</p>
+<h2><span id="经典hdfs体系架构">经典HDFS体系架构</span></h2>
+<p><strong>NameNode负责管理文件系统的元数据信息，而DataNode则负责存储文件块的实际数据。</strong> 这种分工使得HDFS能够高效地存储和管理大规模数据。</p>
 <p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
 <p>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</p>
 <p>因此，NameNode和DataNode在HDFS体系架构中扮演着不同的角色。</p>
@@ -352,53 +807,77 @@
 <p>HDFS是Hadoop分布式文件系统的缩写，是Hadoop生态系统中的一个重要组件。HDFS的体系架构包括一个NameNode和多个DataNode。NameNode是HDFS的主节点，负责管理文件系统的命名空间、文件的元数据信息以及文件块的位置信息。而DataNode则是HDFS的从节点，负责存储文件块的实际数据。</p>
 <p><strong>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</strong></p>
 <p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
-<h3><span id="一般拓扑">一般拓扑</span></h3><p>只有单个NameNode节点，使用SecondaryNameNode或BackupNode节点实时获取NameNode元数据信息，备份元数据。</p>
+<h3><span id="一般拓扑">一般拓扑</span></h3>
+<p>只有单个NameNode节点，使用SecondaryNameNode或BackupNode节点实时获取NameNode元数据信息，备份元数据。</p>
 <p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
-<h3><span id="商用拓扑">商用拓扑</span></h3><p>有两个NameNode节点，并使用ZooKeeper实现NameNode节点间的热切换。</p>
+<h3><span id="商用拓扑">商用拓扑</span></h3>
+<p>有两个NameNode节点，并使用ZooKeeper实现NameNode节点间的热切换。</p>
 <p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
-<h2><span id="命令行接口">命令行接口</span></h2><p>HDFS提供了各种交互方式，例如通过Java API、HTTP、shell命令行的。命令行的交互主要通过hadoop fs来操作。例如：</p>
+<h2><span id="命令行接口">命令行接口</span></h2>
+<p>HDFS提供了各种交互方式，例如通过Java API、HTTP、shell命令行的。命令行的交互主要通过hadoop fs来操作。例如：</p>
 <blockquote>
-<p>hadoop fs -copyFromLocal &#x2F;&#x2F; 从本地复制文件到HDFS<br> hadoop fs mkdir &#x2F;&#x2F; 创建目录<br> hadoop fs -ls  &#x2F;&#x2F; 列出文件列表</p>
+<p>hadoop fs -copyFromLocal // 从本地复制文件到HDFS<br>
+hadoop fs mkdir // 创建目录<br>
+hadoop fs -ls  // 列出文件列表</p>
 </blockquote>
 <p>Hadoop中，文件和目录的权限类似于POSIX模型，包括读、写、执行3种权限：</p>
-<p>读权限（r）：用于读取文件或者列出目录中的内容<br>写权限（w）：对于文件，就是文件的写权限。目录的写权限指在该目录下创建或者删除文件（目录）的权限。<br>执行权限（x）：文件没有所谓的执行权限，被忽略。对于目录，执行权限用于访问器目录下的内容。</p>
+<p>读权限（r）：用于读取文件或者列出目录中的内容<br>
+写权限（w）：对于文件，就是文件的写权限。目录的写权限指在该目录下创建或者删除文件（目录）的权限。<br>
+执行权限（x）：文件没有所谓的执行权限，被忽略。对于目录，执行权限用于访问器目录下的内容。</p>
 <p>每个文件或目录都有owner，group，mode三个属性:</p>
-<p>owner：指文件的所有者<br>group：为权限组<br>mode：由所有者权限、文件所属的组中组员的权限、非所有者非组员的权限组成。</p>
+<p>owner：指文件的所有者<br>
+group：为权限组<br>
+mode：由所有者权限、文件所属的组中组员的权限、非所有者非组员的权限组成。</p>
 <p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="数据流读写流程">数据流（读写流程）</span></h2><h3><span id="读文件">读文件</span></h3><p>大致读文件的流程如下：</p>
+<h2><span id="数据流读写流程">数据流（读写流程）</span></h2>
+<h3><span id="读文件">读文件</span></h3>
+<p>大致读文件的流程如下：</p>
 <p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
 <ol>
-<li><p>客户端传递一个文件Path给FileSystem的open方法</p>
+<li>
+<p>客户端传递一个文件Path给FileSystem的open方法</p>
 </li>
-<li><p>DFS采用RPC远程获取文件最开始的几个block的datanode地址。Namenode会根据网络拓扑结构决定返回哪些节点（前提是节点有block副本），如果客户端本身是Datanode并且节点上刚好有block副本，直接从本地读取。</p>
+<li>
+<p>DFS采用RPC远程获取文件最开始的几个block的datanode地址。Namenode会根据网络拓扑结构决定返回哪些节点（前提是节点有block副本），如果客户端本身是Datanode并且节点上刚好有block副本，直接从本地读取。</p>
 </li>
-<li><p>客户端使用open方法返回的FSDataInputStream对象读取数据（调用read方法）</p>
+<li>
+<p>客户端使用open方法返回的FSDataInputStream对象读取数据（调用read方法）</p>
 </li>
-<li><p>DFSInputStream（FSDataInputStream实现了改类）连接持有第一个block的、最近的节点，反复调用read方法读取数据</p>
+<li>
+<p>DFSInputStream（FSDataInputStream实现了改类）连接持有第一个block的、最近的节点，反复调用read方法读取数据</p>
 </li>
-<li><p>第一个block读取完毕之后，寻找下一个block的最佳datanode，读取数据。如果有必要，DFSInputStream会联系Namenode获取下一批Block 的节点信息（存放于内存，不持久化），这些寻址过程对客户端都是不可见的。</p>
+<li>
+<p>第一个block读取完毕之后，寻找下一个block的最佳datanode，读取数据。如果有必要，DFSInputStream会联系Namenode获取下一批Block 的节点信息（存放于内存，不持久化），这些寻址过程对客户端都是不可见的。</p>
 </li>
-<li><p>数据读取完毕，客户端调用close方法关闭流对象</p>
+<li>
+<p>数据读取完毕，客户端调用close方法关闭流对象</p>
 </li>
 </ol>
-<p>在读数据过程中，如果与Datanode的通信发生错误，DFSInputStream对象会尝试从下一个最佳节点读取数据，并且记住该失败节点， 后续Block的读取不会再连接该节点 </p>
-<p>读取一个Block之后，DFSInputStram会进行检验和验证，如果Block损坏，尝试从其他节点读取数据，并且将损坏的block汇报给Namenode。 </p>
-<p>客户端连接哪个datanode获取数据，是由namenode来指导的，这样可以支持大量并发的客户端请求，namenode尽可能将流量均匀分布到整个集群。 </p>
+<p>在读数据过程中，如果与Datanode的通信发生错误，DFSInputStream对象会尝试从下一个最佳节点读取数据，并且记住该失败节点， 后续Block的读取不会再连接该节点</p>
+<p>读取一个Block之后，DFSInputStram会进行检验和验证，如果Block损坏，尝试从其他节点读取数据，并且将损坏的block汇报给Namenode。</p>
+<p>客户端连接哪个datanode获取数据，是由namenode来指导的，这样可以支持大量并发的客户端请求，namenode尽可能将流量均匀分布到整个集群。</p>
 <p>Block的位置信息是存储在namenode的内存中，因此相应位置请求非常高效，不会成为瓶颈。</p>
-<h3><span id="写文件">写文件</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
-<p>步骤分解 </p>
+<h3><span id="写文件">写文件</span></h3>
+<p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
+<p>步骤分解</p>
 <ol>
-<li><p>客户端调用DistributedFileSystem的create方法</p>
+<li>
+<p>客户端调用DistributedFileSystem的create方法</p>
 </li>
-<li><p>DistributedFileSystem远程RPC调用Namenode在文件系统的命名空间中创建一个新文件，此时该文件没有关联到任何block。 这个过程中，Namenode会做很多校验工作，例如是否已经存在同名文件，是否有权限，如果验证通过，返回一个FSDataOutputStream对象。 如果验证不通过，抛出异常到客户端。</p>
+<li>
+<p>DistributedFileSystem远程RPC调用Namenode在文件系统的命名空间中创建一个新文件，此时该文件没有关联到任何block。 这个过程中，Namenode会做很多校验工作，例如是否已经存在同名文件，是否有权限，如果验证通过，返回一个FSDataOutputStream对象。 如果验证不通过，抛出异常到客户端。</p>
 </li>
-<li><p>客户端写入数据的时候，DFSOutputStream分解为packets（数据包），并写入到一个数据队列中，该队列由DataStreamer消费。</p>
+<li>
+<p>客户端写入数据的时候，DFSOutputStream分解为packets（数据包），并写入到一个数据队列中，该队列由DataStreamer消费。</p>
 </li>
-<li><p>DateStreamer负责请求Namenode分配新的block存放的数据节点。这些节点存放同一个Block的副本，构成一个管道。 DataStreamer将packet写入到管道的第一个节点，第一个节点存放好packet之后，转发给下一个节点，下一个节点存放 之后继续往下传递。</p>
+<li>
+<p>DateStreamer负责请求Namenode分配新的block存放的数据节点。这些节点存放同一个Block的副本，构成一个管道。 DataStreamer将packet写入到管道的第一个节点，第一个节点存放好packet之后，转发给下一个节点，下一个节点存放 之后继续往下传递。</p>
 </li>
-<li><p>DFSOutputStream同时维护一个ack queue队列，等待来自datanode确认消息。当管道上的所有datanode都确认之后，packet从ack队列中移除。</p>
+<li>
+<p>DFSOutputStream同时维护一个ack queue队列，等待来自datanode确认消息。当管道上的所有datanode都确认之后，packet从ack队列中移除。</p>
 </li>
-<li><p>数据写入完毕，客户端close输出流。将所有的packet刷新到管道中，然后安心等待来自datanode的确认消息。全部得到确认之后告知Namenode文件是完整的。 Namenode此时已经知道文件的所有Block信息（因为DataStreamer是请求Namenode分配block的），只需等待达到最小副本数要求，然后返回成功信息给客户端。</p>
+<li>
+<p>数据写入完毕，客户端close输出流。将所有的packet刷新到管道中，然后安心等待来自datanode的确认消息。全部得到确认之后告知Namenode文件是完整的。 Namenode此时已经知道文件的所有Block信息（因为DataStreamer是请求Namenode分配block的），只需等待达到最小副本数要求，然后返回成功信息给客户端。</p>
 </li>
 </ol>
 <p>Namenode如何决定副本存在哪个Datanode？</p>
@@ -406,72 +885,104 @@
 <p>第一个副本放在客户端相同的机器上，如果机器在集群之外，随机选择一个（但是会尽可能选择容量不是太慢或者当前操作太繁忙的）</p>
 <p>第二个副本随机放在不同于第一个副本的机架上。</p>
 <p>第三个副本放在跟第二个副本同一机架上，但是不同的节点上，满足条件的节点中随机选择。</p>
-<p>更多的副本在整个集群上随机选择，虽然会尽量避免太多副本在同一机架上。 </p>
+<p>更多的副本在整个集群上随机选择，虽然会尽量避免太多副本在同一机架上。</p>
 <p>副本的位置确定之后，在建立写入管道的时候，会考虑网络拓扑结构。下面是可能的一个存放策略：</p>
 <p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
 <p>这样选择很好的平衡了可靠性、读写性能</p>
 <ul>
-<li><p>可靠性：Block分布在两个机架上</p>
+<li>
+<p>可靠性：Block分布在两个机架上</p>
 </li>
-<li><p>写带宽：写入管道的过程只需要跨越一个交换机</p>
+<li>
+<p>写带宽：写入管道的过程只需要跨越一个交换机</p>
 </li>
-<li><p>读带宽：可以从两个机架中任选一个读取</p>
-</li>
-</ul>
-<h2><span id="hdfs内部特性">HDFS内部特性</span></h2><h2><span id="数据冗余">数据冗余</span></h2><ul>
-<li><p>HDFS将每个文件存储成一系列数据块（Block），默认块大小为64MB（可配置）。</p>
-</li>
-<li><p>为了容错，文件的所有数据块都会有副本（副本数量即复制因子，可配置）。</p>
-</li>
-<li><p>HDFS的文件都是一次性写入的，并且严格限制为任何时候都只有一个写用户。</p>
+<li>
+<p>读带宽：可以从两个机架中任选一个读取</p>
 </li>
 </ul>
-<h2><span id="副本存放">副本存放</span></h2><ul>
-<li><p>HDFS集群一般运行在多个机架上，不同机架上机器的通信需要通过交换机。</p>
+<h2><span id="hdfs内部特性">HDFS内部特性</span></h2>
+<h2><span id="数据冗余">数据冗余</span></h2>
+<ul>
+<li>
+<p>HDFS将每个文件存储成一系列数据块（Block），默认块大小为64MB（可配置）。</p>
 </li>
-<li><p>HDFS采用机架感知（Rack-aware）的策略来改进数据的可靠性、可用性和网络带宽的利用率。</p>
+<li>
+<p>为了容错，文件的所有数据块都会有副本（副本数量即复制因子，可配置）。</p>
 </li>
-<li><p>机架的错误远比节点的错误少，这个策略可以防止整个机架失效时数据丢失，提高数据的可靠性和可用性，又能保证性能。</p>
-</li>
-</ul>
-<h3><span id="副本选择">副本选择</span></h3><ul>
-<li><p>HDFS会尽量使用离程序最近的副本来满足用户请求，这样可以减少总带宽消耗和读延时。</p>
-</li>
-<li><p>HDFS的架构支持数据均衡策略。</p>
-</li>
-</ul>
-<h3><span id="心跳检测">心跳检测</span></h3><ul>
-<li><p>NameNode周期性地从集群中的每个DataNode接受心跳包和块报告，收到心跳包说明该DataNode工作正常。</p>
-</li>
-<li><p>NameNode会标记最近没有心跳的DataNode为宕机，不会发给它们任何新的I&#x2F;O请求。</p>
-</li>
-<li><p>NameNode会不断检测这些需要复制的数据块，并在需要的时候重新复制。</p>
+<li>
+<p>HDFS的文件都是一次性写入的，并且严格限制为任何时候都只有一个写用户。</p>
 </li>
 </ul>
-<h3><span id="数据完整性检测">数据完整性检测</span></h3><ul>
-<li><p>多种原因可能造成从DataNode获取的数据块有损坏。</p>
+<h2><span id="副本存放">副本存放</span></h2>
+<ul>
+<li>
+<p>HDFS集群一般运行在多个机架上，不同机架上机器的通信需要通过交换机。</p>
 </li>
-<li><p>HDFS客户端软件实现了对HDFS文件内容的校验和检查（Checksum）。</p>
+<li>
+<p>HDFS采用机架感知（Rack-aware）的策略来改进数据的可靠性、可用性和网络带宽的利用率。</p>
 </li>
-<li><p>DataNode获得的数据块对应的校验和隐藏文件中的不同，客户端就会判定数据块有损坏，将从其他DataNode获取该数据块的副本。</p>
-</li>
-</ul>
-<h3><span id="简单一致性模型-流式数据访问">简单一致性模型、流式数据访问</span></h3><ul>
-<li><p>HDFS的应用程序一般对文件实行一次写、多次读的访问模式。</p>
-</li>
-<li><p>文件一旦创建、写入和关闭之后就不需要再更改了。</p>
-</li>
-<li><p>这样就简化了数据一致性问题，高吞吐量的数据访问才成为可能；运行在HDFS上的应用主要以流式读为主，做批量处理；更注重数据访问的高吞吐量。</p>
+<li>
+<p>机架的错误远比节点的错误少，这个策略可以防止整个机架失效时数据丢失，提高数据的可靠性和可用性，又能保证性能。</p>
 </li>
 </ul>
-<h3><span id="客户端缓存">客户端缓存</span></h3><ul>
-<li><p>客户端创建文件的请求不是立即到达NameNode，HDFS客户端先把数据缓存到本地的一个临时文件，程序的写操作透明地重定向到这个临时文件。</p>
+<h3><span id="副本选择">副本选择</span></h3>
+<ul>
+<li>
+<p>HDFS会尽量使用离程序最近的副本来满足用户请求，这样可以减少总带宽消耗和读延时。</p>
 </li>
-<li><p>当这个临时文件累积的数据超过一个块的大小（64MB）时，客户端才会联系NameNode。</p>
+<li>
+<p>HDFS的架构支持数据均衡策略。</p>
 </li>
-<li><p>如果NameNode在文件关闭之前死机，那么文件将会丢失。</p>
+</ul>
+<h3><span id="心跳检测">心跳检测</span></h3>
+<ul>
+<li>
+<p>NameNode周期性地从集群中的每个DataNode接受心跳包和块报告，收到心跳包说明该DataNode工作正常。</p>
 </li>
-<li><p>如果不采用客户端缓存，网络速度和拥塞都会对输出产生很大的影响。</p>
+<li>
+<p>NameNode会标记最近没有心跳的DataNode为宕机，不会发给它们任何新的I/O请求。</p>
+</li>
+<li>
+<p>NameNode会不断检测这些需要复制的数据块，并在需要的时候重新复制。</p>
+</li>
+</ul>
+<h3><span id="数据完整性检测">数据完整性检测</span></h3>
+<ul>
+<li>
+<p>多种原因可能造成从DataNode获取的数据块有损坏。</p>
+</li>
+<li>
+<p>HDFS客户端软件实现了对HDFS文件内容的校验和检查（Checksum）。</p>
+</li>
+<li>
+<p>DataNode获得的数据块对应的校验和隐藏文件中的不同，客户端就会判定数据块有损坏，将从其他DataNode获取该数据块的副本。</p>
+</li>
+</ul>
+<h3><span id="简单一致性模型-流式数据访问">简单一致性模型、流式数据访问</span></h3>
+<ul>
+<li>
+<p>HDFS的应用程序一般对文件实行一次写、多次读的访问模式。</p>
+</li>
+<li>
+<p>文件一旦创建、写入和关闭之后就不需要再更改了。</p>
+</li>
+<li>
+<p>这样就简化了数据一致性问题，高吞吐量的数据访问才成为可能；运行在HDFS上的应用主要以流式读为主，做批量处理；更注重数据访问的高吞吐量。</p>
+</li>
+</ul>
+<h3><span id="客户端缓存">客户端缓存</span></h3>
+<ul>
+<li>
+<p>客户端创建文件的请求不是立即到达NameNode，HDFS客户端先把数据缓存到本地的一个临时文件，程序的写操作透明地重定向到这个临时文件。</p>
+</li>
+<li>
+<p>当这个临时文件累积的数据超过一个块的大小（64MB）时，客户端才会联系NameNode。</p>
+</li>
+<li>
+<p>如果NameNode在文件关闭之前死机，那么文件将会丢失。</p>
+</li>
+<li>
+<p>如果不采用客户端缓存，网络速度和拥塞都会对输出产生很大的影响。</p>
 </li>
 </ul>
 
@@ -507,8 +1018,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="mapreduce-定义">MapReduce 定义</span></h2><p>MapReduce 是一个分布式运算程序的编程框架，是用户开发“基于hadoop的数据分析应用”的核心框架，其核心功能是将用户编写的业务逻辑代码和自带默认组件整合成一个完整的分布式运算程序，并发运行在一个hadoop集群上。</p>
-<h2><span id="mapreduce-产生缘由">MapReduce 产生缘由</span></h2><p>为什么需要MapReduce？</p>
+        <h2><span id="mapreduce-定义">MapReduce 定义</span></h2>
+<p>MapReduce 是一个分布式运算程序的编程框架，是用户开发“基于hadoop的数据分析应用”的核心框架，其核心功能是将用户编写的业务逻辑代码和自带默认组件整合成一个完整的分布式运算程序，并发运行在一个hadoop集群上。</p>
+<h2><span id="mapreduce-产生缘由">MapReduce 产生缘由</span></h2>
+<p>为什么需要MapReduce？</p>
 <ul>
 <li>海量数据在单机上处理因为硬件资源限制，无法胜任。</li>
 <li>而一旦将单机版程序扩展到集群来分布式运行，将极大增加程序的复杂度和开发难度。</li>
@@ -520,61 +1033,82 @@
 <li>分布式：文件分布式存储（HDFS）、运算逻辑需要至少分成2个阶段（一个阶段独立并发，一个阶段汇聚）、运算程序如何分发、程序如何分配运算任务（切片）、两阶段的程序如何启动？如何协调？、整个程序运行过程中的监控？容错？重试？</li>
 </ul>
 <p>可见在程序由单机版扩成分布式时，会引入大量的复杂工作。</p>
-<h2><span id="mapreduce与yarn的关系">MapReduce与Yarn的关系</span></h2><p>Yarn 是一个资源调度平台，负责为运算程序提供服务器运算资源，相当于一个分布式的操作系统平台。而MapReduce等运算程序则相当于运行于操作系统之上的应用程序。</p>
+<h2><span id="mapreduce与yarn的关系">MapReduce与Yarn的关系</span></h2>
+<p>Yarn 是一个资源调度平台，负责为运算程序提供服务器运算资源，相当于一个分布式的操作系统平台。而MapReduce等运算程序则相当于运行于操作系统之上的应用程序。</p>
 <p>YARN的重要概念：</p>
 <ol>
-<li><p>yarn并不清楚用户提交的程序的运行机制；</p>
+<li>
+<p>yarn并不清楚用户提交的程序的运行机制；</p>
 </li>
-<li><p>yarn只提供运算资源的调度（用户程序向yarn申请资源，yarn就负责分配资源）；</p>
+<li>
+<p>yarn只提供运算资源的调度（用户程序向yarn申请资源，yarn就负责分配资源）；</p>
 </li>
-<li><p>yarn中的主管角色叫ResourceManager；</p>
+<li>
+<p>yarn中的主管角色叫ResourceManager；</p>
 </li>
-<li><p>yarn中具体提供运算资源的角色叫NodeManager；</p>
+<li>
+<p>yarn中具体提供运算资源的角色叫NodeManager；</p>
 </li>
-<li><p>这样一来，yarn其实就与运行的用户程序完全解耦，就意味着yarn上可以运行各种类型的分布式运算程序（MapReduce只是其中的一种），比如MapReduce、storm程序，spark程序，tez……；</p>
+<li>
+<p>这样一来，yarn其实就与运行的用户程序完全解耦，就意味着yarn上可以运行各种类型的分布式运算程序（MapReduce只是其中的一种），比如MapReduce、storm程序，spark程序，tez……；</p>
 </li>
-<li><p>所以，spark、storm等运算框架都可以整合在yarn上运行，只要他们各自的框架中有符合yarn规范的资源请求机制即可；</p>
+<li>
+<p>所以，spark、storm等运算框架都可以整合在yarn上运行，只要他们各自的框架中有符合yarn规范的资源请求机制即可；</p>
 </li>
-<li><p>Yarn就成为一个通用的资源调度平台，从此，企业中以前存在的各种运算集群都可以整合在一个物理集群上，提高资源利用率，方便数据共享。</p>
+<li>
+<p>Yarn就成为一个通用的资源调度平台，从此，企业中以前存在的各种运算集群都可以整合在一个物理集群上，提高资源利用率，方便数据共享。</p>
 </li>
 </ol>
-<h2><span id="mapreduce-工作原理">MapReduce 工作原理</span></h2><p>严格说起来MapReduce并不是一种算法， 而是一个计算思想。它由map和reduce两个阶段组成。</p>
-<h3><span id="mapreduce-进程">MapReduce 进程</span></h3><p>为了提高开发效率，可以将分布式程序中的公共功能封装成框架，让开发人员可以将精力集中于业务逻辑。</p>
+<h2><span id="mapreduce-工作原理">MapReduce 工作原理</span></h2>
+<p>严格说起来MapReduce并不是一种算法， 而是一个计算思想。它由map和reduce两个阶段组成。</p>
+<h3><span id="mapreduce-进程">MapReduce 进程</span></h3>
+<p>为了提高开发效率，可以将分布式程序中的公共功能封装成框架，让开发人员可以将精力集中于业务逻辑。</p>
 <p>而MapReduce就是这样一个分布式程序的通用框架，整体结构如下（在分布式运行时有三类实例进程）：</p>
 <ul>
 <li>MRAppMaster：负责整个程序的过程调度及状态协调</li>
 <li>MapTask：负责map阶段的整个数据处理流程</li>
 <li>ReduceTask：负责reduce阶段的整个数据处理流程</li>
 </ul>
-<h3><span id="mapreduce-运行机制">MapReduce 运行机制</span></h3><p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
+<h3><span id="mapreduce-运行机制">MapReduce 运行机制</span></h3>
+<p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
 <p>流程描述如下：</p>
 <ol>
-<li><p>一个MR程序启动的时候，最先启动的是MRAppMaster，MRAppMaster启动后根据本次job的描述信息，计算出需要的MapTask实例数量，然后向集群申请机器启动相应数量的MapTask进程；</p>
+<li>
+<p>一个MR程序启动的时候，最先启动的是MRAppMaster，MRAppMaster启动后根据本次job的描述信息，计算出需要的MapTask实例数量，然后向集群申请机器启动相应数量的MapTask进程；</p>
 </li>
-<li><p>MapTask进程启动之后，根据给定的数据切片范围进行数据处理，主体流程为：</p>
+<li>
+<p>MapTask进程启动之后，根据给定的数据切片范围进行数据处理，主体流程为：</p>
 <ul>
 <li>利用客户指定的inputformat来获取RecordReader读取数据，形成输入KV对；</li>
 <li>将输入KV对传递给客户定义的map()方法，做逻辑运算，并将map()方法输出的KV对收集到缓存；</li>
 <li>将缓存中的KV对按照K分区排序后不断溢写到磁盘文件。</li>
 </ul>
 </li>
-<li><p>MRAppMaster监控到所有MapTask进程任务完成之后，会根据客户指定的参数启动相应数量的ReduceTask进程，并告知ReduceTask进程要处理的数据范围（数据分区）；</p>
+<li>
+<p>MRAppMaster监控到所有MapTask进程任务完成之后，会根据客户指定的参数启动相应数量的ReduceTask进程，并告知ReduceTask进程要处理的数据范围（数据分区）；</p>
 </li>
-<li><p>ReduceTask进程启动之后，根据MRAppMaster告知的待处理数据所在位置，从若干台MapTask运行所在机器上获取到若干个MapTask输出结果文件，并在本地进行重新归并排序，然后按照相同key的KV为一个组，调用客户定义的reduce()方法进行逻辑运算，并收集运算输出的结果KV，然后调用客户指定的outputformat将结果数据输出到外部存储。</p>
+<li>
+<p>ReduceTask进程启动之后，根据MRAppMaster告知的待处理数据所在位置，从若干台MapTask运行所在机器上获取到若干个MapTask输出结果文件，并在本地进行重新归并排序，然后按照相同key的KV为一个组，调用客户定义的reduce()方法进行逻辑运算，并收集运算输出的结果KV，然后调用客户指定的outputformat将结果数据输出到外部存储。</p>
 </li>
 </ol>
 <p>我们来举个例子。</p>
-<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>上图是一个统计词频的任务。</p>
+<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>
+上图是一个统计词频的任务。</p>
 <ol>
-<li><p>Hadoop将输入数据切成若干个分片，并将每个split（分割）交给一个map task（Map任务）处理。</p>
+<li>
+<p>Hadoop将输入数据切成若干个分片，并将每个split（分割）交给一个map task（Map任务）处理。</p>
 </li>
-<li><p>Mapping之后，相当于得出这个task里面，每个词以及它出现的次数。</p>
+<li>
+<p>Mapping之后，相当于得出这个task里面，每个词以及它出现的次数。</p>
 </li>
-<li><p>shuffle（拖移）将相同的词放在一起，并对它们进行排序，分成若干个分片。</p>
+<li>
+<p>shuffle（拖移）将相同的词放在一起，并对它们进行排序，分成若干个分片。</p>
 </li>
-<li><p>根据这些分片，进行reduce（归约）。</p>
+<li>
+<p>根据这些分片，进行reduce（归约）。</p>
 </li>
-<li><p>统计出reduce task的结果，输出到文件。</p>
+<li>
+<p>统计出reduce task的结果，输出到文件。</p>
 </li>
 </ol>
 <p>在MapReduce里，为了完成上面这些过程，需要两个角色：JobTracker和TaskTracker。</p>
@@ -583,7 +1117,8 @@
 <p>现在这边给出一个简单的mapreduce实现示例：</p>
 <p>用于统计输入文件中每个单词的出现次数。</p>
 <ol>
-<li><p><strong>导入必要的包：</strong></p>
+<li>
+<p><strong>导入必要的包：</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>conf<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>fs<span class="token punctuation">.</span></span><span class="token class-name">Path</span></span><span class="token punctuation">;</span>
@@ -596,7 +1131,8 @@
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>input<span class="token punctuation">.</span></span><span class="token class-name">FileInputFormat</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>output<span class="token punctuation">.</span></span><span class="token class-name">FileOutputFormat</span></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 </li>
-<li><p><strong>定义Mapper类：</strong></p>
+<li>
+<p><strong>定义Mapper类：</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyMapper</span> <span class="token keyword">extends</span> <span class="token class-name">Mapper</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">LongWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">LongWritable</span> key<span class="token punctuation">,</span> <span class="token class-name">Text</span> value<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
         <span class="token class-name">String</span> line <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -607,10 +1143,10 @@
         <span class="token punctuation">&#125;</span>
     <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>Mapper类的作用是将输入的文本数据拆分成单词，然后为每个单词输出一个键-值对（单词, 1）。</p>
 </li>
-<li><p><strong>定义Reducer类：</strong></p>
+<li>
+<p><strong>定义Reducer类：</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyReduce</span> <span class="token keyword">extends</span> <span class="token class-name">Reducer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">Text</span> key<span class="token punctuation">,</span> <span class="token class-name">Iterable</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> values<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
         <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
@@ -622,10 +1158,10 @@
         context<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntWritable</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>Reducer类的作用是接收来自Mapper的键-值对，对相同键的值进行累加，然后输出单词和其总出现次数。</p>
 </li>
-<li><p><strong>主函数（main方法）：</strong></p>
+<li>
+<p><strong>主函数（main方法）：</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">InterruptedException</span><span class="token punctuation">,</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">ClassNotFoundException</span> <span class="token punctuation">&#123;</span>
     <span class="token class-name">Configuration</span> conf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Configuration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token class-name">Job</span> job <span class="token operator">=</span> <span class="token class-name">Job</span><span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span>conf<span class="token punctuation">,</span> <span class="token string">"word count"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -645,7 +1181,8 @@
 
     <span class="token comment">// 提交作业并等待完成</span>
     job<span class="token punctuation">.</span><span class="token function">waitForCompletion</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
 </ol>
 <p><img src="/img/hadoop/hadoop6.png" alt="hadoop"></p>
 <p>在整个Hadoop架构中，计算框架起到承上启下的作用，一方面可以操作HDFS中的数据，另一方面可以被封装，提供Hive、Pig这样的上层组件的调用。</p>
@@ -699,37 +1236,51 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="hadoop是什么">Hadoop是什么？</span></h2><p>Hadoop是一个由Apache基金会所开发的分布式系统基础架构，是一个<strong>存储系统</strong>+<strong>计算框架</strong>的软件框架。主要解决海量数据存储与计算的问题，是大数据技术中的基石。Hadoop以一种可靠、高效、可伸缩的方式进行数据处理，用户可以在不了解分布式底层细节的情况下，开发分布式程序，用户可以轻松地在Hadoop上开发和运行处理海量数据的应用程序。</p>
-<h2><span id="hadoop能解决什么问题">Hadoop能解决什么问题</span></h2><ul>
-<li><p><strong>海量数据存储</strong></p>
+        <h2><span id="hadoop是什么">Hadoop是什么？</span></h2>
+<p>Hadoop是一个由Apache基金会所开发的分布式系统基础架构，是一个<strong>存储系统</strong>+<strong>计算框架</strong>的软件框架。主要解决海量数据存储与计算的问题，是大数据技术中的基石。Hadoop以一种可靠、高效、可伸缩的方式进行数据处理，用户可以在不了解分布式底层细节的情况下，开发分布式程序，用户可以轻松地在Hadoop上开发和运行处理海量数据的应用程序。</p>
+<h2><span id="hadoop能解决什么问题">Hadoop能解决什么问题</span></h2>
+<ul>
+<li>
+<p><strong>海量数据存储</strong></p>
 <p>HDFS有高容错性的特点，并且设计用来部署在低廉的（low-cost）硬件上；而且它提供高吞吐量（High throughput）来访问数据，适合那些有着超大数据集（large data set）的应用程序,它由n台运行着DataNode的机器组成和1台（另外一个standby）运行NameNode进程一起构成。每个DataNode 管理一部分数据，然后NameNode负责管理整个HDFS 集群的信息（存储元数据）。</p>
 </li>
-<li><p><strong>资源管理，调度和分配</strong></p>
+<li>
+<p><strong>资源管理，调度和分配</strong></p>
 <p><code>Apache Hadoop YARN</code>（Yet Another Resource Negotiator，另一种资源协调者）是一种新的 Hadoop 资源管理器，它是一个通用资源管理系统和调度平台，可为上层应用提供统一的资源管理和调度，它的引入为集群在利用率、资源统一管理和数据共享等方面带来了巨大好处。</p>
 </li>
 </ul>
-<h2><span id="hadoop的由来">Hadoop的由来</span></h2><p><img src="/img/hadoop/hadoop1.png" alt="hadoop"></p>
-<h2><span id="hadoop的核心架构">Hadoop的核心架构</span></h2><p>Hadoop的核心，说白了，就是<code>HDFS</code>和<code>MapReduce</code>。HDFS为海量数据提供了存储，而MapReduce为海量数据提供了计算框架。</p>
-<h3><span id="hdfs">HDFS</span></h3><p><img src="/img/hadoop/hadoop2.png" alt="hadoop"></p>
-<p>整个HDFS有三个重要角色：<strong>NameNode（名称节点）</strong>、<strong>DataNode（数据节点）</strong>和<strong>Client（客户机）</strong>。</p>
-<p>典型的主从架构，用<strong>TCP&#x2F;IP</strong>通信</p>
+<h2><span id="hadoop的由来">Hadoop的由来</span></h2>
+<p><img src="/img/hadoop/hadoop1.png" alt="hadoop"></p>
+<h2><span id="hadoop的核心架构">Hadoop的核心架构</span></h2>
+<p>Hadoop的核心，说白了，就是<code>HDFS</code>和<code>MapReduce</code>。HDFS为海量数据提供了存储，而MapReduce为海量数据提供了计算框架。</p>
+<h3><span id="hdfs">HDFS</span></h3>
+<p><img src="/img/hadoop/hadoop2.png" alt="hadoop"></p>
+<p>整个HDFS有三个重要角色：<strong>NameNode（名称节点）</strong>、<strong>DataNode（数据节点）<strong>和</strong>Client（客户机）</strong>。</p>
+<p>典型的主从架构，用<strong>TCP/IP</strong>通信</p>
 <ul>
-<li><p><strong>NameNode：</strong>是<strong>Master</strong>节点（主节点），可以看作是分布式文件系统中的管理者，主要负责管理文件系统的命名空间、集群配置信息和存储块的复制等。NameNode会将文件系统的<strong>Meta-data</strong>存储在内存中，这些信息主要包括了文件信息、每一个文件对应的文件块的信息和每一个文件块在DataNode的信息等。</p>
+<li>
+<p><strong>NameNode：<strong>是</strong>Master</strong>节点（主节点），可以看作是分布式文件系统中的管理者，主要负责管理文件系统的命名空间、集群配置信息和存储块的复制等。NameNode会将文件系统的<strong>Meta-data</strong>存储在内存中，这些信息主要包括了文件信息、每一个文件对应的文件块的信息和每一个文件块在DataNode的信息等。</p>
 </li>
-<li><p><strong>DataNode：</strong>是<strong>Slave</strong>节点（从节点），是文件存储的基本单元，它将Block存储在本地文件系统中，保存了Block的Meta-data，同时周期性地将所有存在的Block信息发送给NameNode。</p>
+<li>
+<p><strong>DataNode：<strong>是</strong>Slave</strong>节点（从节点），是文件存储的基本单元，它将Block存储在本地文件系统中，保存了Block的Meta-data，同时周期性地将所有存在的Block信息发送给NameNode。</p>
 </li>
-<li><p><strong>Client：</strong>切分文件；访问HDFS；与NameNode交互，获得文件位置信息；与DataNode交互，读取和写入数据。</p>
+<li>
+<p>**Client：**切分文件；访问HDFS；与NameNode交互，获得文件位置信息；与DataNode交互，读取和写入数据。</p>
 </li>
 </ul>
 <p>还有一个Block（块）的概念：Block是HDFS中的基本读写单元；HDFS中的文件都是被切割为block（块）进行存储的；这些块被复制到多个DataNode中；块的大小（通常为64MB）和复制的块数量在创建文件时由Client决定。</p>
-<h3><span id="mapreduce">MapReduce</span></h3><p>MapReduce是一种分布式计算模型，它将大规模数据集（大于1TB）分成许多小数据块，然后在集群中的各个节点上进行并行处理，最后将结果汇总。MapReduce的计算过程可以分为两个阶段：Map阶段和Reduce阶段。</p>
+<h3><span id="mapreduce">MapReduce</span></h3>
+<p>MapReduce是一种分布式计算模型，它将大规模数据集（大于1TB）分成许多小数据块，然后在集群中的各个节点上进行并行处理，最后将结果汇总。MapReduce的计算过程可以分为两个阶段：Map阶段和Reduce阶段。</p>
 <ul>
-<li><p><strong>Map阶段：</strong>将输入数据切分成若干个小数据块，然后由多个Map任务并行处理，每个Map任务将处理结果输出为若干个键值对。</p>
+<li>
+<p>**Map阶段：**将输入数据切分成若干个小数据块，然后由多个Map任务并行处理，每个Map任务将处理结果输出为若干个键值对。</p>
 </li>
-<li><p><strong>Reduce阶段：</strong>将Map阶段的输出结果按照键值对中的键进行分组，然后由多个Reduce任务并行处理，每个Reduce任务将处理结果输出为若干个键值对。</p>
+<li>
+<p>**Reduce阶段：**将Map阶段的输出结果按照键值对中的键进行分组，然后由多个Reduce任务并行处理，每个Reduce任务将处理结果输出为若干个键值对。</p>
 </li>
 </ul>
-<h2><span id="总结">总结</span></h2><p>Hadoop是一个分布式系统基础架构，主要解决海量数据存储与计算的问题。它的核心是HDFS和MapReduce，其中HDFS为海量数据提供了存储，而MapReduce为海量数据提供了计算框架。除此之外，Hadoop还有一个重要的组件——YARN，它是一个通用资源管理系统和调度平台，可为上层应用提供统一的资源管理和调度。</p>
+<h2><span id="总结">总结</span></h2>
+<p>Hadoop是一个分布式系统基础架构，主要解决海量数据存储与计算的问题。它的核心是HDFS和MapReduce，其中HDFS为海量数据提供了存储，而MapReduce为海量数据提供了计算框架。除此之外，Hadoop还有一个重要的组件——YARN，它是一个通用资源管理系统和调度平台，可为上层应用提供统一的资源管理和调度。</p>
 
     
     </div>
@@ -763,9 +1314,11 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="云计算的定义">云计算的定义</span></h2><p>即通过网络按需提供可动态伸缩的廉价计算服务。是与信息技术、软件、互联网相关的一种服务。</p>
+        <h2><span id="云计算的定义">云计算的定义</span></h2>
+<p>即通过网络按需提供可动态伸缩的廉价计算服务。是与信息技术、软件、互联网相关的一种服务。</p>
 <p>云计算是一种按使用量付费的模式，这种模式提供可用的、便捷的、按需的网络访问，进入可配置的计算机资源共享池（资源包括网络、服务器、存储、应用软件、服务），这些资源能够被快速提供。</p>
-<h2><span id="云计算发展史">云计算发展史</span></h2><p>2006年3月，亚马逊（Amazon）推出弹性计算云（Elastic Compute Cloud；EC2）服务。</p>
+<h2><span id="云计算发展史">云计算发展史</span></h2>
+<p>2006年3月，亚马逊（Amazon）推出弹性计算云（Elastic Compute Cloud；EC2）服务。</p>
 <p>2006年8月9日，Google首席执行官埃里克·施密特（Eric Schmidt）在搜索引擎大会（SES San Jose 2006）首次提出“云计算”（Cloud Computing）的概念。Google“云端计算”源于Google工程师克里斯托弗·比希利亚所做的“Google 101”项目。</p>
 <p>2007年10月，Google与IBM开始在美国大学校园推广云计算的计划。</p>
 <p>2008年2月1日，IBM（NYSE: IBM）宣布将在中国无锡太湖新城科教产业园为中国的软件公司建立全球第一个云计算中心（Cloud Computing Center）。</p>
@@ -774,7 +1327,8 @@
 <p>2010年3月5日，Novell与云安全联盟（CSA）共同宣布一项供应商中立计划，名为“可信任云计算计划（Trusted Cloud Initiative）”。</p>
 <p>2010年7月，美国国家航空航天局和包括Rackspace、AMD、Intel、戴尔等支持厂商共同宣布“OpenStack”开放源代码计划，微软在2010年10月表示支持OpenStack与Windows Server 2008 R2的集成；而Ubuntu已把OpenStack加至11.04版本中。</p>
 <p>2011年2月，思科系统正式加入OpenStack，重点研制OpenStack的网络服务。</p>
-<h2><span id="云计算的技术背景">云计算的技术背景</span></h2><p>云计算是<code>并行计算(Parallel Computing)</code>、<code>分布式计算(Distributed Computing)</code>和<code>网格计算(Grid Computing)</code>的发展，或者说是这些计算机科学概念的商业实现</p>
+<h2><span id="云计算的技术背景">云计算的技术背景</span></h2>
+<p>云计算是<code>并行计算(Parallel Computing)</code>、<code>分布式计算(Distributed Computing)</code>和<code>网格计算(Grid Computing)</code>的发展，或者说是这些计算机科学概念的商业实现</p>
 <p>云计算是<code>虚拟化(Virtualization)</code>、<code>效用计算(Utility Computing)</code>、<code>IaaS(基础设施即服务)</code>、<code>PaaS(平台即服务)</code>、<code>SaaS(软件即服务)</code>等技术混合演进、提升的结果</p>
 
     
@@ -809,7 +1363,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>本节我们将讨论如何处理事件，包括如何在虚拟节点中描述事件，如何把事件添加到 DOM 元素上，以及如何更新事件。我们先来解决第一个问题，即如何在虚拟节点中描述事件。事件可以视作一种特殊的属性，因此我们可以约定，在 vnode.props 对象中，凡是以字符串 on 开头的属性都视作事件。例如：</p>
+        <h2><span id="引言">引言</span></h2>
+<p>本节我们将讨论如何处理事件，包括如何在虚拟节点中描述事件，如何把事件添加到 DOM 元素上，以及如何更新事件。我们先来解决第一个问题，即如何在虚拟节点中描述事件。事件可以视作一种特殊的属性，因此我们可以约定，在 vnode.props 对象中，凡是以字符串 on 开头的属性都视作事件。例如：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -820,7 +1375,6 @@
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>解决了事件在虚拟节点层面的描述问题后，我们再来看看如何将事件添加到 DOM 元素上。这非常简单，只需要在 patchProps 中调用 addEventListener 函数来绑定事件即可，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 匹配以 on 开头的属性，视其为事件</span>
@@ -840,7 +1394,6 @@
     <span class="token comment">// 省略部分代码（处理其他属性的逻辑）</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>事实上可以更为优化的事件更新机制，避免多次调用 <code>removeEventListener</code> 和 <code>addEventListener</code>。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -873,7 +1426,6 @@
     <span class="token comment">// 省略部分代码（处理其他属性的逻辑）</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>观察上面的代码，事件绑定主要分为两个步骤。先从 el._vei 中读取对应的 invoker，如果 invoker 不存在，则将伪造的 invoker 作为事件处理函数，并将它缓存到el._vei 属性中。</p>
 <p>把真正的事件处理函数赋值给 invoker.value 属性，然后把伪造的 invoker 函数作为事件处理函数绑定到元素上。可以看到，当事件触发时，实际上执行的是伪造的事件处理函数，在其内部间接执行了真正的事件处理函数 invoker.value(e)。</p>
 <p>当更新事件时，由于 el._vei 已经存在了，所以我们只需要将invoker.value 的值修改为新的事件处理函数即可。</p>
@@ -894,8 +1446,8 @@
 
 <span class="token comment">// 假设 renderer 是你的渲染器对象</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>当渲染器尝试渲染这上面代码中给出的 vnode 时，会先绑定click 事件，然后再绑定 contextmenu 事件。后绑定的contextmenu 事件的处理函数将覆盖先绑定的 click 事件的处理函<br>数。为了解决事件覆盖的问题，我们需要重新设计 el._vei 的数据结构。我们应该将 el._vei 设计为一个对象，它的键是事件名称，它的值则是对应的事件处理函数，这样就不会发生事件覆盖的现象了.</p>
+<p>当渲染器尝试渲染这上面代码中给出的 vnode 时，会先绑定click 事件，然后再绑定 contextmenu 事件。后绑定的contextmenu 事件的处理函数将覆盖先绑定的 click 事件的处理函<br>
+数。为了解决事件覆盖的问题，我们需要重新设计 el._vei 的数据结构。我们应该将 el._vei 设计为一个对象，它的键是事件名称，它的值则是对应的事件处理函数，这样就不会发生事件覆盖的现象了.</p>
 <p>根据你提供的代码片段，这段代码主要是用于处理 DOM 元素的属性更新，其中包括事件的绑定和解绑逻辑。在这个代码中，它使用了一个 <code>el._vei</code> 的对象来缓存事件处理函数。下面是你提供的代码的一些修正：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -928,7 +1480,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token comment">// 处理其他属性的逻辑</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们修改了 invoker 函数的实现。当 invoker函数执行时，在调用真正的事件处理函数之前，要先检查invoker.value 的数据结构是否是数组，如果是数组则遍历它，并逐个调用定义在数组中的事件处理函数。</p>
 
     
@@ -963,14 +1514,16 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
 <p>那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。</p>
 <p>每个Vue组件都实现了一个render函数。大多数时候，该函数将由Vue编译器创建。当我们在组件上指定模板时，该模板的内容将由Vue编译器处理，编译器最终将返回render函数。渲染函数本质上返回一个虚拟DOM节点，该节点将被Vue在浏览器DOM中渲染。</p>
-<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong> </p>
-<p><strong>虚拟文档对象模型（或”DOM”）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
+<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong></p>
+<p><strong>虚拟文档对象模型（或&quot;DOM&quot;）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
 <p>Vue更新浏览器DOM时，会将更新的虚拟DOM与上一个虚拟DOM进行比较，并仅使用已修改的部分更新实际DOM。这意味着更少的元素更改，从而提高了性能。Render函数返回虚拟DOM节点，在Vue生态系统中通常称为VNode，该接口是允许Vue在浏览器DOM中写入这些对象的接口。它们包含使用Vue所需的所有信息。</p>
 <p><img src="/img/vue-render/render-pipeline.png" alt="vue-render"></p>
-<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2><p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
+<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2>
+<p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -980,7 +1533,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面这段代码描述的是“一个<code>div</code>标签具有一个子节点，且子节点是<code>p</code>标签”。可以看到，<code>vnode.children</code>是一个数组，它的每一个元素都是一个独立的虚拟节点对象。这样就形成了树型结构，即虚拟DOM树。</p>
 <p>为了完成子节点的渲染，我们需要修改<code>mountElement</code>函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -995,12 +1547,13 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token punctuation">&#125;</span>
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上面这段代码中，我们增加了新的判断分支。使用<code>Array.isArray</code>函数判断<code>vnode.children</code>是否是数组，如果是数组，则循环遍历它，并调用<code>patch</code>函数挂载数组中的虚拟节点。在挂载子节点时，需要注意以下两点：</p>
 <ol>
-<li><p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
+<li>
+<p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
 </li>
-<li><p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
+<li>
+<p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
 </li>
 </ol>
 <p>完成了子节点的挂载后，我们再来看看如何用<code>vnode</code>描述一个标签的属性，以及如何渲染这些属性。我们知道，HTML标签有很多属性，其中有些属性是通用的，例如<code>id</code>、<code>class</code>等，而有些属性是特定元素才有的，例如<code>form</code>元素的<code>action</code>属性。实际上，渲染一个元素的属性比想象中要复杂，不过我们仍然秉承一切从简的原则，先来看看最基本的属性处理。</p>
@@ -1017,7 +1570,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><code>vnode.props</code>是一个对象，它的键代表元素的属性名称，它的值代表对应属性的值。这样，我们就可以通过遍历<code>props</code>对象的方式，把这些属性渲染到对应的元素上，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1034,7 +1586,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们首先检查了<code>vnode.props</code>字段是否存在，如果存在则遍历它，并调用<code>setAttribute</code>函数将属性设置到元素上。实际上，除了使用<code>setAttribute</code>函数为元素设置属性之外，还可以通过DOM对象直接设置：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1049,18 +1600,19 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们没有选择使用<code>setAttribute</code>函数，而是直接将属性设置在DOM对象上，即<code>el[key] = vnode.props[key]</code>。实际上，无论是使用<code>setAttribute</code>函数，还是直接操作DOM对象，都存在缺陷。如前所述，为元素设置属性比想象中要复杂得多。不过，在讨论具体有哪些缺陷之前，我们有必要先搞清楚两个重要的概念：HTML Attributes和DOM Properties。</p>
 <p>当我们处理元素属性时，有两种主要的方式：使用HTML Attributes和DOM Properties。这两者在概念上有些许不同：</p>
 <ol>
-<li><p><strong>HTML Attributes</strong>:</p>
+<li>
+<p><strong>HTML Attributes</strong>:</p>
 <ul>
 <li>HTML Attributes是在HTML标签中定义的属性，例如<code>id</code>、<code>class</code>、<code>src</code>等。</li>
 <li>通过<code>setAttribute</code>方法可以设置HTML Attributes。</li>
 <li>HTML Attributes的值始终是字符串。</li>
 </ul>
 </li>
-<li><p><strong>DOM Properties</strong>:</p>
+<li>
+<p><strong>DOM Properties</strong>:</p>
 <ul>
 <li>DOM Properties是DOM对象上的属性，例如<code>element.id</code>、<code>element.className</code>、<code>element.src</code>等。</li>
 <li>直接操作DOM对象可以设置DOM Properties。</li>
@@ -1068,70 +1620,62 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 </ul>
 </li>
 </ol>
-<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2><p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
+<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2>
+<p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
 <p>如果我们使用<code>setAttribute</code>方法设置属性，那么属性会被设置为HTML Attributes。如果我们直接操作DOM对象的属性，属性会被设置为DOM Properties。</p>
 <p>现在，我们来讨论一下这两种方式存在的问题：</p>
 <ol>
-<li><p><strong>属性值类型转换问题</strong>:</p>
+<li>
+<p><strong>属性值类型转换问题</strong>:</p>
 <ul>
-<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute(&#39;value&#39;, 42)</code>会将值转换为字符串<code>&#39;42&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute('value', 42)</code>会将值转换为字符串<code>'42'</code>。</li>
 </ul>
 </li>
-<li><p><strong>布尔属性问题</strong>:</p>
+<li>
+<p><strong>布尔属性问题</strong>:</p>
 <ul>
 <li>HTML中的一些属性是布尔属性，例如<code>checked</code>、<code>disabled</code>等。对于这些属性，如果存在就表示为<code>true</code>，不存在就表示为<code>false</code>。</li>
-<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute(&#39;disabled&#39;, &#39;false&#39;)</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>&#39;false&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute('disabled', 'false')</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>'false'</code>。</li>
 </ul>
 </li>
 </ol>
 <p>考虑到这些问题，最好的做法是尽量使用DOM Properties而不是HTML Attributes来设置元素的属性。这样可以避免类型转换问题和布尔属性问题，确保属性被正确设置。</p>
 <p>首先，HTML Attributes指的是定义在HTML标签上的属性，例如<code>id=&quot;my-input&quot;</code>、<code>type=&quot;text&quot;</code>和<code>value=&quot;foo&quot;</code>。当浏览器解析这段HTML代码后，会创建一个与之相符的DOM元素对象，我们可以通过JavaScript代码来读取该DOM对象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> el <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#my-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>现在来说一下DOM Properties。许多HTML Attributes在DOM对象上有与之同名的DOM Properties，例如<code>id=&quot;my-input&quot;</code>对应<code>el.id</code>，<code>type=&quot;text&quot;</code>对应<code>el.type</code>，<code>value=&quot;foo&quot;</code>对应<code>el.value</code>等。但是，DOM Properties与HTML Attributes的名字并不总是一模一样的，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>class=&quot;foo&quot;</code>对应的DOM Properties则是<code>el.className</code>。另外，并不是所有HTML Attributes都有与之对应的DOM Properties，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">aria-valuenow</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>75<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>aria-*</code>类的HTML Attributes就没有与之对应的DOM Properties。</p>
 <p>类似地，也不是所有DOM Properties都有与之对应的HTML Attributes，例如可以用<code>el.textContent</code>来设置元素的文本内容，但并没有与之对应的HTML Attributes来完成同样的工作。</p>
 <p>HTML Attributes的值与DOM Properties的值之间是有关联的。例如下面的HTML片段：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>&#39;foo&#39;</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
+<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>'foo'</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
 <p>但并不是所有HTML Attributes与DOM Properties之间都是直接映射的关系，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>&#39;foo&#39;</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>&#39;bar&#39;</code>，那么：</p>
+<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>'foo'</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>'bar'</code>，那么：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>但如果运行下面的代码，会发生“奇怪”的现象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute(&#39;value&#39;)</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
+<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute('value')</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
 <p>但我们仍然可以通过<code>el.defaultValue</code>来访问初始值，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 el<span class="token punctuation">.</span>value<span class="token punctuation">;</span> <span class="token comment">// 'bar'</span>
 el<span class="token punctuation">.</span>defaultValue<span class="token punctuation">;</span> <span class="token comment">// 'foo'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>这说明一个HTML Attributes可能关联多个DOM Properties。例如在上例中，<code>value=&quot;foo&quot;</code>与<code>el.value</code>和<code>el.defaultValue</code>都有关联。</p>
 <p>虽然我们可以认为HTML Attributes是用来设置与之对应的DOM Properties的初始值的，但有些值是受限制的，就好像浏览器内部做了默认值校验。如果你通过HTML Attributes提供的默认值不合法，那么浏览器会使用内建的合法值作为对应DOM Properties的默认值，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>&#39;foo&#39;</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>&#39;text&#39;</code>，而非字符串<code>&#39;foo&#39;</code>：</p>
+<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>'foo'</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>'text'</code>，而非字符串<code>'foo'</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'text'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>从上述分析来看，HTML Attributes与DOM Properties之间的关系很复杂，但实际上我们只需要记住一个核心原则：HTML Attributes的作用是设置与之对应的DOM Properties的初始值。</p>
-<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2><p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
+<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2>
+<p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
 <p>首先，我们以一个禁用的按钮为例，如下所示的HTML代码：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>浏览器会自动将这个按钮设置为禁用状态，并将其对应的DOM Properties <code>el.disabled</code>的值设置为<code>true</code>。但是，如果同样的代码出现在Vue.js的模板中，情况就会有所不同。</p>
 <p>在Vue.js的模板中，HTML模板会被编译成虚拟节点（vnode），其中<code>props.disabled</code>的值是一个空字符串。如果直接使用<code>setAttribute</code>函数设置属性，会导致意外的效果，即按钮被禁用。例如，以下模板：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>对应的虚拟节点为：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> button <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'button'</span><span class="token punctuation">,</span>
@@ -1139,10 +1683,8 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token literal-property property">disabled</span><span class="token operator">:</span> <span class="token boolean">false</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>如果使用<code>setAttribute</code>函数将属性值设置为空字符串，实际上相当于：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'disabled'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>而按钮的<code>el.disabled</code>属性是布尔类型的，不关心具体的HTML Attributes的值是什么，只要<code>disabled</code>属性存在，按钮就会被禁用。因此，渲染器不应该总是使用<code>setAttribute</code>函数将<code>vnode.props</code>对象中的属性设置到元素上。</p>
 <p>为了解决这个问题，我们可以优先设置元素的DOM Properties，但当值为空字符串时，需要手动将其矫正为<code>true</code>。以下是一个具体的实现示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1166,7 +1708,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上述代码中，我们检查每个<code>vnode.props</code>中的属性，看看是否存在对应的DOM Properties。如果存在，优先设置DOM Properties。同时，对布尔类型的DOM Properties做了值的矫正，即当要设置的值为空字符串时，将其矫正为布尔值<code>true</code>。如果<code>vnode.props</code>中的属性没有对应的DOM Properties，则仍然使用<code>setAttribute</code>函数完成属性的设置。</p>
 <p>然而，上述实现仍然存在问题。有些DOM Properties是只读的，例如<code>el.form</code>。为了解决这个问题，我们可以添加一个辅助函数<code>shouldSetAsProps</code>，用于判断是否应该将属性作为DOM Properties设置。如果属性是只读的，或者需要特殊处理，就应该使用<code>setAttribute</code>函数来设置属性。</p>
 <p>最后，为了使属性设置操作与平台无关，我们将属性设置相关的操作提取到渲染器选项中。以下是相应的代码示例：</p>
@@ -1193,7 +1734,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在<code>mountElement</code>函数中，只需要调用<code>patchProps</code>函数，并为其传递相应的参数即可。这样，我们就将属性相关的渲染逻辑从渲染器的核心中抽离出来，使其更加可维护和灵活。</p>
 
     
@@ -1228,16 +1768,23 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
 <p>另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。</p>
 <p>在Vue.js中，渲染器（renderer）是负责执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。渲染器不仅可以渲染真实DOM元素，还是框架跨平台能力的关键。在设计渲染器时，需要考虑其可自定义的能力。</p>
-<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2><p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
+<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2>
+<p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
 <p>在Vue.js中，渲染器（renderer）是用来执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。以下是渲染器的基本概念及其含义：</p>
-<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3><p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3><p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="挂载mounting">挂载（Mounting）</span></h3><p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
-<h3><span id="容器container">容器（Container）</span></h3><p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
-<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3><p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
+<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3>
+<p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3>
+<p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="挂载mounting">挂载（Mounting）</span></h3>
+<p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
+<h3><span id="容器container">容器（Container）</span></h3>
+<p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
+<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3>
+<p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">function</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 渲染逻辑</span>
@@ -1258,21 +1805,17 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 同构渲染</span>
 <span class="token function">hydrate</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面的代码片中通过<code>createRenderer</code>函数创建了一个渲染器对象，包含了<code>render</code>和<code>hydrate</code>函数。<code>render</code>函数用于将虚拟DOM渲染为真实DOM元素，而<code>hydrate</code>函数用于将虚拟DOM激活为已有的真实DOM元素。</p>
 <p>好的，现在我们已经对渲染器有了一个比较基础的认识，下面来一步步深入了解一下：</p>
 <p>渲染器的实现可以通过如下的函数来表示，其中<code>domString</code>是待渲染的HTML字符串，<code>container</code>是挂载点的DOM元素：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token parameter">domString<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   container<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> domString<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>使用渲染器的示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">renderer</span><span class="token punctuation">(</span><span class="token string">'&lt;h1>Hello&lt;/h1>'</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>上述代码将<code>&lt;h1&gt;Hello&lt;/h1&gt;</code>插入到id为<code>app</code>的DOM元素内。渲染器不仅可以渲染静态字符串，还可以渲染动态拼接的HTML内容：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>count<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
 <p>如果<code>count</code>是一个响应式数据，那么可以使用响应系统来自动化整个渲染过程。首先，定义一个响应式数据<code>count</code>，然后在副作用函数内调用渲染器函数进行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> count <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1281,11 +1824,9 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 count<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上述代码中，<code>count</code>是一个<code>ref</code>响应式数据。当修改<code>count.value</code>的值时，副作用函数会重新执行，完成重新渲染，最终渲染到页面的内容是<code>&lt;h1&gt;2&lt;/h1&gt;</code>。</p>
 <p>这里使用了Vue 3提供的<code>@vue/reactivity</code>包中的响应式API，通过<code>&lt;script&gt;</code>标签引入：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://unpkg.com/@vue/reactivity@3.0.5/dist/reactivity.global.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>上述代码中给出了<code>render</code>函数的基本实现，下面将其执行流程进行详细分析。假设我们连续三次调用<code>renderer.render</code>函数来执行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> renderer <span class="token operator">=</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1295,12 +1836,12 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode2<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 第三次渲染</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在首次渲染时，渲染器将<code>vnode1</code>渲染为真实DOM，并将<code>vnode1</code>存储到容器元素的<code>container.vnode</code>属性中，作为旧vnode。</p>
 <p>在第二次渲染时，旧的vnode存在（即<code>container.vnode</code>中有值），此时渲染器将<code>vnode2</code>作为新vnode，将新旧vnode一同传递给<code>patch</code>函数进行打补丁。</p>
-<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = &#39;&#39;</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
+<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = ''</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
 <p>关于<code>patch</code>函数，它是整个渲染器的核心入口，接收三个参数：旧vnode <code>n1</code>、新vnode <code>n2</code>和容器 <code>container</code>。在首次渲染时，旧vnode <code>n1</code>是<code>undefined</code>，表示挂载动作。<code>patch</code>函数不仅用于打补丁，也可以执行挂载动作。</p>
-<h2><span id="自定义渲染器">自定义渲染器</span></h2><p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
+<h2><span id="自定义渲染器">自定义渲染器</span></h2>
+<p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 创建渲染器函数，接收配置项作为参数</span>
 <span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token parameter">options</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 从配置项中获取操作 DOM 的 API</span>
@@ -1375,183 +1916,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
 <span class="token comment">// 使用自定义渲染器渲染虚拟节点到挂载点</span>
 <span class="token function">customRenderer</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面的代码片我们通过<code>createRenderer</code>函数创建了一个自定义渲染器，并通过配置项(<code>customRendererOptions</code>)传递操作DOM的API。渲染器在执行时，根据配置项中的API来完成相应的操作。通过这种方式，我们实现了一个通用的、不依赖于特定平台的渲染器。在实际应用中，可以根据不同的平台需求，通过配置不同的API，实现跨平台的渲染能力。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/04/just-in-time-compilers/" itemprop="url">JIT (just-in-time) compiler 是怎么工作的</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-04T02:05:22.000Z" itemprop="datePublished">2023年11月4日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/JITcompiler/">JITcompiler</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>在谈到JIT前，还是需要对编译过程有一些简单的了解。</p>
-<p>在编译原理中，把源代码翻译成机器指令，一般要经过以下几个重要步骤：</p>
-<p><img src="/img/just-in-time/JIT1.png" alt="JIT (just-in-time) compiler"></p>
-<h2><span id="jit简介">JIT简介</span></h2><p><strong>JIT是just in time的缩写，也就是即时编译。</strong> 通过JIT技术，能够做到Java程序执行速度的加速。那么，是怎么做到的呢？</p>
-<p>我们都知道，Java是一门解释型语言（或者说是半编译，半解释型语言）。Java通过编译器javac先将源程序编译成与平台无关的Java字节码文件（.class），再由JVM解释执行字节码文件，从而做到平台无关。 但是，有利必有弊。对字节码的解释执行过程实质为：JVM先将字节码翻译为对应的机器指令，然后执行机器指令。很显然，这样经过解释执行，其执行速度必然不如直接执行二进制字节码文件。</p>
-<p>而为了提高执行速度，便引入了 JIT 技术。当JVM发现某个方法或代码块运行特别频繁的时候，就会认为这是<code>“热点代码”（Hot Spot Code）</code>。然后JIT会把部分“热点代码”编译成本地机器相关的机器码，并进行优化，然后再把编译后的机器码缓存起来，以备下次使用。</p>
-<p><img src="/img/just-in-time/JIT2.webp" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="hot-spot编译">Hot Spot编译</span></h3><p>当 JVM 执行代码时，它并不是立即开始编译代码的。这主要有两个原因：</p>
-<p>首先，如果这段代码本身在将来只会被执行一次，那么从本质上看，编译就是在浪费精力。因为将代码翻译成 java 字节码相对于编译这段代码并执行代码来说，要快很多。</p>
-<p>当然，如果一段代码频繁的调用方法，或是一个循环，也就是这段代码被多次执行，那么编译就非常值得了。因此，编译器具有的这种权衡能力会首先执行解释后的代码，然后再去分辨哪些方法会被频繁调用来保证其本身的编译。<strong>Hot Spot VM 采用了 JIT compile 技术，将运行频率很高的字节码直接编译为机器指令执行以提高性能</strong> ，所以当字节码被 JIT 编译为机器码的时候，要说它是编译执行的也可以。也就是说，运行时，部分代码可能由 JIT 翻译为目标机器指令（以 method 为翻译单位，还会保存起来，第二次执行就不用翻译了）直接执行。</p>
-<p>第二个原因是最优化，当 JVM 执行某一方法或遍历循环的次数越多，就会更加了解代码结构，那么 JVM 在编译代码的时候就做出相应的优化。</p>
-<h2><span id="javascript-编译-jit-just-in-time-compiler-是怎么工作的">JavaScript 编译 - JIT (just-in-time) compiler 是怎么工作的</span></h2><p>大体来说，有两种方式可以将程序翻译成机器可执行的指令，使用编译器 (Compiler) 或者是 解释器 (Interpreter)。</p>
-<h3><span id="解释器">解释器</span></h3><p>解释器是边翻译，边执行。</p>
-<p>优缺点</p>
-<ul>
-<li>优点：快速执行，不需要等待编译</li>
-<li>缺点：相同的代码可能被翻译多次，比如循环内部的代码</li>
-</ul>
-<p><img src="/img/just-in-time/JIT3.png" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="编译器">编译器</span></h3><p>而编译器则是提前将结果翻译出来，并生成一个可执行程序。 </p>
-<p>优缺点</p>
-<ul>
-<li>优点：不需要重复编译，并且可以在编译时对代码做优化</li>
-<li>缺点：需要提前编译</li>
-</ul>
-<p><img src="/img/just-in-time/JIT4.png" alt="JIT (just-in-time) compiler"></p>
-<h3><span id="jit">JIT</span></h3><p>JavaScript 刚出现的时候，是一个典型的解释型语言，因此运行速度极慢，后来浏览器引入了 JIT compiler，大幅提高了 JavaScript 的运行速度。</p>
-<blockquote>
-<p>原理：They added a new part to the JavaScript engine, called a monitor (aka a profiler). That monitor watches the code as it runs, and makes a note of how many times it is run and what types are used.</p>
-</blockquote>
-<p>简单来说，浏览器在 JavaScript engine 中加入了一个 monitor，用来观察运行的代码。并记录下每段代码运行的次数和代码中的变量的类型。</p>
-<p>那么问题来了，为什么这样做能提高运行速度？</p>
-<p>后面的所有内容都以下面这个函数的运行为例：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">arraySum</span><span class="token punctuation">(</span><span class="token parameter">arr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">var</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    sum <span class="token operator">+=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>1st step - Interpreter</strong></p>
-<p>一开始只是简单的使用解释器执行，当某一行代码被执行了几次，这行代码会被打上 Warm 的标签；当某一行代码被执行了很多次，这行代码会被打上 Hot 的标签</p>
-<p><strong>2nd step - Baseline compiler</strong></p>
-<p>被打上 Warm 标签的代码会被传给<code>Baseline Compiler</code>编译且储存，同时按照<code>行数 (Line number)</code> 和<code>变量类型 (Variable type) </code>被索引（为什么会引入变量类型做索引很重要，后面会讲）</p>
-<p>当发现执行的代码命中索引，会直接取出编译后的代码执行，从而不需要重复编译已经编译过的代码</p>
-<p><strong>3rd step - Optimizing compiler</strong></p>
-<p>被打上 Hot 标签的代码会被传给<code> Optimizing compiler</code>，这里会对这部分带码做更优化的编译。怎么样做更优化的编译呢？关键点就在这里，没有别的办法，只能用概率模型做一些合理的 <code>假设 (Assumptions)</code>。<br>比如我们上面的循环中的代码 sum +&#x3D; arr[i]，尽管这里只是简单的 + 运算和赋值，但是因为 JavaScript 的动态类型 (Dynamic typing)，对应的编译结果有很多种可能（这个角度能很明显的暴露动态类型的缺点）</p>
-<p>比如:</p>
-<p>sum 是 Int，arr 是 Array，i 是 Int，这里的 + 就是加法运算，对应其中一种编译结果</p>
-<p>sum 是 string，arr 是 Array，i 是 Int，这里的 + 就是字符串拼接，并且需要把 i 转换为 string 类型<br>…</p>
-<p>下面的图可以看出，这么简单的一行代码对应有 2^4 &#x3D; 16 种可能的编译结果</p>
-<p><img src="/img/just-in-time/JIT5.png" alt="JIT (just-in-time) compiler"></p>
-<p>前面第二步的 Baseline compiler 做的就是这件事，所以上面说编译后的代码需要使用<code>line number</code>和<code>variable type</code>一起做索引，因为不同的 variable type 对应不同的编译结果。</p>
-<p>如果代码是 “Warm” 的，JIT 的任务也就到此为止，后面每次执行的时候，需要先判断类型，再使用对应类型的编译结果就好。</p>
-<p>但是上面我们说，当代码变成 “hot” 的时候，会做更多的优化。这里的优化其实指的就是 JIT 直接假设一个前提，比如这里我们直接假设 sum 是 Int，i 也是 Int，arr 是 Array，于是就只用一种编译结果就好了。</p>
-<p>实际上，在执行前会做类型检查，看是假设是否成立，如果不成立执行就会被打回<code>interpreter</code>或者<code>baseline compiler</code>的版本，这个操作叫做<code> &quot;反优化 (deoptimization)&quot;</code>。</p>
-<p>可以看出，只要假设的成功率足够高，那么代码的执行速度就会快。但是如果假设的成功率很低，那么会导致比没有任何优化的时候还要慢（因为要经历<code>optimize =&gt; deoptimize</code>的过程）</p>
-<h2><span id="结论">结论</span></h2><p>简而言之，这就是 JIT运行时所做的事情。它通过监控正在运行的代码并发送要优化的热代码路径，使 JavaScript 运行得更快。这使得大多数 JavaScript 应用程序的性能提高了许多倍。</p>
-<p>然而，即使有了这些改进，JavaScript 的性能仍然无法预测。为了使速度更快，JIT 在运行时增加了一些开销，包括：</p>
-<p><strong>优化和反优化</strong></p>
-<ul>
-<li><p>用于监视器和发生信息丢失时恢复信息的内存</p>
-</li>
-<li><p>用于存储函数的基线和优化版本的内存</p>
-</li>
-<li><p>这里还有改进的空间：可以消除开销，使性能更加可预测。</p>
-</li>
-</ul>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/03/wasm-1/" itemprop="url">浅谈WebAssembly</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-03T11:33:25.000Z" itemprop="datePublished">2023年11月3日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Wasm/">Wasm</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
-<h2><span id="wasm-x3dx3d-汇编级性能">WASM &#x3D;&#x3D; 汇编级性能？</span></h2><p>这显然不对，<strong>WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。</strong> 这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
-<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1&#x2F;20 的水平，而 WASM 则可以跑到机器码 1&#x2F;3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。</p>
-<p>这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
-<p>一个在 WASM 和 JS 之间做性能对比的经典案例，就是 Mozilla 开发者和 V8 开发者的白学现场。整个过程是这样的：</p>
-<p>Mozilla Hacks 发表了一篇名为 <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">用 Rust 和 WASM 优化 Source Map 性能 的博文</a>，将 source-map 这个 JS 包的性能优化了五倍。</p>
-<p>V8 核心开发 Vyacheslav Egorov 回应名为<a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">你也许不需要用 Rust 和 WASM 来优化 JS 的博文</a>，用纯 JS 实现了速度比 Rust 更快的惊人优化。</p>
-<p>原文作者以 无需魔法的速度 为名展开了进一步讨论，并用 Rust 做出了新的性能优化。</p>
-<p>巧的是，这场论战正发生在两年前白色相簿的季节。双方就像雪菜和冬马那样展开了高水平的对决，名场面十分精彩。最终 Vyacheslav 给出了一张三轮过招后的性能对比图。可以看到虽然最终还是 Rust 更快，但 JS 被逼到极限后非但不是败犬，还胜出了一回合：</p>
-<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
-<p>另外，大佬Milo Yip 做过的不同语言光线追踪性能测试（修罗场），也能侧面印证带 VM 语言与机器码之间的性能对比结论。C++、Java 和 JS 在未经特别优化的前提下，可以分别代表三个典型的性能档次：</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby 渲染比试</a></p>
-<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2><p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
-<p>而这种套两层 for 循环的苦力活，用现在的 WASM 重写能快几倍就非常不错了。至于浏览器内 AI 计算的性能方面，社区的评测结论也是 WebGL 和 WebMetal 具备最高的性能水平，然后才是 WASM。参见这里：<a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">浏览器内的 AI 评测</a></p>
-<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
-<p>而且，对于前端来说，计算密集型的应用场景并不算太多，比起 WebGPU 这种图形渲染的技术的发展前景可以说算是比较弱势，但毕竟二者不在同一种应用场景下。</p>
-<p>所以对计算密集型任务，WASM 并不是前端唯一的救星，而是给大家多了一种在性能、开发成本和效果之间权衡的选择。在我个人印象里，前端在图形渲染外需要算力的场景说实话并不太多，像加密、压缩、挖矿这种，都难说是高频刚需。至于未来可能相当重要的 AI 应用，<strong>长期而言我还是看好 WebGPU 这种更能发挥出 GPU 潜力的下一代标准，当然 WASM 也已经是个不错的可选项了。</strong></p>
-<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2><p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) &#x3D;&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
-<p><strong>这还真不一定。</strong></p>
-<p>因为现代浏览器内的 JS 引擎都有进行性能优化的利器，都标配了一种东西，那就是 <code>JIT</code>。简单来说，上面这个 add 函数如果始终都在算整数加法，那么 JS 引擎就会自动编译出一份计算 int a + int b 的机器码来替代掉原始的 JS 函数，这样高频调用这个函数的性能就会得到极大的提升，这也就是 JIT 所谓 Just-in-time 编译的奥妙所在了。</p>
-<p>所以，不要一觉得 JS 慢就想着手动靠 WASM 来嵌入 C，其实现代 JS 引擎可都是在不停地帮你<code>「自动把 JS 转换成 C」</code>的！如果你可以把一个 JS 函数改写成等价的 C，那么我猜如果把这个函数单独抽离出来，靠 JS 引擎的 JIT 都很可能达到相近的性能。这应该就是 V8 开发者敢用 JS 和 Rust 对线的底气所在吧。</p>
-<p><a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">像在 JS 和 WASM 之间的调用终于变快了</a> 这篇文章中，Lin Clark 非常精彩地论述了整个优化过程，<strong>最终使得 JS 和 WASM 间的函数调用，比非内联的 JS 函数间调用要快</strong>。不过，至于和被 JIT 内联掉的 JS 函数调用相比起来如何，这篇文章就没有提及了。</p>
-<p>这里偏个题，Mozilla 经常宣传自己实现的超大幅优化，有不少都可能来源于之前明显的设计问题（平心而论，我们自己何尝不是这样呢）。像去年 Firefox 70 在 Mac 上实现的 大幅省电优化，其根源是什么呢？粗略的理解是，以前的 Firefox 在 Mac 上竟然每帧都会全量更新窗口像素！当然，这些文章的干货都相当多，十分推荐大家打好基础后看看原文，至少是个更大的世界，也常常能对软件架构设计有所启发。</p>
-<p>如果后续 WASM 支持了 GC，那么嵌入互调的情况很可能更复杂。例如我最近就尝试在 Flutter 的 Dart 和安卓的 Java 之间手动同步大对象，希望能「嵌入一些安卓平台能力到 Flutter 体系里」，然而这带来了许多冗长而低性能的胶水代码，需要通过异步的消息来做深拷贝，可控性很低。</p>
-<p>虽然 WASM 现在还没有 GC，但一旦加上，我有理由怀疑它和 JS 之间的对象生命周期管理也会遇到类似的问题。只是这个问题主要是让 Mozilla 和 Google 的人来操心，用不着我们管而已。</p>
-<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2><p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
-<ul>
-<li>在安卓的 Java class 里调用 C++</li>
-<li>在 Flutter 的 Dart 里调用 C</li>
-<li>在 QuickJS 这种嵌入式 JS 引擎里调用 C</li>
-</ul>
-<p>它们都能做到一件事，那就是在引擎里新建原生对象，并将它以传引用的方式直接交给<code>C / C++</code>函数调用，并用引擎的 GC 来管理对象的生命周期。这种方式一般称为<code> FFI（Foreign Function Interface 外部函数接口）</code>，可以把原生代码嵌入到语言 Runtime 中。但如果是两个不同的 Runtime，事情就没有这么简单了。<strong>例如 QuickJS 到 Java 的 binding 项目 Quack，就需要在 JS 的对象和 Java 对象中做 Marshalling（类似于 JSON 那样的序列化和反序列化）的过程，不能随便传引用。</strong></p>
-<p><strong>对 WASM 来说是怎样的呢？</strong> 基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,<strong>wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。</strong> 但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C &#x2F; C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
-<p>例如现在如果需要频繁地用 WASM 操作 JS 对象，那么几乎必然是影响性能的。这方面典型的坑是基于 WASM 移植的 OpenGL 应用。像 C++ 中的一个 glTexImage2D 函数，目前编译到 WASM 后就需要先从 WASM 走到 JS 胶水层，再在 JS 里调 gl.texImage2D 这样的 WebGL API，最后才能经由 C++ binding 调用到原生的图形 API。这样从一层胶水变成了两层，性能不要说比起原生 C++，能比得上直接写 JS 吗？</p>
-<p>当然，Mozilla 也意识到了这个问题，因此他们在尝试如何更好地将 <code>Web IDL（也就是浏览器原生 API 的 binding）</code>开放给 WASM，并在这个过程中提出了 WASM Interface Types 概念：既然 WASM 已经是个字节码的中间层了，那么干脆给它约定个能一统所有编程语言运行时类型的 IR 规范吧！不过，这一规范还是希望主要靠协议化、结构化的深拷贝来解决问题，只有未来的 anyref 类型是可以传引用的。anyref 有些像 Unix 里的文件描述符，这里就不展开了。</p>
-<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
-<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2><p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
-<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 &#x2F; ARM &#x2F; MIPS &#x2F; WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。</p>
-<p>像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
-<p>所以这里再重复一遍，编译 WASM 应用所需的依赖库和整套工具链，几乎都跟 JS 没什么关系。JS 就像机器码那样，只是人家工具链编译出来的输出格式而已。在 JS 开发者看来，这整套东西可能显得相当突兀。但从原生应用开发者的视角看来，这一切都再正常不过了。</p>
-<h2><span id="后记">后记</span></h2><p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
 
     
     </div>

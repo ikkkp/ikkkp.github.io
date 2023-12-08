@@ -23,18 +23,18 @@
 
 
 
-    <meta name="description" content="PrefaceLet’s start with an example. A handler is assigned to the &lt;div&gt;, but if you click on any nested tags (e.g., &lt;em&gt; or &lt;code&gt;), the handler will also run: &lt;div onclick&#x3D;&quot;alert(">
+    <meta name="description" content="Preface Let’s start with an example. A handler is assigned to the &lt;div&gt;, but if you click on any nested tags (e.g., &lt;em&gt; or &lt;code&gt;), the handler will also run: &lt;div onclick&#x3D;&quot;alert">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Bubbling and Capturing">
 <meta property="og:url" content="https://ikkkp.github.io/2023/12/05/en/Event-Bubbling/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="PrefaceLet’s start with an example. A handler is assigned to the &lt;div&gt;, but if you click on any nested tags (e.g., &lt;em&gt; or &lt;code&gt;), the handler will also run: &lt;div onclick&#x3D;&quot;alert(">
+<meta property="og:description" content="Preface Let’s start with an example. A handler is assigned to the &lt;div&gt;, but if you click on any nested tags (e.g., &lt;em&gt; or &lt;code&gt;), the handler will also run: &lt;div onclick&#x3D;&quot;alert">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-12-05T07:46:41.000Z">
-<meta property="article:modified_time" content="2023-12-06T11:30:33.717Z">
+<meta property="article:modified_time" content="2023-12-08T08:14:30.445Z">
 <meta property="article:author" content="Huangzl">
-<meta property="article:tag" content="Vue,Browser,Front-end">
+<meta property="article:tag" content="Vue,Browser,FE">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 
@@ -227,7 +227,7 @@
         
         <span class="column is-narrow article-category">
             <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/en/categories/Vue/Browser/">Browser</a><span>></span><a class="article-category-link" href="/en/categories/Vue/Browser/Front-end/">Front-end</a>
+            <a class="article-category-link" href="/en/categories/FE/">FE</a>
         </span>
         
         
@@ -238,16 +238,17 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2><p><strong>Let’s start with an example.</strong></p>
+        <h2><span id="preface">Preface</span></h2>
+<p><strong>Let’s start with an example.</strong></p>
 <p>A handler is assigned to the <code>&lt;div&gt;</code>, but if you click on any nested tags (e.g., <code>&lt;em&gt;</code> or <code>&lt;code&gt;</code>), the handler will also run:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'The handler!'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>If you click on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>EM<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>, the handler on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>DIV<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> runs.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <blockquote>
 <p>So, if you click on EM, the handler on DIV runs.</p>
 </blockquote>
-<h2><span id="bubbling">Bubbling</span></h2><p>The bubbling principle is straightforward.</p>
+<h2><span id="bubbling">Bubbling</span></h2>
+<p>The bubbling principle is straightforward.</p>
 <p><strong>When an event occurs on an element, it first runs the handler on that element, then runs the handler on its parent element, and continues up to handlers on other ancestors.</strong></p>
 <p>Suppose we have 3 layers of nesting <code>FORM &gt; DIV &gt; P</code>, each with its own handler:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
@@ -262,27 +263,33 @@
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><strong>Now, what happens if you click on <code>&lt;p&gt;</code>?</strong></p>
 <ol>
-<li><p>First, the handler runs on <code>&lt;p&gt;</code>.</p>
+<li>
+<p>First, the handler runs on <code>&lt;p&gt;</code>.</p>
 </li>
-<li><p>Then, it runs on <code>&lt;div&gt;</code>.</p>
+<li>
+<p>Then, it runs on <code>&lt;div&gt;</code>.</p>
 </li>
-<li><p>Then, it runs on <code>&lt;form&gt;</code>.</p>
+<li>
+<p>Then, it runs on <code>&lt;form&gt;</code>.</p>
 </li>
-<li><p>Finally, it runs on the document.</p>
+<li>
+<p>Finally, it runs on the document.</p>
 </li>
 </ol>
 <p><strong>This behavior is called “event bubbling” because it bubbles up from the element like a bubble.</strong></p>
 <p>So, if we click on <code>&lt;p&gt;</code>, we will see 3 alerts: p → div → form.</p>
-<h3><span id="eventtarget">event.target</span></h3><p>The handler on a parent element can always access detailed information about where the event actually occurred.</p>
+<h3><span id="eventtarget">event.target</span></h3>
+<p>The handler on a parent element can always access detailed information about where the event actually occurred.</p>
 <p><strong>The element that triggered the event, the deepest nested one, is called the target element, and it can be accessed through <code>event.target</code>.</strong></p>
 <p>Note the difference with <code>this</code> (which equals <code>event.currentTarget</code>):</p>
 <ul>
-<li><p><code>this</code> is the “current” element at the time the handler is running, and it remains the same.</p>
+<li>
+<p><code>this</code> is the “current” element at the time the handler is running, and it remains the same.</p>
 </li>
-<li><p><code>event.target</code> is the “target” element when the event happens, and it can be any element; it changes during the bubbling process.</p>
+<li>
+<p><code>event.target</code> is the “target” element when the event happens, and it can be any element; it changes during the bubbling process.</p>
 </li>
 </ul>
 <p>Let’s illustrate this with an example!</p>
@@ -290,7 +297,7 @@
 <p>Note: Here, all events are bound to the form instead of individual elements.</p>
 <p>In the <code>form.onclick</code> handler:</p>
 <ul>
-<li><code>this</code> (&#x3D;<code>event.currentTarget</code>) is the <code>&lt;form&gt;</code> element because the handler runs on it.</li>
+<li><code>this</code> (=<code>event.currentTarget</code>) is the <code>&lt;form&gt;</code> element because the handler runs on it.</li>
 <li><code>event.target</code> is the actual clicked element inside the form.</li>
 </ul>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">HTML</span><span class="token punctuation">></span></span>
@@ -349,12 +356,11 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">the bubbling doesn't reach here</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <div onclick="alert(`the bubbling doesn't reach here`)" style="width:150px;height:50px;background-color:red">
   <button onclick="event.stopPropagation()">Click me</button>
 </div>
-
-<h2><span id="capturing">Capturing</span></h2><p><strong>Another phase of event handling is called “capturing.”</strong></p>
+<h2><span id="capturing">Capturing</span></h2>
+<p><strong>Another phase of event handling is called “capturing.”</strong></p>
 <p>The DOM event standard describes the three phases of event propagation:</p>
 <ol>
 <li>Capturing phase — The event travels down the hierarchy of elements (from the window).</li>
@@ -366,17 +372,18 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
 <p>In other words: Clicking on <code>&lt;td&gt;</code>, the event first descends through the ancestor chain to the element (capturing phase), then reaches the target (target phase), and finally ascends (bubbling phase), calling handlers along the way.</p>
 <p>So far, we have only discussed bubbling because the capturing phase is rarely used. Typically, we don’t see it.</p>
 <p>Handlers added with <code>on&lt;event&gt;</code> attributes or using HTML attributes or with <code>addEventListener(event, handler)</code> with two arguments have no knowledge of capturing; they run only in the second and third phases.</p>
-<h2><span id="summary">Summary</span></h2><p><strong>When an event occurs — the element nested deepest where the event happened is marked as the “target element” (<code>event.target</code>).</strong></p>
+<h2><span id="summary">Summary</span></h2>
+<p><strong>When an event occurs — the element nested deepest where the event happened is marked as the “target element” (<code>event.target</code>).</strong></p>
 <ul>
 <li>Then, the event moves down from the document root to the <code>event.target</code>, invoking handlers assigned with <code>addEventListener(..., true)</code> (where <code>true</code> is a shorthand for <code>&#123;capture: true&#125;</code>).</li>
 <li>Next, the handler on the target element itself is called.</li>
-<li>Finally, the event bubbles up from <code>event.target</code> to the root, calling handlers assigned with <code>on&lt;event&gt;</code>, HTML attributes, and <code>addEventListener</code> without a third parameter or with <code>false</code>&#x2F;<code>&#123;capture: false&#125;</code>.</li>
+<li>Finally, the event bubbles up from <code>event.target</code> to the root, calling handlers assigned with <code>on&lt;event&gt;</code>, HTML attributes, and <code>addEventListener</code> without a third parameter or with <code>false</code>/<code>&#123;capture: false&#125;</code>.</li>
 </ul>
 <p><strong>Each handler has access to properties of the <code>event</code> object:</strong></p>
 <ul>
 <li><code>event.target</code> — The element deepest in the hierarchy that triggered the event.</li>
-<li><code>event.currentTarget</code> (&#x3D;<code>this</code>) — The current element handling the event (the one with the handler).</li>
-<li><code>event.eventPhase</code> — The current phase (capturing&#x3D;1, target&#x3D;2, bubbling&#x3D;3).</li>
+<li><code>event.currentTarget</code> (=<code>this</code>) — The current element handling the event (the one with the handler).</li>
+<li><code>event.eventPhase</code> — The current phase (capturing=1, target=2, bubbling=3).</li>
 </ul>
 <p>Any event handler can stop the event by calling <code>event.stopPropagation()</code>, but it’s not recommended because we might not be sure if we genuinely don’t need the event to bubble up for other purposes.</p>
 <p>The capturing phase is rarely used, and usually, events are handled during the bubbling phase. There’s a reason for this logic.</p>
@@ -387,7 +394,7 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
     
     <div class="columns is-variable is-1 is-multiline is-mobile">
     
-        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Vue-Browser-Front-end/">#Vue,Browser,Front-end</a></span>
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/en/tags/Vue-Browser-FE/">#Vue,Browser,FE</a></span>
     
     </div>
     

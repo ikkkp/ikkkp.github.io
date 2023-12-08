@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>Vuejs 组件的实现原理 - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2023/12/08/en/vue-component-1/" rel="alternate" hreflang="en" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2023/12/08/vue-component-1/">
+    
+
+
+
+
+
+    <meta name="description" content="前言 我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vuejs 组件的实现原理">
+<meta property="og:url" content="https://ikkkp.github.io/2023/12/08/vue-component-1/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="前言 我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2023-12-08T07:45:05.000Z">
+<meta property="article:modified_time" content="2023-12-08T08:07:56.021Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Vuejs 组件的实现原理" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1393J2EVCZ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-1393J2EVCZ');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#前言">1&nbsp;&nbsp;<b>前言</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#渲染组件">2&nbsp;&nbsp;<b>渲染组件</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#总结">3&nbsp;&nbsp;<b>总结</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/2023/12/08/en/vue-component-1/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Vuejs 组件的实现原理
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">2023年12月8日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2>
+<p>我们在前面讨论过了<a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">vue渲染器</a>，<strong>渲染器主要负责将虚拟 DOM 渲染为真实 DOM</strong> ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。</p>
+<p>但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。</p>
+<p>有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面。组件化的实现同样需要渲染器的支持</p>
+<h2><span id="渲染组件">渲染组件</span></h2>
+<p>从用户的角度来看，一个有状态组件就是一个选项对象，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 是一个组件，它的值是一个选项对象</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span> 
+  <span class="token keyword">return</span>  <span class="token punctuation">&#123;</span><span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>但是，如果从渲染器的内部实现来看，一个组件则是一个特殊类型的虚拟 DOM 节点。例如，为了描述普通标签，我们用虚拟节点的vnode.type 属性来存储标签名称，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"> <span class="token comment">// 该 vnode 用来描述普通标签</span>
+<span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span>
+<span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>为了描述片段，我们让虚拟节点的 vnode.type 属性的值为Fragment, 而为了描述文本，我们让虚拟节点的 vnode.type 属性的值为Text，</p>
+<p>还记得我们之前在渲染器讨论过的<code>patch函数</code>吗？</p>
+<p><strong>在patch函数中，Vue会根据新旧虚拟DOM节点的差异进行不同的处理逻辑。</strong> 如果是首次渲染，会执行首次渲染的逻辑；如果是更新渲染，会根据差异更新实际的DOM节点。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 02. 如果新旧节点类型不同，执行卸载操作</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>n1 <span class="token operator">&amp;&amp;</span> n1<span class="token punctuation">.</span>type <span class="token operator">!==</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">unmount</span><span class="token punctuation">(</span>n1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    n1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 07. 获取节点类型</span>
+  <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> type <span class="token punctuation">&#125;</span> <span class="token operator">=</span> n2<span class="token punctuation">;</span>
+
+  <span class="token comment">// 09. 判断节点类型</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 10. 处理普通元素</span>
+    <span class="token comment">// TODO: 处理普通元素的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Text<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 11. 处理文本节点</span>
+    <span class="token comment">// TODO: 处理文本节点的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Fragment<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 13. 处理片段</span>
+    <span class="token comment">// TODO: 处理片段的逻辑</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 返回新节点的实际DOM元素</span>
+  <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，渲染器会使用虚拟节点的 type 属性来区分其类型。对于不同类型的节点，需要采用不同的处理方法来完成挂载和更新。</p>
+<p>实际上，对于组件来说也是一样的。<strong>为了使用虚拟节点来描述组件，我们可以用虚拟节点的 vnode.type 属性来存储组件的选项对象</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 02. 如果新旧节点类型不同，执行卸载操作</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>n1 <span class="token operator">&amp;&amp;</span> n1<span class="token punctuation">.</span>type <span class="token operator">!==</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">unmount</span><span class="token punctuation">(</span>n1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    n1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 07. 获取节点类型</span>
+  <span class="token keyword">const</span> type <span class="token operator">=</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">;</span>
+
+  <span class="token comment">// 09. 判断节点类型</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 10. 处理普通元素</span>
+    <span class="token comment">// TODO: 处理普通元素的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Text<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 11. 处理文本节点</span>
+    <span class="token comment">// TODO: 处理文本节点的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Fragment<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 13. 处理片段</span>
+    <span class="token comment">// TODO: 处理片段的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'object'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 16. vnode.type 的值是选项对象，作为组件来处理</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>n1<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 17. 挂载组件</span>
+      <span class="token function">mountComponent</span><span class="token punctuation">(</span>n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 21. 更新组件</span>
+      <span class="token function">patchComponent</span><span class="token punctuation">(</span>n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 返回新节点的实际DOM元素</span>
+  <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在上面这段代码中，我们新增了一个 else if 分支，用来处理虚拟节点的 vnode.type 属性值为对象的情况，即将该虚拟节点作为组件的描述来看待，并调用 mountComponent 和 patchComponent 函数来完成组件的挂载和更新。</p>
+<p>上面我们回顾了有关于组件的一些基本概念，组件的挂载和更新是如何实现的，其实我们更关注的还应该是<strong>用户应该如何编写组件？组件的选项对象必须包含哪些内容？以及组件拥有哪些能力？</strong></p>
+<p>因此，一个组件必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM。换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 组件定义</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 组件名称，可选</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// 组件的渲染函数，其返回值必须为虚拟 DOM,一个组件必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 返回虚拟 DOM</span>
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'text content'</span><span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 用来描述组件的 vnode 对象，type 属性值为组件的选项对象</span>
+<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 调用渲染器来渲染组件</span>
+renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>CompNode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 渲染器中真正完成组件渲染任务的是 mountComponent 函数</span>
+<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 通过 vnode 获取组件的选项对象，即 vnode.type</span>
+  <span class="token keyword">const</span> componentOptions <span class="token operator">=</span> vnode<span class="token punctuation">.</span>type<span class="token punctuation">;</span>
+
+  <span class="token comment">// 获取组件的渲染函数 render</span>
+  <span class="token keyword">const</span> render <span class="token operator">=</span> componentOptions<span class="token punctuation">.</span>render<span class="token punctuation">;</span>
+
+  <span class="token comment">// 执行渲染函数，获取组件要渲染的内容，即 render 函数返回的虚拟 DOM</span>
+  <span class="token keyword">const</span> subTree <span class="token operator">=</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 最后调用 patch 函数来挂载组件所描述的内容，即 subTree</span>
+  <span class="token function">patch</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> subTree<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2><span id="总结">总结</span></h2>
+<p>我们现在来回顾一下组件的基础，我们显式声明了一个组件的对象实例，该组件的选项对象必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM，之后我们再调用render和patch进行组件的更新和替换。<strong>换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，而渲染器的作用就是将组件的渲染函数的返回值渲染为真实 DOM。</strong></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Vue/">#Vue</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop  article-nav-prev">
+            
+            <a href="/2023/12/08/vue-component-2/">Vuejs 组件事件与 emit 的实现</a>
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2023/12/06/Browser-Default-Behavior/">浏览器默认行为</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2023 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2023/12/08/en/vue-component-1/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>

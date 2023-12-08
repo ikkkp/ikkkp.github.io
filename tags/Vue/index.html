@@ -184,6 +184,398 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/08/vue-component-2/" itemprop="url">Vuejs 组件事件与 emit 的实现</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">2023年12月8日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2>
+<p>想把Vuejs 组件事件与 emit 的实现讲清楚，我先要把组件事件和emit的应用讲清楚，这样大家会更清楚的理解组件事件和emit的实现。</p>
+<p>对于组件事件，我们其实之前就已经提到过了浏览器的事件机制：</p>
+<h3><span id="浏览器事件回顾">浏览器事件回顾</span></h3>
+<p>浏览器事件是指在 Web 页面中发生的各种交互和状态变化的信号。这些事件可以由用户的操作、浏览器的状态变化或其他一些因素触发。以下是一些常见的 DOM 事件和它们的简介：</p>
+<h4><span id="鼠标事件">鼠标事件：</span></h4>
+<ul>
+<li><strong>click：</strong> 当鼠标点击一个元素时触发。对于触摸屏设备，也会在触摸屏上进行点击时触发。</li>
+<li><strong>contextmenu：</strong> 当鼠标右键点击一个元素时触发。</li>
+<li><strong>mouseover / mouseout：</strong> 当鼠标指针移入或离开一个元素时触发。</li>
+<li><strong>mousedown / mouseup：</strong> 当在元素上按下或释放鼠标按钮时触发。</li>
+<li><strong>mousemove：</strong> 当鼠标移动时触发。</li>
+</ul>
+<h4><span id="键盘事件">键盘事件：</span></h4>
+<ul>
+<li><strong>keydown 和 keyup：</strong> 当按下和松开一个按键时触发。</li>
+</ul>
+<h4><span id="表单form元素事件">表单（form）元素事件：</span></h4>
+<ul>
+<li><strong>submit：</strong> 当访问者提交了一个 <code>&lt;form&gt;</code> 时触发。</li>
+<li><strong>focus：</strong> 当访问者聚焦于一个元素时触发，例如聚焦于一个 <code>&lt;input&gt;</code>。</li>
+</ul>
+<h4><span id="document-事件">Document 事件：</span></h4>
+<ul>
+<li><strong>DOMContentLoaded：</strong> 当 HTML 的加载和处理均完成，DOM 被完全构建完成时触发。</li>
+</ul>
+<h4><span id="css-事件">CSS 事件：</span></h4>
+<ul>
+<li><strong>transitionend：</strong> 当一个 CSS 动画完成时触发。</li>
+</ul>
+<p>这些事件可以通过 JavaScript 中的事件监听器来捕获和处理。例如，通过给元素添加事件监听器，可以在特定事件发生时执行相应的代码。事件是 Web 开发中交互和响应的基础。</p>
+<p>那我们所说的组件事件和浏览器事件有什么区别呢？</p>
+<p><strong>对于事件这一个定义，我们可以这样理解：事件是指在特定的时间点上发生的事情，在某个时间点产生了一个信号，而信号可以被接收处理，这就是事件。</strong></p>
+<p>下面我们所说的组件事件，其实相对于浏览器事件来说更为宏观，它是指在Vue组件中，组件之间的通信方式，而这种通信方式是通过事件来实现的，这里的事件就是我们所说的组件事件。</p>
+<p><strong>Vue 组件之间通过事件进行通信的主要机制是通过 emit 和 on 方法。当子组件需要向父组件通信时，它会触发一个事件，并通过 emit 方法将事件发送出去；而父组件则通过在模板中使用 v-on 指令监听这个事件，从而执行相应的逻辑。</strong></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- 子组件 ChildComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sendMessage<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>点击通知父组件<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">sendMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 使用 emit 发送自定义事件</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'child-event'</span><span class="token punctuation">,</span> <span class="token string">'Hello from child!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- 父组件 ParentComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>child-component</span> <span class="token attr-name">@child-event</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>handleChildEvent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>child-component</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>从子组件接收的消息: &#123;&#123; messageFromChild &#125;&#125;<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">import</span> ChildComponent <span class="token keyword">from</span> <span class="token string">'./ChildComponent.vue'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">components</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    ChildComponent
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">messageFromChild</span><span class="token operator">:</span> <span class="token string">''</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">handleChildEvent</span><span class="token punctuation">(</span><span class="token parameter">message</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 使用 v-on 监听子组件的事件</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>messageFromChild <span class="token operator">=</span> message<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Vue 的事件机制是通过发布/订阅模式实现的。$emit 用于发布（触发）事件，而 v-on 则用于订阅（监听）事件。这使得不同组件之间可以相互通信，实现了组件之间的解耦。</p>
+<p><strong>首先，我们会注意到，子组件通过 this.$emit(‘child-event’, ‘Hello from child!’) 发送了一个自定义事件 child-event，而父组件则通过 @child-event=“handleChildEvent” 监听了这个事件。</strong> 这里的 child-event 就是我们自定义的事件名，而 handleChildEvent 则是父组件中定义的一个方法，用于处理子组件发送过来的消息。</p>
+<p>当使用一个自定义的MyComponent组件时，我们可以监听由 emit 函数发射的自定义事件</p>
+<p>可以看到，自定义事件 change 被编译成名为 onChange 的属性，并存储在 props 数据对象中。这实际上是一种约定。作为框架设计者，也可以按照自己期望的方式来设计事件的编译结果。在具体的实现上，发射自定义事件的本质就是根据事件名称去props 数据对象中寻找对应的事件处理函数并执行，如下面的代码所示：</p>
+<h2><span id="emit的实现">emit的实现</span></h2>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 组件定义</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+  <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 发射 change 事件，并传递给事件处理函数两个参数</span>
+    <span class="token function">emit</span><span class="token punctuation">(</span><span class="token string">'change'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 组件的渲染逻辑</span>
+      <span class="token keyword">return</span> <span class="token comment">/* ... */</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>上面这一段代码会被编译成一个节点 CompNode，它的类型为 MyComponent 组件，同时会将 emit 函数传递给组件的 setup 函数，如下所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 定义一个 Vue 组件节点 CompNode</span>
+<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 指定节点的类型为 MyComponent 组件</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent<span class="token punctuation">,</span>
+
+  <span class="token comment">// 为组件传递的 props 对象</span>
+  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 在 MyComponent 组件中，会有一个 onChange 的事件处理函数，其值为 handler</span>
+    <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，自定义事件 change 被编译成名为 onChange 的属性，并存储在 props 数据对象中。这实际上是一种约定。作为框架设计者，也可以按照自己期望的方式来设计事件的编译结果。</p>
+<p>在具体的实现上，发射自定义事件的本质就是根据事件名称去props 数据对象中寻找对应的事件处理函数并执行，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 挂载组件</span>
+<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 省略部分代码</span>
+
+  <span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    state<span class="token punctuation">,</span> <span class="token comment">// 状态</span>
+    <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// 响应式处理 props</span>
+    <span class="token literal-property property">isMounted</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">subTree</span><span class="token operator">:</span> <span class="token keyword">null</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 定义 emit 函数，它接收两个参数</span>
+  <span class="token comment">// event: 事件名称</span>
+  <span class="token comment">// payload: 传递给事件处理函数的参数</span>
+  <span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 根据约定对事件名称进行处理，例如 change --> onChange</span>
+    <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 根据处理后的事件名称去 props 中寻找对应的事件处理函数</span>
+    <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 调用事件处理函数并传递参数</span>
+      <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'事件不存在'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 将 emit 函数添加到 setupContext 中</span>
+  <span class="token keyword">const</span> setupContext <span class="token operator">=</span> <span class="token punctuation">&#123;</span> attrs<span class="token punctuation">,</span> emit <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 省略部分代码</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 解析 props 数据的函数，对事件类型的 props 做特殊处理</span>
+<span class="token keyword">function</span> <span class="token function">resolveProps</span><span class="token punctuation">(</span><span class="token parameter">options<span class="token punctuation">,</span> propsData</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> props <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> attrs <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">const</span> key <span class="token keyword">in</span> propsData<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 以字符串 'on' 开头的 props 添加到 props 数据中，否则添加到 attrs 中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> options <span class="token operator">||</span> key<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      props<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      attrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>emit</code> 的实现原理主要涉及两个方面：<code>setupContext</code> 的注入和事件名称的约定转换。</p>
+<ol>
+<li>
+<p><strong>setupContext 的注入：</strong> 在 Vue 的组件中，<code>setup</code> 函数接收两个参数：<code>props</code> 和 <code>context</code>。<code>context</code> 中包含了一系列属性和方法，其中之一就是 <code>emit</code> 函数。Vue 3 的组件中，<code>setup</code> 函数返回的对象中，可以将 <code>emit</code> 函数添加到 <code>setupContext</code> 中，以便用户在组件内通过 <code>setupContext.emit</code> 访问。</p>
+<p>下面是一个简单的例子，展示了如何在 <code>setup</code> 函数中添加 <code>emit</code> 到 <code>setupContext</code>：</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 添加 emit 到 setupContext</span>
+  context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
+
+  <span class="token comment">// 其他 setup 逻辑</span>
+  <span class="token comment">// ...</span>
+
+  <span class="token comment">// 返回 setup 返回的对象</span>
+  <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这样，在组件内部，用户就可以通过 <code>setupContext.emit</code> 来调用 <code>emit</code> 函数了。</p>
+</li>
+<li>
+<p><strong>事件名称的约定转换：</strong> 在 <code>emit</code> 函数内部，为了匹配组件模板中的事件处理函数，需要对事件名称进行约定转换。Vue 使用了一种约定，将事件名称转换为驼峰命名的形式。例如，<code>change</code> 事件会转换为 <code>onChange</code>。这样，用户在组件模板中监听事件时，可以使用驼峰命名的方式。</p>
+<p>下面是一个简单的例子，展示了事件名称的约定转换：</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 根据约定对事件名称进行处理，例如 change --> onChange</span>
+  <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 根据处理后的事件名称去 props 中寻找对应的事件处理函数</span>
+  <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 调用事件处理函数并传递参数</span>
+    <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'事件不存在'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里的 <code>emit</code> 函数会将事件名称转换为以 “on” 开头并使用驼峰命名的形式，例如 <code>change</code> 转换为 <code>onChange</code>。然后，它会在 <code>instance.props</code> 中查找对应的事件处理函数并执行。</p>
+</li>
+</ol>
+<p>需要注意的是，事件类型的 props 在 <code>instance.props</code> 中是找不到的，因此它们会存储在 <code>attrs</code> 中。为了解决这个问题，在解析 props 数据时，需要对事件类型的 props 做特殊处理，确保它们被正确添加到 <code>props</code> 中，而不是 <code>attrs</code>。这样，<code>emit</code> 函数就能够在 <code>instance.props</code> 中正确地找到对应的事件处理函数。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            <a href="/2023/12/08/vue-component-1/" itemprop="url">Vuejs 组件的实现原理</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">2023年12月8日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2>
+<p>我们在前面讨论过了<a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">vue渲染器</a>，<strong>渲染器主要负责将虚拟 DOM 渲染为真实 DOM</strong> ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。</p>
+<p>但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。</p>
+<p>有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面。组件化的实现同样需要渲染器的支持</p>
+<h2><span id="渲染组件">渲染组件</span></h2>
+<p>从用户的角度来看，一个有状态组件就是一个选项对象，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 是一个组件，它的值是一个选项对象</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span> 
+  <span class="token keyword">return</span>  <span class="token punctuation">&#123;</span><span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>但是，如果从渲染器的内部实现来看，一个组件则是一个特殊类型的虚拟 DOM 节点。例如，为了描述普通标签，我们用虚拟节点的vnode.type 属性来存储标签名称，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"> <span class="token comment">// 该 vnode 用来描述普通标签</span>
+<span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span>
+<span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>为了描述片段，我们让虚拟节点的 vnode.type 属性的值为Fragment, 而为了描述文本，我们让虚拟节点的 vnode.type 属性的值为Text，</p>
+<p>还记得我们之前在渲染器讨论过的<code>patch函数</code>吗？</p>
+<p><strong>在patch函数中，Vue会根据新旧虚拟DOM节点的差异进行不同的处理逻辑。</strong> 如果是首次渲染，会执行首次渲染的逻辑；如果是更新渲染，会根据差异更新实际的DOM节点。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 02. 如果新旧节点类型不同，执行卸载操作</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>n1 <span class="token operator">&amp;&amp;</span> n1<span class="token punctuation">.</span>type <span class="token operator">!==</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">unmount</span><span class="token punctuation">(</span>n1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    n1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 07. 获取节点类型</span>
+  <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> type <span class="token punctuation">&#125;</span> <span class="token operator">=</span> n2<span class="token punctuation">;</span>
+
+  <span class="token comment">// 09. 判断节点类型</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 10. 处理普通元素</span>
+    <span class="token comment">// TODO: 处理普通元素的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Text<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 11. 处理文本节点</span>
+    <span class="token comment">// TODO: 处理文本节点的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Fragment<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 13. 处理片段</span>
+    <span class="token comment">// TODO: 处理片段的逻辑</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 返回新节点的实际DOM元素</span>
+  <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，渲染器会使用虚拟节点的 type 属性来区分其类型。对于不同类型的节点，需要采用不同的处理方法来完成挂载和更新。</p>
+<p>实际上，对于组件来说也是一样的。<strong>为了使用虚拟节点来描述组件，我们可以用虚拟节点的 vnode.type 属性来存储组件的选项对象</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 02. 如果新旧节点类型不同，执行卸载操作</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>n1 <span class="token operator">&amp;&amp;</span> n1<span class="token punctuation">.</span>type <span class="token operator">!==</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">unmount</span><span class="token punctuation">(</span>n1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    n1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 07. 获取节点类型</span>
+  <span class="token keyword">const</span> type <span class="token operator">=</span> n2<span class="token punctuation">.</span>type<span class="token punctuation">;</span>
+
+  <span class="token comment">// 09. 判断节点类型</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 10. 处理普通元素</span>
+    <span class="token comment">// TODO: 处理普通元素的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Text<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 11. 处理文本节点</span>
+    <span class="token comment">// TODO: 处理文本节点的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>type <span class="token operator">===</span> Fragment<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 13. 处理片段</span>
+    <span class="token comment">// TODO: 处理片段的逻辑</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> type <span class="token operator">===</span> <span class="token string">'object'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 16. vnode.type 的值是选项对象，作为组件来处理</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>n1<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 17. 挂载组件</span>
+      <span class="token function">mountComponent</span><span class="token punctuation">(</span>n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 21. 更新组件</span>
+      <span class="token function">patchComponent</span><span class="token punctuation">(</span>n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 返回新节点的实际DOM元素</span>
+  <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在上面这段代码中，我们新增了一个 else if 分支，用来处理虚拟节点的 vnode.type 属性值为对象的情况，即将该虚拟节点作为组件的描述来看待，并调用 mountComponent 和 patchComponent 函数来完成组件的挂载和更新。</p>
+<p>上面我们回顾了有关于组件的一些基本概念，组件的挂载和更新是如何实现的，其实我们更关注的还应该是<strong>用户应该如何编写组件？组件的选项对象必须包含哪些内容？以及组件拥有哪些能力？</strong></p>
+<p>因此，一个组件必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM。换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 组件定义</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 组件名称，可选</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+
+  <span class="token comment">// 组件的渲染函数，其返回值必须为虚拟 DOM,一个组件必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 返回虚拟 DOM</span>
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
+      <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'text content'</span><span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 用来描述组件的 vnode 对象，type 属性值为组件的选项对象</span>
+<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 调用渲染器来渲染组件</span>
+renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>CompNode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 渲染器中真正完成组件渲染任务的是 mountComponent 函数</span>
+<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 通过 vnode 获取组件的选项对象，即 vnode.type</span>
+  <span class="token keyword">const</span> componentOptions <span class="token operator">=</span> vnode<span class="token punctuation">.</span>type<span class="token punctuation">;</span>
+
+  <span class="token comment">// 获取组件的渲染函数 render</span>
+  <span class="token keyword">const</span> render <span class="token operator">=</span> componentOptions<span class="token punctuation">.</span>render<span class="token punctuation">;</span>
+
+  <span class="token comment">// 执行渲染函数，获取组件要渲染的内容，即 render 函数返回的虚拟 DOM</span>
+  <span class="token keyword">const</span> subTree <span class="token operator">=</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 最后调用 patch 函数来挂载组件所描述的内容，即 subTree</span>
+  <span class="token function">patch</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> subTree<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2><span id="总结">总结</span></h2>
+<p>我们现在来回顾一下组件的基础，我们显式声明了一个组件的对象实例，该组件的选项对象必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM，之后我们再调用render和patch进行组件的更新和替换。<strong>换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，而渲染器的作用就是将组件的渲染函数的返回值渲染为真实 DOM。</strong></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/28/vue5/" itemprop="url">Vue 2/3 共存开发的思路</a>
         
     </h1>
@@ -203,25 +595,36 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括<br>• 安全更新<br>• 浏览器兼容</p>
-<p>Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，<strong>是否有可能使我们的库同时支持 Vue 2 和 3 ？</strong></p>
-<h3><span id="通用代码">通用代码</span></h3><p>最简单的方法是编写适用于<strong>两个版本的通用代码</strong> ，无需任何额外的修改，就像人们对Python 2 和 3所做的那样。简单并不意味着容易。编写此类组件需要避免<strong>Vue 3 中新引入的内容</strong> 以及<strong>Vue 2 中弃用的内容</strong> 。换句话说，您不能使用：</p>
+        <h2><span id="前言">前言</span></h2>
+<p>2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括<br>
+• 安全更新<br>
+• 浏览器兼容</p>
+<p>Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库/插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，<strong>是否有可能使我们的库同时支持 Vue 2 和 3 ？</strong></p>
+<h3><span id="通用代码">通用代码</span></h3>
+<p>最简单的方法是编写适用于<strong>两个版本的通用代码</strong> ，无需任何额外的修改，就像人们对Python 2 和 3所做的那样。简单并不意味着容易。编写此类组件需要避免<strong>Vue 3 中新引入的内容</strong> 以及<strong>Vue 2 中弃用的内容</strong> 。换句话说，您不能使用：</p>
 <ul>
 <li>合成API</li>
 <li>.sync .native修饰语</li>
 <li>过滤器</li>
 <li>3rd 方供应商对象</li>
 </ul>
-<h3><span id="使用分支">使用分支</span></h3><p>核心团队成员对此问题的回复建议使用不同的分支来分隔对每个定位版本的支持。我认为这对于现有和成熟的库来说是一个很好的解决方案，因为它们的代码库通常更稳定，并且版本目标优化可能需要它们具有更好的代码隔离。</p>
+<h3><span id="使用分支">使用分支</span></h3>
+<p>核心团队成员对此问题的回复建议使用不同的分支来分隔对每个定位版本的支持。我认为这对于现有和成熟的库来说是一个很好的解决方案，因为它们的代码库通常更稳定，并且版本目标优化可能需要它们具有更好的代码隔离。</p>
 <p>这样做的缺点是您需要维护两个代码库，这会使您的工作量增加一倍。对于小型库或想要支持两个版本的新库来说，进行两次错误修复或功能补充是不理想的。我不建议在项目一开始就使用这种方法。</p>
-<h3><span id="构建脚本">构建脚本</span></h3><p>在VueUse中，编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。有了这个，我可以编写一次代码并使库支持两个 Vue 版本。它的问题是我需要在每个版本上构建两次并引导用户安装相应的插件版本（@vue&#x2F;composition-api对于Vue 2则需要手动安装）。</p>
-<h2><span id="vue-2x2f3-共存开发的思路">Vue 2&#x2F;3 共存开发的思路</span></h2><h3><span id="同时支持-vue-2x2f3-项目">同时⽀持 Vue 2&#x2F;3 项⽬</span></h3><h4><span id="vue-2x2f3-项目存在的可能场景">Vue 2&#x2F;3 项⽬存在的可能场景</span></h4><p><strong>渐进式迁移：</strong> 如果有一个较大的 Vue 2 项目，但是想要逐步迁移到 Vue 3，可以选择在项目中同时引入 Vue 3，然后逐步将 Vue 2 组件迁移到 Vue 3。</p>
+<h3><span id="构建脚本">构建脚本</span></h3>
+<p>在VueUse中，编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。有了这个，我可以编写一次代码并使库支持两个 Vue 版本。它的问题是我需要在每个版本上构建两次并引导用户安装相应的插件版本（@vue/composition-api对于Vue 2则需要手动安装）。</p>
+<h2><span id="vue-23-共存开发的思路">Vue 2/3 共存开发的思路</span></h2>
+<h3><span id="同时支持-vue-23-项目">同时⽀持 Vue 2/3 项⽬</span></h3>
+<h4><span id="vue-23-项目存在的可能场景">Vue 2/3 项⽬存在的可能场景</span></h4>
+<p><strong>渐进式迁移：</strong> 如果有一个较大的 Vue 2 项目，但是想要逐步迁移到 Vue 3，可以选择在项目中同时引入 Vue 3，然后逐步将 Vue 2 组件迁移到 Vue 3。</p>
 <p><strong>依赖库和插件兼容性：</strong> 如果项目依赖于一些 Vue 2 的插件或库，而这些插件或库还没有升级到 Vue 3，可能需要同时使用 Vue 2 和 Vue 3 以确保兼容性。</p>
 <p><strong>新功能采用 Vue 3：</strong> 可能希望项目中使用 Vue 3 来利用其新功能和性能优势，同时保留 Vue 2 用于旧的组件或功能。</p>
-<p><strong>项⽬融合者：</strong> 公司内部基于体验要求，需要 Vue 2&#x2F;3项⽬呈现在同⼀⻚⾯中</p>
-<p><strong>内部组件资产维护者：</strong> 需要在 Vue 2&#x2F;3 的项⽬都⽀持，且能⼒必须⼀致</p>
+<p><strong>项⽬融合者：</strong> 公司内部基于体验要求，需要 Vue 2/3项⽬呈现在同⼀⻚⾯中</p>
+<p><strong>内部组件资产维护者：</strong> 需要在 Vue 2/3 的项⽬都⽀持，且能⼒必须⼀致</p>
 <p><strong>⽼项⽬应⽤开发者：</strong> 需要⽤到⼀个第三⽅图表组件，但只有 Vue 3 版本，⽽⾮ Vue 2 版本</p>
-<h3><span id="解决方案">解决⽅案</span></h3><h4><span id="1-vue-2x2f3-项目共存">1. Vue 2&#x2F;3 项⽬共存</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
+<h3><span id="解决方案">解决⽅案</span></h3>
+<h4><span id="1-vue-23-项目共存">1. Vue 2/3 项⽬共存</span></h4>
+<p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
 <p>直接通过 Vue 3 的 createApp 创建⼀个 Vue 3 的根实例，然后通过 Vue 2 的 mount ⽅法挂载到 Vue 2 的根实例上，这样就可以在 Vue 2 的项⽬中使⽤ Vue 3 的组件。</p>
 <p>相关的代码仓库贴在这里，大家自取：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
 <p><img src="/img/vue5/vue5-2.jpg" alt="vue-5"></p>
@@ -230,7 +633,6 @@
 <span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
 
 <span class="token function">createApp</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">mount</span><span class="token punctuation">(</span><span class="token string">'#vue3'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 2 项⽬</span>
 <span class="token keyword">import</span> Vue <span class="token keyword">from</span> <span class="token string">'vue2'</span>
 <span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
@@ -261,9 +663,9 @@
     <span class="token function">Inspect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>这样我们属于是将Vue2和Vue3单独做成了两个独立的包，然后在vite.config.ts中配置了不同的编译规则，这样就可以在同一个页面中使用Vue2和Vue3。</p>
-<h4><span id="2-jessicasachsx2fpetite-方案">2. JessicaSachs&#x2F;petite 方案</span></h4><p>先来简单介绍一下<a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>：</p>
+<h4><span id="2-jessicasachspetite-方案">2. JessicaSachs/petite 方案</span></h4>
+<p>先来简单介绍一下<a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>：</p>
 <blockquote>
 <p><strong>Petite是一个为Vue组件作者构建的主观GitHub模板。</strong> 它设置了开发、文档和测试通用SFC组件所需的工具，并与Vue 2.7运行时向后兼容。</p>
 </blockquote>
@@ -272,30 +674,32 @@
 <p>而这也意味着您将在 npm 上发布软件包的两个版本，而不是为了支持 Vue 2 或 Vue 3 而中断主要版本。</p>
 <p><strong>这样做的缺点是您的用户在升级和更改导入时需要安装新版本。</strong> 好处是您可以更轻松地编写向后兼容的代码并为用户提供定期升级。此外，您还可以拆分仅 Vue 2 和仅 Vue 3 的依赖项。</p>
 <p>如果您在通用代码中使用lodash，您将需要在工作区根目录中运行后pnpm build，每个包 ( lib-vue3、lib-vue2) 应独立部署。</p>
-<h4><span id="3-vue-bridge-方案">3. vue-bridge 方案</span></h4><h4><span id="4-vue-demi-方案">4. vue-demi 方案</span></h4><p>仓库实例：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
+<h4><span id="3-vue-bridge-方案">3. vue-bridge 方案</span></h4>
+<h4><span id="4-vue-demi-方案">4. vue-demi 方案</span></h4>
+<p>仓库实例：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
 <p>Vue Demi是一个开发实用程序，允许您为 Vue 2 和 3 编写通用 Vue 库。无需担心用户安装的版本。</p>
-<p>当您要创建 Vue 插件&#x2F;库时，只需安装vue-demi为依赖项并从中导入与 Vue 相关的任何内容即可。像往常一样发布你的插件&#x2F;库，你的包将变得通用！</p>
+<p>当您要创建 Vue 插件/库时，只需安装vue-demi为依赖项并从中导入与 Vue 相关的任何内容即可。像往常一样发布你的插件/库，你的包将变得通用！</p>
 <pre class="line-numbers language-none"><code class="language-none">&#123;
   &quot;dependencies&quot;: &#123;
     &quot;vue-demi&quot;: &quot;latest&quot;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> Vue<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> reactive<span class="token punctuation">,</span> ref <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>在底层，它使用了postinstallnpm hook。安装所有包后，脚本将开始检查已安装的 Vue 版本，并将导出重定向到基于本地 Vue 版本。使用 Vue 2 时，@vue&#x2F;composition-api如果未安装，它也会自动安装。</p>
-<p>所需要注意的有关于库&#x2F;组件的点：</p>
-<p><strong>库&#x2F;组件</strong></p>
+<p>在底层，它使用了postinstallnpm hook。安装所有包后，脚本将开始检查已安装的 Vue 版本，并将导出重定向到基于本地 Vue 版本。使用 Vue 2 时，@vue/composition-api如果未安装，它也会自动安装。</p>
+<p>所需要注意的有关于库/组件的点：</p>
+<p><strong>库/组件</strong></p>
 <ul>
 <li>单仓库 - 多个包构建</li>
 <li>依赖管理</li>
-<li>alias 别名配置<ul>
+<li>alias 别名配置
+<ul>
 <li>npm 包名</li>
 <li>构建工具配置</li>
 </ul>
 </li>
 </ul>
-<h3><span id="vue-2-应用中引入-vue-3-组件">Vue 2 应⽤中引⼊ Vue 3 组件</span></h3><p><strong>会有组件互操作的限制</strong></p>
+<h3><span id="vue-2-应用中引入-vue-3-组件">Vue 2 应⽤中引⼊ Vue 3 组件</span></h3>
+<p><strong>会有组件互操作的限制</strong></p>
 <ul>
 <li>context 共享</li>
 <li>scoped slots</li>
@@ -341,8 +745,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>渲染器的核心就是 Diff 算法。简单来说，当新旧 vnode 的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较的算法就叫作 Diff 算法。我们知道，操作 DOM 的性能开销通常比较大，而渲染器的核心 Diff 算法就是为了解决这个问题而诞生的。</p>
-<h2><span id="减少-dom-操作的性能开销">减少 DOM 操作的性能开销</span></h2><p>核心 Diff 只关心新旧虚拟节点都存在一组子节点的情况。针对两组子节点的更新，我们之前采用了一种简单直接的手段，即卸载全部旧子节点，再挂载全部新子节点。这么做的确可以完成更新，但由于没有复用任何 DOM 元素，所以会产生极大的性能开销。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>渲染器的核心就是 Diff 算法。简单来说，当新旧 vnode 的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较的算法就叫作 Diff 算法。我们知道，操作 DOM 的性能开销通常比较大，而渲染器的核心 Diff 算法就是为了解决这个问题而诞生的。</p>
+<h2><span id="减少-dom-操作的性能开销">减少 DOM 操作的性能开销</span></h2>
+<p>核心 Diff 只关心新旧虚拟节点都存在一组子节点的情况。针对两组子节点的更新，我们之前采用了一种简单直接的手段，即卸载全部旧子节点，再挂载全部新子节点。这么做的确可以完成更新，但由于没有复用任何 DOM 元素，所以会产生极大的性能开销。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 旧 vnode</span>
 <span class="token keyword">const</span> oldNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
@@ -362,7 +768,6 @@
     <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'6'</span> <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>按照之前的做法，当更新子节点时，我们需要执行 6 次 DOM 操作：</p>
 <ul>
 <li>卸载所有旧子节点，需要 3 次 DOM 删除操作；</li>
@@ -389,11 +794,10 @@
     <span class="token comment">// 省略部分代码</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，oldChildren 和 newChildren 分别是旧的一组子节点和新的一组子节点。我们遍历前者，并将两者中对应位置的节点分别传递给 patch 函数进行更新。patch 函数在执行更新时，发现新旧子节点只有文本内容不同，因此只会更新其文本节点的内容。这样，我们就成功地将 6 次 DOM 操作减少为 3 次。其中菱形代表新子节点，矩形代表旧子节点，圆形代表真实 DOM 节点。</p>
-<p><img src="/img/vue-render/render-diff1.png" alt="render-diff"></p>
+<p><img src="img/vue-render/render-diff1.png" alt="render-diff"></p>
 <p>这种做法虽然能够减少 DOM 操作次数，但问题也很明显。在上面的代码中，我们通过遍历旧的一组子节点，并假设新的一组子节点的数量与之相同，只有在这种情况下，这段代码才能正确地工作。但是，新旧两组子节点的数量未必相同。当新的一组子节点的数量少于旧的一组子节点的数量时，意味着有些节点在更新后应该被卸载。</p>
-<p><img src="/img/vue-render/render-diff2.png" alt="render-diff"></p>
+<p><img src="img/vue-render/render-diff2.png" alt="render-diff"></p>
 
     
     </div>
@@ -427,7 +831,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>本节我们将讨论如何处理事件，包括如何在虚拟节点中描述事件，如何把事件添加到 DOM 元素上，以及如何更新事件。我们先来解决第一个问题，即如何在虚拟节点中描述事件。事件可以视作一种特殊的属性，因此我们可以约定，在 vnode.props 对象中，凡是以字符串 on 开头的属性都视作事件。例如：</p>
+        <h2><span id="引言">引言</span></h2>
+<p>本节我们将讨论如何处理事件，包括如何在虚拟节点中描述事件，如何把事件添加到 DOM 元素上，以及如何更新事件。我们先来解决第一个问题，即如何在虚拟节点中描述事件。事件可以视作一种特殊的属性，因此我们可以约定，在 vnode.props 对象中，凡是以字符串 on 开头的属性都视作事件。例如：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -438,7 +843,6 @@
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>解决了事件在虚拟节点层面的描述问题后，我们再来看看如何将事件添加到 DOM 元素上。这非常简单，只需要在 patchProps 中调用 addEventListener 函数来绑定事件即可，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 匹配以 on 开头的属性，视其为事件</span>
@@ -458,7 +862,6 @@
     <span class="token comment">// 省略部分代码（处理其他属性的逻辑）</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>事实上可以更为优化的事件更新机制，避免多次调用 <code>removeEventListener</code> 和 <code>addEventListener</code>。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -491,7 +894,6 @@
     <span class="token comment">// 省略部分代码（处理其他属性的逻辑）</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>观察上面的代码，事件绑定主要分为两个步骤。先从 el._vei 中读取对应的 invoker，如果 invoker 不存在，则将伪造的 invoker 作为事件处理函数，并将它缓存到el._vei 属性中。</p>
 <p>把真正的事件处理函数赋值给 invoker.value 属性，然后把伪造的 invoker 函数作为事件处理函数绑定到元素上。可以看到，当事件触发时，实际上执行的是伪造的事件处理函数，在其内部间接执行了真正的事件处理函数 invoker.value(e)。</p>
 <p>当更新事件时，由于 el._vei 已经存在了，所以我们只需要将invoker.value 的值修改为新的事件处理函数即可。</p>
@@ -512,8 +914,8 @@
 
 <span class="token comment">// 假设 renderer 是你的渲染器对象</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>当渲染器尝试渲染这上面代码中给出的 vnode 时，会先绑定click 事件，然后再绑定 contextmenu 事件。后绑定的contextmenu 事件的处理函数将覆盖先绑定的 click 事件的处理函<br>数。为了解决事件覆盖的问题，我们需要重新设计 el._vei 的数据结构。我们应该将 el._vei 设计为一个对象，它的键是事件名称，它的值则是对应的事件处理函数，这样就不会发生事件覆盖的现象了.</p>
+<p>当渲染器尝试渲染这上面代码中给出的 vnode 时，会先绑定click 事件，然后再绑定 contextmenu 事件。后绑定的contextmenu 事件的处理函数将覆盖先绑定的 click 事件的处理函<br>
+数。为了解决事件覆盖的问题，我们需要重新设计 el._vei 的数据结构。我们应该将 el._vei 设计为一个对象，它的键是事件名称，它的值则是对应的事件处理函数，这样就不会发生事件覆盖的现象了.</p>
 <p>根据你提供的代码片段，这段代码主要是用于处理 DOM 元素的属性更新，其中包括事件的绑定和解绑逻辑。在这个代码中，它使用了一个 <code>el._vei</code> 的对象来缓存事件处理函数。下面是你提供的代码的一些修正：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -546,7 +948,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token comment">// 处理其他属性的逻辑</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们修改了 invoker 函数的实现。当 invoker函数执行时，在调用真正的事件处理函数之前，要先检查invoker.value 的数据结构是否是数组，如果是数组则遍历它，并逐个调用定义在数组中的事件处理函数。</p>
 
     
@@ -581,14 +982,16 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
 <p>那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。</p>
 <p>每个Vue组件都实现了一个render函数。大多数时候，该函数将由Vue编译器创建。当我们在组件上指定模板时，该模板的内容将由Vue编译器处理，编译器最终将返回render函数。渲染函数本质上返回一个虚拟DOM节点，该节点将被Vue在浏览器DOM中渲染。</p>
-<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong> </p>
-<p><strong>虚拟文档对象模型（或”DOM”）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
+<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong></p>
+<p><strong>虚拟文档对象模型（或&quot;DOM&quot;）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
 <p>Vue更新浏览器DOM时，会将更新的虚拟DOM与上一个虚拟DOM进行比较，并仅使用已修改的部分更新实际DOM。这意味着更少的元素更改，从而提高了性能。Render函数返回虚拟DOM节点，在Vue生态系统中通常称为VNode，该接口是允许Vue在浏览器DOM中写入这些对象的接口。它们包含使用Vue所需的所有信息。</p>
 <p><img src="/img/vue-render/render-pipeline.png" alt="vue-render"></p>
-<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2><p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
+<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2>
+<p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -598,7 +1001,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面这段代码描述的是“一个<code>div</code>标签具有一个子节点，且子节点是<code>p</code>标签”。可以看到，<code>vnode.children</code>是一个数组，它的每一个元素都是一个独立的虚拟节点对象。这样就形成了树型结构，即虚拟DOM树。</p>
 <p>为了完成子节点的渲染，我们需要修改<code>mountElement</code>函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -613,12 +1015,13 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token punctuation">&#125;</span>
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上面这段代码中，我们增加了新的判断分支。使用<code>Array.isArray</code>函数判断<code>vnode.children</code>是否是数组，如果是数组，则循环遍历它，并调用<code>patch</code>函数挂载数组中的虚拟节点。在挂载子节点时，需要注意以下两点：</p>
 <ol>
-<li><p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
+<li>
+<p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
 </li>
-<li><p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
+<li>
+<p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
 </li>
 </ol>
 <p>完成了子节点的挂载后，我们再来看看如何用<code>vnode</code>描述一个标签的属性，以及如何渲染这些属性。我们知道，HTML标签有很多属性，其中有些属性是通用的，例如<code>id</code>、<code>class</code>等，而有些属性是特定元素才有的，例如<code>form</code>元素的<code>action</code>属性。实际上，渲染一个元素的属性比想象中要复杂，不过我们仍然秉承一切从简的原则，先来看看最基本的属性处理。</p>
@@ -635,7 +1038,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><code>vnode.props</code>是一个对象，它的键代表元素的属性名称，它的值代表对应属性的值。这样，我们就可以通过遍历<code>props</code>对象的方式，把这些属性渲染到对应的元素上，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -652,7 +1054,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们首先检查了<code>vnode.props</code>字段是否存在，如果存在则遍历它，并调用<code>setAttribute</code>函数将属性设置到元素上。实际上，除了使用<code>setAttribute</code>函数为元素设置属性之外，还可以通过DOM对象直接设置：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -667,18 +1068,19 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们没有选择使用<code>setAttribute</code>函数，而是直接将属性设置在DOM对象上，即<code>el[key] = vnode.props[key]</code>。实际上，无论是使用<code>setAttribute</code>函数，还是直接操作DOM对象，都存在缺陷。如前所述，为元素设置属性比想象中要复杂得多。不过，在讨论具体有哪些缺陷之前，我们有必要先搞清楚两个重要的概念：HTML Attributes和DOM Properties。</p>
 <p>当我们处理元素属性时，有两种主要的方式：使用HTML Attributes和DOM Properties。这两者在概念上有些许不同：</p>
 <ol>
-<li><p><strong>HTML Attributes</strong>:</p>
+<li>
+<p><strong>HTML Attributes</strong>:</p>
 <ul>
 <li>HTML Attributes是在HTML标签中定义的属性，例如<code>id</code>、<code>class</code>、<code>src</code>等。</li>
 <li>通过<code>setAttribute</code>方法可以设置HTML Attributes。</li>
 <li>HTML Attributes的值始终是字符串。</li>
 </ul>
 </li>
-<li><p><strong>DOM Properties</strong>:</p>
+<li>
+<p><strong>DOM Properties</strong>:</p>
 <ul>
 <li>DOM Properties是DOM对象上的属性，例如<code>element.id</code>、<code>element.className</code>、<code>element.src</code>等。</li>
 <li>直接操作DOM对象可以设置DOM Properties。</li>
@@ -686,70 +1088,62 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 </ul>
 </li>
 </ol>
-<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2><p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
+<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2>
+<p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
 <p>如果我们使用<code>setAttribute</code>方法设置属性，那么属性会被设置为HTML Attributes。如果我们直接操作DOM对象的属性，属性会被设置为DOM Properties。</p>
 <p>现在，我们来讨论一下这两种方式存在的问题：</p>
 <ol>
-<li><p><strong>属性值类型转换问题</strong>:</p>
+<li>
+<p><strong>属性值类型转换问题</strong>:</p>
 <ul>
-<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute(&#39;value&#39;, 42)</code>会将值转换为字符串<code>&#39;42&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute('value', 42)</code>会将值转换为字符串<code>'42'</code>。</li>
 </ul>
 </li>
-<li><p><strong>布尔属性问题</strong>:</p>
+<li>
+<p><strong>布尔属性问题</strong>:</p>
 <ul>
 <li>HTML中的一些属性是布尔属性，例如<code>checked</code>、<code>disabled</code>等。对于这些属性，如果存在就表示为<code>true</code>，不存在就表示为<code>false</code>。</li>
-<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute(&#39;disabled&#39;, &#39;false&#39;)</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>&#39;false&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute('disabled', 'false')</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>'false'</code>。</li>
 </ul>
 </li>
 </ol>
 <p>考虑到这些问题，最好的做法是尽量使用DOM Properties而不是HTML Attributes来设置元素的属性。这样可以避免类型转换问题和布尔属性问题，确保属性被正确设置。</p>
 <p>首先，HTML Attributes指的是定义在HTML标签上的属性，例如<code>id=&quot;my-input&quot;</code>、<code>type=&quot;text&quot;</code>和<code>value=&quot;foo&quot;</code>。当浏览器解析这段HTML代码后，会创建一个与之相符的DOM元素对象，我们可以通过JavaScript代码来读取该DOM对象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> el <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#my-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>现在来说一下DOM Properties。许多HTML Attributes在DOM对象上有与之同名的DOM Properties，例如<code>id=&quot;my-input&quot;</code>对应<code>el.id</code>，<code>type=&quot;text&quot;</code>对应<code>el.type</code>，<code>value=&quot;foo&quot;</code>对应<code>el.value</code>等。但是，DOM Properties与HTML Attributes的名字并不总是一模一样的，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>class=&quot;foo&quot;</code>对应的DOM Properties则是<code>el.className</code>。另外，并不是所有HTML Attributes都有与之对应的DOM Properties，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">aria-valuenow</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>75<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>aria-*</code>类的HTML Attributes就没有与之对应的DOM Properties。</p>
 <p>类似地，也不是所有DOM Properties都有与之对应的HTML Attributes，例如可以用<code>el.textContent</code>来设置元素的文本内容，但并没有与之对应的HTML Attributes来完成同样的工作。</p>
 <p>HTML Attributes的值与DOM Properties的值之间是有关联的。例如下面的HTML片段：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>&#39;foo&#39;</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
+<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>'foo'</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
 <p>但并不是所有HTML Attributes与DOM Properties之间都是直接映射的关系，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>&#39;foo&#39;</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>&#39;bar&#39;</code>，那么：</p>
+<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>'foo'</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>'bar'</code>，那么：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>但如果运行下面的代码，会发生“奇怪”的现象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute(&#39;value&#39;)</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
+<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute('value')</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
 <p>但我们仍然可以通过<code>el.defaultValue</code>来访问初始值，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 el<span class="token punctuation">.</span>value<span class="token punctuation">;</span> <span class="token comment">// 'bar'</span>
 el<span class="token punctuation">.</span>defaultValue<span class="token punctuation">;</span> <span class="token comment">// 'foo'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>这说明一个HTML Attributes可能关联多个DOM Properties。例如在上例中，<code>value=&quot;foo&quot;</code>与<code>el.value</code>和<code>el.defaultValue</code>都有关联。</p>
 <p>虽然我们可以认为HTML Attributes是用来设置与之对应的DOM Properties的初始值的，但有些值是受限制的，就好像浏览器内部做了默认值校验。如果你通过HTML Attributes提供的默认值不合法，那么浏览器会使用内建的合法值作为对应DOM Properties的默认值，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>&#39;foo&#39;</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>&#39;text&#39;</code>，而非字符串<code>&#39;foo&#39;</code>：</p>
+<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>'foo'</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>'text'</code>，而非字符串<code>'foo'</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'text'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>从上述分析来看，HTML Attributes与DOM Properties之间的关系很复杂，但实际上我们只需要记住一个核心原则：HTML Attributes的作用是设置与之对应的DOM Properties的初始值。</p>
-<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2><p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
+<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2>
+<p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
 <p>首先，我们以一个禁用的按钮为例，如下所示的HTML代码：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>浏览器会自动将这个按钮设置为禁用状态，并将其对应的DOM Properties <code>el.disabled</code>的值设置为<code>true</code>。但是，如果同样的代码出现在Vue.js的模板中，情况就会有所不同。</p>
 <p>在Vue.js的模板中，HTML模板会被编译成虚拟节点（vnode），其中<code>props.disabled</code>的值是一个空字符串。如果直接使用<code>setAttribute</code>函数设置属性，会导致意外的效果，即按钮被禁用。例如，以下模板：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>对应的虚拟节点为：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> button <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'button'</span><span class="token punctuation">,</span>
@@ -757,10 +1151,8 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token literal-property property">disabled</span><span class="token operator">:</span> <span class="token boolean">false</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>如果使用<code>setAttribute</code>函数将属性值设置为空字符串，实际上相当于：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'disabled'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>而按钮的<code>el.disabled</code>属性是布尔类型的，不关心具体的HTML Attributes的值是什么，只要<code>disabled</code>属性存在，按钮就会被禁用。因此，渲染器不应该总是使用<code>setAttribute</code>函数将<code>vnode.props</code>对象中的属性设置到元素上。</p>
 <p>为了解决这个问题，我们可以优先设置元素的DOM Properties，但当值为空字符串时，需要手动将其矫正为<code>true</code>。以下是一个具体的实现示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -784,7 +1176,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上述代码中，我们检查每个<code>vnode.props</code>中的属性，看看是否存在对应的DOM Properties。如果存在，优先设置DOM Properties。同时，对布尔类型的DOM Properties做了值的矫正，即当要设置的值为空字符串时，将其矫正为布尔值<code>true</code>。如果<code>vnode.props</code>中的属性没有对应的DOM Properties，则仍然使用<code>setAttribute</code>函数完成属性的设置。</p>
 <p>然而，上述实现仍然存在问题。有些DOM Properties是只读的，例如<code>el.form</code>。为了解决这个问题，我们可以添加一个辅助函数<code>shouldSetAsProps</code>，用于判断是否应该将属性作为DOM Properties设置。如果属性是只读的，或者需要特殊处理，就应该使用<code>setAttribute</code>函数来设置属性。</p>
 <p>最后，为了使属性设置操作与平台无关，我们将属性设置相关的操作提取到渲染器选项中。以下是相应的代码示例：</p>
@@ -811,7 +1202,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在<code>mountElement</code>函数中，只需要调用<code>patchProps</code>函数，并为其传递相应的参数即可。这样，我们就将属性相关的渲染逻辑从渲染器的核心中抽离出来，使其更加可维护和灵活。</p>
 
     
@@ -846,16 +1236,23 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
 <p>另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。</p>
 <p>在Vue.js中，渲染器（renderer）是负责执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。渲染器不仅可以渲染真实DOM元素，还是框架跨平台能力的关键。在设计渲染器时，需要考虑其可自定义的能力。</p>
-<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2><p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
+<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2>
+<p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
 <p>在Vue.js中，渲染器（renderer）是用来执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。以下是渲染器的基本概念及其含义：</p>
-<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3><p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3><p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="挂载mounting">挂载（Mounting）</span></h3><p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
-<h3><span id="容器container">容器（Container）</span></h3><p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
-<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3><p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
+<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3>
+<p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3>
+<p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="挂载mounting">挂载（Mounting）</span></h3>
+<p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
+<h3><span id="容器container">容器（Container）</span></h3>
+<p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
+<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3>
+<p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">function</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 渲染逻辑</span>
@@ -876,21 +1273,17 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 同构渲染</span>
 <span class="token function">hydrate</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面的代码片中通过<code>createRenderer</code>函数创建了一个渲染器对象，包含了<code>render</code>和<code>hydrate</code>函数。<code>render</code>函数用于将虚拟DOM渲染为真实DOM元素，而<code>hydrate</code>函数用于将虚拟DOM激活为已有的真实DOM元素。</p>
 <p>好的，现在我们已经对渲染器有了一个比较基础的认识，下面来一步步深入了解一下：</p>
 <p>渲染器的实现可以通过如下的函数来表示，其中<code>domString</code>是待渲染的HTML字符串，<code>container</code>是挂载点的DOM元素：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token parameter">domString<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   container<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> domString<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>使用渲染器的示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">renderer</span><span class="token punctuation">(</span><span class="token string">'&lt;h1>Hello&lt;/h1>'</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>上述代码将<code>&lt;h1&gt;Hello&lt;/h1&gt;</code>插入到id为<code>app</code>的DOM元素内。渲染器不仅可以渲染静态字符串，还可以渲染动态拼接的HTML内容：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>count<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
 <p>如果<code>count</code>是一个响应式数据，那么可以使用响应系统来自动化整个渲染过程。首先，定义一个响应式数据<code>count</code>，然后在副作用函数内调用渲染器函数进行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> count <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -899,11 +1292,9 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 count<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上述代码中，<code>count</code>是一个<code>ref</code>响应式数据。当修改<code>count.value</code>的值时，副作用函数会重新执行，完成重新渲染，最终渲染到页面的内容是<code>&lt;h1&gt;2&lt;/h1&gt;</code>。</p>
 <p>这里使用了Vue 3提供的<code>@vue/reactivity</code>包中的响应式API，通过<code>&lt;script&gt;</code>标签引入：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://unpkg.com/@vue/reactivity@3.0.5/dist/reactivity.global.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>上述代码中给出了<code>render</code>函数的基本实现，下面将其执行流程进行详细分析。假设我们连续三次调用<code>renderer.render</code>函数来执行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> renderer <span class="token operator">=</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -913,12 +1304,12 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode2<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 第三次渲染</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在首次渲染时，渲染器将<code>vnode1</code>渲染为真实DOM，并将<code>vnode1</code>存储到容器元素的<code>container.vnode</code>属性中，作为旧vnode。</p>
 <p>在第二次渲染时，旧的vnode存在（即<code>container.vnode</code>中有值），此时渲染器将<code>vnode2</code>作为新vnode，将新旧vnode一同传递给<code>patch</code>函数进行打补丁。</p>
-<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = &#39;&#39;</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
+<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = ''</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
 <p>关于<code>patch</code>函数，它是整个渲染器的核心入口，接收三个参数：旧vnode <code>n1</code>、新vnode <code>n2</code>和容器 <code>container</code>。在首次渲染时，旧vnode <code>n1</code>是<code>undefined</code>，表示挂载动作。<code>patch</code>函数不仅用于打补丁，也可以执行挂载动作。</p>
-<h2><span id="自定义渲染器">自定义渲染器</span></h2><p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
+<h2><span id="自定义渲染器">自定义渲染器</span></h2>
+<p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 创建渲染器函数，接收配置项作为参数</span>
 <span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token parameter">options</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 从配置项中获取操作 DOM 的 API</span>
@@ -993,7 +1384,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
 <span class="token comment">// 使用自定义渲染器渲染虚拟节点到挂载点</span>
 <span class="token function">customRenderer</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面的代码片我们通过<code>createRenderer</code>函数创建了一个自定义渲染器，并通过配置项(<code>customRendererOptions</code>)传递操作DOM的API。渲染器在执行时，根据配置项中的API来完成相应的操作。通过这种方式，我们实现了一个通用的、不依赖于特定平台的渲染器。在实际应用中，可以根据不同的平台需求，通过配置不同的API，实现跨平台的渲染能力。</p>
 
     
@@ -1028,14 +1418,15 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>介绍 reactive 与 shallowReactive 的区别，即深响应和浅响应的区别。</p>
-<h2><span id="浅响应式与深相应式">浅响应式与深相应式</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <h2><span id="前言">前言</span></h2>
+<p>介绍 reactive 与 shallowReactive 的区别，即深响应和浅响应的区别。</p>
+<h2><span id="浅响应式与深相应式">浅响应式与深相应式</span></h2>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><span class="token punctuation">&#123;</span> 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar<span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// 修改 obj.foo.bar 的值，并不能触发响应</span>
 obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar <span class="token operator">=</span> <span class="token number">2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>首先，创建 obj 代理对象，该对象的 foo 属性值也是一个对象，即 { bar: 1} 。接着，在副作用函数内访问 obj.foo.bar 的值。但是我们发现，后续对 obj.foo.bar 的修改不能触发副作用函数重新执行，这是为什么呢？来看一下现在的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj <span class="token punctuation">,</span><span class="token punctuation">&#123;</span>
@@ -1049,7 +1440,6 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token comment">// 省略其他拦截函数</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>由上面这段代码可知，当我们读取 obj.foo.bar 时，首先要读取 obj.foo 的值。这里我们直接使用 Reflect.get 函数返回obj.foo 的结果。由于通过 Reflect.get 得到 obj.foo 的结果是一个普通对象，即 { bar: 1} ，它并不是一个响应式对象，所以在副作用函数中访问 obj.foo.bar 时，是不能建立响应联系的。要解决这个问题，我们需要对 Reflect.get 返回的结果做一层包装:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
@@ -1064,12 +1454,12 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
     <span class="token comment">// Other traps...</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>这段代码定义了一个名为reactive的函数，该函数接收一个对象作为参数，并返回该对象的代理。这个代理使用了get陷阱函数，当我们尝试获取对象的某个属性时，这个函数就会被触发。</p>
 <p>在get陷阱函数中，我们首先使用Reflect.get方法获取目标对象的属性值。Reflect.get方法接收三个参数：目标对象、属性名和接收器对象。在这里，接收器对象就是代理对象本身。</p>
 <p>然后，我们检查获取的结果是否为对象。如果是对象，我们就对其进行响应式处理，即再次调用reactive函数。这样做的目的是确保嵌套的对象也具有响应式特性，也就是说，当我们修改这些嵌套对象的属性时，也能触发响应式系统。</p>
 <p>最后，如果获取的结果不是对象，我们就直接返回结果。</p>
-<h2><span id="浅响应式">浅响应式</span></h2><p>然而，并非所有情况下我们都希望深响应，这就催生了shallowReactive，即浅响应。所谓浅响应，指的是只有对象的第一层属性是响应的，例如：</p>
+<h2><span id="浅响应式">浅响应式</span></h2>
+<p>然而，并非所有情况下我们都希望深响应，这就催生了shallowReactive，即浅响应。所谓浅响应，指的是只有对象的第一层属性是响应的，例如：</p>
 <p>例如，我们有一个对象，它的属性值也是一个对象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">innerObj</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1078,18 +1468,15 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>如果我们对obj进行深响应处理：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> reactiveObj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>那么，无论我们修改obj的属性，还是修改innerObj的属性，都会触发响应式系统：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">reactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>但是，如果我们只想要obj的第一层属性是响应的，也就是说，只有当我们修改obj的属性时才触发响应式系统，而修改innerObj的属性则不触发，那么我们就需要使用shallowReactive函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>这样，只有当我们修改obj的属性时，才会触发响应式系统：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">shallowReactiveObj<span class="token punctuation">.</span>innerObj <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">// 触发响应式系统</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 不触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h2><span id="vuejs里reactive和shallowreactive">Vuejs里reactive和shallowReactive</span></h2><p>在Vue.js中，reactive和shallowReactive函数都用于创建响应式对象，这一小节来讨论下他们的不同。</p>
+<h2><span id="vuejs里reactive和shallowreactive">Vuejs里reactive和shallowReactive</span></h2>
+<p>在Vue.js中，reactive和shallowReactive函数都用于创建响应式对象，这一小节来讨论下他们的不同。</p>
 <p>reactive函数创建的是深度响应式对象。这意味着不仅对象本身，而且它内部的所有嵌套对象都会变成响应式的。无论是修改对象的属性，还是修改其嵌套对象的属性，都会触发响应式系统。</p>
 <p>而shallowReactive函数创建的是浅层响应式对象。这意味着只有对象的顶层属性是响应式的。如果对象包含嵌套对象，那么修改这些嵌套对象的属性不会触发响应式系统。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1103,22 +1490,22 @@ reactiveObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// 这将不会触发响应式系统</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="只读和浅只读">只读和浅只读</span></h2><p>讨论完响应式和浅响应式，我们在来说下只读和浅只读：</p>
+<h2><span id="只读和浅只读">只读和浅只读</span></h2>
+<p>讨论完响应式和浅响应式，我们在来说下只读和浅只读：</p>
 <p>Vue.js还提供了<code>readonly</code>和<code>shallowReadonly</code>函数，它们用于创建只读的响应式对象。</p>
 <p><code>readonly</code>函数创建的是深度只读的响应式对象。这意味着不仅对象本身是只读的，而且它内部的所有嵌套对象也都是只读的。任何尝试修改对象或其嵌套对象的属性的操作都会失败。</p>
 <p><code>shallowReadonly</code>函数创建的是浅层只读的响应式对象。这意味着只有对象的顶层属性是只读的。如果对象包含嵌套对象，那么这些嵌套对象的属性是可以修改的。</p>
-<pre><code class="javascript">let obj = &#123;
+<pre><code class="language-javascript">let obj = &#123;
   innerObj: &#123;
-    key: &#39;value&#39;
+    key: 'value'
   &#125;
 &#125;
 
 let readonlyObj = Vue.readonly(obj);
-readonlyObj.innerObj.key = &#39;new value&#39;; // 这将失败，因为对象是只读的
+readonlyObj.innerObj.key = 'new value'; // 这将失败，因为对象是只读的
 
 let shallowReadonlyObj = Vue.shallowReadonly(obj);
-shallowReadonlyObj.innerObj.key = &#39;new value&#39;; // 这将成功，因为只有顶层属性是只读的
+shallowReadonlyObj.innerObj.key = 'new value'; // 这将成功，因为只有顶层属性是只读的
 </code></pre>
 
     
@@ -1153,10 +1540,11 @@ shallowReadonlyObj.innerObj.key = &#39;new value&#39;; // 这将成功，因为�
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
+        <h2><span id="引言">引言</span></h2>
+<p>既然 Vue.js 3 的响应式数据是基于 Proxy 实现的，那么我们就有必要了解 Proxy 以及与之相关联的 Reflect。什么是 Proxy 呢？简单地说，使用 Proxy 可以创建一个代理对象。它能够实现对其他对象的代理，这里的关键词是其他对象，也就是说，Proxy 只能代理对象，无法代理非对象值，例如字符串、布尔值等。那么，代理指的是什么呢？所谓代理，指的是对一个对象基本语义的代理。它允许我们拦截并重新定义对一个对象的基本操作。</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy">创建对象代理 Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect">内置的对象 Reflect</a></p>
-<p>当我们讨论编程语言中的”基本语义”时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
+<p>当我们讨论编程语言中的&quot;基本语义&quot;时，我们指的是对数据进行读取和修改的最基本操作。在JavaScript中，这些操作通常包括读取属性值和设置属性值。例如，在给定一个对象<code>obj</code>的情况下，以下操作被认为是基本语义的操作：</p>
 <ol>
 <li>读取属性值：<code>obj.foo</code> （读取属性<code>foo</code>的值）</li>
 <li>设置属性值：<code>obj.foo = newValue</code> （设置属性<code>foo</code>的值）</li>
@@ -1164,9 +1552,9 @@ shallowReadonlyObj.innerObj.key = &#39;new value&#39;; // 这将成功，因为�
 <p>在上述代码中，<code>Proxy</code>对象允许我们拦截（或者说重定义）这些基本语义的操作。<code>Proxy</code>的构造函数接受两个参数：被代理的对象和一个包含拦截器（也称为夹子或陷阱）的对象。在拦截器对象中，我们可以定义<code>get</code>方法来拦截读取属性操作，定义<code>set</code>方法来拦截设置属性操作。这样，我们就可以在这些操作发生时执行自定义的逻辑。</p>
 <p>关于<code>Reflect</code>对象，它是JavaScript的一个全局对象，提供了与<code>Proxy</code>拦截器方法一一对应的方法。这些<code>Reflect</code>方法提供了默认的操作行为。例如，<code>Reflect.get(target, key)</code>方法提供了访问对象属性的默认行为，与直接使用<code>target[key]</code>是等价的。同时，<code>Reflect</code>方法还可以接受第三个参数，用来指定函数调用时的<code>this</code>值。</p>
 <p>理解这些基本语义操作以及如何使用<code>Proxy</code>和<code>Reflect</code>来拦截和处理这些操作，是理解JavaScript中响应式数据（Reactive Data）实现的关键。在响应式数据中，我们可以利用<code>Proxy</code>和<code>Reflect</code>来追踪对象属性的读取和修改，从而实现数据的响应式更新。</p>
-<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2><p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
+<h2><span id="proxy-的基本用法">Proxy 的基本用法</span></h2>
+<p>当我们谈论基本语义时，我们指的是 JavaScript 中的一些基本操作，比如读取对象属性值和设置对象属性值。考虑下面的对象 <code>obj</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>在这里，<code>obj.foo</code> 是一个读取属性的基本语义操作，<code>obj.foo = newValue</code> 是一个设置属性的基本语义操作。</p>
 <p>现在，我们可以使用 <code>Proxy</code> 来拦截这些基本语义的操作。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1184,11 +1572,11 @@ shallowReadonlyObj.innerObj.key = &#39;new value&#39;; // 这将成功，因为�
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// 输出：读取属性 foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// 输出：设置属性 foo 为 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上面的代码中，我们创建了一个 <code>handler</code> 对象，其中定义了 <code>get</code> 和 <code>set</code> 方法，用来拦截属性的读取和设置。然后，我们使用 <code>Proxy</code> 构造函数创建了一个代理对象 <code>proxyObj</code>，它会拦截 <code>obj</code> 对象上的读取和设置操作。当我们访问 <code>proxyObj.foo</code> 时，会触发 <code>get</code> 方法，输出相应的信息。当我们设置 <code>proxyObj.foo</code> 的值时，会触发 <code>set</code> 方法，同样输出相应的信息。</p>
 <p>这样，<code>Proxy</code> 允许我们在基本语义操作发生时执行自定义的逻辑，而不需要直接操作原始对象。在实际应用中，这种能力可以用来实现响应式数据、数据验证、日志记录等功能。</p>
 <p>当我们使用 <code>Proxy</code> 拦截对象属性的读取操作时，我们需要特别注意访问器属性（accessor properties）的情况，因为访问器属性使用 getter 函数来定义，而这个函数内部的 <code>this</code> 关键字会根据调用方式而变化。</p>
-<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2><p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
+<h2><span id="reflect-在响应式中的用法">Reflect 在响应式中的用法</span></h2>
+<p>在拦截器函数中，我们希望建立副作用函数与响应式数据之间的关联，确保当属性被访问时，能够正确地进行依赖收集，以便在属性发生变化时触发副作用函数的重新执行。然而，如果我们直接使用 <code>target[key]</code> 来获取属性值，那么访问器属性内部的 <code>this</code> 关键字将指向原始对象，而不是代理对象，这会导致无法正确建立响应关系。</p>
 <p>解决这个问题的方法是使用 <code>Reflect.get(target, key, receiver)</code> 来代替 <code>target[key]</code>。这样，<code>Reflect.get</code> 的第三个参数 <code>receiver</code> 就能正确地指向代理对象，而不是原始对象。这样一来，在访问器属性的 getter 函数内部，<code>this</code> 关键字就会指向代理对象，从而建立了正确的响应关系。</p>
 <p>以下是使用 <code>Reflect.get</code> 的修正代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1206,10 +1594,10 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// 触发副作用函数的重新执行</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>我们可以再看一个简单一点的示例：</p>
 <p>当使用代理对象时，<code>receiver</code>参数主要用于确保在代理的拦截函数内部，<code>this</code>指向代理对象，从而建立响应式联系。下面我将对比使用<code>receiver</code>参数和不使用的情况，以便更清楚地理解它的作用。</p>
-<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-使用receiver参数的情况">1. 使用<code>receiver</code>参数的情况：</span></h3>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -1224,9 +1612,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这个例子中，我们使用了<code>receiver</code>参数传递给<code>Reflect.get</code>，确保在<code>get</code>拦截函数内部，<code>this</code>指向代理对象<code>proxy</code>。当你访问<code>proxy.foo</code>时，<code>get</code>拦截函数被触发，并且<code>this</code>指向<code>proxy</code>对象。</p>
-<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-不使用receiver参数的情况">2. 不使用<code>receiver</code>参数的情况：</span></h3>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -1243,7 +1631,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这个例子中，我们没有使用<code>receiver</code>参数。由于没有传递<code>receiver</code>参数，<code>this</code>在<code>get</code>拦截函数内部指向的是原始对象<code>data</code>。虽然代理对象<code>proxy</code>被使用，但<code>get</code>拦截函数内部的<code>this</code>并不指向<code>proxy</code>，而是指向原始对象<code>data</code>。因此，这种情况下，响应式联系不会得到建立。</p>
 <p>虽然说两个函数的输出是一致的，但显然没有使用<code>receiver</code>参数时响应式联系不会得到建立。也就是说在effect函数里面，对象不会得到正确的响应。</p>
 
@@ -1279,7 +1666,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
+        <h2><span id="引言">引言</span></h2>
+<p>当我们讨论竞态问题时，通常指的是在多进程或多线程编程中出现的一种并发问题。然而，在前端开发中，我们可能较少直接面对多线程编程，但我们经常会遇到与竞态问题相似的情境。一个常见的例子是在异步编程中，特别是在处理异步事件、回调函数或者Promise时。</p>
 <p>例如，考虑以下的异步代码：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -1291,10 +1679,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 输出 undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这个例子中，<code>fetchData</code> 函数是异步的，它在1秒后将数据赋给 <code>data</code> 变量。但是，由于 JavaScript 是单线程的，<code>fetchData</code> 函数会在主线程的事件队列中等待1秒，而在这1秒内，<code>console.log(data)</code> 语句会立即执行，此时 <code>data</code> 的值为 <code>undefined</code>，因为 <code>fetchData</code> 函数还未完成执行。</p>
 <p>在异步编程中，由于代码的非阻塞性质，会出现类似的竞态条件问题。在处理异步操作时，我们需要小心确保数据的一致性和正确性，避免在异步操作完成前就去访问或修改相关数据。</p>
-<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2><p>那么竞态问题跟我们响应式有什么联系呢？</p>
+<h2><span id="竞态问题与响应式">竞态问题与响应式</span></h2>
+<p>那么竞态问题跟我们响应式有什么联系呢？</p>
 <p>举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -1303,7 +1691,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// 将请求结果赋值给 data</span>
 finalData <span class="token operator">=</span> res
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们使用 watch 观测 obj 对象的变化，每次 obj对象发生变化都会发送网络请求，例如请求接口数据，等数据请求成功之后，将结果赋值给 finalData 变量。观察上面的代码，乍一看似乎没什么问题。但仔细思考会发现这段代码会发生竞态问题。假设我们第一次修改 obj 对象的某个字段值，这会导致回调函数执行，同时发送了第一次请求 A。随着时间的推移，在请求 A 的结果返回之前，我们对 obj 对象的某个字段值进行了第二次修改，这会导致发送第二次请求 B。此时请求 A 和请求 B 都在进行中，那么哪一个请求会先返回结果呢？我们不确定，如果请求B 先于请求 A 返回结果，就会导致最终 finalData 中存储的是 A 请求的结果</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="对比"></p>
 <p>但由于请求 B 是后发送的，因此我们认为请求 B 返回的数据才是“最新”的，而请求 A 则应该被视为“过期”的，所以我们希望变量finalData 存储的值应该是由请求 B 返回的结果，而非请求 A 返回的结果。</p>
@@ -1327,338 +1714,8 @@ finalData <span class="token operator">=</span> res
     <span class="token comment">// 后续操作...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>如上面的代码所示，在发送请求之前，我们定义了 expired 标志变量，用来标识当前副作用函数的执行是否过期；接着调用onInvalidate 函数注册了一个过期回调，当该副作用函数的执行过期时将 expired 标志变量设置为 true；最后只有当没有过期时才采用请求结果，这样就可以有效地避免上述问题了。</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="对比"></p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/31/vue-watch-computed/" itemprop="url">vue-watch-computed原理</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">2023年10月31日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
-<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2><p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p>然而，在某些情况下，我们希望副作用函数在需要的时候才执行，而不是立即执行。一个典型的例子是计算属性。为了实现这种延迟执行的效果，我们可以在<code>options</code>中添加一个<code>lazy</code>属性，并将其设置为<code>true</code>。当<code>lazy</code>为<code>true</code>时，副作用函数不会在初始化时立即执行，而是在需要的时候才执行。修正后的代码如下所示：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
-  <span class="token comment">// 这个函数不会立即执行</span>
-  <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token comment">// options</span>
-  <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>具体实现中，我们将副作用函数<code>effectFn</code>作为<code>effect</code>函数的返回值返回。这意味着，当我们调用<code>effect</code>函数时，我们会得到对应的副作用函数，并且可以在需要的时候手动执行它。这种机制赋予了我们更多的控制权，允许我们决定何时触发副作用函数的执行，而不是立即执行它。</p>
-<p>这种设计模式特别适用于特定场景，例如计算属性。在计算属性中，我们可能希望在特定时刻触发副作用函数的执行，而不是在初始化时立即执行。通过将副作用函数作为<code>effect</code>函数的返回值，我们能够灵活地控制副作用函数的执行时机，以满足不同场景的需求。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 设置副作用函数的 options 和 deps</span>
-  effectFn<span class="token punctuation">.</span>options <span class="token operator">=</span> options<span class="token punctuation">;</span>
-  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 只有非 lazy 时执行副作用函数</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token comment">// 将副作用函数作为返回值返回</span>
-  <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在这个代码中，<code>effect</code>函数的第二个参数是一个<code>options</code>对象，其中<code>lazy</code>属性被设置为<code>true</code>。这意味着传递给<code>effect</code>的副作用函数会在需要的时候才执行，例如在计算属性被访问时。这种延迟执行的特性使得<code>effect</code>函数非常适合用于实现计算属性等场景。</p>
-<p>在上述代码中，我们通过<code>options</code>参数的<code>lazy</code>属性控制副作用函数的立即执行。如果<code>options.lazy</code>为<code>true</code>，副作用函数将被延迟执行，直到手动触发为止。</p>
-<p>现在我们通过计算属性实现了lazy懒加载，那么数据缓存该怎么实现呢。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// value 用来缓存上一次计算的值</span>
-  <span class="token keyword">let</span> value<span class="token punctuation">;</span>
-  <span class="token comment">// dirty 标志，用来标识是否需要重新计算值，为 true 则意味着“脏”，需要计算</span>
-  <span class="token keyword">let</span> dirty <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> effectFn <span class="token operator">=</span> <span class="token function">effect</span><span class="token punctuation">(</span>getter<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">get</span> <span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// 只有“脏”时才计算值，并将得到的值缓存到 value 中</span>
-      <span class="token keyword">if</span> <span class="token punctuation">(</span>dirty<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        value <span class="token operator">=</span> <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">// 将 dirty 设置为 false，下一次访问直接使用缓存到 value 中的值</span>
-        dirty <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span>
-      <span class="token keyword">return</span> value<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>解决了懒计算的问题，只有在真正需要计算<code>value</code>的时候，才会执行<code>effectFn</code>。同时，它还引入了一个<code>dirty</code>标志，用于标识当前的计算是否需要重新进行。如果<code>dirty</code>为<code>true</code>，则重新计算<code>value</code>的值，并将<code>dirty</code>标志设置为<code>false</code>，以便下一次访问时可以直接使用缓存的值。</p>
-<h2><span id="watch-的实现原理">watch 的实现原理</span></h2><p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'数据变了'</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-<span class="token comment">// 修改响应数据的值，会导致回调函数执行</span>
-obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>假设 obj 是一个响应数据，使用 watch 函数观测它，并传递一个回调函数，当修改响应式数据的值时，会触发该回调函数执行。实际上，watch 的实现本质上就是利用了 effect 以及options.scheduler 选项，如以下代码所示：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-<span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-<span class="token comment">// 当 obj.foo 的值变化时，会执行 scheduler 调度函数</span>
-<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在一个副作用函数中访问响应式数据 obj.foo，通过前面的介绍，我们知道这会在副作用函数与响应式数据之间建立联系，当响应式数据变化时，会触发副作用函数重新执行。但有一个例外，即如果副作用函数存在 scheduler 选项，当响应式数据发生变化时，会触发 scheduler 调度函数执行，而非直接触发副作用函数执行。从这个角度来看，其实 scheduler 调度函数就相当于一个回调函数，而watch 的实现就是利用了这个特点。</p>
-<p>下面是最简单的 watch 函数的实现：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// watch 函数接收两个参数，source 是响应式数据，cb 是回调函数</span>
-<span class="token keyword">function</span> <span class="token function">watch</span><span class="token punctuation">(</span><span class="token parameter">source<span class="token punctuation">,</span> cb</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span>
-    <span class="token comment">// 触发读取操作，从而建立联系</span>
-    <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> source<span class="token punctuation">.</span>foo<span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">scheduler</span><span class="token operator">:</span> <span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-      <span class="token comment">// 当数据变化时，调用回调函数 cb</span>
-      <span class="token function-variable function">fn</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-        <span class="token function">cb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>于是一段完整的代码：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 响应式数据对象</span>
-<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 创建代理对象，用于监听数据变化</span>
-<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    target<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> value<span class="token punctuation">;</span>
-    <span class="token comment">// 数据变化时触发回调函数</span>
-    <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'数据变化了'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">// watch 函数接收两个参数，source 是响应式数据，cb 是回调函数</span>
-<span class="token keyword">function</span> <span class="token function">watch</span><span class="token punctuation">(</span><span class="token parameter">source<span class="token punctuation">,</span> cb</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> source<span class="token punctuation">.</span>foo<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">scheduler</span><span class="token operator">:</span> <span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token function-variable function">fn</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      <span class="token function">cb</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">// 模拟 effect 函数</span>
-<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// 在这里执行 effect 相关逻辑</span>
-  <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 这里假设执行 fn 会触发响应式数据的读取操作</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">// 模拟 scheduler 函数</span>
-<span class="token keyword">function</span> <span class="token function">scheduler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// 在这里可以添加调度逻辑</span>
-  <span class="token comment">// 这里返回一个函数作为 scheduler</span>
-  <span class="token keyword">return</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 这里可以添加具体的调度逻辑</span>
-    <span class="token comment">// ...</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">// 数据变化</span>
-obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 输出: 数据变化了</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>我们首先定义了一个原始的数据对象data，其中有一个属性foo，初始值为1。接着，我们使用Proxy创建了一个代理对象obj，该代理对象会拦截对data的操作。</p>
-<p>当你调用obj.foo++时，会触发Proxy的set拦截器。在set拦截器中，我们首先将属性值设置到目标对象上，然后调用watch函数，并传入obj和一个回调函数。在watch函数中，我们使用了一个假设的effect函数（实际开发中可能是框架提供的响应式函数），这个函数用于监听数据的变化。在watch函数中，我们传入了source.foo的读取操作，以及一个包含scheduler和fn属性的配置对象。scheduler可以用于定义调度逻辑（在示例中为空函数），fn则是一个当数据变化时会被调用的回调函数。</p>
-<p>当obj.foo++执行时，set拦截器触发，watch函数被调用。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/31/vue-effect/" itemprop="url">嵌套的 effect 与 effect 栈</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T02:09:08.000Z" itemprop="datePublished">2023年10月31日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
-<h2><span id="嵌套的-effect">嵌套的 effect</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-    <span class="token comment">/* ... */</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effectFn1 的执行会导致 effectFn2 的执行。那么，什么场景下会出现嵌套的 effect 呢？拿 Vue.js 来说，实际上 Vue.js 的渲染函数就是在一个 effect 中执行的.</p>
-<p>当组件发生嵌套时，例如 Foo 组件渲染了 Bar 组件：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar 组件</span>
-<span class="token keyword">const</span> Bar <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token punctuation">&#123;</span><span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">// Foo 组件渲染了 Bar 组件</span>
-<span class="token keyword">const</span> Foo <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token operator">&lt;</span>Bar <span class="token operator">/</span><span class="token operator">></span> <span class="token punctuation">&#125;</span><span class="token comment">// jsx 语法</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>此时就发生了 effect 嵌套，它相当于：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  Foo<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token comment">// 嵌套</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>effect函数可以嵌套使用，也就是说，一个effect函数内部可以包含另一个effect函数。当外部effect函数依赖于内部effect函数创建的响应式数据时，内部effect函数会被自动追踪，确保外部effect函数在内部effect函数发生变化时得以执行。</p>
-<p>这种嵌套的effect函数用于创建依赖关系链，确保当某个响应式数据变化时，所有依赖于它的effect函数都能够被触发执行，从而保持应用的响应性。</p>
-<p>而”effect 栈”，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
-<p>现在有一个不使用栈结构的嵌套的<code>effect</code>函数的例子，但是他并不能实现嵌套的功能。假设我们有两个响应式数据<code>count1</code>和<code>count2</code>，其中<code>count2</code>的值依赖于<code>count1</code>的值。我们可以使用嵌套的<code>effect</code>函数来实现这种依赖关系。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 原始数据</span>
-<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 代理对象</span>
-<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">读取属性: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> target<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 全局变量</span>
-<span class="token keyword">let</span> temp1<span class="token punctuation">,</span> temp2<span class="token punctuation">;</span>
-
-<span class="token comment">// effectFn1 嵌套了 effectFn2</span>
-<span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn1 执行'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn2 执行'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 在 effectFn2 中读取 obj.bar 属性</span>
-    temp2 <span class="token operator">=</span> obj<span class="token punctuation">.</span>bar<span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 在 effectFn1 中读取 obj.foo 属性</span>
-  temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><code>effectFn1</code>是外部的<code>effect</code>函数，它依赖于<code>obj.foo</code>的值，并且在内部包含了一个<code>innerEffect</code>，内部的<code>effect</code>函数依赖于<code>obj.bar</code>的值。当我们修改<code>obj.foo</code>时，我们希望外部的<code>effect</code>函数被触发执行，并且输出<code>obj.foo</code>的值，然后触发内部的依赖函数。当我们修改<code>obj.bar</code>时，内部的<code>effect</code>函数被触发执行，并且输出<code>obj.bar</code>的值。</p>
-<p>我们用全局变量 activeEffect 来存储通过 effect 函数注册的副作用函数，这意味着同一时刻 activeEffect 所存储的副作用函数只能有一个。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
-<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
-
-<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// 定义副作用函数</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 调用 cleanup 函数，具体实现需要根据需求补充</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 将副作用函数赋值给 activeEffect</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-    <span class="token comment">// 执行副作用函数</span>
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 将当前副作用函数的依赖集合存储在 effectFn.deps 中（需要根据实际逻辑补充）</span>
-    effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment">// 这里需要根据实际逻辑设置依赖集合</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-  
-  <span class="token comment">// 执行副作用函数</span>
-  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>但其实只使用一个变量储存而不使用栈结构，当副作用函数发生嵌套时，内层副作用函数的执行会覆盖 activeEffect 的值，并且永远不会恢复到原来的值。这时如果再有响应式数据进行依赖收集，即使这个响应式数据是在外层副作用函数中读取的，它们收集到的副作用函数也都会是内层副作用函数，也就是说我在读取<code>obj.foo</code>的时候，activeEffect还只是innerEffect的值，并且只触发了innerEffect的效果。</p>
-<p>为了解决这个问题，我们需要一个副作用函数栈 effectStack，在副作用函数执行时，将当前副作用函数压入栈中，待副作用函数执行完毕后将其从栈中弹出，并始终让 activeEffect 指向栈顶的副作用函数。这样就能做到一个响应式数据只会收集直接读取其值的副作用函数，而不会出现互相影响的情况：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
-<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
-
-<span class="token comment">// effect 栈</span>
-<span class="token keyword">const</span> effectStack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 调用 cleanup 函数，具体实现需要根据需求补充</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-
-    <span class="token comment">// 将当前副作用函数压入栈中</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">// 在当前副作用函数执行完毕后，将当前副作用函数弹出栈，并把 activeEffect 还原为之前的值</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 初始化副作用函数的依赖集合</span>
-  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 执行副作用函数</span>
-  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 
     
     </div>

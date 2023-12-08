@@ -9,43 +9,22 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/categories/Vue/Browser/Front-end/</loc>
-        <lastmod>2023-12-06T12:13:03.701Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Vue/Browser/</loc>
-        <lastmod>2023-12-06T12:13:03.701Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://ikkkp.github.io/categories/Vue/</loc>
-        <lastmod>2023-12-06T12:13:03.701Z</lastmod>
+        <lastmod>2023-12-08T08:55:32.924Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/categories/Webpack/Front-end/</loc>
-        <lastmod>2023-12-06T11:31:44.708Z</lastmod>
+        <loc>https://ikkkp.github.io/categories/FE/</loc>
+        <lastmod>2023-12-08T08:16:00.776Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://ikkkp.github.io/categories/Webpack/</loc>
-        <lastmod>2023-12-06T11:31:44.708Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Vue/Front-end/</loc>
-        <lastmod>2023-12-06T11:23:53.544Z</lastmod>
+        <lastmod>2023-12-08T08:12:34.250Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -123,13 +102,6 @@
     <url>
         <loc>https://ikkkp.github.io/categories/Build/</loc>
         <lastmod>2023-11-04T02:33:13.268Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/categories/Front-end/</loc>
-        <lastmod>2023-11-03T14:08:46.051Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

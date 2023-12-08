@@ -9,8 +9,8 @@
 
 
     <url>
-        <loc>https://ikkkp.github.io/2023/12/06/en/Browser-Default-Behavior/</loc>
-        <lastmod>2023-12-06T12:13:03.701Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/12/08/en/vue-component-2/</loc>
+        <lastmod>2023-12-08T08:55:32.924Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -23,8 +23,8 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/12/06/Browser-Default-Behavior/</loc>
-        <lastmod>2023-12-06T11:47:37.132Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/12/08/en/vue-component-1/</loc>
+        <lastmod>2023-12-08T08:53:05.955Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -37,8 +37,30 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/10/Webpack-optimization-4/</loc>
-        <lastmod>2023-12-06T11:31:44.708Z</lastmod>
+        <loc>https://ikkkp.github.io/2023/12/08/vue-component-2/</loc>
+        <lastmod>2023-12-08T08:51:20.172Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2017/08/27/en/ajax-and-cors/</loc>
+        <lastmod>2023-12-08T08:16:00.776Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/10/en/Webpack-optimization-4/</loc>
+        <lastmod>2023-12-08T08:15:27.877Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -52,63 +74,7 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/12/05/en/Event-Delegation/</loc>
-        <lastmod>2023-12-06T11:30:42.276Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/12/05/en/Event-Bubbling/</loc>
-        <lastmod>2023-12-06T11:30:33.717Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/11/29/Custom-Elements/</loc>
-        <lastmod>2023-12-06T11:30:20.711Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/12/05/Event-Bubbling/</loc>
-        <lastmod>2023-12-06T11:30:11.016Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/12/05/Event-Delegation/</loc>
-        <lastmod>2023-12-06T11:23:53.544Z</lastmod>
+        <lastmod>2023-12-08T08:14:46.812Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -122,7 +88,177 @@
 
     <url>
         <loc>https://ikkkp.github.io/2023/11/29/en/Custom-Elements/</loc>
-        <lastmod>2023-12-02T13:18:09.334Z</lastmod>
+        <lastmod>2023-12-08T08:14:43.719Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/05/en/Event-Bubbling/</loc>
+        <lastmod>2023-12-08T08:14:30.445Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/06/en/Browser-Default-Behavior/</loc>
+        <lastmod>2023-12-08T08:13:55.829Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/06/Browser-Default-Behavior/</loc>
+        <lastmod>2023-12-08T08:13:19.607Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/10/Webpack-optimization-4/</loc>
+        <lastmod>2023-12-08T08:13:04.723Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/26/Webpack-optimization-1/</loc>
+        <lastmod>2023-12-08T08:12:34.250Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2017/08/27/ajax-and-cors/</loc>
+        <lastmod>2023-12-08T08:12:19.006Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/05/Event-Delegation/</loc>
+        <lastmod>2023-12-08T08:11:59.492Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/05/Event-Bubbling/</loc>
+        <lastmod>2023-12-08T08:11:55.058Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/11/29/Custom-Elements/</loc>
+        <lastmod>2023-12-08T08:11:48.343Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/29/webpack-plugin-design/</loc>
+        <lastmod>2023-12-08T08:10:42.330Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/</loc>
+        <lastmod>2023-12-08T08:10:30.548Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
+        <lastmod>2023-12-08T08:10:24.271Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2023/12/08/vue-component-1/</loc>
+        <lastmod>2023-12-08T08:07:56.021Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -219,20 +355,6 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/11/10/en/Webpack-optimization-4/</loc>
-        <lastmod>2023-11-22T02:29:23.951Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
         <loc>https://ikkkp.github.io/2023/11/20/ModernWeb-Debugging1/</loc>
         <lastmod>2023-11-22T02:27:15.971Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -263,20 +385,6 @@
     <url>
         <loc>https://ikkkp.github.io/2023/11/11/vue-renderer-4/</loc>
         <lastmod>2023-11-11T08:42:25.873Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-3/</loc>
-        <lastmod>2023-11-10T02:15:42.124Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -555,14 +663,6 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2023/10/26/Webpack-optimization-1/</loc>
-        <lastmod>2023-11-04T02:42:19.562Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://ikkkp.github.io/2023/10/27/pack-tool-preview/</loc>
         <lastmod>2023-11-04T02:33:13.268Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -665,34 +765,6 @@
         <lastmod>2023-11-04T02:30:39.642Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/10/29/webpack-plugin-design/</loc>
-        <lastmod>2023-11-04T02:30:35.564Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2023/10/27/Webpack-optimization-2/</loc>
-        <lastmod>2023-11-04T02:30:27.371Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-        <image:image>
-
-            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
-
-        </image:image>
 
     </url>
 
@@ -803,14 +875,6 @@
     </url>
 
     <url>
-        <loc>https://ikkkp.github.io/2017/08/27/en/ajax-and-cors/</loc>
-        <lastmod>2023-11-03T14:08:46.051Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://ikkkp.github.io/2023/10/28/en/301-302-Redirection/</loc>
         <lastmod>2023-11-03T14:08:44.689Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -877,14 +941,6 @@
             <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
 
         </image:image>
-
-    </url>
-
-    <url>
-        <loc>https://ikkkp.github.io/2017/08/27/ajax-and-cors/</loc>
-        <lastmod>2023-10-15T08:40:45.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
 
     </url>
 

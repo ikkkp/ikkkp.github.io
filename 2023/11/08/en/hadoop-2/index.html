@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Definition of MapReduceMapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is">
+    <meta name="description" content="Definition of MapReduce MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MapReduce Working Principle in Hadoop">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/08/en/hadoop-2/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Definition of MapReduceMapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is">
+<meta property="og:description" content="Definition of MapReduce MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-08T07:48:11.000Z">
@@ -242,8 +242,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="definition-of-mapreduce">Definition of MapReduce</span></h2><p>MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is to integrate the user’s written business logic code and default components into a complete distributed computing program, which runs concurrently on a Hadoop cluster.</p>
-<h2><span id="reason-for-the-emergence-of-mapreduce">Reason for the Emergence of MapReduce</span></h2><p>Why do we need MapReduce?</p>
+        <h2><span id="definition-of-mapreduce">Definition of MapReduce</span></h2>
+<p>MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is to integrate the user’s written business logic code and default components into a complete distributed computing program, which runs concurrently on a Hadoop cluster.</p>
+<h2><span id="reason-for-the-emergence-of-mapreduce">Reason for the Emergence of MapReduce</span></h2>
+<p>Why do we need MapReduce?</p>
 <ul>
 <li>Massive data cannot be processed on a single machine due to hardware resource limitations.</li>
 <li>Once the single-machine version of the program is extended to run on a cluster, it will greatly increase the complexity and development difficulty of the program.</li>
@@ -255,7 +257,8 @@
 <li>Distributed: file distributed storage (HDFS), computing logic needs to be divided into at least two stages (one stage is independently concurrent, one stage is converged), how to distribute computing programs, how to allocate computing tasks (slicing), how to start the two-stage program? How to coordinate? Monitoring during the entire program running process? Fault tolerance? Retry?</li>
 </ul>
 <p>It can be seen that when the program is extended from a single-machine version to a distributed version, a large amount of complex work will be introduced.</p>
-<h2><span id="relationship-between-mapreduce-and-yarn">Relationship between MapReduce and Yarn</span></h2><p>Yarn is a resource scheduling platform that is responsible for providing server computing resources for computing programs, which is equivalent to a distributed operating system platform. MapReduce and other computing programs are like application programs running on top of the operating system.</p>
+<h2><span id="relationship-between-mapreduce-and-yarn">Relationship between MapReduce and Yarn</span></h2>
+<p>Yarn is a resource scheduling platform that is responsible for providing server computing resources for computing programs, which is equivalent to a distributed operating system platform. MapReduce and other computing programs are like application programs running on top of the operating system.</p>
 <p>Important concepts of YARN:</p>
 <ol>
 <li>Yarn does not know the running mechanism of the program submitted by the user;</li>
@@ -266,20 +269,25 @@
 <li>Therefore, computing frameworks such as Spark and Storm can be integrated to run on Yarn, as long as they have resource request mechanisms that comply with Yarn specifications in their respective frameworks;</li>
 <li>Yarn becomes a universal resource scheduling platform. From then on, various computing clusters that previously existed in enterprises can be integrated on a physical cluster to improve resource utilization and facilitate data sharing.</li>
 </ol>
-<h2><span id="mapreduce-working-principle">MapReduce Working Principle</span></h2><p>Strictly speaking, MapReduce is not an algorithm, but a computing idea. It consists of two stages: map and reduce.</p>
-<h3><span id="mapreduce-process">MapReduce Process</span></h3><p>To improve development efficiency, common functions in distributed programs can be encapsulated into frameworks, allowing developers to focus on business logic.</p>
+<h2><span id="mapreduce-working-principle">MapReduce Working Principle</span></h2>
+<p>Strictly speaking, MapReduce is not an algorithm, but a computing idea. It consists of two stages: map and reduce.</p>
+<h3><span id="mapreduce-process">MapReduce Process</span></h3>
+<p>To improve development efficiency, common functions in distributed programs can be encapsulated into frameworks, allowing developers to focus on business logic.</p>
 <p>MapReduce is such a general framework for distributed programs, and its overall structure is as follows (there are three types of instance processes during distributed operation):</p>
 <ul>
 <li>MRAppMaster: responsible for the process scheduling and status coordination of the entire program</li>
 <li>MapTask: responsible for the entire data processing process of the map phase</li>
 <li>ReduceTask: responsible for the entire data processing process of the reduce phase</li>
 </ul>
-<h3><span id="mapreduce-mechanism">MapReduce Mechanism</span></h3><p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
+<h3><span id="mapreduce-mechanism">MapReduce Mechanism</span></h3>
+<p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
 <p>The process is described as follows:</p>
 <ol>
-<li><p>When an MR program starts, the MRAppMaster is started first. After the MRAppMaster starts, according to the description information of this job, it calculates the number of MapTask instances required and applies to the cluster to start the corresponding number of MapTask processes.</p>
+<li>
+<p>When an MR program starts, the MRAppMaster is started first. After the MRAppMaster starts, according to the description information of this job, it calculates the number of MapTask instances required and applies to the cluster to start the corresponding number of MapTask processes.</p>
 </li>
-<li><p>After the MapTask process is started, data processing is performed according to the given data slice range. The main process is:</p>
+<li>
+<p>After the MapTask process is started, data processing is performed according to the given data slice range. The main process is:</p>
 </li>
 </ol>
 <ul>
@@ -288,23 +296,31 @@
 <li>Sort the KV pairs in the cache according to K partition and continuously overflow to the disk file.</li>
 </ul>
 <ol start="3">
-<li><p>After the MRAppMaster monitors that all MapTask process tasks are completed, it will start the corresponding number of ReduceTask processes according to the customer-specified parameters, and inform the ReduceTask process of the data range (data partition) to be processed.</p>
+<li>
+<p>After the MRAppMaster monitors that all MapTask process tasks are completed, it will start the corresponding number of ReduceTask processes according to the customer-specified parameters, and inform the ReduceTask process of the data range (data partition) to be processed.</p>
 </li>
-<li><p>After the ReduceTask process is started, according to the location of the data to be processed notified by the MRAppMaster, it obtains several MapTask output result files from several machines where the MapTask is running, and performs re-merging and sorting locally. Then, groups the KV with the same key into one group, calls the customer-defined reduce() method for logical operation, collects the result KV output by the operation, and then calls the customer-specified outputformat to output the result data to external storage.</p>
+<li>
+<p>After the ReduceTask process is started, according to the location of the data to be processed notified by the MRAppMaster, it obtains several MapTask output result files from several machines where the MapTask is running, and performs re-merging and sorting locally. Then, groups the KV with the same key into one group, calls the customer-defined reduce() method for logical operation, collects the result KV output by the operation, and then calls the customer-specified outputformat to output the result data to external storage.</p>
 </li>
 </ol>
 <p>Let’s take an example.</p>
-<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>The above figure shows a word frequency counting task.</p>
+<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>
+The above figure shows a word frequency counting task.</p>
 <ol>
-<li><p>Hadoop divides the input data into several slices and assigns each split to a map task for processing.</p>
+<li>
+<p>Hadoop divides the input data into several slices and assigns each split to a map task for processing.</p>
 </li>
-<li><p>After mapping, each word and its frequency in this task are obtained.</p>
+<li>
+<p>After mapping, each word and its frequency in this task are obtained.</p>
 </li>
-<li><p>Shuffle puts the same words together, sorts them, and divides them into several slices.</p>
+<li>
+<p>Shuffle puts the same words together, sorts them, and divides them into several slices.</p>
 </li>
-<li><p>According to these slices, reduce is performed.</p>
+<li>
+<p>According to these slices, reduce is performed.</p>
 </li>
-<li><p>The result of the reduce task is counted and output to a file.</p>
+<li>
+<p>The result of the reduce task is counted and output to a file.</p>
 </li>
 </ol>
 <p>In MapReduce, two roles are required to complete these processes: JobTracker and TaskTracker.</p>
@@ -313,7 +329,8 @@
 <p>Here is a simple MapReduce implementation example:</p>
 <p>It is used to count the number of occurrences of each word in the input file.</p>
 <ol>
-<li><p><strong>Import necessary packages:</strong></p>
+<li>
+<p><strong>Import necessary packages:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>conf<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>fs<span class="token punctuation">.</span></span><span class="token class-name">Path</span></span><span class="token punctuation">;</span>
@@ -326,7 +343,8 @@
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>input<span class="token punctuation">.</span></span><span class="token class-name">FileInputFormat</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>output<span class="token punctuation">.</span></span><span class="token class-name">FileOutputFormat</span></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 </li>
-<li><p><strong>Define the Mapper class:</strong></p>
+<li>
+<p><strong>Define the Mapper class:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyMapper</span> <span class="token keyword">extends</span> <span class="token class-name">Mapper</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">LongWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">LongWritable</span> key<span class="token punctuation">,</span> <span class="token class-name">Text</span> value<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
     <span class="token class-name">String</span> line <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -337,10 +355,10 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>The Mapper class is responsible for splitting the input text data into words and outputting a key-value pair (word, 1) for each word.</p>
 </li>
-<li><p><strong>Define the Reducer class:</strong></p>
+<li>
+<p><strong>Define the Reducer class:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyReduce</span> <span class="token keyword">extends</span> <span class="token class-name">Reducer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">Text</span> key<span class="token punctuation">,</span> <span class="token class-name">Iterable</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> values<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
@@ -352,10 +370,10 @@
     context<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntWritable</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>The Reducer class receives key-value pairs from the Mapper, accumulates the values of the same key, and then outputs the word and its total number of occurrences.</p>
 </li>
-<li><p><strong>Main function (main method):</strong></p>
+<li>
+<p><strong>Main function (main method):</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">InterruptedException</span><span class="token punctuation">,</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">ClassNotFoundException</span> <span class="token punctuation">&#123;</span>
   <span class="token class-name">Configuration</span> conf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Configuration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token class-name">Job</span> job <span class="token operator">=</span> <span class="token class-name">Job</span><span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span>conf<span class="token punctuation">,</span> <span class="token string">"word count"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -375,7 +393,8 @@
 
   <span class="token comment">// Submit the job and wait for it to complete</span>
   job<span class="token punctuation">.</span><span class="token function">waitForCompletion</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
 </ol>
 <p><img src="/img/hadoop/hadoop6.png" alt="hadoop"></p>
 <p>In the entire Hadoop architecture, the computing framework plays a crucial role, on the one hand, it can operate on the data in HDFS, on the other hand, it can be encapsulated to provide calls from upper-level components such as Hive and Pig.</p>
