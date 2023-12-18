@@ -202,8 +202,7 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser.</p>
+        <h2><span id="preface">Preface</span></h2><p>In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser.</p>
 <p>For example:</p>
 <ul>
 <li>Clicking a link triggers navigation to the URL.</li>
@@ -211,8 +210,7 @@
 <li>Pressing and dragging the mouse button on text selects the text.</li>
 </ul>
 <p>When handling an event with JavaScript, we usually don’t want the corresponding browser behavior to occur. Instead, we want to implement alternative behaviors.</p>
-<h2><span id="preventing-browser-behavior">Preventing Browser Behavior</span></h2>
-<p>There are two ways to tell the browser that we don’t want it to execute default behavior:</p>
+<h2><span id="preventing-browser-behavior">Preventing Browser Behavior</span></h2><p>There are two ways to tell the browser that we don’t want it to execute default behavior:</p>
 <ul>
 <li>The common way is to use the event object, which has a <code>event.preventDefault()</code> method.</li>
 <li>If the handler is assigned using <code>on&lt;event&gt;</code> (rather than <code>addEventListener</code>), returning false is also effective.</li>
@@ -221,21 +219,19 @@
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token keyword">return</span> <span class="token boolean">false</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
 or
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p><a href="/" onclick="return false">Click here</a><br>
-or<br>
-<a href="/" onclick="event.preventDefault()">here</a></p>
+
+<p><a href="/" onclick="return false">Click here</a><br>or<br><a href="/" onclick="event.preventDefault()">here</a></p>
 <br>
+
 <p>It’s important to note that using <code>on&lt;event&gt;</code> and returning false is not a good practice.</p>
 <p>Returning false from the handler is an exception. The return value of event handlers is usually ignored. The only exception is returning false from a handler assigned using <code>on&lt;event&gt;</code>.</p>
-<h2><span id="handler-option-passive">Handler Option “passive”</span></h2>
-<p>The optional <code>passive: true</code> option in <code>addEventListener</code> signals to the browser that the handler will not call <code>preventDefault()</code>.</p>
+<h2><span id="handler-option-passive">Handler Option “passive”</span></h2><p>The optional <code>passive: true</code> option in <code>addEventListener</code> signals to the browser that the handler will not call <code>preventDefault()</code>.</p>
 <p>Why is this necessary?</p>
 <p>On mobile devices, some events like <code>touchmove</code> (when the user moves their finger on the screen) can lead to scrolling by default, which can be prevented using <code>preventDefault()</code> in the handler.</p>
 <p>So, when the browser detects such events, it must first process all handlers. If <code>preventDefault</code> is not called anywhere, the page can continue scrolling. However, this may cause unnecessary delays and “jitter” in the UI.</p>
 <p>The <code>passive: true</code> option informs the browser that the handler will not cancel scrolling. The browser then immediately scrolls the page to provide a smoother experience and somehow processes the event.</p>
 <p>For certain browsers (such as Firefox and Chrome), <code>touchstart</code> and <code>touchmove</code> events have passive set to true by default.</p>
-<h2><span id="eventdefaultprevented"><code>event.defaultPrevented</code></span></h2>
-<p>If the default behavior is prevented, the <code>event.defaultPrevented</code> property is true; otherwise, it is false.</p>
+<h2><span id="eventdefaultprevented"><code>event.defaultPrevented</code></span></h2><p>If the default behavior is prevented, the <code>event.defaultPrevented</code> property is true; otherwise, it is false.</p>
 <p>Here’s an interesting use case.</p>
 <p><strong>Do you remember our discussion on <code>event.stopPropagation()</code> in the Bubbling and Capturing chapter and why stopping propagation is not good?</strong></p>
 <p>Sometimes, we can use <code>event.defaultPrevented</code> as an alternative to notify other event handlers that the event has been handled.</p>
@@ -246,12 +242,16 @@ or<br>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">oncontextmenu</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>alert('Draw our menu'); return false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
   Right-click shows our context menu
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <br>
+
 <p><button>Right-click shows browser context menu</button></p>
 <button oncontextmenu="alert('Draw our menu'); return false">
   Right-click shows our context menu
 </button>
+
 <br>
+
 <p>Now, in addition to this context menu, let’s implement a document-wide context menu.</p>
 <p>When right-clicking, it should display the nearest context menu:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click here for the document context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
@@ -268,9 +268,12 @@ or<br>
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <br>
+
 <p>Right-click here for the document context menu</p>
 <button id="elem">Right-click here for the button context menu</button>
+
 <script>
   elem.oncontextmenu = function(event) {
     event.preventDefault();
@@ -282,9 +285,10 @@ or<br>
     alert("Document context menu");
   };
 </script>
+
 <br>
-<h2><span id="issue-and-solutions">Issue and Solutions</span></h2>
-<p>The problem arises when clicking on <code>elem</code>, and we get two menus: the button-level menu and the document-level menu due to event bubbling.</p>
+
+<h2><span id="issue-and-solutions">Issue and Solutions</span></h2><p>The problem arises when clicking on <code>elem</code>, and we get two menus: the button-level menu and the document-level menu due to event bubbling.</p>
 <p>One solution is to prevent the event from bubbling up when handling the right-click event in the button. We can achieve this using <code>event.stopPropagation()</code>:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu (fixed with event.stopPropagation)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
@@ -301,6 +305,7 @@ or<br>
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Now, the button-level menu works as expected. However, this comes at a cost — we deny any external code access to right-click information, including counters for collecting statistics. This is not advisable.</p>
 <p>Another alternative is to check whether the document handler has prevented the browser’s default behavior. If it has, the event has already been handled, and we don’t need to react to it:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu (added a check for event.defaultPrevented)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
@@ -319,21 +324,19 @@ or<br>
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Now everything works as expected. If we have nested elements, each with its own context menu, this approach will work. Just make sure to check <code>event.defaultPrevented</code> in each <code>contextmenu</code> handler.</p>
 <blockquote>
-<p><strong>event.stopPropagation() and event.preventDefault()</strong><br>
-As we’ve seen, <code>event.stopPropagation()</code> and <code>event.preventDefault()</code> (also considered as <code>return false</code>) are two different things. They are unrelated to each other.</p>
+<p><strong>event.stopPropagation() and event.preventDefault()</strong><br>As we’ve seen, <code>event.stopPropagation()</code> and <code>event.preventDefault()</code> (also considered as <code>return false</code>) are two different things. They are unrelated to each other.</p>
 </blockquote>
 <blockquote>
-<p><strong>Nested Context Menu Structure</strong><br>
-There are other ways to implement nested context menus. One approach is to have a global object with a <code>document.oncontextmenu</code> handler and a method to store other handlers. This object would capture any right-click, browse stored handlers, and run the appropriate one.</p>
+<p><strong>Nested Context Menu Structure</strong><br>There are other ways to implement nested context menus. One approach is to have a global object with a <code>document.oncontextmenu</code> handler and a method to store other handlers. This object would capture any right-click, browse stored handlers, and run the appropriate one.</p>
 </blockquote>
 <p>However, every piece of code needing a context menu should be aware of this object and use its assistance rather than having its own <code>contextmenu</code> handler.</p>
-<h2><span id="summary">Summary</span></h2>
-<p>There are many default browser behaviors:</p>
+<h2><span id="summary">Summary</span></h2><p>There are many default browser behaviors:</p>
 <ul>
 <li><code>mousedown</code> — Starts selection (dragging the mouse for selection).</li>
-<li><code>click</code> on <code>&lt;input type=&quot;checkbox&quot;&gt;</code> — Selects/deselects the input.</li>
+<li><code>click</code> on <code>&lt;input type=&quot;checkbox&quot;&gt;</code> — Selects&#x2F;deselects the input.</li>
 <li><code>submit</code> — Clicking <code>&lt;input type=&quot;submit&quot;&gt;</code> or pressing Enter in form fields triggers this event, leading the browser to submit the form.</li>
 <li><code>keydown</code> — Pressing a key adds a character to a field or triggers other actions.</li>
 <li><code>contextmenu</code> — Event occurs on right-click, triggering the default behavior of showing the browser context menu.</li>
@@ -378,17 +381,16 @@ There are other ways to implement nested context menus. One approach is to have 
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p><strong>Let’s start with an example.</strong></p>
+        <h2><span id="preface">Preface</span></h2><p><strong>Let’s start with an example.</strong></p>
 <p>A handler is assigned to the <code>&lt;div&gt;</code>, but if you click on any nested tags (e.g., <code>&lt;em&gt;</code> or <code>&lt;code&gt;</code>), the handler will also run:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'The handler!'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>If you click on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>EM<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span>, the handler on <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">></span></span>DIV<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>code</span><span class="token punctuation">></span></span> runs.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <blockquote>
 <p>So, if you click on EM, the handler on DIV runs.</p>
 </blockquote>
-<h2><span id="bubbling">Bubbling</span></h2>
-<p>The bubbling principle is straightforward.</p>
+<h2><span id="bubbling">Bubbling</span></h2><p>The bubbling principle is straightforward.</p>
 <p><strong>When an event occurs on an element, it first runs the handler on that element, then runs the handler on its parent element, and continues up to handlers on other ancestors.</strong></p>
 <p>Suppose we have 3 layers of nesting <code>FORM &gt; DIV &gt; P</code>, each with its own handler:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
@@ -403,33 +405,27 @@ There are other ways to implement nested context menus. One approach is to have 
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>P<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><strong>Now, what happens if you click on <code>&lt;p&gt;</code>?</strong></p>
 <ol>
-<li>
-<p>First, the handler runs on <code>&lt;p&gt;</code>.</p>
+<li><p>First, the handler runs on <code>&lt;p&gt;</code>.</p>
 </li>
-<li>
-<p>Then, it runs on <code>&lt;div&gt;</code>.</p>
+<li><p>Then, it runs on <code>&lt;div&gt;</code>.</p>
 </li>
-<li>
-<p>Then, it runs on <code>&lt;form&gt;</code>.</p>
+<li><p>Then, it runs on <code>&lt;form&gt;</code>.</p>
 </li>
-<li>
-<p>Finally, it runs on the document.</p>
+<li><p>Finally, it runs on the document.</p>
 </li>
 </ol>
 <p><strong>This behavior is called “event bubbling” because it bubbles up from the element like a bubble.</strong></p>
 <p>So, if we click on <code>&lt;p&gt;</code>, we will see 3 alerts: p → div → form.</p>
-<h3><span id="eventtarget">event.target</span></h3>
-<p>The handler on a parent element can always access detailed information about where the event actually occurred.</p>
+<h3><span id="eventtarget">event.target</span></h3><p>The handler on a parent element can always access detailed information about where the event actually occurred.</p>
 <p><strong>The element that triggered the event, the deepest nested one, is called the target element, and it can be accessed through <code>event.target</code>.</strong></p>
 <p>Note the difference with <code>this</code> (which equals <code>event.currentTarget</code>):</p>
 <ul>
-<li>
-<p><code>this</code> is the “current” element at the time the handler is running, and it remains the same.</p>
+<li><p><code>this</code> is the “current” element at the time the handler is running, and it remains the same.</p>
 </li>
-<li>
-<p><code>event.target</code> is the “target” element when the event happens, and it can be any element; it changes during the bubbling process.</p>
+<li><p><code>event.target</code> is the “target” element when the event happens, and it can be any element; it changes during the bubbling process.</p>
 </li>
 </ul>
 <p>Let’s illustrate this with an example!</p>
@@ -437,7 +433,7 @@ There are other ways to implement nested context menus. One approach is to have 
 <p>Note: Here, all events are bound to the form instead of individual elements.</p>
 <p>In the <code>form.onclick</code> handler:</p>
 <ul>
-<li><code>this</code> (=<code>event.currentTarget</code>) is the <code>&lt;form&gt;</code> element because the handler runs on it.</li>
+<li><code>this</code> (&#x3D;<code>event.currentTarget</code>) is the <code>&lt;form&gt;</code> element because the handler runs on it.</li>
 <li><code>event.target</code> is the actual clicked element inside the form.</li>
 </ul>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">HTML</span><span class="token punctuation">></span></span>
@@ -496,11 +492,12 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token function">alert</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">the bubbling doesn't reach here</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click me<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <div onclick="alert(`the bubbling doesn't reach here`)" style="width:150px;height:50px;background-color:red">
   <button onclick="event.stopPropagation()">Click me</button>
 </div>
-<h2><span id="capturing">Capturing</span></h2>
-<p><strong>Another phase of event handling is called “capturing.”</strong></p>
+
+<h2><span id="capturing">Capturing</span></h2><p><strong>Another phase of event handling is called “capturing.”</strong></p>
 <p>The DOM event standard describes the three phases of event propagation:</p>
 <ol>
 <li>Capturing phase — The event travels down the hierarchy of elements (from the window).</li>
@@ -512,18 +509,17 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
 <p>In other words: Clicking on <code>&lt;td&gt;</code>, the event first descends through the ancestor chain to the element (capturing phase), then reaches the target (target phase), and finally ascends (bubbling phase), calling handlers along the way.</p>
 <p>So far, we have only discussed bubbling because the capturing phase is rarely used. Typically, we don’t see it.</p>
 <p>Handlers added with <code>on&lt;event&gt;</code> attributes or using HTML attributes or with <code>addEventListener(event, handler)</code> with two arguments have no knowledge of capturing; they run only in the second and third phases.</p>
-<h2><span id="summary">Summary</span></h2>
-<p><strong>When an event occurs — the element nested deepest where the event happened is marked as the “target element” (<code>event.target</code>).</strong></p>
+<h2><span id="summary">Summary</span></h2><p><strong>When an event occurs — the element nested deepest where the event happened is marked as the “target element” (<code>event.target</code>).</strong></p>
 <ul>
 <li>Then, the event moves down from the document root to the <code>event.target</code>, invoking handlers assigned with <code>addEventListener(..., true)</code> (where <code>true</code> is a shorthand for <code>&#123;capture: true&#125;</code>).</li>
 <li>Next, the handler on the target element itself is called.</li>
-<li>Finally, the event bubbles up from <code>event.target</code> to the root, calling handlers assigned with <code>on&lt;event&gt;</code>, HTML attributes, and <code>addEventListener</code> without a third parameter or with <code>false</code>/<code>&#123;capture: false&#125;</code>.</li>
+<li>Finally, the event bubbles up from <code>event.target</code> to the root, calling handlers assigned with <code>on&lt;event&gt;</code>, HTML attributes, and <code>addEventListener</code> without a third parameter or with <code>false</code>&#x2F;<code>&#123;capture: false&#125;</code>.</li>
 </ul>
 <p><strong>Each handler has access to properties of the <code>event</code> object:</strong></p>
 <ul>
 <li><code>event.target</code> — The element deepest in the hierarchy that triggered the event.</li>
-<li><code>event.currentTarget</code> (=<code>this</code>) — The current element handling the event (the one with the handler).</li>
-<li><code>event.eventPhase</code> — The current phase (capturing=1, target=2, bubbling=3).</li>
+<li><code>event.currentTarget</code> (&#x3D;<code>this</code>) — The current element handling the event (the one with the handler).</li>
+<li><code>event.eventPhase</code> — The current phase (capturing&#x3D;1, target&#x3D;2, bubbling&#x3D;3).</li>
 </ul>
 <p>Any event handler can stop the event by calling <code>event.stopPropagation()</code>, but it’s not recommended because we might not be sure if we genuinely don’t need the event to bubble up for other purposes.</p>
 <p>The capturing phase is rarely used, and usually, events are handled during the bubbling phase. There’s a reason for this logic.</p>
@@ -563,18 +559,15 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements.</p>
+        <h2><span id="preface">Preface</span></h2><p>Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements.</p>
 <p>Vue and Web Components are primarily complementary technologies. Whether integrating custom elements into existing Vue applications or building and distributing custom elements using Vue, Vue provides excellent support for both using and creating custom elements.</p>
-<h2><span id="what-are-custom-elements">What are Custom Elements</span></h2>
-<p>A key feature of Web Components is the ability to create custom elements: HTML elements whose behavior is defined by web developers, extending the set of elements available in browsers.</p>
+<h2><span id="what-are-custom-elements">What are Custom Elements</span></h2><p>A key feature of Web Components is the ability to create custom elements: HTML elements whose behavior is defined by web developers, extending the set of elements available in browsers.</p>
 <p>There are two types of custom elements in Web Components:</p>
 <ul>
 <li><strong>Customized Built-in Elements:</strong> Inherit from standard HTML elements, such as HTMLImageElement or HTMLParagraphElement. Their implementation defines the behavior of standard elements.</li>
 <li><strong>Autonomous Custom Elements:</strong> Inherit from the HTML element base class HTMLElement. You have to implement their behavior from scratch.</li>
 </ul>
-<h3><span id="custom-element-lifecycle-callbacks">Custom Element Lifecycle Callbacks</span></h3>
-<p>Custom Elements also have lifecycle callbacks.</p>
+<h3><span id="custom-element-lifecycle-callbacks">Custom Element Lifecycle Callbacks</span></h3><p>Custom Elements also have lifecycle callbacks.</p>
 <p><strong>Once your custom element is registered, the browser calls certain methods of your class when your custom element interacts with the page in specific ways.</strong> By providing implementations for these methods, known as lifecycle callbacks, you can run code to respond to these events.</p>
 <p>The custom element lifecycle callbacks include:</p>
 <ul>
@@ -611,17 +604,16 @@ For example, if you click `<span class="token tag"><span class="token tag"><span
 <span class="token punctuation">&#125;</span>
 
 customElements<span class="token punctuation">.</span><span class="token function">define</span><span class="token punctuation">(</span><span class="token string">"my-custom-element"</span><span class="token punctuation">,</span> MyCustomElement<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="using-custom-elements-in-vue">Using Custom Elements in Vue</span></h2>
-<p>Using custom elements in a Vue application is largely similar to using native HTML elements, but a few points need to be kept in mind:</p>
-<h3><span id="skipping-component-resolution">Skipping Component Resolution</span></h3>
-<p><strong>By default, Vue tries to parse non-native HTML tags as registered Vue components and then render them as custom elements.</strong> This leads to Vue issuing a “Unknown custom element” warning during development. To inform Vue that certain elements should be treated as custom elements and skip component resolution, we can specify the <code>compilerOptions.isCustomElement</code> option.</p>
+
+<h2><span id="using-custom-elements-in-vue">Using Custom Elements in Vue</span></h2><p>Using custom elements in a Vue application is largely similar to using native HTML elements, but a few points need to be kept in mind:</p>
+<h3><span id="skipping-component-resolution">Skipping Component Resolution</span></h3><p><strong>By default, Vue tries to parse non-native HTML tags as registered Vue components and then render them as custom elements.</strong> This leads to Vue issuing a “Unknown custom element” warning during development. To inform Vue that certain elements should be treated as custom elements and skip component resolution, we can specify the <code>compilerOptions.isCustomElement</code> option.</p>
 <p>If you are using Vue for build setup, this option should be passed through build configuration as it is a compile-time option.</p>
 <p>Example of in-browser configuration:</p>
 <pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F; Only works if using in-browser compilation.
 &#x2F;&#x2F; If using build tools, see config examples below.
 app.config.compilerOptions.isCustomElement &#x3D; (tag) &#x3D;&gt; tag.includes(&#39;-&#39;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="vite-configuration-example">Vite Configuration Example</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vite.config.js</span>
+
+<h3><span id="vite-configuration-example">Vite Configuration Example</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vite.config.js</span>
 <span class="token keyword">import</span> vue <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
 
 <span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
@@ -636,8 +628,8 @@ app.config.compilerOptions.isCustomElement &#x3D; (tag) &#x3D;&gt; tag.includes(
     <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="vue-cli-configuration-example">Vue CLI Configuration Example</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vue.config.js</span>
+
+<h3><span id="vue-cli-configuration-example">Vue CLI Configuration Example</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vue.config.js</span>
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token function-variable function">chainWebpack</span><span class="token operator">:</span> <span class="token parameter">config</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
     config<span class="token punctuation">.</span>module
@@ -654,12 +646,13 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3>
-<p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
+
+<h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3><p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
 <p><strong>Defining Custom Elements</strong></p>
 <p>Vue supports creating custom elements using the same Vue component API with the <code>defineCustomElement</code> method. This method takes the same parameters as <code>defineComponent</code> but returns an extended custom element constructor <code>HTMLElement</code>:</p>
 <p>Template:0</p>
 <pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;my-vue-element&gt;&lt;&#x2F;my-vue-element&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineCustomElement <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
 
 <span class="token keyword">const</span> MyVueElement <span class="token operator">=</span> <span class="token function">defineCustomElement</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
@@ -684,6 +677,7 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
     <span class="token comment">// initial props (optional)</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>When discussing custom elements and Vue components, we are essentially talking about two different approaches to building web applications. <strong>Custom elements are a web standard, akin to HTML elements, while Vue components are a more advanced building approach provided by the Vue.js framework.</strong></p>
 <p>Some argue that using only custom elements is a more “future-proof” approach, but this passage points out that such a view is overly simplistic. It lists reasons explaining why the Vue component model is more practical. Some key points include:</p>
 <p>Vue components offer more features, such as a convenient template system, methods for managing state, and an efficient way to render components on the server. These features are essential for building complex applications.</p>
@@ -694,20 +688,15 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
 <li>A reactive state management system conducive to extracting and reusing logic across components;</li>
 <li>A high-performance method for rendering components on the server (SSR) and composing them on the client side, crucial for Web Vitals metrics like SEO and LCP. Native custom elements SSR typically involves simulating the DOM in Node.js and then serializing the mutated DOM, while Vue SSR compiles as much as possible into string concatenation, which is more efficient.</li>
 </ul>
-<h3><span id="definecustomelement-api-vue-component-transformation"><code>defineCustomElement</code> API Vue Component Transformation</span></h3>
-<p>Using the <code>defineCustomElement</code> API to transform Vue components into registerable custom element classes has several benefits:</p>
+<h3><span id="definecustomelement-api-vue-component-transformation"><code>defineCustomElement</code> API Vue Component Transformation</span></h3><p>Using the <code>defineCustomElement</code> API to transform Vue components into registerable custom element classes has several benefits:</p>
 <ol>
-<li>
-<p><strong>Cross-Framework Integration:</strong> By transforming Vue components into custom element classes, you can use these components in different frontend frameworks and libraries. This makes your components more versatile and integrable with other technology stacks.</p>
+<li><p><strong>Cross-Framework Integration:</strong> By transforming Vue components into custom element classes, you can use these components in different frontend frameworks and libraries. This makes your components more versatile and integrable with other technology stacks.</p>
 </li>
-<li>
-<p><strong>Independent Usage:</strong> After registering a Vue component as a custom element, it can be used independently of a Vue application. This means you can use the component without an entire Vue application, and introduce it into different build systems and module systems.</p>
+<li><p><strong>Independent Usage:</strong> After registering a Vue component as a custom element, it can be used independently of a Vue application. This means you can use the component without an entire Vue application, and introduce it into different build systems and module systems.</p>
 </li>
-<li>
-<p><strong>Progressive Migration:</strong> If your application is gradually transitioning to Vue, you can achieve a progressive migration by transforming certain components into custom elements. This allows you to gradually introduce Vue components into an existing project without the need for a complete rewrite.</p>
+<li><p><strong>Progressive Migration:</strong> If your application is gradually transitioning to Vue, you can achieve a progressive migration by transforming certain components into custom elements. This allows you to gradually introduce Vue components into an existing project without the need for a complete rewrite.</p>
 </li>
-<li>
-<p><strong>Web Components Standard Compatibility:</strong> Registering Vue components as custom elements makes them compatible with the Web Components standard. This means you can leverage other tools and libraries in the Web Components ecosystem, enhancing the interoperability of your components.</p>
+<li><p><strong>Web Components Standard Compatibility:</strong> Registering Vue components as custom elements makes them compatible with the Web Components standard. This means you can leverage other tools and libraries in the Web Components ecosystem, enhancing the interoperability of your components.</p>
 </li>
 </ol>
 <p>In other words, the <code>defineCustomElement</code> API’s purpose is to compile Vue components into custom elements that can be used in the browser without relying on the Vue compiler for real-time compilation.</p>

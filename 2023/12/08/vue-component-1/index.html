@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="前言 我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面">
+    <meta name="description" content="前言我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vuejs 组件的实现原理">
 <meta property="og:url" content="https://ikkkp.github.io/2023/12/08/vue-component-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言 我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面">
+<meta property="og:description" content="前言我们在前面讨论过了vue渲染器，渲染器主要负责将虚拟 DOM 渲染为真实 DOM ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。 但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。 有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面。">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-12-08T07:45:05.000Z">
@@ -167,7 +167,7 @@
             </div>
             
             
-            <a class="navbar-item" target="_blank" title="Facebook" href="https://twitter.com/hungzln3">
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
                 <i class="fab fa-twitter"></i>
                 
@@ -229,12 +229,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>我们在前面讨论过了<a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">vue渲染器</a>，<strong>渲染器主要负责将虚拟 DOM 渲染为真实 DOM</strong> ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。</p>
+        <h2><span id="前言">前言</span></h2><p>我们在前面讨论过了<a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">vue渲染器</a>，<strong>渲染器主要负责将虚拟 DOM 渲染为真实 DOM</strong> ，我们只需要使用虚拟 DOM来描述最终呈现的内容即可。</p>
 <p>但当我们编写比较复杂的页面时，用来描述页面结构的虚拟 DOM 的代码量会变得越来越多，或者说页面模板会变得越来越大。这时，我们就需要组件化的能力。</p>
 <p>有了组件，我们就可以将一个大的页面拆分为多个部分，每一个部分都可以作为单独的组件，这些组件共同组成完整的页面。组件化的实现同样需要渲染器的支持</p>
-<h2><span id="渲染组件">渲染组件</span></h2>
-<p>从用户的角度来看，一个有状态组件就是一个选项对象，如下面的代码所示：</p>
+<h2><span id="渲染组件">渲染组件</span></h2><p>从用户的角度来看，一个有状态组件就是一个选项对象，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 是一个组件，它的值是一个选项对象</span>
 <span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
 <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
@@ -242,12 +240,14 @@
   <span class="token keyword">return</span>  <span class="token punctuation">&#123;</span><span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>但是，如果从渲染器的内部实现来看，一个组件则是一个特殊类型的虚拟 DOM 节点。例如，为了描述普通标签，我们用虚拟节点的vnode.type 属性来存储标签名称，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"> <span class="token comment">// 该 vnode 用来描述普通标签</span>
 <span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
 <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span>
 <span class="token comment">// ...</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>为了描述片段，我们让虚拟节点的 vnode.type 属性的值为Fragment, 而为了描述文本，我们让虚拟节点的 vnode.type 属性的值为Text，</p>
 <p>还记得我们之前在渲染器讨论过的<code>patch函数</code>吗？</p>
 <p><strong>在patch函数中，Vue会根据新旧虚拟DOM节点的差异进行不同的处理逻辑。</strong> 如果是首次渲染，会执行首次渲染的逻辑；如果是更新渲染，会根据差异更新实际的DOM节点。</p>
@@ -276,6 +276,7 @@
   <span class="token comment">// 返回新节点的实际DOM元素</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>可以看到，渲染器会使用虚拟节点的 type 属性来区分其类型。对于不同类型的节点，需要采用不同的处理方法来完成挂载和更新。</p>
 <p>实际上，对于组件来说也是一样的。<strong>为了使用虚拟节点来描述组件，我们可以用虚拟节点的 vnode.type 属性来存储组件的选项对象</strong></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -312,6 +313,7 @@
   <span class="token comment">// 返回新节点的实际DOM元素</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面这段代码中，我们新增了一个 else if 分支，用来处理虚拟节点的 vnode.type 属性值为对象的情况，即将该虚拟节点作为组件的描述来看待，并调用 mountComponent 和 patchComponent 函数来完成组件的挂载和更新。</p>
 <p>上面我们回顾了有关于组件的一些基本概念，组件的挂载和更新是如何实现的，其实我们更关注的还应该是<strong>用户应该如何编写组件？组件的选项对象必须包含哪些内容？以及组件拥有哪些能力？</strong></p>
 <p>因此，一个组件必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM。换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，如下面的代码所示：</p>
@@ -353,8 +355,8 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token function">patch</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> subTree<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="总结">总结</span></h2>
-<p>我们现在来回顾一下组件的基础，我们显式声明了一个组件的对象实例，该组件的选项对象必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM，之后我们再调用render和patch进行组件的更新和替换。<strong>换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，而渲染器的作用就是将组件的渲染函数的返回值渲染为真实 DOM。</strong></p>
+
+<h2><span id="总结">总结</span></h2><p>我们现在来回顾一下组件的基础，我们显式声明了一个组件的对象实例，该组件的选项对象必须包含一个渲染函数，即 render 函数，并且渲染函数的返回值应该是虚拟 DOM，之后我们再调用render和patch进行组件的更新和替换。<strong>换句话说，组件的渲染函数就是用来描述组件所渲染内容的接口，而渲染器的作用就是将组件的渲染函数的返回值渲染为真实 DOM。</strong></p>
 
     
     </div>

@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Preface Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements. Vue and Web Components are primarily complementary technologies. Whet">
+    <meta name="description" content="PrefaceWeb Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements. Vue and Web Components are primarily complementary technologies. Wheth">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue Components and Web Components Custom Elements">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/29/en/Custom-Elements/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Preface Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements. Vue and Web Components are primarily complementary technologies. Whet">
+<meta property="og:description" content="PrefaceWeb Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements. Vue and Web Components are primarily complementary technologies. Wheth">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-29T02:13:58.000Z">
@@ -252,18 +252,15 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements.</p>
+        <h2><span id="preface">Preface</span></h2><p>Web Components is a collective term for a set of native web APIs that allow developers to create reusable custom elements.</p>
 <p>Vue and Web Components are primarily complementary technologies. Whether integrating custom elements into existing Vue applications or building and distributing custom elements using Vue, Vue provides excellent support for both using and creating custom elements.</p>
-<h2><span id="what-are-custom-elements">What are Custom Elements</span></h2>
-<p>A key feature of Web Components is the ability to create custom elements: HTML elements whose behavior is defined by web developers, extending the set of elements available in browsers.</p>
+<h2><span id="what-are-custom-elements">What are Custom Elements</span></h2><p>A key feature of Web Components is the ability to create custom elements: HTML elements whose behavior is defined by web developers, extending the set of elements available in browsers.</p>
 <p>There are two types of custom elements in Web Components:</p>
 <ul>
 <li><strong>Customized Built-in Elements:</strong> Inherit from standard HTML elements, such as HTMLImageElement or HTMLParagraphElement. Their implementation defines the behavior of standard elements.</li>
 <li><strong>Autonomous Custom Elements:</strong> Inherit from the HTML element base class HTMLElement. You have to implement their behavior from scratch.</li>
 </ul>
-<h3><span id="custom-element-lifecycle-callbacks">Custom Element Lifecycle Callbacks</span></h3>
-<p>Custom Elements also have lifecycle callbacks.</p>
+<h3><span id="custom-element-lifecycle-callbacks">Custom Element Lifecycle Callbacks</span></h3><p>Custom Elements also have lifecycle callbacks.</p>
 <p><strong>Once your custom element is registered, the browser calls certain methods of your class when your custom element interacts with the page in specific ways.</strong> By providing implementations for these methods, known as lifecycle callbacks, you can run code to respond to these events.</p>
 <p>The custom element lifecycle callbacks include:</p>
 <ul>
@@ -300,17 +297,16 @@
 <span class="token punctuation">&#125;</span>
 
 customElements<span class="token punctuation">.</span><span class="token function">define</span><span class="token punctuation">(</span><span class="token string">"my-custom-element"</span><span class="token punctuation">,</span> MyCustomElement<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="using-custom-elements-in-vue">Using Custom Elements in Vue</span></h2>
-<p>Using custom elements in a Vue application is largely similar to using native HTML elements, but a few points need to be kept in mind:</p>
-<h3><span id="skipping-component-resolution">Skipping Component Resolution</span></h3>
-<p><strong>By default, Vue tries to parse non-native HTML tags as registered Vue components and then render them as custom elements.</strong> This leads to Vue issuing a “Unknown custom element” warning during development. To inform Vue that certain elements should be treated as custom elements and skip component resolution, we can specify the <code>compilerOptions.isCustomElement</code> option.</p>
+
+<h2><span id="using-custom-elements-in-vue">Using Custom Elements in Vue</span></h2><p>Using custom elements in a Vue application is largely similar to using native HTML elements, but a few points need to be kept in mind:</p>
+<h3><span id="skipping-component-resolution">Skipping Component Resolution</span></h3><p><strong>By default, Vue tries to parse non-native HTML tags as registered Vue components and then render them as custom elements.</strong> This leads to Vue issuing a “Unknown custom element” warning during development. To inform Vue that certain elements should be treated as custom elements and skip component resolution, we can specify the <code>compilerOptions.isCustomElement</code> option.</p>
 <p>If you are using Vue for build setup, this option should be passed through build configuration as it is a compile-time option.</p>
 <p>Example of in-browser configuration:</p>
 <pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F; Only works if using in-browser compilation.
 &#x2F;&#x2F; If using build tools, see config examples below.
 app.config.compilerOptions.isCustomElement &#x3D; (tag) &#x3D;&gt; tag.includes(&#39;-&#39;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="vite-configuration-example">Vite Configuration Example</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vite.config.js</span>
+
+<h3><span id="vite-configuration-example">Vite Configuration Example</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vite.config.js</span>
 <span class="token keyword">import</span> vue <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
 
 <span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
@@ -325,8 +321,8 @@ app.config.compilerOptions.isCustomElement &#x3D; (tag) &#x3D;&gt; tag.includes(
     <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="vue-cli-configuration-example">Vue CLI Configuration Example</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vue.config.js</span>
+
+<h3><span id="vue-cli-configuration-example">Vue CLI Configuration Example</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// vue.config.js</span>
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token function-variable function">chainWebpack</span><span class="token operator">:</span> <span class="token parameter">config</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
     config<span class="token punctuation">.</span>module
@@ -343,12 +339,13 @@ module<span class="token punctuation">.</span>exports <span class="token operato
       <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3>
-<p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
+
+<h3><span id="building-custom-elements-with-vue">Building Custom Elements with Vue</span></h3><p>The primary advantage of custom elements is their ability to be used with any framework or even without a framework. This makes them suitable for distributing components to end consumers who may not use the same frontend stack, or when you want to isolate the implementation details of the components used in the final application.</p>
 <p><strong>Defining Custom Elements</strong></p>
 <p>Vue supports creating custom elements using the same Vue component API with the <code>defineCustomElement</code> method. This method takes the same parameters as <code>defineComponent</code> but returns an extended custom element constructor <code>HTMLElement</code>:</p>
 <p>Template:0</p>
 <pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;my-vue-element&gt;&lt;&#x2F;my-vue-element&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineCustomElement <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
 
 <span class="token keyword">const</span> MyVueElement <span class="token operator">=</span> <span class="token function">defineCustomElement</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
@@ -373,6 +370,7 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
     <span class="token comment">// initial props (optional)</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>When discussing custom elements and Vue components, we are essentially talking about two different approaches to building web applications. <strong>Custom elements are a web standard, akin to HTML elements, while Vue components are a more advanced building approach provided by the Vue.js framework.</strong></p>
 <p>Some argue that using only custom elements is a more “future-proof” approach, but this passage points out that such a view is overly simplistic. It lists reasons explaining why the Vue component model is more practical. Some key points include:</p>
 <p>Vue components offer more features, such as a convenient template system, methods for managing state, and an efficient way to render components on the server. These features are essential for building complex applications.</p>
@@ -383,20 +381,15 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
 <li>A reactive state management system conducive to extracting and reusing logic across components;</li>
 <li>A high-performance method for rendering components on the server (SSR) and composing them on the client side, crucial for Web Vitals metrics like SEO and LCP. Native custom elements SSR typically involves simulating the DOM in Node.js and then serializing the mutated DOM, while Vue SSR compiles as much as possible into string concatenation, which is more efficient.</li>
 </ul>
-<h3><span id="definecustomelement-api-vue-component-transformation"><code>defineCustomElement</code> API Vue Component Transformation</span></h3>
-<p>Using the <code>defineCustomElement</code> API to transform Vue components into registerable custom element classes has several benefits:</p>
+<h3><span id="definecustomelement-api-vue-component-transformation"><code>defineCustomElement</code> API Vue Component Transformation</span></h3><p>Using the <code>defineCustomElement</code> API to transform Vue components into registerable custom element classes has several benefits:</p>
 <ol>
-<li>
-<p><strong>Cross-Framework Integration:</strong> By transforming Vue components into custom element classes, you can use these components in different frontend frameworks and libraries. This makes your components more versatile and integrable with other technology stacks.</p>
+<li><p><strong>Cross-Framework Integration:</strong> By transforming Vue components into custom element classes, you can use these components in different frontend frameworks and libraries. This makes your components more versatile and integrable with other technology stacks.</p>
 </li>
-<li>
-<p><strong>Independent Usage:</strong> After registering a Vue component as a custom element, it can be used independently of a Vue application. This means you can use the component without an entire Vue application, and introduce it into different build systems and module systems.</p>
+<li><p><strong>Independent Usage:</strong> After registering a Vue component as a custom element, it can be used independently of a Vue application. This means you can use the component without an entire Vue application, and introduce it into different build systems and module systems.</p>
 </li>
-<li>
-<p><strong>Progressive Migration:</strong> If your application is gradually transitioning to Vue, you can achieve a progressive migration by transforming certain components into custom elements. This allows you to gradually introduce Vue components into an existing project without the need for a complete rewrite.</p>
+<li><p><strong>Progressive Migration:</strong> If your application is gradually transitioning to Vue, you can achieve a progressive migration by transforming certain components into custom elements. This allows you to gradually introduce Vue components into an existing project without the need for a complete rewrite.</p>
 </li>
-<li>
-<p><strong>Web Components Standard Compatibility:</strong> Registering Vue components as custom elements makes them compatible with the Web Components standard. This means you can leverage other tools and libraries in the Web Components ecosystem, enhancing the interoperability of your components.</p>
+<li><p><strong>Web Components Standard Compatibility:</strong> Registering Vue components as custom elements makes them compatible with the Web Components standard. This means you can leverage other tools and libraries in the Web Components ecosystem, enhancing the interoperability of your components.</p>
 </li>
 </ol>
 <p>In other words, the <code>defineCustomElement</code> API’s purpose is to compile Vue components into custom elements that can be used in the browser without relying on the Vue compiler for real-time compilation.</p>
