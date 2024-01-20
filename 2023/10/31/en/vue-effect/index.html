@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="IntroductionEffect functions can be nested. But why is this design choice made? Nested Effectseffect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#">
+    <meta name="description" content="Introduction Effect functions can be nested. But why is this design choice made? Nested Effects effect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nested Effects and Effect Stack">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/31/en/vue-effect/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="IntroductionEffect functions can be nested. But why is this design choice made? Nested Effectseffect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F; &amp;#">
+<meta property="og:description" content="Introduction Effect functions can be nested. But why is this design choice made? Nested Effects effect(function effectFn1() &amp;#123;   effect(function effectFn2() &amp;#123; &#x2F;* ... *&#x2F; &amp;#125;)     &#x2F;* ... *&#x2F;">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T02:09:08.000Z">
@@ -222,12 +222,13 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2><p>Effect functions can be nested. But why is this design choice made?</p>
-<h2><span id="nested-effects">Nested Effects</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <h2><span id="introduction">Introduction</span></h2>
+<p>Effect functions can be nested. But why is this design choice made?</p>
+<h2><span id="nested-effects">Nested Effects</span></h2>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
     <span class="token comment">/* ... */</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>In the code above, <code>effectFn1</code> is nested within <code>effectFn2</code>. The execution of <code>effectFn1</code> will trigger the execution of <code>effectFn2</code>. So, when do we encounter nested effects? Take Vue.js, for example; Vue.js’s rendering function is executed within an effect.</p>
 <p>When components are nested, for instance, when the Foo component renders the Bar component:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar component</span>
@@ -240,7 +241,6 @@
   <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">return</span> <span class="token operator">&lt;</span>Bar <span class="token operator">/</span><span class="token operator">></span> <span class="token punctuation">&#125;</span><span class="token comment">// JSX syntax</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>Nested effects occur in this scenario. It can be visualized as follows:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   Foo<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -249,7 +249,6 @@
     Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>The <code>effect</code> function can be nested, meaning an <code>effect</code> function can contain another <code>effect</code> function. When an outer <code>effect</code> function depends on reactive data created inside an inner <code>effect</code> function, the inner <code>effect</code> function is automatically tracked, ensuring that the outer <code>effect</code> function is executed when the inner <code>effect</code> function changes.</p>
 <p>This nested structure of effect functions establishes a dependency chain, ensuring that when reactive data changes, all the effect functions dependent on it are triggered, thereby maintaining the responsiveness of the application.</p>
 <p>The “effect stack” in Vue 3’s internal implementation is crucial. Vue uses an effect stack to track the currently executing effect functions, similar to a function call stack. This stack manages the execution order and dependency relationships of effect functions.</p>
@@ -281,7 +280,6 @@
   <span class="token comment">// Access obj.foo property within effectFn1</span>
   temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><code>effectFn1</code> is the outer <code>effect</code> function, which depends on the value of <code>obj.foo</code>. It contains an <code>innerEffect</code> within it. The inner <code>effect</code> function, <code>effectFn2</code>, depends on the value of <code>obj.bar</code>. When we modify <code>obj.foo</code>, the outer <code>effect</code> function should be triggered and output the value of <code>obj.foo</code>. When we modify <code>obj.bar</code>, the inner <code>effect</code> function should be triggered and output the value of <code>obj.bar</code>.</p>
 <p>We use the global variable <code>activeEffect</code> to store the effect functions registered through the <code>effect</code> function. This means that at any given time, <code>activeEffect</code> stores only one effect function.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
@@ -303,7 +301,6 @@
   <span class="token comment">// Execute the effect function</span>
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>However, by only using a single variable for storage without employing a stack structure, when nested effects occur, the execution of the inner effect function will overwrite the value of <code>activeEffect</code>. It will never be restored to its original value. If there is a reactive data performing dependency collection, even if it is read within the outer effect function, the collected effect functions will all be from the inner effect function. In other words, when I read <code>obj.foo</code>, <code>activeEffect</code> still refers to the value of <code>innerEffect</code>, and only the <code>innerEffect</code> is triggered.</p>
 <p>To solve this issue, we need an effect function stack called <code>effectStack</code>. When an effect function is executed, the current effect function is pushed onto the stack. After the execution of the effect function is completed, it is popped from the stack. The <code>activeEffect</code> is always set to the top effect function on the stack. This ensures that a reactive data will only collect the effect function that directly reads its value, preventing mutual interference:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Use a global variable to store the currently active effect function</span>
@@ -333,10 +330,10 @@
   <span class="token comment">// Execute the effect function</span>
   <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <hr>
 <p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
 <pre><code>
+
 </code></pre>
 
     
@@ -384,7 +381,7 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2023 Huangzl&nbsp;
+                &copy; 2024 Huangzl&nbsp;
                 Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
                         target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
             </div>

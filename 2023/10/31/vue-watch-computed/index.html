@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="引言之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。 计算属性与lazy属">
+    <meta name="description" content="引言 之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。 计算属性与lazy">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-watch-computed原理">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/31/vue-watch-computed/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="引言之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。 计算属性与lazy属">
+<meta property="og:description" content="引言 之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。 计算属性与lazy">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T04:45:41.000Z">
@@ -229,12 +229,13 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2><p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
-<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2><p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
+        <h2><span id="引言">引言</span></h2>
+<p>之前介绍过了 effect 函数，它用来注册副作用函数，同时它也允许指定一些选项参数 options，例如指定 scheduler 调度器来控制副作用函数的执行时机和方式；也介绍了用来追踪和收集依赖的track 函数，以及用来触发副作用函数重新执行的 trigger 函数。实际上，综合这些内容，我们就可以实现 Vue.js 中一个非常重要并且非常有特色的能力——计算属性。</p>
+<h2><span id="计算属性与lazy属性">计算属性与<code>lazy</code>属性</span></h2>
+<p>在Vue.js中，<code>effect</code>函数是用来创建响应式副作用的函数。默认情况下，传递给<code>effect</code>的副作用函数会立即执行。例如，下面的代码中，<code>effect</code>函数会立即执行传递给它的副作用函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>然而，在某些情况下，我们希望副作用函数在需要的时候才执行，而不是立即执行。一个典型的例子是计算属性。为了实现这种延迟执行的效果，我们可以在<code>options</code>中添加一个<code>lazy</code>属性，并将其设置为<code>true</code>。当<code>lazy</code>为<code>true</code>时，副作用函数不会在初始化时立即执行，而是在需要的时候才执行。修正后的代码如下所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// 这个函数不会立即执行</span>
@@ -246,7 +247,6 @@
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>具体实现中，我们将副作用函数<code>effectFn</code>作为<code>effect</code>函数的返回值返回。这意味着，当我们调用<code>effect</code>函数时，我们会得到对应的副作用函数，并且可以在需要的时候手动执行它。这种机制赋予了我们更多的控制权，允许我们决定何时触发副作用函数的执行，而不是立即执行它。</p>
 <p>这种设计模式特别适用于特定场景，例如计算属性。在计算属性中，我们可能希望在特定时刻触发副作用函数的执行，而不是在初始化时立即执行。通过将副作用函数作为<code>effect</code>函数的返回值，我们能够灵活地控制副作用函数的执行时机，以满足不同场景的需求。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -271,7 +271,6 @@
   <span class="token comment">// 将副作用函数作为返回值返回</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这个代码中，<code>effect</code>函数的第二个参数是一个<code>options</code>对象，其中<code>lazy</code>属性被设置为<code>true</code>。这意味着传递给<code>effect</code>的副作用函数会在需要的时候才执行，例如在计算属性被访问时。这种延迟执行的特性使得<code>effect</code>函数非常适合用于实现计算属性等场景。</p>
 <p>在上述代码中，我们通过<code>options</code>参数的<code>lazy</code>属性控制副作用函数的立即执行。如果<code>options.lazy</code>为<code>true</code>，副作用函数将被延迟执行，直到手动触发为止。</p>
 <p>现在我们通过计算属性实现了lazy懒加载，那么数据缓存该怎么实现呢。</p>
@@ -299,15 +298,14 @@
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>解决了懒计算的问题，只有在真正需要计算<code>value</code>的时候，才会执行<code>effectFn</code>。同时，它还引入了一个<code>dirty</code>标志，用于标识当前的计算是否需要重新进行。如果<code>dirty</code>为<code>true</code>，则重新计算<code>value</code>的值，并将<code>dirty</code>标志设置为<code>false</code>，以便下一次访问时可以直接使用缓存的值。</p>
-<h2><span id="watch-的实现原理">watch 的实现原理</span></h2><p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
+<h2><span id="watch-的实现原理">watch 的实现原理</span></h2>
+<p>所谓 watch，其本质就是观测一个响应式数据，当数据发生变化时通知并执行相应的回调函数。举个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'数据变了'</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// 修改响应数据的值，会导致回调函数执行</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>假设 obj 是一个响应数据，使用 watch 函数观测它，并传递一个回调函数，当修改响应式数据的值时，会触发该回调函数执行。实际上，watch 的实现本质上就是利用了 effect 以及options.scheduler 选项，如以下代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -316,7 +314,6 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// 当 obj.foo 的值变化时，会执行 scheduler 调度函数</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在一个副作用函数中访问响应式数据 obj.foo，通过前面的介绍，我们知道这会在副作用函数与响应式数据之间建立联系，当响应式数据变化时，会触发副作用函数重新执行。但有一个例外，即如果副作用函数存在 scheduler 选项，当响应式数据发生变化时，会触发 scheduler 调度函数执行，而非直接触发副作用函数执行。从这个角度来看，其实 scheduler 调度函数就相当于一个回调函数，而watch 的实现就是利用了这个特点。</p>
 <p>下面是最简单的 watch 函数的实现：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// watch 函数接收两个参数，source 是响应式数据，cb 是回调函数</span>
@@ -379,7 +376,6 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span>
 
 <span class="token comment">// 输出: 数据变化了</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>我们首先定义了一个原始的数据对象data，其中有一个属性foo，初始值为1。接着，我们使用Proxy创建了一个代理对象obj，该代理对象会拦截对data的操作。</p>
 <p>当你调用obj.foo++时，会触发Proxy的set拦截器。在set拦截器中，我们首先将属性值设置到目标对象上，然后调用watch函数，并传入obj和一个回调函数。在watch函数中，我们使用了一个假设的effect函数（实际开发中可能是框架提供的响应式函数），这个函数用于监听数据的变化。在watch函数中，我们传入了source.foo的读取操作，以及一个包含scheduler和fn属性的配置对象。scheduler可以用于定义调度逻辑（在示例中为空函数），fn则是一个当数据变化时会被调用的回调函数。</p>
 <p>当obj.foo++执行时，set拦截器触发，watch函数被调用。</p>
@@ -429,7 +425,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2023 Huangzl&nbsp;
+                &copy; 2024 Huangzl&nbsp;
                 Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
                         target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
             </div>

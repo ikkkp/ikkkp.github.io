@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="前言2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括• 安全更新• 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，">
+    <meta name="description" content="前言 2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括 • 安全更新 • 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码 最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，就">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue 2&#x2F;3 共存开发的思路">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/28/vue5/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括• 安全更新• 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，">
+<meta property="og:description" content="前言 2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括 • 安全更新 • 浏览器兼容 Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，是否有可能使我们的库同时支持 Vue 2 和 3 ？ 通用代码 最简单的方法是编写适用于两个版本的通用代码 ，无需任何额外的修改，就">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-28T15:40:22.000Z">
@@ -167,15 +167,15 @@
                     <hr class="navbar-divider">
                     
                     
-                    <a class="navbar-item" href="#vue-2x2f3-共存开发的思路">2&nbsp;&nbsp;<b>Vue 2/3 共存开发的思路</b></a>
+                    <a class="navbar-item" href="#vue-23-共存开发的思路">2&nbsp;&nbsp;<b>Vue 2/3 共存开发的思路</b></a>
                     
                     
                     
-                    <a class="navbar-item" href="#同时支持-vue-2x2f3-项目">2.1&nbsp;&nbsp;同时⽀持 Vue 2/3 项⽬</a>
+                    <a class="navbar-item" href="#同时支持-vue-23-项目">2.1&nbsp;&nbsp;同时⽀持 Vue 2/3 项⽬</a>
                     
                     
                     
-                    <a class="navbar-item" href="#vue-2x2f3-项目存在的可能场景">2.1.1&nbsp;&nbsp;Vue 2/3 项⽬存在的可能场景</a>
+                    <a class="navbar-item" href="#vue-23-项目存在的可能场景">2.1.1&nbsp;&nbsp;Vue 2/3 项⽬存在的可能场景</a>
                     
                     
                     
@@ -183,11 +183,11 @@
                     
                     
                     
-                    <a class="navbar-item" href="#1-vue-2x2f3-项目共存">2.2.1&nbsp;&nbsp;1. Vue 2/3 项⽬共存</a>
+                    <a class="navbar-item" href="#1-vue-23-项目共存">2.2.1&nbsp;&nbsp;1. Vue 2/3 项⽬共存</a>
                     
                     
                     
-                    <a class="navbar-item" href="#2-jessicasachsx2fpetite-方案">2.2.2&nbsp;&nbsp;2. JessicaSachs/petite 方案</a>
+                    <a class="navbar-item" href="#2-jessicasachspetite-方案">2.2.2&nbsp;&nbsp;2. JessicaSachs/petite 方案</a>
                     
                     
                     
@@ -267,25 +267,36 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括<br>• 安全更新<br>• 浏览器兼容</p>
-<p>Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库&#x2F;插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，<strong>是否有可能使我们的库同时支持 Vue 2 和 3 ？</strong></p>
-<h3><span id="通用代码">通用代码</span></h3><p>最简单的方法是编写适用于<strong>两个版本的通用代码</strong> ，无需任何额外的修改，就像人们对Python 2 和 3所做的那样。简单并不意味着容易。编写此类组件需要避免<strong>Vue 3 中新引入的内容</strong> 以及<strong>Vue 2 中弃用的内容</strong> 。换句话说，您不能使用：</p>
+        <h2><span id="前言">前言</span></h2>
+<p>2023 年 12 ⽉ 31 ⽇后，功能仍然可⽤，但不再提供更新，包括<br>
+• 安全更新<br>
+• 浏览器兼容</p>
+<p>Evan 宣布 Vue 3 的第一个 RC将于 7 月中旬发布。这篇文章建议库/插件作者开始迁移对 Vue 3 的支持。但是由于 API 和行为发生了很大变化，<strong>是否有可能使我们的库同时支持 Vue 2 和 3 ？</strong></p>
+<h3><span id="通用代码">通用代码</span></h3>
+<p>最简单的方法是编写适用于<strong>两个版本的通用代码</strong> ，无需任何额外的修改，就像人们对Python 2 和 3所做的那样。简单并不意味着容易。编写此类组件需要避免<strong>Vue 3 中新引入的内容</strong> 以及<strong>Vue 2 中弃用的内容</strong> 。换句话说，您不能使用：</p>
 <ul>
 <li>合成API</li>
 <li>.sync .native修饰语</li>
 <li>过滤器</li>
 <li>3rd 方供应商对象</li>
 </ul>
-<h3><span id="使用分支">使用分支</span></h3><p>核心团队成员对此问题的回复建议使用不同的分支来分隔对每个定位版本的支持。我认为这对于现有和成熟的库来说是一个很好的解决方案，因为它们的代码库通常更稳定，并且版本目标优化可能需要它们具有更好的代码隔离。</p>
+<h3><span id="使用分支">使用分支</span></h3>
+<p>核心团队成员对此问题的回复建议使用不同的分支来分隔对每个定位版本的支持。我认为这对于现有和成熟的库来说是一个很好的解决方案，因为它们的代码库通常更稳定，并且版本目标优化可能需要它们具有更好的代码隔离。</p>
 <p>这样做的缺点是您需要维护两个代码库，这会使您的工作量增加一倍。对于小型库或想要支持两个版本的新库来说，进行两次错误修复或功能补充是不理想的。我不建议在项目一开始就使用这种方法。</p>
-<h3><span id="构建脚本">构建脚本</span></h3><p>在VueUse中，编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。有了这个，我可以编写一次代码并使库支持两个 Vue 版本。它的问题是我需要在每个版本上构建两次并引导用户安装相应的插件版本（@vue&#x2F;composition-api对于Vue 2则需要手动安装）。</p>
-<h2><span id="vue-2x2f3-共存开发的思路">Vue 2&#x2F;3 共存开发的思路</span></h2><h3><span id="同时支持-vue-2x2f3-项目">同时⽀持 Vue 2&#x2F;3 项⽬</span></h3><h4><span id="vue-2x2f3-项目存在的可能场景">Vue 2&#x2F;3 项⽬存在的可能场景</span></h4><p><strong>渐进式迁移：</strong> 如果有一个较大的 Vue 2 项目，但是想要逐步迁移到 Vue 3，可以选择在项目中同时引入 Vue 3，然后逐步将 Vue 2 组件迁移到 Vue 3。</p>
+<h3><span id="构建脚本">构建脚本</span></h3>
+<p>在VueUse中，编写了一些构建脚本，以便在构建时从目标版本的 API 导入代码。之后，我需要发布两个标签vue2 vue3来区分不同版本的支持。有了这个，我可以编写一次代码并使库支持两个 Vue 版本。它的问题是我需要在每个版本上构建两次并引导用户安装相应的插件版本（@vue/composition-api对于Vue 2则需要手动安装）。</p>
+<h2><span id="vue-23-共存开发的思路">Vue 2/3 共存开发的思路</span></h2>
+<h3><span id="同时支持-vue-23-项目">同时⽀持 Vue 2/3 项⽬</span></h3>
+<h4><span id="vue-23-项目存在的可能场景">Vue 2/3 项⽬存在的可能场景</span></h4>
+<p><strong>渐进式迁移：</strong> 如果有一个较大的 Vue 2 项目，但是想要逐步迁移到 Vue 3，可以选择在项目中同时引入 Vue 3，然后逐步将 Vue 2 组件迁移到 Vue 3。</p>
 <p><strong>依赖库和插件兼容性：</strong> 如果项目依赖于一些 Vue 2 的插件或库，而这些插件或库还没有升级到 Vue 3，可能需要同时使用 Vue 2 和 Vue 3 以确保兼容性。</p>
 <p><strong>新功能采用 Vue 3：</strong> 可能希望项目中使用 Vue 3 来利用其新功能和性能优势，同时保留 Vue 2 用于旧的组件或功能。</p>
-<p><strong>项⽬融合者：</strong> 公司内部基于体验要求，需要 Vue 2&#x2F;3项⽬呈现在同⼀⻚⾯中</p>
-<p><strong>内部组件资产维护者：</strong> 需要在 Vue 2&#x2F;3 的项⽬都⽀持，且能⼒必须⼀致</p>
+<p><strong>项⽬融合者：</strong> 公司内部基于体验要求，需要 Vue 2/3项⽬呈现在同⼀⻚⾯中</p>
+<p><strong>内部组件资产维护者：</strong> 需要在 Vue 2/3 的项⽬都⽀持，且能⼒必须⼀致</p>
 <p><strong>⽼项⽬应⽤开发者：</strong> 需要⽤到⼀个第三⽅图表组件，但只有 Vue 3 版本，⽽⾮ Vue 2 版本</p>
-<h3><span id="解决方案">解决⽅案</span></h3><h4><span id="1-vue-2x2f3-项目共存">1. Vue 2&#x2F;3 项⽬共存</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
+<h3><span id="解决方案">解决⽅案</span></h3>
+<h4><span id="1-vue-23-项目共存">1. Vue 2/3 项⽬共存</span></h4>
+<p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
 <p>直接通过 Vue 3 的 createApp 创建⼀个 Vue 3 的根实例，然后通过 Vue 2 的 mount ⽅法挂载到 Vue 2 的根实例上，这样就可以在 Vue 2 的项⽬中使⽤ Vue 3 的组件。</p>
 <p>相关的代码仓库贴在这里，大家自取：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
 <p><img src="/img/vue5/vue5-2.jpg" alt="vue-5"></p>
@@ -294,7 +305,6 @@
 <span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
 
 <span class="token function">createApp</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">mount</span><span class="token punctuation">(</span><span class="token string">'#vue3'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 2 项⽬</span>
 <span class="token keyword">import</span> Vue <span class="token keyword">from</span> <span class="token string">'vue2'</span>
 <span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
@@ -325,9 +335,9 @@
     <span class="token function">Inspect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>这样我们属于是将Vue2和Vue3单独做成了两个独立的包，然后在vite.config.ts中配置了不同的编译规则，这样就可以在同一个页面中使用Vue2和Vue3。</p>
-<h4><span id="2-jessicasachsx2fpetite-方案">2. JessicaSachs&#x2F;petite 方案</span></h4><p>先来简单介绍一下<a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>：</p>
+<h4><span id="2-jessicasachspetite-方案">2. JessicaSachs/petite 方案</span></h4>
+<p>先来简单介绍一下<a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>：</p>
 <blockquote>
 <p><strong>Petite是一个为Vue组件作者构建的主观GitHub模板。</strong> 它设置了开发、文档和测试通用SFC组件所需的工具，并与Vue 2.7运行时向后兼容。</p>
 </blockquote>
@@ -336,30 +346,32 @@
 <p>而这也意味着您将在 npm 上发布软件包的两个版本，而不是为了支持 Vue 2 或 Vue 3 而中断主要版本。</p>
 <p><strong>这样做的缺点是您的用户在升级和更改导入时需要安装新版本。</strong> 好处是您可以更轻松地编写向后兼容的代码并为用户提供定期升级。此外，您还可以拆分仅 Vue 2 和仅 Vue 3 的依赖项。</p>
 <p>如果您在通用代码中使用lodash，您将需要在工作区根目录中运行后pnpm build，每个包 ( lib-vue3、lib-vue2) 应独立部署。</p>
-<h4><span id="3-vue-bridge-方案">3. vue-bridge 方案</span></h4><h4><span id="4-vue-demi-方案">4. vue-demi 方案</span></h4><p>仓库实例：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
+<h4><span id="3-vue-bridge-方案">3. vue-bridge 方案</span></h4>
+<h4><span id="4-vue-demi-方案">4. vue-demi 方案</span></h4>
+<p>仓库实例：<a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
 <p>Vue Demi是一个开发实用程序，允许您为 Vue 2 和 3 编写通用 Vue 库。无需担心用户安装的版本。</p>
-<p>当您要创建 Vue 插件&#x2F;库时，只需安装vue-demi为依赖项并从中导入与 Vue 相关的任何内容即可。像往常一样发布你的插件&#x2F;库，你的包将变得通用！</p>
+<p>当您要创建 Vue 插件/库时，只需安装vue-demi为依赖项并从中导入与 Vue 相关的任何内容即可。像往常一样发布你的插件/库，你的包将变得通用！</p>
 <pre class="line-numbers language-none"><code class="language-none">&#123;
   &quot;dependencies&quot;: &#123;
     &quot;vue-demi&quot;: &quot;latest&quot;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> Vue<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> reactive<span class="token punctuation">,</span> ref <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>在底层，它使用了postinstallnpm hook。安装所有包后，脚本将开始检查已安装的 Vue 版本，并将导出重定向到基于本地 Vue 版本。使用 Vue 2 时，@vue&#x2F;composition-api如果未安装，它也会自动安装。</p>
-<p>所需要注意的有关于库&#x2F;组件的点：</p>
-<p><strong>库&#x2F;组件</strong></p>
+<p>在底层，它使用了postinstallnpm hook。安装所有包后，脚本将开始检查已安装的 Vue 版本，并将导出重定向到基于本地 Vue 版本。使用 Vue 2 时，@vue/composition-api如果未安装，它也会自动安装。</p>
+<p>所需要注意的有关于库/组件的点：</p>
+<p><strong>库/组件</strong></p>
 <ul>
 <li>单仓库 - 多个包构建</li>
 <li>依赖管理</li>
-<li>alias 别名配置<ul>
+<li>alias 别名配置
+<ul>
 <li>npm 包名</li>
 <li>构建工具配置</li>
 </ul>
 </li>
 </ul>
-<h3><span id="vue-2-应用中引入-vue-3-组件">Vue 2 应⽤中引⼊ Vue 3 组件</span></h3><p><strong>会有组件互操作的限制</strong></p>
+<h3><span id="vue-2-应用中引入-vue-3-组件">Vue 2 应⽤中引⼊ Vue 3 组件</span></h3>
+<p><strong>会有组件互操作的限制</strong></p>
 <ul>
 <li>context 共享</li>
 <li>scoped slots</li>
@@ -418,7 +430,7 @@
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2023 Huangzl&nbsp;
+                &copy; 2024 Huangzl&nbsp;
                 Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
                         target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
             </div>

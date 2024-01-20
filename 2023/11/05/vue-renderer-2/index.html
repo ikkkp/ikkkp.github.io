@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="前言Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。 那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。 每个Vue组">
+    <meta name="description" content="前言 Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。 那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。 每个Vue">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-render挂载与更新">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/05/vue-renderer-2/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。 那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。 每个Vue组">
+<meta property="og:description" content="前言 Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。 那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。 每个Vue">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-05T05:05:27.000Z">
@@ -235,14 +235,16 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
+        <h2><span id="前言">前言</span></h2>
+<p>Vue.js模板功能强大，几乎可以满足我们在应用程序中所需的一切。但是，有一些场景下，比如基于输入或插槽值创建动态组件，render函数可以更好地满足这些用例。</p>
 <p>那些来自React世界的开发者可能对render函数非常熟悉。通常在JSX中使用它们来构建React组件。虽然Vue渲染函数也可以用JSX编写，但我们将继续使用原始JS，有助于我们可以更轻松地了解Vue组件系统的基础。。</p>
 <p>每个Vue组件都实现了一个render函数。大多数时候，该函数将由Vue编译器创建。当我们在组件上指定模板时，该模板的内容将由Vue编译器处理，编译器最终将返回render函数。渲染函数本质上返回一个虚拟DOM节点，该节点将被Vue在浏览器DOM中渲染。</p>
-<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong> </p>
-<p><strong>虚拟文档对象模型（或”DOM”）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
+<p>现在又引出了虚拟DOM的概念， <strong>虚拟DOM到底是什么？</strong></p>
+<p><strong>虚拟文档对象模型（或&quot;DOM&quot;）允许Vue在更新浏览器之前在其内存中渲染组件。</strong> 这使一切变得更快，同时也避免了DOM重新渲染的高昂成本。因为每个DOM节点对象包含很多属性和方法，因此使用虚拟DOM预先在内存进行操作，可以省去很多浏览器直接创建DOM节点对象的开销。</p>
 <p>Vue更新浏览器DOM时，会将更新的虚拟DOM与上一个虚拟DOM进行比较，并仅使用已修改的部分更新实际DOM。这意味着更少的元素更改，从而提高了性能。Render函数返回虚拟DOM节点，在Vue生态系统中通常称为VNode，该接口是允许Vue在浏览器DOM中写入这些对象的接口。它们包含使用Vue所需的所有信息。</p>
 <p><img src="/img/vue-render/render-pipeline.png" alt="vue-render"></p>
-<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2><p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
+<h2><span id="挂载子节点和元素的属性">挂载子节点和元素的属性</span></h2>
+<p>当<code>vnode.children</code>的值是字符串类型时，会把它设置为元素的文本内容。一个元素除了具有文本子节点外，还可以包含其他元素子节点，并且子节点可以是很多个。为了描述元素的子节点，我们需要将<code>vnode.children</code>定义为数组：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -252,7 +254,6 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>上面这段代码描述的是“一个<code>div</code>标签具有一个子节点，且子节点是<code>p</code>标签”。可以看到，<code>vnode.children</code>是一个数组，它的每一个元素都是一个独立的虚拟节点对象。这样就形成了树型结构，即虚拟DOM树。</p>
 <p>为了完成子节点的渲染，我们需要修改<code>mountElement</code>函数，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -267,12 +268,13 @@
   <span class="token punctuation">&#125;</span>
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上面这段代码中，我们增加了新的判断分支。使用<code>Array.isArray</code>函数判断<code>vnode.children</code>是否是数组，如果是数组，则循环遍历它，并调用<code>patch</code>函数挂载数组中的虚拟节点。在挂载子节点时，需要注意以下两点：</p>
 <ol>
-<li><p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
+<li>
+<p>传递给<code>patch</code>函数的第一个参数是<code>null</code>。因为是挂载阶段，没有旧<code>vnode</code>，所以只需要传递<code>null</code>即可。这样，当<code>patch</code>函数执行时，就会递归地调用<code>mountElement</code>函数完成挂载。</p>
 </li>
-<li><p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
+<li>
+<p>传递给<code>patch</code>函数的第三个参数是挂载点。由于我们正在挂载的子元素是<code>div</code>标签的子节点，所以需要把刚刚创建的<code>div</code>元素作为挂载点，这样才能保证这些子节点挂载到正确位置。</p>
 </li>
 </ol>
 <p>完成了子节点的挂载后，我们再来看看如何用<code>vnode</code>描述一个标签的属性，以及如何渲染这些属性。我们知道，HTML标签有很多属性，其中有些属性是通用的，例如<code>id</code>、<code>class</code>等，而有些属性是特定元素才有的，例如<code>form</code>元素的<code>action</code>属性。实际上，渲染一个元素的属性比想象中要复杂，不过我们仍然秉承一切从简的原则，先来看看最基本的属性处理。</p>
@@ -289,7 +291,6 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p><code>vnode.props</code>是一个对象，它的键代表元素的属性名称，它的值代表对应属性的值。这样，我们就可以通过遍历<code>props</code>对象的方式，把这些属性渲染到对应的元素上，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -306,7 +307,6 @@
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们首先检查了<code>vnode.props</code>字段是否存在，如果存在则遍历它，并调用<code>setAttribute</code>函数将属性设置到元素上。实际上，除了使用<code>setAttribute</code>函数为元素设置属性之外，还可以通过DOM对象直接设置：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -321,18 +321,19 @@
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在这段代码中，我们没有选择使用<code>setAttribute</code>函数，而是直接将属性设置在DOM对象上，即<code>el[key] = vnode.props[key]</code>。实际上，无论是使用<code>setAttribute</code>函数，还是直接操作DOM对象，都存在缺陷。如前所述，为元素设置属性比想象中要复杂得多。不过，在讨论具体有哪些缺陷之前，我们有必要先搞清楚两个重要的概念：HTML Attributes和DOM Properties。</p>
 <p>当我们处理元素属性时，有两种主要的方式：使用HTML Attributes和DOM Properties。这两者在概念上有些许不同：</p>
 <ol>
-<li><p><strong>HTML Attributes</strong>:</p>
+<li>
+<p><strong>HTML Attributes</strong>:</p>
 <ul>
 <li>HTML Attributes是在HTML标签中定义的属性，例如<code>id</code>、<code>class</code>、<code>src</code>等。</li>
 <li>通过<code>setAttribute</code>方法可以设置HTML Attributes。</li>
 <li>HTML Attributes的值始终是字符串。</li>
 </ul>
 </li>
-<li><p><strong>DOM Properties</strong>:</p>
+<li>
+<p><strong>DOM Properties</strong>:</p>
 <ul>
 <li>DOM Properties是DOM对象上的属性，例如<code>element.id</code>、<code>element.className</code>、<code>element.src</code>等。</li>
 <li>直接操作DOM对象可以设置DOM Properties。</li>
@@ -340,70 +341,62 @@
 </ul>
 </li>
 </ol>
-<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2><p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
+<h2><span id="html-attributes和dom-properties">HTML Attributes和DOM Properties</span></h2>
+<p>在处理元素属性时，我们需要明确HTML Attributes和DOM Properties之间的区别。</p>
 <p>如果我们使用<code>setAttribute</code>方法设置属性，那么属性会被设置为HTML Attributes。如果我们直接操作DOM对象的属性，属性会被设置为DOM Properties。</p>
 <p>现在，我们来讨论一下这两种方式存在的问题：</p>
 <ol>
-<li><p><strong>属性值类型转换问题</strong>:</p>
+<li>
+<p><strong>属性值类型转换问题</strong>:</p>
 <ul>
-<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute(&#39;value&#39;, 42)</code>会将值转换为字符串<code>&#39;42&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置属性时，属性的值始终被转换为字符串。这就意味着，如果我们将一个数字或布尔值赋给属性，它们都会被转换为字符串。例如，<code>element.setAttribute('value', 42)</code>会将值转换为字符串<code>'42'</code>。</li>
 </ul>
 </li>
-<li><p><strong>布尔属性问题</strong>:</p>
+<li>
+<p><strong>布尔属性问题</strong>:</p>
 <ul>
 <li>HTML中的一些属性是布尔属性，例如<code>checked</code>、<code>disabled</code>等。对于这些属性，如果存在就表示为<code>true</code>，不存在就表示为<code>false</code>。</li>
-<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute(&#39;disabled&#39;, &#39;false&#39;)</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>&#39;false&#39;</code>。</li>
+<li>当我们使用<code>setAttribute</code>方法设置布尔属性时，不论属性值是什么，都会被视为存在。例如，<code>element.setAttribute('disabled', 'false')</code>会使元素具有<code>disabled</code>属性，即使值是字符串<code>'false'</code>。</li>
 </ul>
 </li>
 </ol>
 <p>考虑到这些问题，最好的做法是尽量使用DOM Properties而不是HTML Attributes来设置元素的属性。这样可以避免类型转换问题和布尔属性问题，确保属性被正确设置。</p>
 <p>首先，HTML Attributes指的是定义在HTML标签上的属性，例如<code>id=&quot;my-input&quot;</code>、<code>type=&quot;text&quot;</code>和<code>value=&quot;foo&quot;</code>。当浏览器解析这段HTML代码后，会创建一个与之相符的DOM元素对象，我们可以通过JavaScript代码来读取该DOM对象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> el <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#my-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>现在来说一下DOM Properties。许多HTML Attributes在DOM对象上有与之同名的DOM Properties，例如<code>id=&quot;my-input&quot;</code>对应<code>el.id</code>，<code>type=&quot;text&quot;</code>对应<code>el.type</code>，<code>value=&quot;foo&quot;</code>对应<code>el.value</code>等。但是，DOM Properties与HTML Attributes的名字并不总是一模一样的，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>class=&quot;foo&quot;</code>对应的DOM Properties则是<code>el.className</code>。另外，并不是所有HTML Attributes都有与之对应的DOM Properties，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">aria-valuenow</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>75<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><code>aria-*</code>类的HTML Attributes就没有与之对应的DOM Properties。</p>
 <p>类似地，也不是所有DOM Properties都有与之对应的HTML Attributes，例如可以用<code>el.textContent</code>来设置元素的文本内容，但并没有与之对应的HTML Attributes来完成同样的工作。</p>
 <p>HTML Attributes的值与DOM Properties的值之间是有关联的。例如下面的HTML片段：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>&#39;foo&#39;</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
+<p>这个片段描述了一个具有<code>id</code>属性的<code>div</code>标签。其中，<code>id=&quot;foo&quot;</code>对应的DOM Properties是<code>el.id</code>，并且值为字符串<code>'foo'</code>。我们把这种HTML Attributes与DOM Properties具有相同名称（即<code>id</code>）的属性看作直接映射。</p>
 <p>但并不是所有HTML Attributes与DOM Properties之间都是直接映射的关系，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>&#39;foo&#39;</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>&#39;bar&#39;</code>，那么：</p>
+<p>这是一个具有<code>value</code>属性的<code>input</code>标签。如果用户没有修改文本框的内容，那么通过<code>el.value</code>读取对应的DOM Properties的值就是字符串<code>'foo'</code>。而如果用户修改了文本框的值，那么<code>el.value</code>的值就是当前文本框的值。例如，用户将文本框的内容修改为<code>'bar'</code>，那么：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>但如果运行下面的代码，会发生“奇怪”的现象：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute(&#39;value&#39;)</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
+<p>可以发现，用户对文本框内容的修改并不会影响<code>el.getAttribute('value')</code>的返回值，这个现象蕴含着HTML Attributes所代表的意义。实际上，HTML Attributes的作用是设置与之对应的DOM Properties的初始值。一旦值改变，那么DOM Properties始终存储着当前值，而通过<code>getAttribute</code>函数得到的仍然是初始值。</p>
 <p>但我们仍然可以通过<code>el.defaultValue</code>来访问初始值，如下面的代码所示：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仍然是 'foo'</span>
 el<span class="token punctuation">.</span>value<span class="token punctuation">;</span> <span class="token comment">// 'bar'</span>
 el<span class="token punctuation">.</span>defaultValue<span class="token punctuation">;</span> <span class="token comment">// 'foo'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>这说明一个HTML Attributes可能关联多个DOM Properties。例如在上例中，<code>value=&quot;foo&quot;</code>与<code>el.value</code>和<code>el.defaultValue</code>都有关联。</p>
 <p>虽然我们可以认为HTML Attributes是用来设置与之对应的DOM Properties的初始值的，但有些值是受限制的，就好像浏览器内部做了默认值校验。如果你通过HTML Attributes提供的默认值不合法，那么浏览器会使用内建的合法值作为对应DOM Properties的默认值，例如：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>&#39;foo&#39;</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>&#39;text&#39;</code>，而非字符串<code>&#39;foo&#39;</code>：</p>
+<p>我们知道，为<code>&lt;input/&gt;</code>标签的<code>type</code>属性指定字符串<code>'foo'</code>是不合法的，因此浏览器会矫正这个不合法的值。所以当我们尝试读取<code>el.type</code>时，得到的其实是矫正后的值，即字符串<code>'text'</code>，而非字符串<code>'foo'</code>：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'text'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>从上述分析来看，HTML Attributes与DOM Properties之间的关系很复杂，但实际上我们只需要记住一个核心原则：HTML Attributes的作用是设置与之对应的DOM Properties的初始值。</p>
-<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2><p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
+<h2><span id="如何正确地设置元素属性">如何正确地设置元素属性</span></h2>
+<p>在上文中，我们讨论了在Vue.js单文件组件的模板中，HTML Attributes和DOM Properties的设置方式。在普通的HTML文件中，浏览器会自动解析HTML Attributes并设置相应的DOM Properties。然而，在Vue.js的模板中，需要框架手动处理这些属性的设置。</p>
 <p>首先，我们以一个禁用的按钮为例，如下所示的HTML代码：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>浏览器会自动将这个按钮设置为禁用状态，并将其对应的DOM Properties <code>el.disabled</code>的值设置为<code>true</code>。但是，如果同样的代码出现在Vue.js的模板中，情况就会有所不同。</p>
 <p>在Vue.js的模板中，HTML模板会被编译成虚拟节点（vnode），其中<code>props.disabled</code>的值是一个空字符串。如果直接使用<code>setAttribute</code>函数设置属性，会导致意外的效果，即按钮被禁用。例如，以下模板：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>对应的虚拟节点为：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> button <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'button'</span><span class="token punctuation">,</span>
@@ -411,10 +404,8 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token literal-property property">disabled</span><span class="token operator">:</span> <span class="token boolean">false</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>如果使用<code>setAttribute</code>函数将属性值设置为空字符串，实际上相当于：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'disabled'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p>而按钮的<code>el.disabled</code>属性是布尔类型的，不关心具体的HTML Attributes的值是什么，只要<code>disabled</code>属性存在，按钮就会被禁用。因此，渲染器不应该总是使用<code>setAttribute</code>函数将<code>vnode.props</code>对象中的属性设置到元素上。</p>
 <p>为了解决这个问题，我们可以优先设置元素的DOM Properties，但当值为空字符串时，需要手动将其矫正为<code>true</code>。以下是一个具体的实现示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -438,7 +429,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在上述代码中，我们检查每个<code>vnode.props</code>中的属性，看看是否存在对应的DOM Properties。如果存在，优先设置DOM Properties。同时，对布尔类型的DOM Properties做了值的矫正，即当要设置的值为空字符串时，将其矫正为布尔值<code>true</code>。如果<code>vnode.props</code>中的属性没有对应的DOM Properties，则仍然使用<code>setAttribute</code>函数完成属性的设置。</p>
 <p>然而，上述实现仍然存在问题。有些DOM Properties是只读的，例如<code>el.form</code>。为了解决这个问题，我们可以添加一个辅助函数<code>shouldSetAsProps</code>，用于判断是否应该将属性作为DOM Properties设置。如果属性是只读的，或者需要特殊处理，就应该使用<code>setAttribute</code>函数来设置属性。</p>
 <p>最后，为了使属性设置操作与平台无关，我们将属性设置相关的操作提取到渲染器选项中。以下是相应的代码示例：</p>
@@ -465,7 +455,6 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>在<code>mountElement</code>函数中，只需要调用<code>patchProps</code>函数，并为其传递相应的参数即可。这样，我们就将属性相关的渲染逻辑从渲染器的核心中抽离出来，使其更加可维护和灵活。</p>
 
     
@@ -513,7 +502,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <div class="container">
         <div class="columns content">
             <div class="column is-narrow has-text-centered">
-                &copy; 2023 Huangzl&nbsp;
+                &copy; 2024 Huangzl&nbsp;
                 Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
                         target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
             </div>
