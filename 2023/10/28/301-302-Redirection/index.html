@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="前言 当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他">
+    <meta name="description" content="前言当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们">
 <meta property="og:type" content="article">
 <meta property="og:title" content="301&#x2F;302-重定向">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/28/301-302-Redirection/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言 当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他">
+<meta property="og:description" content="前言当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题： 从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。 如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-28T08:18:48.000Z">
@@ -249,27 +249,22 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
+        <h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
 <p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p>
 <p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p>
 <p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p>
 <p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p>
 <p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p>
 <ul>
-<li>
-<p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端/浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
+<li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
 </li>
-<li>
-<p>302重定向：意味着资源暂时位于其他地方，客户端/浏览器应继续请求原始URL。</p>
+<li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p>
 </li>
 </ul>
 <p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p>
 <p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p>
-<p>清除301/302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
-<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2>
-<h3><span id="google-chrome">Google Chrome：</span></h3>
-<ol>
+<p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
+<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol>
 <li>打开Chrome浏览器。</li>
 <li>点击右上角的三个垂直点，选择“更多工具”。</li>
 <li>选择“清除浏览数据”。</li>
@@ -278,16 +273,14 @@
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除数据”按钮。</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3>
-<ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol>
 <li>打开Firefox浏览器。</li>
 <li>点击右上角的三条水平线，选择“隐私与安全”。</li>
 <li>在“Cookie和站点数据”部分，点击“清除数据”。</li>
 <li>确保勾选了“缓存”选项。</li>
 <li>点击“清除”。</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge：</span></h3>
-<ol>
+<h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol>
 <li>打开Edge浏览器。</li>
 <li>点击右上角的三个水平点，选择“设置”。</li>
 <li>滚动至底部，点击“查看高级设置”。</li>
@@ -295,15 +288,11 @@
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除”按钮。</li>
 </ol>
-<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2>
-<h3><span id="windows">Windows：</span></h3>
-<ol>
+<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol>
 <li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li>
-<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
+<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS：</span></h3>
-<ol>
+<h3><span id="macos">macOS：</span></h3><ol>
 <li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li>
 <li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 然后输入管理员密码并再次按下回车键。</li>

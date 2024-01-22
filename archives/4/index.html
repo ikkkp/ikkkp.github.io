@@ -196,11 +196,9 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="引言">引言</span></h2>
-<p>loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 <code>Loader API</code>，并通过 this 上下文访问。</p>
+        <h2><span id="引言">引言</span></h2><p>loader 是导出为一个函数的 node 模块。该函数在 loader 转换资源的时候调用。给定的函数将调用 <code>Loader API</code>，并通过 this 上下文访问。</p>
 <p>这边贴一个官网链接<a target="_blank" rel="noopener" href="https://webpack.docschina.org/contribute/writing-a-loader">loader的用法和例子，以及自定义loader本地开发测试</a></p>
-<h2><span id="webpack-loader的简单使用">Webpack Loader的简单使用</span></h2>
-<p>当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。</p>
+<h2><span id="webpack-loader的简单使用">Webpack Loader的简单使用</span></h2><p>当一个 loader 在资源中使用，这个 loader 只能传入一个参数 - 一个包含资源文件内容的字符串。</p>
 <p>同步 loader 可以 return 一个代表已转换模块（transformed module）的单一值。</p>
 <p>loader 会返回一个或者两个值。第一个值的类型是 JavaScript 代码的字符串或者 buffer。第二个可选值是 SourceMap，它是个 JavaScript 对象。</p>
 <p>下面是一个简单的loader的用法，他将匹配所有的js文件，并使用loader.js处理</p>
@@ -224,6 +222,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>由上面我们可以知道loader的使用方法，但对loader仅停留在使用，那具体的一个loader长什么样呢？</p>
 <p>比如说一个简单的loader是这样的：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">content</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -231,9 +230,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
   <span class="token keyword">return</span> content
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 <p>一个 loader 就是一个node模块，其中暴露了一个函数，并只可以接收一个入参，这个参数是一个包含包含资源文件内容的字符串，而函数的返回值就是处理后的内容。</p>
-<h2><span id="自定义webpack-loader">自定义webpack loader</span></h2>
-<h3><span id="自定义loader的用法准则">自定义loader的用法准则</span></h3>
-<p>编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。</p>
+<h2><span id="自定义webpack-loader">自定义webpack loader</span></h2><h3><span id="自定义loader的用法准则">自定义loader的用法准则</span></h3><p>编写 loader 时应该遵循以下准则。它们按重要程度排序，有些仅适用于某些场景，请阅读下面详细的章节以获得更多信息。</p>
 <ul>
 <li>保持 简单 。</li>
 <li>使用 链式 传递。</li>
@@ -246,22 +243,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>避免 绝对路径 。</li>
 <li>使用 <code>peer dependencies</code>。</li>
 </ul>
-<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3>
-<p>首先，在一个webpack项目目录中的文件夹中创建以下文件：</p>
+<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，在一个webpack项目目录中的文件夹中创建以下文件：</p>
 <ul>
 <li><code>src/loader/custom-loader.js</code>：自定义Loader的源文件。</li>
 <li><code>src/index.js</code>：JavaScript入口文件，用于测试自定义Loader。</li>
 </ul>
-<h3><span id="步骤2编写自定义loader">步骤2：编写自定义Loader</span></h3>
-<p>在 <code>custom-loader.js</code> 文件中，编写你的自定义loader代码。这个Loader的作用是将在每个加载的JavaScript文件的顶部添加一个注释。</p>
+<h3><span id="步骤2编写自定义loader">步骤2：编写自定义Loader</span></h3><p>在 <code>custom-loader.js</code> 文件中，编写你的自定义loader代码。这个Loader的作用是将在每个加载的JavaScript文件的顶部添加一个注释。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/loader/custom-loader.js</span>
 module<span class="token punctuation">.</span><span class="token function-variable function">exports</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">source</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 在源代码的顶部添加自定义注释</span>
     <span class="token keyword">const</span> updatedSource <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/** Custom Comment added by Custom Loader */\n</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>source<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> updatedSource<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3>
-<p>在项目根目录下创建Webpack配置文件 <code>webpack.config.js</code>。在配置文件中，使用刚刚编写的自定义Loader。</p>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在项目根目录下创建Webpack配置文件 <code>webpack.config.js</code>。在配置文件中，使用刚刚编写的自定义Loader。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -281,9 +276,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token punctuation">]</span><span class="token punctuation">,</span>
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>功能就简单的进行了一下实现，这里我们主要说一下如何测试调用我们的本地的 loader，方式有两种，一种是通过 <code>Npm link</code> 的方式进行测试，这边贴一个<code>Npm link</code>的链接，大家可以去创建一个软连接进行本地测试，还是挺方便的<a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/v6/commands/npm-link">npm-link</a>。 另外一种就是直接在项目里面进行路径配置：</p>
-<h4><span id="单loader配置方法">单loader配置方法</span></h4>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
+<h4><span id="单loader配置方法">单loader配置方法</span></h4><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
 <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span>
   <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -293,8 +288,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="多loader配置方法">多loader配置方法</span></h4>
-<p>当然也可以通过数组的方式进行配置</p>
+
+<h4><span id="多loader配置方法">多loader配置方法</span></h4><p>当然也可以通过数组的方式进行配置</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">//webpack.config.js</span>
 <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 这里就是说先去找 node_modules 目录中，如果没有的话再去 loaders 目录查找</span>
@@ -303,17 +298,17 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'custom-loader'</span><span class="token punctuation">)</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤4测试自定义loader">步骤4：测试自定义Loader</span></h3>
-<p>在 <code>index.js</code> 文件中，编写一些JavaScript代码，例如：</p>
+
+<h3><span id="步骤4测试自定义loader">步骤4：测试自定义Loader</span></h3><p>在 <code>index.js</code> 文件中，编写一些JavaScript代码，例如：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/index.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Hello, Webpack Loader!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="步骤5运行webpack构建">步骤5：运行Webpack构建</span></h3>
-<p>运行以下命令来构建你的项目：</p>
+
+<h3><span id="步骤5运行webpack构建">步骤5：运行Webpack构建</span></h3><p>运行以下命令来构建你的项目：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>构建完成后，你将在 <code>dist</code> 文件夹中找到生成的 <code>bundle.js</code> 文件。在这个文件里面可以看到在顶部添加了自定义注释的JavaScript代码。</p>
 <hr>
-<h2><span id="webpack-plugin的简单使用">Webpack plugin的简单使用</span></h2>
-<p>插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以在 webpack 构建流程中引入自定义的行为。</p>
+<h2><span id="webpack-plugin的简单使用">Webpack plugin的简单使用</span></h2><p>插件向第三方开发者提供了 webpack 引擎中完整的能力。使用阶段式的构建回调，开发者可以在 webpack 构建流程中引入自定义的行为。</p>
 <p>比如说最简单的一个例子：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -332,23 +327,19 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// 可以添加更多的插件</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上面这个例子里面使用了HtmlWebpackPlugin插件，根据指定的HTML模板生成一个新的HTML文件，并将打包后的JavaScript文件自动添加到生成的HTML文件中。</p>
 <p>一个基本的webpack 插件由以下组成：</p>
 <ul>
-<li>
-<p>一个 JavaScript 命名函数或 JavaScript 类。</p>
+<li><p>一个 JavaScript 命名函数或 JavaScript 类。</p>
 </li>
-<li>
-<p>在插件函数的 prototype 上定义一个 apply 方法，apply 方法在 webpack 装载这个插件的时候被调用，并且会传入 compiler 对象。。</p>
+<li><p>在插件函数的 prototype 上定义一个 apply 方法，apply 方法在 webpack 装载这个插件的时候被调用，并且会传入 compiler 对象。。</p>
 </li>
-<li>
-<p>指定一个绑定到 webpack 自身的事件钩子。</p>
+<li><p>指定一个绑定到 webpack 自身的事件钩子。</p>
 </li>
-<li>
-<p>处理 webpack 内部实例的特定数据。</p>
+<li><p>处理 webpack 内部实例的特定数据。</p>
 </li>
-<li>
-<p>功能完成后调用 webpack 提供的回调。</p>
+<li><p>功能完成后调用 webpack 提供的回调。</p>
 </li>
 </ul>
 <p>一个插件结构如下：</p>
@@ -366,18 +357,15 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> HelloWorldPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2>
-<p>在插件开发中最重要的两个资源就是 compiler 和 compilation 对象。可以说Webpack plugin的开发就是围绕着这两个对象的 hook 进行操作</p>
+
+<h2><span id="compiler-and-compilation">Compiler and Compilation</span></h2><p>在插件开发中最重要的两个资源就是 compiler 和 compilation 对象。可以说Webpack plugin的开发就是围绕着这两个对象的 hook 进行操作</p>
 <p><code>compiler</code> 对象可以理解为一个和 webpack 环境整体绑定的一个对象，它包含了所有的环境配置，包括 options，loader 和 plugin，当 webpack 启动时，这个对象会被实例化，并且他是<code>全局唯一</code>的，上面我们说到的 apply 方法传入的参数就是它。</p>
 <p><code>compilation</code> 在每次构建资源的过程中都会被创建出来，一个 compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息。它同样也提供了很多的 hook 。</p>
-<h2><span id="自定义webpack-plugin">自定义Webpack plugin</span></h2>
-<h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3>
-<p>首先，还是需要一个webpack项目。我们在这个文件夹中创建以下文件：</p>
+<h2><span id="自定义webpack-plugin">自定义Webpack plugin</span></h2><h3><span id="步骤1创建项目目录和文件">步骤1：创建项目目录和文件</span></h3><p>首先，还是需要一个webpack项目。我们在这个文件夹中创建以下文件：</p>
 <ul>
 <li><code>src/plugins/CustomPlugin.js</code>：自定义插件的源文件。</li>
 </ul>
-<h3><span id="步骤2编写自定义插件">步骤2：编写自定义插件</span></h3>
-<p>在 <code>CustomPlugin.js</code> 文件中，我们编写了一个插件，并将在Webpack构建结束时输出一条信息。</p>
+<h3><span id="步骤2编写自定义插件">步骤2：编写自定义插件</span></h3><p>在 <code>CustomPlugin.js</code> 文件中，我们编写了一个插件，并将在Webpack构建结束时输出一条信息。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// src/plugins/CustomPlugin.js</span>
 <span class="token keyword">class</span> <span class="token class-name">CustomPlugin</span> <span class="token punctuation">&#123;</span>
     <span class="token function">apply</span><span class="token punctuation">(</span><span class="token parameter">compiler</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -388,8 +376,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token punctuation">&#125;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> CustomPlugin<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3>
-<p>在配置文件中，使用上面我们的自定义插件。</p>
+
+<h3><span id="步骤3配置webpack">步骤3：配置Webpack</span></h3><p>在配置文件中，使用上面我们的自定义插件。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack.config.js</span>
 <span class="token keyword">const</span> CustomPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./src/plugins/CustomPlugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -404,9 +392,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
         <span class="token comment">// 可以添加更多的插件</span>
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="步骤4运行webpack构建">步骤4：运行Webpack构建</span></h3>
-<p>现在进行Webpack构建：</p>
+
+
+<h3><span id="步骤4运行webpack构建">步骤4：运行Webpack构建</span></h3><p>现在进行Webpack构建：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npx webpack <span class="token parameter variable">--config</span> webpack.config.js<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 
     
     </div>
@@ -440,27 +430,22 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
+        <h2><span id="前言">前言</span></h2><p>当你在网站上进行重定向设置时，特别是在以下两种情况下，可能会遇到问题：</p>
 <p>从HTTP到HTTPS的重定向： 假设你配置了SSL证书，将网站从HTTP升级到HTTPS。</p>
 <p>如果在这个过程中出现了问题，导致网站无法正常访问，你可能会想撤销重定向，回到HTTP版本。然而，问题在于，一旦你使用了301永久性重定向，浏览器会把这个重定向信息保存下来。即使你在服务器上取消了重定向，用户的浏览器依然会强制将他们重定向到HTTPS版本，无法再访问HTTP版本。</p>
 <p>更改网站域名的重定向： 当你将网站从一个域名（比如<code>old-domain.com</code>）迁移到另一个域名（比如<code>new-domain.com</code>），你可能会使用301永久性重定向，以便搜索引擎和浏览器知道网站已经永久地移动到了新的域名。</p>
 <p>但如果在这个过程中出现了问题，你可能希望撤销重定向，使用户能够再次访问旧域名。然而，由于301重定向被浏览器硬缓存，用户将被永久性地重定向到新域名，无法再访问旧域名。</p>
 <p>为了避免这种情况，建议在测试确保一切正常后，一开始使用302临时性重定向，而不是301永久性重定向。302重定向不会被浏览器永久性地缓存，这意味着如果需要，你可以随时撤销重定向，而用户不会被永久性地锁定在新的网址上。这样可以避免用户需要手动清除浏览器缓存的繁琐步骤，提供更好的用户体验。</p>
 <ul>
-<li>
-<p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端/浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
+<li><p>301重定向：意味着资源（页面）被永久性地移动到了一个新的位置。客户端&#x2F;浏览器不应再尝试请求原始位置，而应该从现在开始使用新的位置。</p>
 </li>
-<li>
-<p>302重定向：意味着资源暂时位于其他地方，客户端/浏览器应继续请求原始URL。</p>
+<li><p>302重定向：意味着资源暂时位于其他地方，客户端&#x2F;浏览器应继续请求原始URL。</p>
 </li>
 </ul>
 <p>301是永久性重定向。即使你从服务器移除了重定向，你的浏览器仍然会将资源永久性地重定向到新的域名或HTTPS，因为它们被硬缓存。</p>
 <p>所以，302不会被浏览器硬缓存，如果你从服务器（网站）移除了重定向，你就能够访问旧版本。</p>
-<p>清除301/302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
-<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2>
-<h3><span id="google-chrome">Google Chrome：</span></h3>
-<ol>
+<p>清除301&#x2F;302重定向缓存通常涉及清除浏览器缓存或者操作系统的DNS缓存。下面是如何在不同平台上做的说明：</p>
+<h2><span id="清除浏览器缓存适用于windows-macos-linux">清除浏览器缓存（适用于Windows、macOS、Linux）</span></h2><h3><span id="google-chrome">Google Chrome：</span></h3><ol>
 <li>打开Chrome浏览器。</li>
 <li>点击右上角的三个垂直点，选择“更多工具”。</li>
 <li>选择“清除浏览数据”。</li>
@@ -469,16 +454,14 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除数据”按钮。</li>
 </ol>
-<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3>
-<ol>
+<h3><span id="mozilla-firefox">Mozilla Firefox：</span></h3><ol>
 <li>打开Firefox浏览器。</li>
 <li>点击右上角的三条水平线，选择“隐私与安全”。</li>
 <li>在“Cookie和站点数据”部分，点击“清除数据”。</li>
 <li>确保勾选了“缓存”选项。</li>
 <li>点击“清除”。</li>
 </ol>
-<h3><span id="microsoft-edge">Microsoft Edge：</span></h3>
-<ol>
+<h3><span id="microsoft-edge">Microsoft Edge：</span></h3><ol>
 <li>打开Edge浏览器。</li>
 <li>点击右上角的三个水平点，选择“设置”。</li>
 <li>滚动至底部，点击“查看高级设置”。</li>
@@ -486,15 +469,11 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <li>勾选“缓存图像和文件”选项。</li>
 <li>点击“清除”按钮。</li>
 </ol>
-<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2>
-<h3><span id="windows">Windows：</span></h3>
-<ol>
+<h2><span id="清除操作系统的dns缓存适用于windows-macos">清除操作系统的DNS缓存（适用于Windows、macOS）</span></h2><h3><span id="windows">Windows：</span></h3><ol>
 <li>打开命令提示符（在开始菜单中搜索“cmd”并打开）。</li>
-<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
+<li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">ipconfig &#x2F;flushdns<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
-<h3><span id="macos">macOS：</span></h3>
-<ol>
+<h3><span id="macos">macOS：</span></h3><ol>
 <li>打开终端（在应用程序 &gt; 实用工具文件夹中找到）。</li>
 <li>输入以下命令并按下回车键：<pre class="line-numbers language-none"><code class="language-none">sudo dscacheutil -flushcache<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 然后输入管理员密码并再次按下回车键。</li>
@@ -533,21 +512,19 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包/模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
-<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from 'xx/a'</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
-<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2>
-<p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
-<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3>
-<p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
+        <p>webpack v4 开始新增了一个 <code>sideEffects</code> 特性，通过给 package.json 加入 sideEffects 声明该 包&#x2F;模块 是否包含 sideEffects(副作用)，从而可以为 tree-shaking 提供更大的优化空间。</p>
+<p>基于我们对 side effect 的常规理解，我们可以认为，只要我们确定当前包里的模块不包含副作用，然后将发布到 npm 里的包标注为 <code>sideEffects: false</code> ，我们就能为使用方提供更好的打包体验。原理是 webpack 能将标记为 side-effects-free 的包由 <code>import &#123;a&#125; from xx</code> 转换为 <code>import &#123;a&#125; from &#39;xx/a&#39;</code>，从而自动修剪掉不必要的 <code>import</code>，作用同 <code>babel-plugin-import</code>。</p>
+<h2><span id="tree-shaking-与副作用">Tree Shaking 与副作用</span></h2><p>Tree-Shaking在前端界由rollup首先提出并实现，后续webpack在2.x版本也借助于UglifyJS实现了。自那以后，在各类讨论优化打包的文章中，都能看到Tree-Shaking的身影。</p>
+<h3><span id="tree-shaking的原理">Tree-Shaking的原理</span></h3><p>ES6的模块引入是静态分析的，故而可以在编译时正确判断到底加载了什么代码。</p>
 <p>分析程序流，判断哪些变量未被使用、引用，进而删除此代码。</p>
 <p>很好，原理非常完美，那为什么有时候我们项目里面多余的的代码又删不掉呢？</p>
 <p>先说原因：都是副作用的锅！</p>
-<h3><span id="副作用">副作用</span></h3>
-<p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
+<h3><span id="副作用">副作用</span></h3><p>了解过函数式编程的同学对副作用这词肯定不陌生。它大致可以理解成：一个函数会、或者可能会对函数外部变量产生影响的行为。</p>
 <p>举个例子，比如这个函数：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">go</span> <span class="token punctuation">(</span><span class="token parameter">url</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>href <span class="token operator">=</span> url
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>这个函数修改了全局变量location，甚至还让浏览器发生了跳转，这就是一个有副作用的函数。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// componetns.js</span>
 <span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">&#123;</span>
@@ -593,6 +570,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> V6Engine<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>编译时收到这样的警告：<code>WARN: Side effects in initialization of unused variable V6Engine [./dist/car.bundle.js:74,4]</code></p>
 <p>下面给出的回复：Uglify 没做执行程序流分析。它并不会因为你注意到的副作用而删除代码。你要是想弄个完善一点的摇树，去隔壁rollup呗！</p>
 <p>issue中总结下几点关键信息：</p>
@@ -612,6 +590,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>当我们以 app.js 为 <code>entry</code> 时，经过摇树后的代码会变成这样：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// a.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">a</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
@@ -624,6 +603,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token comment">// app.js</span>
 <span class="token keyword">import</span> <span class="token punctuation">&#123;</span>a<span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'package'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>配合 webpack 的 <code>scope hoisting</code> 和 <code>uglify</code> 之后，b 模块的痕迹会被完全抹杀掉。</p>
 <p>但是如果 b 模块中添加了一些副作用，比如一个简单的 log：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// b.js</span>
@@ -633,10 +613,12 @@ webpack 之后会发现 b 模块内容变成了：
 
 <span class="token comment">// b.js</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">v</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token keyword">return</span> v<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <p>虽然 b 模块的导出是被忽略了，但是副作用代码被保留下来了。</p>
 <p>由于目前 <code>transformer</code> 转换后可能引入的各种奇怪操作引发的副作用，很多时候我们会发现就算有了 tree shaking 我们的 <code>bundle size</code> 还是没有明显的减小。</p>
 <p>而通常我们期望的是 b 模块既然不被使用了，其中所有的代码应该不被引入才对。</p>
-<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包/模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块/包 都会被完整的移除。</p>
+<p>这个时候 <code>sideEffects</code> 的作用就显现出来了：如果我们引入的 包&#x2F;模块 被标记为 <code>sideEffects: false</code> 了，那么不管它是否真的有副作用，只要它没有被引用到，整个 模块&#x2F;包 都会被完整的移除。</p>
 <p>以 mobx-react-devtool 为例，我们通常这样去用：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> DevTools <span class="token keyword">from</span> <span class="token string">'mobx-react-devtools'</span><span class="token punctuation">;</span>
 
@@ -650,10 +632,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>这是一个很常见的按需导入场景，然而在没有 <code>sideEffects: false</code> 配置时，即便 <code>NODE_ENV</code> 设为 <code>production</code> ，打包后的代码里依然会包含 mobx-react-devtools 包，虽然我们没使用过其导出成员，但是 mobx-react-devtools 还是会被 import，因为里面“可能”会有副作用。</p>
 <p>但当我们加上 sideEffects false 之后，tree shaking 就能安全的把它从 bundle 里完整的移除掉了。</p>
-<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2>
-<p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
+<h2><span id="sideeffects-的使用场景">sideEffects 的使用场景</span></h2><p>上面也说到，通常我们发布到 npm 上的包很难保证其是否包含副作用（可能是代码的锅可能是 transformer 的锅），但是我们基本能确保这个包是否会对包以外的对象产生影响，比如是否修改了 window 上的属性，是否复写了原生对象方法等。如果我们能保证这一点，其实我们就能知道整个包是否能设置 <code>sideEffects: false</code>了，至于是不是真的有副作用则并不重要，这对于 webpack 而言都是可以接受的。</p>
 <p>这也就能解释为什么能给 vue 这个本身充满副作用的包加上 <code>sideEffects: false</code> 了。</p>
 <p>所以其实 webpack 里的 <code>sideEffects: false</code> 的意思并不是我这个模块真的没有副作用，而只是为了在摇树时告诉 webpack：我这个包在设计的时候就是期望没有副作用的，即使他打完包后是有副作用的。</p>
 
@@ -689,15 +671,13 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="性能优化-js-css代码压缩">性能优化 - JS-CSS代码压缩</span></h2>
-<ul>
-<li>Terser是一个JavaScript的解释（Parser）、Mangler（绞肉机）/Compressor（压缩机）的工具集；</li>
+        <h2><span id="性能优化-js-css代码压缩">性能优化 - JS-CSS代码压缩</span></h2><ul>
+<li>Terser是一个JavaScript的解释（Parser）、Mangler（绞肉机）&#x2F;Compressor（压缩机）的工具集；</li>
 <li>早期我们会使用 uglify-js来压缩、丑化我们的JavaScript代码，但是目前已经不再维护，并且不支持ES6+的语法；</li>
 <li>Terser是从 uglify-es fork 过来的，并且保留它原来的大部分API以及适配 uglify-es和uglify-js@3等；</li>
 </ul>
 <p><a target="_blank" rel="noopener" href="https://github.com/terser/terser">webpack-terser</a></p>
-<h3><span id="javascript-代码压缩">JavaScript 代码压缩</span></h3>
-<p>Webpack 提供了<code>terser-webpack-plugin</code> 插件进行代码优化和压缩。</p>
+<h3><span id="javascript-代码压缩">JavaScript 代码压缩</span></h3><p>Webpack 提供了<code>terser-webpack-plugin</code> 插件进行代码优化和压缩。</p>
 <p>在production模式下，默认就是使用TerserPlugin来处理代码。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> TerserPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'terser-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -708,8 +688,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token literal-property property">minimizer</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token keyword">new</span> <span class="token class-name">TerserPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="css-代码压缩">CSS 代码压缩</span></h3>
-<p>除了JavaScript代码，CSS代码也可以通过Webpack进行压缩。使用<code>css-minimizer-webpack-plugin</code> 进行压缩CSS代码。</p>
+
+
+<h3><span id="css-代码压缩">CSS 代码压缩</span></h3><p>除了JavaScript代码，CSS代码也可以通过Webpack进行压缩。使用<code>css-minimizer-webpack-plugin</code> 进行压缩CSS代码。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> CssMinimizerPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'css-minimizer-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -722,12 +703,10 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">]</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="webpack实现tree-shaking">webpack实现Tree Shaking</span></h3>
-<p>tree shaking 是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。</p>
-<h1><span id="webpack-实现-tree-shaking">Webpack 实现 Tree Shaking</span></h1>
-<p>在现代的前端开发中，代码体积优化是一个关键的议题。Tree Shaking 是一种用于消除未引用代码的优化技术，它可以帮助我们剔除项目中未使用的 JavaScript 模块，从而减小打包后的文件体积。Webpack 提供了内置的支持，使得 Tree Shaking 在项目中变得非常容易实现。</p>
-<h2><span id="开启-es-模块化">开启 ES 模块化</span></h2>
-<p>首先，确保你的 JavaScript 代码采用了 ES 模块化的方式，因为Webpack 的 Tree Shaking 功能仅对 ES 模块有效。你可以在项目中使用 <code>import</code> 和 <code>export</code> 语法来定义模块。</p>
+
+<h3><span id="webpack实现tree-shaking">webpack实现Tree Shaking</span></h3><p>tree shaking 是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。</p>
+<h1><span id="webpack-实现-tree-shaking">Webpack 实现 Tree Shaking</span></h1><p>在现代的前端开发中，代码体积优化是一个关键的议题。Tree Shaking 是一种用于消除未引用代码的优化技术，它可以帮助我们剔除项目中未使用的 JavaScript 模块，从而减小打包后的文件体积。Webpack 提供了内置的支持，使得 Tree Shaking 在项目中变得非常容易实现。</p>
+<h2><span id="开启-es-模块化">开启 ES 模块化</span></h2><p>首先，确保你的 JavaScript 代码采用了 ES 模块化的方式，因为Webpack 的 Tree Shaking 功能仅对 ES 模块有效。你可以在项目中使用 <code>import</code> 和 <code>export</code> 语法来定义模块。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// math.js</span>
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">square</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
@@ -736,21 +715,20 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">cube</span><span class="token punctuation">(</span><span class="token parameter">x</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> x <span class="token operator">*</span> x <span class="token operator">*</span> x<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="webpack-配置">Webpack 配置</span></h2>
-<p>在 Webpack 的配置文件中，确保以下几点设置，以启用 Tree Shaking：</p>
-<p>将 <code>mode</code> 设置为 <code>'production'</code>，Webpack 会自动启用相关的优化，包括 Tree Shaking。</p>
-<h3><span id="js实现tree-shaking">JS实现Tree Shaking</span></h3>
-<p>webpack实现Tree Shaking采用了两种不同的方案：</p>
+
+<h2><span id="webpack-配置">Webpack 配置</span></h2><p>在 Webpack 的配置文件中，确保以下几点设置，以启用 Tree Shaking：</p>
+<p>将 <code>mode</code> 设置为 <code>&#39;production&#39;</code>，Webpack 会自动启用相关的优化，包括 Tree Shaking。</p>
+<h3><span id="js实现tree-shaking">JS实现Tree Shaking</span></h3><p>webpack实现Tree Shaking采用了两种不同的方案：</p>
 <ul>
 <li>usedExports：通过标记某些函数是否被使用，之后通过Terser来进行优化的；</li>
-<li>sideEffects：跳过整个模块/文件，直接查看该文件是否有副作用；</li>
+<li>sideEffects：跳过整个模块&#x2F;文件，直接查看该文件是否有副作用；</li>
 </ul>
-<h4><span id="使用usedexports实现tree-sharking">使用usedExports实现Tree Sharking</span></h4>
-<p>配置模式为production</p>
+<h4><span id="使用usedexports实现tree-sharking">使用usedExports实现Tree Sharking</span></h4><p>配置模式为production</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'production'</span><span class="token punctuation">,</span>
   <span class="token comment">// ...其他配置</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>配置optimization里面的usedExports</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -765,46 +743,32 @@ module<span class="token punctuation">.</span>exports <span class="token operato
    <span class="token literal-property property">usedExports</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4><span id="使用sideeffect实现tree-sharking">使用sideEffect实现Tree Sharking</span></h4>
-<p>在package.json中设置sideEffects的值：</p>
+
+<h4><span id="使用sideeffect实现tree-sharking">使用sideEffect实现Tree Sharking</span></h4><p>在package.json中设置sideEffects的值：</p>
 <ul>
-<li>
-<p>如果我们将sideEffects设置为false，就是告知webpack可以安全的删除未用到的exports；</p>
+<li><p>如果我们将sideEffects设置为false，就是告知webpack可以安全的删除未用到的exports；</p>
 </li>
-<li>
-<p>如果有一些我们希望保留，可以设置为数组；</p>
+<li><p>如果有一些我们希望保留，可以设置为数组；</p>
 </li>
 </ul>
 <pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
   <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"your-project"</span><span class="token punctuation">,</span>
   <span class="token property">"sideEffects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./src/some-side-effectful-file.js"</span><span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/40052192">Webpack 中的 sideEffects </a></p>
-<h4><span id="解释-tree-shaking-和-sideeffects">解释 tree shaking 和 sideEffects</span></h4>
-<p><code>sideEffects</code> 和 <code>usedExports</code>（更多被认为是 tree shaking）是两种不同的优化方式。</p>
-<p><code>sideEffects</code> 更为有效 是因为它允许跳过整个模块/文件和整个文件子树。</p>
-<p><code>usedExports</code> 依赖于 <code>terser</code> 去检测语句中的副作用。它是一个 <code>JavaScript</code> 任务而且没有像 <code>sideEffects</code> 一样简单直接。而且它不能跳转子树/依赖由于细则中说副作用需要被评估。尽管导出函数能运作如常，但 <code>React</code> 框架的高阶函数（HOC）在这种情况下是会出问题的。</p>
-<h3><span id="css实现treeshaking">CSS实现TreeShaking</span></h3>
-<p>CSS的Tree Shaking需要借助于一些其他的插件；</p>
+<h4><span id="解释-tree-shaking-和-sideeffects">解释 tree shaking 和 sideEffects</span></h4><p><code>sideEffects</code> 和 <code>usedExports</code>（更多被认为是 tree shaking）是两种不同的优化方式。</p>
+<p><code>sideEffects</code> 更为有效 是因为它允许跳过整个模块&#x2F;文件和整个文件子树。</p>
+<p><code>usedExports</code> 依赖于 <code>terser</code> 去检测语句中的副作用。它是一个 <code>JavaScript</code> 任务而且没有像 <code>sideEffects</code> 一样简单直接。而且它不能跳转子树&#x2F;依赖由于细则中说副作用需要被评估。尽管导出函数能运作如常，但 <code>React</code> 框架的高阶函数（HOC）在这种情况下是会出问题的。</p>
+<h3><span id="css实现treeshaking">CSS实现TreeShaking</span></h3><p>CSS的Tree Shaking需要借助于一些其他的插件；</p>
 <p>在早期的时候，我们会使用PurifyCss插件来完成CSS的tree shaking，但是目前该库已经不再维护了（最新更新也是在4年前 了）；</p>
 <p>目前我们可以使用另外一个库来完成CSS的Tree Shaking：PurgeCSS，也是一个帮助我们删除未使用的CSS的工具；</p>
-<h2><span id="webpack对文件压缩">Webpack对文件压缩</span></h2>
-<h3><span id="什么是http压缩">什么是HTTP压缩</span></h3>
-<p>HTTP压缩是一种内置在 服务器 和 客户端 之间的，以改进传输速度和带宽利用率的方式；<br>
-HTTP压缩的流程什么呢？<br>
-第一步：HTTP数据在服务器发送前就已经被压缩了；（可以在webpack中完成）<br>
-第二步：兼容的浏览器在向服务器发送请求时，会告知服务器自己支持哪些压缩格式；<br>
-第三步：服务器在浏览器支持的压缩格式下，直接返回对应的压缩后的文件，并且在响应头中告知浏览器；</p>
-<h3><span id="目前的流行压缩格式">目前的流行压缩格式</span></h3>
-<p>目前的压缩格式非常的多：<br>
-compress – UNIX的“compress”程序的方法（历史性原因，不推荐大多数应用使用，应该使用gzip或deflate）；<br>
-deflate – 基于deflate算法（定义于RFC 1951）的压缩，使用zlib数据格式封装；<br>
-gzip – GNU zip格式（定义于RFC 1952），是目前使用比较广泛的压缩算法；<br>
-br – 一种新的开源压缩算法，专为HTTP内容的编码而设计；</p>
-<h3><span id="webpack配置文件压缩">Webpack配置文件压缩</span></h3>
-<p>webpack中相当于是实现了HTTP压缩的第一步操作，我们可以使用CompressionPlugin。</p>
+<h2><span id="webpack对文件压缩">Webpack对文件压缩</span></h2><h3><span id="什么是http压缩">什么是HTTP压缩</span></h3><p>HTTP压缩是一种内置在 服务器 和 客户端 之间的，以改进传输速度和带宽利用率的方式；<br>HTTP压缩的流程什么呢？<br>第一步：HTTP数据在服务器发送前就已经被压缩了；（可以在webpack中完成）<br>第二步：兼容的浏览器在向服务器发送请求时，会告知服务器自己支持哪些压缩格式；<br>第三步：服务器在浏览器支持的压缩格式下，直接返回对应的压缩后的文件，并且在响应头中告知浏览器；</p>
+<h3><span id="目前的流行压缩格式">目前的流行压缩格式</span></h3><p>目前的压缩格式非常的多：<br>compress – UNIX的“compress”程序的方法（历史性原因，不推荐大多数应用使用，应该使用gzip或deflate）；<br>deflate – 基于deflate算法（定义于RFC 1951）的压缩，使用zlib数据格式封装；<br>gzip – GNU zip格式（定义于RFC 1952），是目前使用比较广泛的压缩算法；<br>br – 一种新的开源压缩算法，专为HTTP内容的编码而设计；</p>
+<h3><span id="webpack配置文件压缩">Webpack配置文件压缩</span></h3><p>webpack中相当于是实现了HTTP压缩的第一步操作，我们可以使用CompressionPlugin。</p>
 <p>第一步，安装CompressionPlugin：</p>
 <pre class="line-numbers language-none"><code class="language-none">npm install compression-webpack-plugin -D<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>第二步，使用CompressionPlugin即可</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -883,27 +847,19 @@ br – 一种新的开源压缩算法，专为HTTP内容的编码而设计；</p
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>先来说说为什么要优化？当然如果你的项目很小，构建很快，其实不需要特别关注性能方面的问题。</p>
+        <h2><span id="前言">前言</span></h2><p>先来说说为什么要优化？当然如果你的项目很小，构建很快，其实不需要特别关注性能方面的问题。</p>
 <p>但是随着项目涉及到的页面越来越多，功能和业务代码也会越来越多，相应的 <code>webpack</code> 的构建时间也会越来越久，这个时候我们就不得不考虑性能优化的事情了。</p>
-<p><code>webpack</code> 的性能优化较多，我们考虑从两方面入手：<br>
-优化一：打包后的结果，上线时的性能优化。（比如分包处理、减小包体积、CDN服务器等）<br>
-优化二：优化打包速度，开发或者构建时优化打包速度。（比如 <code>exclude</code> 、<code>cache-loader</code>等）</p>
+<p><code>webpack</code> 的性能优化较多，我们考虑从两方面入手：<br>优化一：打包后的结果，上线时的性能优化。（比如分包处理、减小包体积、CDN服务器等）<br>优化二：优化打包速度，开发或者构建时优化打包速度。（比如 <code>exclude</code> 、<code>cache-loader</code>等）</p>
 <p>因为这个上线时的性能是直接影响到用户使用体验的，而构建时间与我们的日常开发是密切相关，当我们本地开发启动 <code>devServer</code> 或者 <code>build</code> 的时候，如果时间过长，会大大降低我们的工作效率。</p>
-<h2><span id="性能优化-代码分离">性能优化 - 代码分离</span></h2>
-<p>代码分离（Code Splitting）是 <code>webpack</code> 一个非常重要的特性：</p>
-<p>它主要的目的是将代码分离到不同的 <code>bundle</code> 中，之后我们可以按需加载，或者并行加载这些文件；<br>
-比如默认情况下，所有的 <code>JavaScript</code> 代码（业务代码、第三方依赖、暂时没有用到的模块）在首页全部都加载，就会影响首页的加载速度；<br>
-代码分离可以分出更小的 <code>bundle</code> ，以及控制资源加载优先级，提供代码的加载性能；</p>
+<h2><span id="性能优化-代码分离">性能优化 - 代码分离</span></h2><p>代码分离（Code Splitting）是 <code>webpack</code> 一个非常重要的特性：</p>
+<p>它主要的目的是将代码分离到不同的 <code>bundle</code> 中，之后我们可以按需加载，或者并行加载这些文件；<br>比如默认情况下，所有的 <code>JavaScript</code> 代码（业务代码、第三方依赖、暂时没有用到的模块）在首页全部都加载，就会影响首页的加载速度；<br>代码分离可以分出更小的 <code>bundle</code> ，以及控制资源加载优先级，提供代码的加载性能；</p>
 <p>Webpack中常用的代码分离有三种：</p>
 <ul>
 <li><strong>入口起点：使用entry配置手动分离代码</strong>；</li>
 <li><strong>防止重复：使用Entry Dependencies或者SplitChunksPlugin去重和分离代码；</strong></li>
 <li><strong>动态导入：通过模块的内联函数调用来分离代码；</strong></li>
 </ul>
-<h3><span id="入口起点优化-entry-dependencies入口依赖">入口起点优化-Entry Dependencies(入口依赖)</span></h3>
-<p>当项目拥有多个入口点（entry points）时，可能会遇到一些重复依赖的问题。某些模块可能在多个入口点中被引用，导致这些模块被重复打包，增加了最终输出文件的体积。<br>
-dependon-shared模块解决重复依赖</p>
+<h3><span id="入口起点优化-entry-dependencies入口依赖">入口起点优化-Entry Dependencies(入口依赖)</span></h3><p>当项目拥有多个入口点（entry points）时，可能会遇到一些重复依赖的问题。某些模块可能在多个入口点中被引用，导致这些模块被重复打包，增加了最终输出文件的体积。<br>dependon-shared模块解决重复依赖</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
     <span class="token literal-property property">page1</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -921,8 +877,8 @@ dependon-shared模块解决重复依赖</p>
     <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="动态导入dynamic-import">动态导入(dynamic import)</span></h3>
-<p>动态导入是一种在Webpack中实现按需加载（Lazy Loading）的技术，允许在运行时异步加载模块，而不是在应用初始化时就把所有模块打包到一个大文件中。可以提高应用的初始加载速度，并且减小了初始包的体积。</p>
+
+<h3><span id="动态导入dynamic-import">动态导入(dynamic import)</span></h3><p>动态导入是一种在Webpack中实现按需加载（Lazy Loading）的技术，允许在运行时异步加载模块，而不是在应用初始化时就把所有模块打包到一个大文件中。可以提高应用的初始加载速度，并且减小了初始包的体积。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -945,7 +901,8 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>在上述配置中，通过 <code>optimization.splitChunks</code> 进行代码分割，它的 <code>chunks: 'all'</code> 选项表示对所有模块进行代码分割。</p>
+
+<p>在上述配置中，通过 <code>optimization.splitChunks</code> 进行代码分割，它的 <code>chunks: &#39;all&#39;</code> 选项表示对所有模块进行代码分割。</p>
 <p>然后，在代码中使用 <code>import()</code> 函数进行动态导入：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 在需要的地方使用动态导入</span>
 <span class="token keyword">const</span> <span class="token function-variable function">loadModule</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token keyword">import</span><span class="token punctuation">(</span><span class="token string">'./Module'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -953,10 +910,9 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <span class="token function">loadModule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">module</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 使用加载的模块</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>Webpack会将使用 <code>import()</code> 函数引入的模块进行代码分割，生成单独的文件。<br>
-在运行时，这些文件会在需要的时候异步加载。</p>
-<h3><span id="自定义分包-splitchunks">自定义分包-SplitChunks</span></h3>
-<p>分包（code splitting）是一种优化策略，它允许将代码分割成小块，使得应用在加载时能够更快地显示内容。</p>
+
+<p>Webpack会将使用 <code>import()</code> 函数引入的模块进行代码分割，生成单独的文件。<br>在运行时，这些文件会在需要的时候异步加载。</p>
+<h3><span id="自定义分包-splitchunks">自定义分包-SplitChunks</span></h3><p>分包（code splitting）是一种优化策略，它允许将代码分割成小块，使得应用在加载时能够更快地显示内容。</p>
 <p>Webpack提供了多种分包的模式，其中一种是使用<code>SplitChunksPlugin</code>插件来实现的，这个模式叫做<code>splitChunks</code>。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...其他配置</span>
@@ -985,20 +941,18 @@ module<span class="token punctuation">.</span>exports <span class="token operato
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p><a target="_blank" rel="noopener" href="https://webpack.docschina.org/plugins/split-chunks-plugin">webpack-split-chunks-plugin</a></p>
-<h2><span id="性能优化-cdn">性能优化-CDN</span></h2>
-<p>CDN称之为内容分发网络（Content Delivery Network或Content Distribution Network，缩写：CDN）， 它是指通过相互连接的网络系统，利用最靠近每个用户的服务器； 更快、更可靠地将音乐、图片、视频、应用程序及其他文件发送给用户； 来提供高性能、可扩展性及低成本的网络内容传递给用户；</p>
+<h2><span id="性能优化-cdn">性能优化-CDN</span></h2><p>CDN称之为内容分发网络（Content Delivery Network或Content Distribution Network，缩写：CDN）， 它是指通过相互连接的网络系统，利用最靠近每个用户的服务器； 更快、更可靠地将音乐、图片、视频、应用程序及其他文件发送给用户； 来提供高性能、可扩展性及低成本的网络内容传递给用户；</p>
 <p>在开发中，我们使用CDN主要是两种方式：</p>
 <ul>
 <li>打包的所有静态资源，放到CDN服务器， 用户所有资源都是通过CDN服务器加载的；</li>
 <li>一些第三方资源放到CDN服务器上；</li>
 </ul>
 <p>使用CDN（Content Delivery Network，内容分发网络）是一种非常有效的性能优化策略，特别是在Webpack中。CDN可以加速网站的加载速度，减轻服务器负担，并提高用户体验。以下是如何在Webpack中配置和使用CDN的方法：</p>
-<h3><span id="将第三方库引入cdn">将第三方库引入CDN</span></h3>
-<p>将你的项目中用到的第三方库（例如React、Vue、jQuery等）引入CDN。可以选择在HTML文件中直接引入CDN链接：</p>
+<h3><span id="将第三方库引入cdn">将第三方库引入CDN</span></h3><p>将你的项目中用到的第三方库（例如React、Vue、jQuery等）引入CDN。可以选择在HTML文件中直接引入CDN链接：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@版本号/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@版本号/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="在webpack中配置externals">在Webpack中配置externals</span></h3>
-<p>在Webpack的配置中使用externals字段，告诉Webpack哪些模块是外部引入的，不需要打包。</p>
+
+<h3><span id="在webpack中配置externals">在Webpack中配置externals</span></h3><p>在Webpack的配置中使用externals字段，告诉Webpack哪些模块是外部引入的，不需要打包。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...其他配置</span>
   <span class="token literal-property property">externals</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1006,11 +960,12 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token string-property property">'react-dom'</span><span class="token operator">:</span> <span class="token string">'ReactDOM'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>然后在HTML文件中通过script标签引入CDN：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@版本号/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@版本号/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3><span id="配置cdn的publicpath">配置CDN的publicPath</span></h3>
-<p>在Webpack的output字段中配置publicPath，指定在引入资源时使用的URL前缀，通常设置为CDN的地址：</p>
+
+<h3><span id="配置cdn的publicpath">配置CDN的publicPath</span></h3><p>在Webpack的output字段中配置publicPath，指定在引入资源时使用的URL前缀，通常设置为CDN的地址：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// ...其他配置</span>
   <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -1018,11 +973,10 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'https://cdn.example.com/'</span><span class="token punctuation">,</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>这样在Webpack构建时，所有的资源引用路径都会加上CDN的地址前缀。</p>
-<h2><span id="性能优化-提取css文件">性能优化-提取css文件</span></h2>
-<p>将CSS文件从JavaScript打包文件中提取出来是一种常见的性能优化策略。这样做的好处是可以减小JavaScript文件的体积，加快页面加载速度，并且使浏览器能够并行下载CSS和JavaScript文件，提高加载性能。在Webpack中，你可以使用<code>mini-css-extract-plugin</code>插件来实现CSS文件的提取。</p>
-<h3><span id="配置webpack">配置Webpack</span></h3>
-<p>在Webpack配置文件中引入<code>mini-css-extract-plugin</code>插件，然后配置<code>module.rules</code>来处理CSS文件。</p>
+<h2><span id="性能优化-提取css文件">性能优化-提取css文件</span></h2><p>将CSS文件从JavaScript打包文件中提取出来是一种常见的性能优化策略。这样做的好处是可以减小JavaScript文件的体积，加快页面加载速度，并且使浏览器能够并行下载CSS和JavaScript文件，提高加载性能。在Webpack中，你可以使用<code>mini-css-extract-plugin</code>插件来实现CSS文件的提取。</p>
+<h3><span id="配置webpack">配置Webpack</span></h3><p>   在Webpack配置文件中引入<code>mini-css-extract-plugin</code>插件，然后配置<code>module.rules</code>来处理CSS文件。</p>
    <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> MiniCssExtractPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'mini-css-extract-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1047,44 +1001,44 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
   <span class="token punctuation">]</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="引入css文件">引入CSS文件</span></h3>
-<p>在JavaScript文件或者入口文件中引入CSS文件：</p>
+
+<h3><span id="引入css文件">引入CSS文件</span></h3><p>   在JavaScript文件或者入口文件中引入CSS文件：</p>
    <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token string">'./styles.css'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>或者在HTML文件中使用link标签引入提取出来的CSS文件：</p>
+
+<p>   或者在HTML文件中使用link标签引入提取出来的CSS文件：</p>
    <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>stylesheet<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>styles.css<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<h2><span id="性能优化-打包文件命名hashcontenthashchunkhash">性能优化-打包文件命名(Hash,ContentHash,ChunkHash)</span></h2>
-<p>在Webpack中，打包文件的命名是一个重要的性能优化策略。合适的命名方案可以确保浏览器能够正确地缓存文件，避免不必要的网络请求，提高应用的加载速度。以下是三种常见的打包文件命名方式：Hash、ContentHash 和 ChunkHash。</p>
-<h3><span id="hash哈希">Hash（哈希）</span></h3>
-<p>Hash 是根据文件内容生成的哈希值，当文件内容发生改变时，其对应的 Hash 值也会改变。在Webpack中，可以使用 <code>[hash]</code> 占位符来表示 Hash 值。</p>
+
+<h2><span id="性能优化-打包文件命名hashcontenthashchunkhash">性能优化-打包文件命名(Hash,ContentHash,ChunkHash)</span></h2><p>在Webpack中，打包文件的命名是一个重要的性能优化策略。合适的命名方案可以确保浏览器能够正确地缓存文件，避免不必要的网络请求，提高应用的加载速度。以下是三种常见的打包文件命名方式：Hash、ContentHash 和 ChunkHash。</p>
+<h3><span id="hash哈希">Hash（哈希）</span></h3><p>Hash 是根据文件内容生成的哈希值，当文件内容发生改变时，其对应的 Hash 值也会改变。在Webpack中，可以使用 <code>[hash]</code> 占位符来表示 Hash 值。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[hash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="contenthash内容哈希">ContentHash（内容哈希）</span></h3>
-<p>ContentHash 是根据文件内容生成的哈希值，但是不同于 Hash 的是，ContentHash 只会受到文件内容的影响，不会受到文件名或路径等其他因素的影响。在Webpack中，可以使用 <code>[contenthash]</code> 占位符来表示 ContentHash 值。</p>
+
+
+<h3><span id="contenthash内容哈希">ContentHash（内容哈希）</span></h3><p>ContentHash 是根据文件内容生成的哈希值，但是不同于 Hash 的是，ContentHash 只会受到文件内容的影响，不会受到文件名或路径等其他因素的影响。在Webpack中，可以使用 <code>[contenthash]</code> 占位符来表示 ContentHash 值。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[contenthash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="chunkhash块哈希">ChunkHash（块哈希）</span></h3>
-<p>ChunkHash 是根据模块内容生成的哈希值，不同模块的内容不同，它们的 ChunkHash 值也会不同。在Webpack中，可以使用 <code>[chunkhash]</code> 占位符来表示 ChunkHash 值。</p>
+
+
+<h3><span id="chunkhash块哈希">ChunkHash（块哈希）</span></h3><p>ChunkHash 是根据模块内容生成的哈希值，不同模块的内容不同，它们的 ChunkHash 值也会不同。在Webpack中，可以使用 <code>[chunkhash]</code> 占位符来表示 ChunkHash 值。</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[name].[chunkhash].js'</span><span class="token punctuation">,</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2><span id="性能优化-webpack实现tree-shaking">性能优化-webpack实现Tree Shaking</span></h2>
-<p>JavaScript的Tree Shaking：</p>
+
+<h2><span id="性能优化-webpack实现tree-shaking">性能优化-webpack实现Tree Shaking</span></h2><p>JavaScript的Tree Shaking：</p>
 <p>对JavaScript进行Tree Shaking是源自打包工具rollup（后面我们也会讲的构建工具）；</p>
 <p>这是因为Tree Shaking依赖于ES Module的静态语法分析（不执行任何的代码，可以明确知道模块的依赖关系）；</p>
 <p>webpack2正式内置支持了ES2015模块，和检测未使用模块的能力；</p>
 <p>在webpack4正式扩展了这个能力，并且通过 package.json的 sideEffects属性作为标记，告知webpack在编译时，哪里文 件可以安全的删除掉；</p>
 <p>webpack5中，也提供了对部分CommonJS的tree shaking的支持；</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/webpack/changelog-v5#commonjs-tree-shaking">commonjs-tree-shaking</a></p>
-<h3><span id="js实现tree-shaking">JS实现Tree Shaking</span></h3>
-<p>webpack实现Tree Shaking采用了两种不同的方案：</p>
+<h3><span id="js实现tree-shaking">JS实现Tree Shaking</span></h3><p>webpack实现Tree Shaking采用了两种不同的方案：</p>
 <ul>
 <li>usedExports：通过标记某些函数是否被使用，之后通过Terser来进行优化的；</li>
-<li>sideEffects：跳过整个模块/文件，直接查看该文件是否有副作用；</li>
+<li>sideEffects：跳过整个模块&#x2F;文件，直接查看该文件是否有副作用；</li>
 </ul>
-<h3><span id="css进行tree-shaking">CSS进行Tree Shaking</span></h3>
-<p>CSS的Tree Shaking需要借助于一些其他的插件；</p>
+<h3><span id="css进行tree-shaking">CSS进行Tree Shaking</span></h3><p>CSS的Tree Shaking需要借助于一些其他的插件；</p>
 <p>在早期的时候，我们使用PurifyCss插件来完成CSS的tree shaking，但是目前该库已经不再维护；</p>
 <p>目前我们可以使用另外一个库来完成CSS的Tree Shaking：PurgeCSS，也是一个帮助我们删除未使用的CSS的工具: PurgeCss</p>
 
@@ -1120,8 +1074,7 @@ module<span class="token punctuation">.</span>exports <span class="token operato
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2 id="前言">前言</h2>
-<p>一般來說在學習寫網頁的時候，最先碰到的會是 HTML 與 CSS，負責把版面刻出來以及美化版面，當基礎打穩之後，會開始學習 JavaScript，試著做出一點互動性的效果。而「互動」除了使用者跟瀏覽器的互動以外，別忘了還有 Client 端跟 Server 端的互動，也就是必須要學會從瀏覽器用 JavaScript 跟後端 Server 拿資料，否則你的網頁資料都只能是寫死的。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一般來說在學習寫網頁的時候，最先碰到的會是 HTML 與 CSS，負責把版面刻出來以及美化版面，當基礎打穩之後，會開始學習 JavaScript，試著做出一點互動性的效果。而「互動」除了使用者跟瀏覽器的互動以外，別忘了還有 Client 端跟 Server 端的互動，也就是必須要學會從瀏覽器用 JavaScript 跟後端 Server 拿資料，否則你的網頁資料都只能是寫死的。</p>
 <p>這篇的主要預設讀者是網頁前端的初學者，希望能讓本來不太理解怎麼跟 Server 交換資料或是怎麼串 APi 的讀者看完之後，能夠更了解該怎麼跟後端串接。</p>
         <p class="article-more-link">
             <a href="/2017/08/27/ajax-and-cors/#more">閱讀更多</a>

@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understandi">
+    <meta name="description" content="IntroductionTo explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understandin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Implementation of Vue.js Component Events and Emit">
 <meta property="og:url" content="https://ikkkp.github.io/2023/12/08/en/vue-component-2/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understandi">
+<meta property="og:description" content="IntroductionTo explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understandin">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-12-08T08:08:07.000Z">
@@ -246,34 +246,27 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
 <p>For component events, we’ve previously discussed the browser’s event mechanism:</p>
-<h3><span id="browser-event-review">Browser Event Review</span></h3>
-<p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
-<h4><span id="mouse-events">Mouse Events:</span></h4>
-<ul>
+<h3><span id="browser-event-review">Browser Event Review</span></h3><p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
+<h4><span id="mouse-events">Mouse Events:</span></h4><ul>
 <li><strong>click:</strong> Triggered when the mouse clicks on an element. For touch-screen devices, it’s triggered when there’s a tap on the screen.</li>
 <li><strong>contextmenu:</strong> Triggered when the right mouse button clicks on an element.</li>
-<li><strong>mouseover / mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
-<li><strong>mousedown / mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
+<li><strong>mouseover &#x2F; mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
+<li><strong>mousedown &#x2F; mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
 <li><strong>mousemove:</strong> Triggered when the mouse is moved.</li>
 </ul>
-<h4><span id="keyboard-events">Keyboard Events:</span></h4>
-<ul>
+<h4><span id="keyboard-events">Keyboard Events:</span></h4><ul>
 <li><strong>keydown and keyup:</strong> Triggered when a key is pressed down or released.</li>
 </ul>
-<h4><span id="form-element-events">Form Element Events:</span></h4>
-<ul>
+<h4><span id="form-element-events">Form Element Events:</span></h4><ul>
 <li><strong>submit:</strong> Triggered when a visitor submits a <code>&lt;form&gt;</code>.</li>
 <li><strong>focus:</strong> Triggered when a visitor focuses on an element, such as an <code>&lt;input&gt;</code>.</li>
 </ul>
-<h4><span id="document-events">Document Events:</span></h4>
-<ul>
+<h4><span id="document-events">Document Events:</span></h4><ul>
 <li><strong>DOMContentLoaded:</strong> Triggered when HTML is fully loaded and processed, and the DOM is completely constructed.</li>
 </ul>
-<h4><span id="css-events">CSS Events:</span></h4>
-<ul>
+<h4><span id="css-events">CSS Events:</span></h4><ul>
 <li><strong>transitionend:</strong> Triggered when a CSS animation is completed.</li>
 </ul>
 <p>These events can be captured and processed using event listeners in JavaScript. By adding event listeners to elements, specific code can be executed when certain events occur. Events form the foundation of interaction and responsiveness in web development.</p>
@@ -296,6 +289,7 @@
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Parent Component ParentComponent.vue --></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
@@ -324,12 +318,12 @@
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>Vue’s event mechanism is built on the publish/subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
-<p><strong>Firstly, we notice that the child component uses <code>this.$emit('child-event', 'Hello from child!')</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
+
+<p>Vue’s event mechanism is built on the publish&#x2F;subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
+<p><strong>Firstly, we notice that the child component uses <code>this.$emit(&#39;child-event&#39;, &#39;Hello from child!&#39;)</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
 <p>When using a custom <code>MyComponent</code> component, we can listen to the emitted custom event using the <code>v-on</code> directive:</p>
 <p>You can see that the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations. In the actual implementation, emitting a custom event boils down to finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
-<h2><span id="implementation-of-emit">Implementation of emit</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
+<h2><span id="implementation-of-emit">Implementation of emit</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
 <span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
   <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -342,6 +336,7 @@
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The above code will be compiled into a node <code>CompNode</code>, with the type being the <code>MyComponent</code> component. The <code>emit</code> function is passed to the <code>setup</code> function of the component, as shown below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of a Vue component node CompNode</span>
 <span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -354,6 +349,7 @@
     <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As you can see, the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations.</p>
 <p>In the actual implementation, emitting a custom event essentially involves finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Mounting the component</span>
@@ -407,11 +403,11 @@
 
   <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The implementation principle of <code>emit</code> involves two aspects: the injection of <code>setupContext</code> and the convention-based transformation of event names.</p>
 <ol>
-<li>
-<p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
-<p>Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
+<li><p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
+<p> Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
  <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Add emit to setupContext</span>
   context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
@@ -422,11 +418,11 @@
   <span class="token comment">// Return the object returned by setup</span>
   <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
+
+<p> This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
 </li>
-<li>
-<p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
-<p>Here’s a simple example illustrating the convention-based transformation of event names:</p>
+<li><p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
+<p> Here’s a simple example illustrating the convention-based transformation of event names:</p>
  <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
   <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
@@ -441,7 +437,8 @@
     console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
+
+<p> In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
 </li>
 </ol>
 <p>It’s important to note that event-type props are not found in <code>instance.props</code>, so they are stored in <code>attrs</code>. To address this, when parsing props data, event-type props are specially handled to ensure they are correctly added to <code>props</code> instead of <code>attrs</code>. This allows the <code>emit</code> function to correctly find event handling functions in <code>instance.props</code>.</p>
