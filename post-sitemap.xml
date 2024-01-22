@@ -9,6 +9,20 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2024/01/20/en/react-1/</loc>
+        <lastmod>2024-01-22T13:58:28.006Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2024/01/20/react-2/</loc>
         <lastmod>2024-01-22T13:53:42.958Z</lastmod>
         <changefreq>weekly</changefreq>

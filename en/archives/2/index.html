@@ -174,6 +174,219 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/20/en/ModernWeb-Debugging1/" itemprop="url">ModernWeb - A Simple Record on Chrome Local Code Debugging</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-20T11:06:50.000Z" itemprop="datePublished">20 November 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Chrome/">Chrome</a><span>></span><a class="article-category-link" href="/en/categories/Chrome/devtools/">devtools</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>Since attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I want to make a simple record here. First, let me share a link: <a target="_blank" rel="noopener" href="https://www.youtube.com/@ChromeDevs">youtube-ChromeDevs</a></p>
+<p>I would like to express my gratitude to the Chrome DevTools team for their excellent work. However, before the frontend conference by jecfish, I was not aware of so many friendly web debugging tools and performance testing methods. So, I will make a simple record here. If you are interested, you can check out the link above, which contains a lot of useful information. Feel free to show your support to their team.</p>
+<p>Below is the outline of this chapter, which will be further elaborated.</p>
+<p><img src="/img/ModernWeb/modernWeb1.jpg" alt="ModernWeb"></p>
+<h2><span id="local-code-debugging">Local Code Debugging</span></h2><p>This section will cover local code debugging, mainly focusing on the topic of <code>source maps</code>. I will provide some brief introductions and examples.</p>
+<h3><span id="the-need-for-source-code-mapping">The Need for Source Code Mapping</span></h3><iframe width="100%" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+<p>Here is a link: <a target="_blank" rel="noopener" href="https://web.dev/articles/source-maps?hl=en">source-map</a></p>
+<p>This link contains some content about source maps written by jecfish. If you are interested, you can check it out. If the article is too long for you, you can directly read the content below.</p>
+<p>Today, we are going to discuss source code mapping, an important tool in modern web development that greatly simplifies debugging work. In this article, we will explore the basics of source code mapping, how source code mapping is generated, and how it improves the debugging experience.</p>
+<p>Before diving into the study of source maps, we need to have a basic understanding of Modern Web. So, what should we talk about when I mention Modern Web?</p>
+<p><img src="/img/ModernWeb/modernWeb3.jpg" alt="ModernWeb"></p>
+<p>We can see that the console prints some content related to BaseOn CSS styles. Although we are not going to focus on the CSS styles of the console today, you can still define some styles to make your console output more beautiful!</p>
+<p><img src="/img/ModernWeb/modernWeb4.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb5.jpg" alt="ModernWeb"></p>
+<p>After 15 years, we can see that the debugging tools in the Chrome DevTools have evolved from a few options to a rich and diverse set of tools. The changes have been significant. So, today, let’s talk about the specific applications of these 32 debugging tools in Chrome.</p>
+<p><img src="/img/ModernWeb/modernWeb6.jpg" alt="ModernWeb"></p>
+<p><strong>We know that browsers only understand a few languages: HTML &lt;&#x2F;&gt; CSS {;} JavaScript (,) Wasm (of course, modern browser engines now have built-in support for Wasm modules by default). However, our frontend frameworks are extremely rich</strong>, involving languages such as TypeScript, Less, Sass, and frameworks such as Vue, React, and meta frameworks such as Nust.js, Next.js. These frameworks are used in our frontend code, but browsers do not understand these languages. Therefore, we need to convert these languages into languages that browsers can understand.</p>
+<p>We are building more complex web applications, and your development workflow may involve the use of various tools. For example:</p>
+<ul>
+<li>Template languages and HTML preprocessors: Pug, Nunjucks, Markdown.</li>
+<li>CSS preprocessors: SCSS, LESS, PostCSS.</li>
+<li>JavaScript frameworks: Angular, React, Vue, Svelte.</li>
+<li>JavaScript meta frameworks: Next.js, Nuxt, Astro.</li>
+<li>Advanced programming languages: TypeScript, Dart, CoffeeScript.<br>And more. The list keeps growing!</li>
+</ul>
+<p><img src="/img/ModernWeb/modernWeb7.png" alt="ModernWeb"></p>
+<p><strong>These tools require a build process to transpile the code into standard HTML, JavaScript, and CSS that browsers can understand.</strong> Additionally, for performance optimization, it is common practice to minify (e.g., using Terser to reduce and obfuscate JavaScript) and concatenate these files to reduce their size and improve web efficiency.</p>
+<p>During the process of converting these various template languages, preprocessors, and meta frameworks into HTML, JavaScript, and CSS that browsers can understand, there is a compilation process that generates some intermediate code. This intermediate code is our source code mapping, which is what we are going to talk about today.</p>
+<p>For example, using a build tool, we can transpile and minify the following TypeScript file into a single line of JavaScript. You can find this demo on GitHub: <a target="_blank" rel="noopener" href="https://github.com/jecfish/parcel-demo">parcel-demo</a></p>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">/* A TypeScript demo: example.ts */</span>
+
+document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'button'</span><span class="token punctuation">)</span><span class="token operator">?.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> num<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> greet<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'Hello'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> HTMLParagraphElement<span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>greet<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>num<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+  <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Certainly! Below is the English translation of the provided content:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">/* A compressed JavaScript version of the TypeScript demo: example.min.js */</span>
+
+document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"button"</span><span class="token punctuation">)</span><span class="token operator">?.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"click"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> e <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span><span class="token number">101</span> <span class="token operator">*</span> Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"p"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Hello, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>e<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>However, this optimization increases the difficulty of debugging. If compressed code puts everything in a single line and uses short variable names, it becomes challenging to trace the root of the problem. This is where source maps come into play—they map the compiled code back to the original code.</p>
+<p><img src="/img/ModernWeb/modernWeb8.jpg" alt="ModernWeb"></p>
+<p>Now let’s look at a specific example. This example is a simple click event triggering an XHR written in TypeScript, where a 404 error is reported.</p>
+<p><img src="/img/ModernWeb/modernWeb9.jpg" alt="ModernWeb"></p>
+<p>Oh? What’s happening here? Pay attention to the red arrow; it seems like our browser understands TypeScript code?</p>
+<p><img src="/img/ModernWeb/modernWeb10.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb11.jpg" alt="ModernWeb"></p>
+<p>Actually, it’s not the case. Looking at this image, it appears that TypeScript is parsed from main.js.</p>
+<h3><span id="understanding-source-code-mapping-source-map">Understanding Source Code Mapping (source-map)</span></h3><p><img src="/img/ModernWeb/modernWeb12.jpg" alt="ModernWeb"></p>
+<p>These source map files contain basic information about how the compiled code maps back to the original code, allowing developers to easily debug. Here’s an example of a source map:</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+  <span class="token property">"mappings"</span><span class="token operator">:</span> <span class="token string">"AAAAA,SAASC,cAAc,WAAWC, ..."</span><span class="token punctuation">,</span>
+  <span class="token property">"sources"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"src/script.ts"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"sourcesContent"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"document.querySelector('button')..."</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"names"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"document"</span><span class="token punctuation">,</span><span class="token string">"querySelector"</span><span class="token punctuation">,</span> ...<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+  <span class="token property">"file"</span><span class="token operator">:</span> <span class="token string">"example.min.js.map"</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>To understand each field, you can read the <a target="_blank" rel="noopener" href="https://bit.ly/sourcemap">Source Map Specification</a> or this classic article on <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/sourcemaps/?hl=zh-cn#the-anatomy-of-a-source-map">Anatomy of a Source Map</a>.</p>
+<p>The most crucial aspect of source maps is the <code>mappings</code> field. It uses VLQ base 64-encoded strings to map lines and positions in the compiled file to the corresponding original file. Source map visualization tools like <a target="_blank" rel="noopener" href="https://sokra.github.io/source-map-visualization/">source-map-visualization</a> and <a target="_blank" rel="noopener" href="https://evanw.github.io/source-map-visualization/">Source Map Visualization</a> can intuitively display this mapping.</p>
+<p><img src="/img/ModernWeb/modernWeb13.png" alt="ModernWeb"></p>
+<p>The left column represents the generated code, while the original column shows the original source.</p>
+<p>Visualization tools color code each line in the original column and the corresponding code in the generated column.</p>
+<p>The <code>mapping</code> section shows the decoded code mappings. For example, the entry 65 -&gt; 2:2 means:</p>
+<ul>
+<li>Generated code: The word <code>const</code> in the compressed content starts at position 65.</li>
+<li>Original code: The word <code>const</code> starts at line 2, column 2 in the original content.</li>
+</ul>
+<p>This way, developers can quickly identify the relationship between the minified code and the original code, making the debugging process smoother.</p>
+<p>Browser developer tools apply these source code mappings, helping you pinpoint debugging issues directly in the browser.</p>
+<p><img src="/img/ModernWeb/modernWeb14.png" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb15.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb16.jpg" alt="ModernWeb"></p>
+<h3><span id="how-devtools-know-what-to-hide-source-maps">How DevTools Know What to Hide? Source Maps</span></h3><p><img src="/img/ModernWeb/modernWeb17.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb18.jpg" alt="ModernWeb"></p>
+<p><img src="/img/ModernWeb/modernWeb19.jpg" alt="ModernWeb"></p>
+<h2><span id="practical-chrome-debugging-tips">Practical Chrome Debugging Tips</span></h2><h3><span id="requests">Requests</span></h3><p><img src="/img/ModernWeb/modernWeb20.jpg" alt="ModernWeb"></p>
+<p>You can view detailed information about requests in the Network panel, including request headers, response headers, request body, response body, Cookies, Timing, and more.</p>
+<p>Additionally, DevTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/overrides/">overrides</a> allow you to simulate remote resources by overriding HTTP response headers and web content (including XHR and fetch requests) through local overrides. This enables you to prototype changes without waiting for backend support. Local overrides also let you retain changes made in DevTools during page load.</p>
+<p>This is particularly useful in situations where frontend requests to the backend return results that haven’t undergone cross-origin handling (cross-origin handling is typically done on the backend). In such cases, even though the frontend receives correct data, the browser may mark the file as untrusted due to security policies. Local overrides allow you to simulate the backend’s response, facilitating frontend debugging.</p>
+<p>Or, if some data on the backend hasn’t been modified yet, and the frontend receives outdated data, do we have to wait for backend engineers to fix the data before we can work on it? That seems a bit inefficient. Instead, we can use content rewriting through local overrides to simulate the modified data, allowing frontend debugging.</p>
+<p><img src="/img/ModernWeb/modernWeb21.jpg" alt="ModernWeb"></p>
+<p>DevTools&#x2F;overrides indeed is powerful. How does it work?</p>
+<ul>
+<li>When you make changes in DevTools, DevTools saves a copy of the modified file to a folder you specify.</li>
+<li>When you reload the page, DevTools provides the locally modified file instead of the network resource.</li>
+</ul>
+<h4><span id="overriding-web-content">Overriding Web Content</span></h4><h5><span id="set-up-a-folder"><strong>Set Up a Folder</strong></span></h5><ul>
+<li>Set up local overrides.</li>
+<li>Make changes to files and save them in DevTools.</li>
+</ul>
+<p>For example, you can edit files in “Sources” or edit CSS in “Elements” &gt; “Styles” unless the CSS is in an HTML file.</p>
+<p>DevTools saves the modified files, listing them in <strong>Sources &gt; Overrides</strong>, and displays them in related panels and panes, indicated by icons next to overridden files in <strong>Elements &gt; Styles, Network, and Sources &gt; Overrides</strong>.</p>
+<h5><span id="override-xhr-or-fetch-requests-to-simulate-remote-resources"><strong>Override XHR or Fetch Requests to Simulate Remote Resources</strong></span></h5><p>With local overrides, you don’t need access to the backend, and you don’t have to wait for it to support your changes. Simulate and experiment instantly:</p>
+<ul>
+<li>Set up local overrides.</li>
+<li>In Network, filter XHR&#x2F;fetch requests, find the desired request, right-click it, and choose “Override content.”</li>
+<li>Make changes to the fetched data and save the file.</li>
+<li>Refresh. Reload the page and observe the applied changes.</li>
+</ul>
+<p>To understand this workflow better, watch the video <a target="_blank" rel="noopener" href="https://www.youtube.com/embed/NJdAV9UgKuN8AhoaPBquL7giZQo1/TNcd8DCxoK6OmHQqJjKT.mp4">here</a>.</p>
+<h4><span id="override-http-response-headers">Override HTTP Response Headers</span></h4><p>In the “Network” panel, you can override HTTP response headers without accessing the web server.</p>
+<p>With response header overrides, you can prototype fixes for various headers, including but not limited to:</p>
+<ul>
+<li>Cross-Origin Resource Sharing (CORS) headers</li>
+<li>Permissions-Policy headers</li>
+<li>Cross-Origin Isolation headers</li>
+</ul>
+<p>To override response headers:</p>
+<ul>
+<li>Set up local overrides and check.</li>
+<li>Go to Network, find the request, right-click it, and choose “Override headers.” DevTools will guide you to the **Headers</li>
+</ul>
+<blockquote>
+<p>Response Headers Editor**.</p>
+</blockquote>
+<p><img src="/img/ModernWeb/headers.avif" alt="ModernWeb"></p>
+<h3><span id="recorder-beneficial-for-debugging-and-testing">Recorder, Beneficial for Debugging and Testing</span></h3><p>Customize and automate user flows based on the Chrome DevTools Recorder for enhanced debugging and testing.</p>
+<p><img src="/img/ModernWeb/modernWeb22.jpg" alt="ModernWeb"></p>
+<p>Writing automated tests might not be the most exciting part of a developer’s life. As developers, our focus is on functionality, fixing bugs, and improving the world! However, having automated tests in our workflow is crucial in the long run. So, we also recognize the importance of writing automated tests.</p>
+<p>With the Chrome DevTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/recorder/">Recorder</a> panel, you can record and replay user flows. You can export these flows in various formats (such as test scripts) using different third-party extensions and libraries. You can also customize user flows using the Puppeteer Replay library and integrate them into your existing workflow.</p>
+<p>In this blog post, we’ll discuss:</p>
+<ul>
+<li>How to programmatically export and replay user flows.</li>
+<li>How to customize user flows with Puppeteer Replay.</li>
+<li>How to integrate with your CI&#x2F;CD workflow.</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null">Watch the video</a> for a practical demonstration.</p>
+<iframe width="100%" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null"></iframe>
+
+
+<h3><span id="programmatically-exporting-user-flows-and-replaying">Programmatically Exporting User Flows and Replaying</span></h3><p>By default, the Recorder allows you to export recordings as <a target="_blank" rel="noopener" href="https://pptr.dev/">Puppeteer</a> or <a target="_blank" rel="noopener" href="https://github.com/puppeteer/replay">Puppeteer Replay</a> scripts or as pure JSON files.</p>
+<p><img src="/img/ModernWeb/record.avif" alt="ModernWeb"></p>
+<h3><span id="replaying-with-puppeteer-replay">Replaying with Puppeteer Replay</span></h3><p>After exporting the user flow as a JSON file, you have the option to import it back into the Recorder panel and replay it or use external libraries for replay. One such available library is Puppeteer Replay.</p>
+<p><img src="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format" alt="Replaying with Puppeteer Replay"></p>
+<p>Puppeteer Replay is a library that helps you replay user flows. It’s based on Puppeteer and allows you to replay user flows in the browser without writing any code. You can use Puppeteer Replay to replay your user flows to ensure that your application performs well in different environments.</p>
+<h3><span id="integration-with-cix2fcd-pipeline">Integration with CI&#x2F;CD Pipeline</span></h3><p>There are various ways to achieve this, and several tools can be used. Here’s an example of automating this process using GitHub Actions:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># .github/node.js.yml</span>
+
+<span class="token key atrule">name</span><span class="token punctuation">:</span> Replay recordings
+
+<span class="token key atrule">on</span><span class="token punctuation">:</span>
+  <span class="token key atrule">push</span><span class="token punctuation">:</span>
+    <span class="token key atrule">branches</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token string">"main"</span> <span class="token punctuation">]</span>
+  <span class="token key atrule">schedule</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">cron</span><span class="token punctuation">:</span> <span class="token string">'30 12 * * *'</span> <span class="token comment"># daily 12:30pm</span>
+
+<span class="token key atrule">jobs</span><span class="token punctuation">:</span>
+  <span class="token key atrule">build</span><span class="token punctuation">:</span>
+
+    <span class="token key atrule">runs-on</span><span class="token punctuation">:</span> ubuntu<span class="token punctuation">-</span>latest
+
+    <span class="token key atrule">steps</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">uses</span><span class="token punctuation">:</span> actions/checkout@v3
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Use Node.js
+      <span class="token key atrule">uses</span><span class="token punctuation">:</span> actions/setup<span class="token punctuation">-</span>node@v3
+      <span class="token key atrule">with</span><span class="token punctuation">:</span>
+        <span class="token key atrule">node-version</span><span class="token punctuation">:</span> 18.x
+        <span class="token key atrule">cache</span><span class="token punctuation">:</span> <span class="token string">'npm'</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm install puppeteer
+    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm run replay<span class="token punctuation">-</span>all
+    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm run start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this example, we replay the user flow under the following conditions:</p>
+<ul>
+<li>New changes are pushed to the main branch.</li>
+<li>Daily at 12:30 PM.</li>
+</ul>
+<p>In addition to GitHub Actions, you can also integrate this with your preferred cloud provider.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/10/en/Webpack-optimization-4/" itemprop="url">Webpack HMR Principle Analysis</a>
         
     </h1>
@@ -1629,109 +1842,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 <p>In the above code, we create a custom renderer using the <code>createRenderer</code> function, which takes configuration options as parameters. The configuration options include functions for creating elements, setting text content, and inserting elements into a parent. The <code>customRenderer</code> function takes a virtual node and a container as parameters, and it can handle both mounting and patching logic based on the existence of the old virtual node (<code>container.vnode</code>).</p>
 <p>This custom renderer allows platform-independent rendering by abstracting the core logic and making it adaptable to different platforms through configuration options.</p>
 <p>Please note that the code above demonstrates the concept of a custom renderer and focuses on its implementation logic. In a real-world scenario, you might need additional error handling, optimizations, and proper DOM manipulations based on the specific platform requirements.</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/04/en/just-in-time-compilers/" itemprop="url">How Does JIT (Just-In-Time) Compiler Work</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-04T02:05:22.000Z" itemprop="datePublished">4 November 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/JIT-compiler/">JIT compiler</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>Before delving into JIT, it’s essential to have a basic understanding of the compilation process.</p>
-<p>In compiler theory, translating source code into machine instructions generally involves several crucial steps:</p>
-<p><img src="/img/just-in-time/JIT1.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h2><span id="jit-overview">JIT Overview</span></h2><p><strong>JIT stands for Just-In-Time compiler.</strong> Through JIT technology, it’s possible to accelerate the execution speed of Java programs. But how is this achieved?</p>
-<p>Java is an interpreted language (or semi-compiled, semi-interpreted language). Java compiles the source code into platform-independent Java bytecode files (.class) using the javac compiler. These bytecode files are then interpreted and executed by the Java Virtual Machine (JVM), ensuring platform independence. However, interpreting bytecode involves translating it into corresponding machine instructions, which inevitably slows down the execution speed compared to directly executing binary bytecode files.</p>
-<p>To enhance execution speed, JIT technology is introduced. When the JVM identifies a method or code block that is executed frequently, it recognizes it as a <strong>“Hot Spot Code.”</strong> JIT compiles these “Hot Spot Codes” into native machine-specific machine code, optimizes it, and caches the compiled machine code for future use.</p>
-<p><img src="/img/just-in-time/JIT2.webp" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="hot-spot-compilation">Hot Spot Compilation</span></h3><p>When the JVM executes code, it doesn’t immediately start compiling it. There are two main reasons for this:</p>
-<p>Firstly, if a piece of code is expected to be executed only once in the future, compiling it immediately is essentially a waste of resources. Compiling code into Java bytecode is much faster than both compiling and executing the code.</p>
-<p>However, if a piece of code, such as a method call or a loop, is executed multiple times, compiling it becomes worthwhile. The compiler has the ability to discern which methods are frequently called to ensure efficient compilation. <strong>Hot Spot VM employs JIT compilation technology to directly compile high-frequency bytecode into machine instructions</strong> (with the method as the compilation unit). These compiled machine instructions are executed directly when bytecode is JIT-compiled, providing a performance boost.</p>
-<p>The second reason involves optimization. As a method or loop is executed more frequently, the JVM gains a better understanding of the code structure. Therefore, the JVM can make corresponding optimizations during the compilation process.</p>
-<h2><span id="how-javascript-is-compiled-how-jit-just-in-time-compiler-works">How JavaScript is Compiled - How JIT (Just-In-Time) Compiler Works</span></h2><p>In general, there are two ways to translate programs into machine-executable instructions: using a Compiler or an Interpreter.</p>
-<h3><span id="interpreter">Interpreter</span></h3><p>An interpreter translates and executes code line by line as it encounters it.</p>
-<p>Pros:</p>
-<ul>
-<li>Fast execution, no compilation delay.<br>Cons:</li>
-<li>Same code might be translated multiple times, especially within loops.</li>
-</ul>
-<p><img src="/img/just-in-time/JIT3.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="compiler">Compiler</span></h3><p>A compiler translates the code in advance and generates an executable program.</p>
-<p>Pros:</p>
-<ul>
-<li>No need for repeated compilation; can optimize code during compilation.<br>Cons:</li>
-<li>Requires upfront compilation.</li>
-</ul>
-<p><img src="/img/just-in-time/JIT4.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="jit">JIT</span></h3><p>When JavaScript first emerged, it was a typical interpreted language, resulting in slow execution speeds. Later, browsers introduced JIT compilers, significantly improving JavaScript’s execution speed.</p>
-<blockquote>
-<p>Principle: They added a new component to the JavaScript engine, known as a monitor (or profiler). This monitor observes the running code, noting how many times it runs and the types used.</p>
-</blockquote>
-<p>In essence, browsers added a monitor to the JavaScript engine to observe the running code, recording how many times each code segment is executed and the variable types used.</p>
-<p>Now, why does this approach speed up the execution?</p>
-<p>Let’s consider a function for illustration:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">arraySum</span><span class="token punctuation">(</span><span class="token parameter">arr</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">var</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> arr<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    sum <span class="token operator">+=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>1st Step - Interpreter</strong></p>
-<p>Initially, the code is executed using an interpreter. When a line of code is executed several times, it is marked as <strong>“Warm,”</strong> and if executed frequently, it is labeled as <strong>“Hot.”</strong></p>
-<p><strong>2nd Step - Baseline Compiler</strong></p>
-<p>Warm-labeled code is passed to the <strong>Baseline Compiler</strong>, which compiles and stores it. The compiled code is indexed based on <strong>line numbers</strong> and <strong>variable types</strong> (why variable types are important will be explained shortly).</p>
-<p>When the index matches, the corresponding compiled code is directly executed without recompilation, eliminating the need to recompile already compiled code.</p>
-<p><strong>3rd Step - Optimizing Compiler</strong></p>
-<p>Hot-labeled code is sent to the <strong>Optimizing Compiler</strong>, where further optimizations are applied. How are these optimizations performed? This is the key: due to JavaScript’s <strong>dynamic typing</strong>, a single line of code can have multiple possible compilations, exposing the drawback of dynamic typing.</p>
-<p>For instance:</p>
-<ul>
-<li><code>sum</code> is Int, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is simple addition, corresponding to one compilation result.</li>
-<li><code>sum</code> is string, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is string concatenation, requiring the conversion of <code>i</code> to a string type.<br>…</li>
-</ul>
-<p>As illustrated in the diagram below, such a simple line of code has 16 possible compilation results.</p>
-<p><img src="/img/just-in-time/JIT5.png" alt="JIT (Just-In-Time) Compiler"></p>
-<p>The Baseline Compiler handles this complexity, and thus, the compiled code needs to be indexed using both <strong>line numbers</strong> and <strong>variable types</strong>. Different variable types lead to different compilation results.</p>
-<p>If the code is “Warm,” the JIT’s job ends here. Each subsequent execution involves type checks and uses the corresponding compiled result.</p>
-<p>However, when the code becomes “Hot,” more optimizations are performed. Here, optimization means JIT makes a specific assumption. For example, assuming <code>sum</code> and <code>i</code> are both Integers and <code>arr</code> is an Array, only one compilation result is needed.</p>
-<p>In practice, type checks are performed before execution. If the assumptions are incorrect, the execution is <strong>“deoptimized,”</strong> reverting to the interpreter or baseline compiler versions. This process is called <strong>“deoptimization.”</strong></p>
-<p>As evident, the speed of execution relies on the accuracy of these assumptions. If the assumption success rate is high, the code executes faster. Conversely, low success rates lead to slower execution than without any optimization (due to the <code>optimize =&gt; deoptimize</code> process).</p>
-<h2><span id="conclusion">Conclusion</span></h2><p>In summary, this is what JIT does at runtime. It monitors running code, identifies hot code paths for optimization, making JavaScript run faster. This significantly improves the performance of most JavaScript applications.</p>
-<p>However, JavaScript performance remains unpredictable. To make it faster, JIT adds some overhead at runtime, including:</p>
-<p><strong>Optimization and Deoptimization</strong></p>
-<ul>
-<li>Memory for monitoring and recovering lost information</li>
-<li>Memory for storing baseline and optimized versions of functions</li>
-</ul>
-<p>There’s room for improvement, notably in eliminating overhead to make performance more predictable.</p>
-<hr>
 
     
     </div>
