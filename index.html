@@ -177,6 +177,263 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2024/01/23/react-3/" itemprop="url">React入门-第三篇</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-01-23T04:36:30.000Z" itemprop="datePublished">2024年1月23日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/React/">React</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>本篇主要对React的状态进行一个介绍。</p>
+<p><strong>声明式 UI 与命令式 UI 的比较</strong></p>
+<p>当你设计 UI 交互时，可能会去思考 UI 如何根据用户的操作而响应变化。想象一个允许用户提交一个答案的表单：</p>
+<ul>
+<li><p>当你向表单输入数据时，“提交”按钮会随之变成可用状态</p>
+</li>
+<li><p>当你点击“提交”后，表单和提交按钮都会随之变成不可用状态，并且会加载动画会随之出现</p>
+</li>
+<li><p>如果网络请求成功，表单会随之隐藏，同时“提交成功”的信息会随之出现</p>
+</li>
+<li><p>如果网络请求失败，错误信息会随之出现，同时表单又变为可用状态</p>
+</li>
+</ul>
+<p><code>在 命令式编程 中，以上的过程直接告诉你如何去实现交互。你必须去根据要发生的事情写一些明确的命令去操作 UI。</code></p>
+<p>而在Vuejs渐进式框架和React库里面都是采用的声明式编程。</p>
+<h2><span id="声明式地考虑-ui">声明式地考虑 UI</span></h2><p>你已经从上面的例子看到如何去实现一个表单了，为了更好地理解如何在 React 中思考，一般情况下要用 React 重新实现这个 UI就要经过这几个一般步骤：</p>
+<ol>
+<li><p>定位你的组件中不同的视图状态</p>
+</li>
+<li><p>确定是什么触发了这些 state 的改变</p>
+</li>
+<li><p>表示内存中的 state（需要使用 useState）</p>
+</li>
+<li><p>删除任何不必要的 state 变量</p>
+</li>
+<li><p>连接事件处理函数去设置 state</p>
+</li>
+</ol>
+<h2><span id="react的状态管理">React的状态管理</span></h2><p>在React中，状态管理是一个非常重要的概念，React的状态管理是通过<code>state</code>来实现的。</p>
+<h3><span id="state">state</span></h3><p><code>state</code>是React组件中的一个内置对象，用于存储组件内部的状态。<code>state</code>是一个普通的JavaScript对象，我们可以通过<code>this.state</code>来访问它。</p>
+<p><strong>React 会为 UI 中的组件结构构建 渲染树。</strong></p>
+<p>当向一个组件添加状态时，那么可能会认为状态“存在”在组件内。但实际上，状态是由 React 保存的。<strong>React 通过组件在渲染树中的位置将它保存的每个状态与正确的组件关联起来。</strong></p>
+<p>这边与Vuejs的区别是，Vue的响应式系统是与组件进行隔离开来的，而React的状态是与组件进行绑定的。</p>
+<p><em>我们将state嵌入进React的组件里面，作为组件vnode的一部分信息，当React的state更新时，也意味着组件的信息更新，会触发组件的重新渲染。</em></p>
+<p>如果理解了这一点，那么我们就可以很轻易的理解React的响应式是怎么工作的了，React的状态是与组件绑定的，当状态更新时，组件也会更新，这也是React的响应式系统。</p>
+<p>我们来具体给一个例子：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> counter <span class="token operator">=</span> <span class="token operator">&lt;</span>Counter <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>counter<span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#123;</span>counter<span class="token punctuation">&#125;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>score<span class="token punctuation">,</span> setScore<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>hover<span class="token punctuation">,</span> setHover<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> className <span class="token operator">=</span> <span class="token string">'counter'</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>hover<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' hover'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div
+      className<span class="token operator">=</span><span class="token punctuation">&#123;</span>className<span class="token punctuation">&#125;</span>
+      onPointerEnter<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      onPointerLeave<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+    <span class="token operator">></span>
+      <span class="token operator">&lt;</span>h1<span class="token operator">></span><span class="token punctuation">&#123;</span>score<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setScore</span><span class="token punctuation">(</span>score <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+        加一
+      <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>下面是它们的树形结构的样子：</p>
+<p><img src="/img/react/react-4.webp" alt="vue-react"></p>
+<p>这是两个独立的 counter，因为它们在树中被渲染在了各自的位置。 一般情况下你不用去考虑这些位置来使用 React，但知道它们是如何工作会很有用。</p>
+<p>而他们有各自的状态，因为每个组件实例都有自己的 state。 你可以在一个组件中使用多个 state 变量。当我更新了state之后，会触发组件的重新渲染，这边我们可以看到，两个counter的状态是独立的，互不影响。</p>
+<p><strong>相同位置的相同组件会使得 state 被保留下来</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>isFancy<span class="token punctuation">,</span> setIsFancy<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>isFancy <span class="token operator">?</span> <span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>Counter isFancy<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token boolean">true</span><span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span> 
+      <span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>Counter isFancy<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token boolean">false</span><span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span> 
+      <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span>label<span class="token operator">></span>
+        <span class="token operator">&lt;</span>input
+          type<span class="token operator">=</span><span class="token string">"checkbox"</span>
+          checked<span class="token operator">=</span><span class="token punctuation">&#123;</span>isFancy<span class="token punctuation">&#125;</span>
+          onChange<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token parameter">e</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+            <span class="token function">setIsFancy</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>target<span class="token punctuation">.</span>checked<span class="token punctuation">)</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span>
+        <span class="token operator">/</span><span class="token operator">></span>
+        使用好看的样式
+      <span class="token operator">&lt;</span><span class="token operator">/</span>label<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> isFancy <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>score<span class="token punctuation">,</span> setScore<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>hover<span class="token punctuation">,</span> setHover<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> className <span class="token operator">=</span> <span class="token string">'counter'</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>hover<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' hover'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>isFancy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' fancy'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div
+      className<span class="token operator">=</span><span class="token punctuation">&#123;</span>className<span class="token punctuation">&#125;</span>
+      onPointerEnter<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      onPointerLeave<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+    <span class="token operator">></span>
+      <span class="token operator">&lt;</span>h1<span class="token operator">></span><span class="token punctuation">&#123;</span>score<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setScore</span><span class="token punctuation">(</span>score <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+        加一
+      <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/react/react-7.webp" alt="vue-react"></p>
+<p>那么<strong>相同位置的不同组件会使 state 重置</strong>，这一点应该大家也能够知道为什么了。</p>
+<p>再举一个例子：将一个<code>&lt;Counter&gt; </code>替换为一个 <code>&lt;p&gt;</code></p>
+<p><img src="/img/react/react-5.webp" alt="vue-react"></p>
+<p>当 Counter 变为 p 时，Counter 会被移除，同时 p 被添加。</p>
+<p><img src="/img/react/react-6.webp" alt="vue-react"></p>
+<p>当切换回来时，p 会被删除，而 Counter 会被添加</p>
+<p>参考的React文档在这里：<a target="_blank" rel="noopener" href="https://zh-hans.react.dev/learn/preserving-and-resetting-state">状态与渲染树中的位置相关</a></p>
+<h2><span id="提取状态逻辑到-reducer-中">提取状态逻辑到 reducer 中</span></h2><p><strong>对于那些需要更新多个状态的组件来说，过于分散的事件处理程序可能会令人不知所措。</strong>对于这种情况，你可以在组件外部将所有状态更新逻辑合并到一个称为 <code>“reducer”</code> 的函数中。这样，事件处理程序就会变得简洁，因为它们只需要指定用户的 <code>“actions”</code>。在文件的底部，<code>reducer</code> 函数指定状态应该如何更新以响应每个 <code>action</code>！</p>
+<p><strong>useReducer 是 React 中的一个 Hook，用于管理组件的状态逻辑。</strong><code>它提供了一种更复杂状态逻辑的组织方式，适用于那些包含多个子值或需要根据先前的状态来更新的状态。</code> useReducer 的使用方式类似于 <code>Redux</code> 中的 <code>reducer</code> 概念。</p>
+<p>下面是 <code>useReducer</code> 的基本用法：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> React<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> useReducer <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token comment">// reducer函数，接受当前state和action，返回新的state</span>
+<span class="token keyword">const</span> <span class="token function-variable function">reducer</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">state<span class="token punctuation">,</span> action</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>action<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">case</span> <span class="token string">'INCREMENT'</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> state<span class="token punctuation">.</span>count <span class="token operator">+</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> <span class="token string">'DECREMENT'</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> state<span class="token punctuation">.</span>count <span class="token operator">-</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">default</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> state<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> initialState <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Counter</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 使用useReducer，传入reducer和初始state</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>state<span class="token punctuation">,</span> dispatch<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useReducer</span><span class="token punctuation">(</span>reducer<span class="token punctuation">,</span> initialState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token literal-property property">Count</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>state<span class="token punctuation">.</span>count<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'INCREMENT'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'DECREMENT'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Decrement<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> Counter<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>主要的步骤包括：</p>
+<ol>
+<li><p>定义 <code>reducer</code> 函数： 这个函数接收当前状态 <code>state</code> 和一个描述动作的 <code>action</code>，然后根据 <code>action</code> 的类型执行相应的逻辑，并返回新的状态。</p>
+</li>
+<li><p>初始化状态： 通过调用 <code>useReducer(reducer, initialState)</code> 来创建状态和 <code>dispatch</code> 函数。</p>
+</li>
+<li><p>在组件中使用状态和 <code>dispatch</code>： 通过 <code>state</code> 访问当前状态值，通过 <code>dispatch</code> 触发 <code>reducer</code> 执行。</p>
+</li>
+</ol>
+<h2><span id="使用-context-进行深层数据传递">使用 Context 进行深层数据传递</span></h2><p><strong>通常，你会通过 props 将信息从父组件传递给子组件。</strong> 但是，如果要在组件树中深入传递一些 prop，或者树里的许多组件需要使用相同的 prop，那么传递 prop 可能会变得很麻烦。Context 允许父组件将一些信息提供给它下层的任何组件，不管该组件多深层也无需通过 props 逐层透传。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> React<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> createContext<span class="token punctuation">,</span> useContext<span class="token punctuation">,</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建一个Context</span>
+<span class="token keyword">const</span> MyContext <span class="token operator">=</span> <span class="token function">createContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建一个包含Provider和Consumer的组件</span>
+<span class="token keyword">const</span> <span class="token function-variable function">MyProvider</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> children <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>data<span class="token punctuation">,</span> setData<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token string">'Hello from Context'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>MyContext<span class="token punctuation">.</span>Provider value<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#123;</span> data<span class="token punctuation">,</span> setData <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>children<span class="token punctuation">&#125;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>MyContext<span class="token punctuation">.</span>Provider<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 使用 useContext 获取Context中的值</span>
+<span class="token keyword">const</span> <span class="token function-variable function">ChildComponent</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> data<span class="token punctuation">,</span> setData <span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">useContext</span><span class="token punctuation">(</span>MyContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span>p<span class="token operator">></span><span class="token punctuation">&#123;</span>data<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setData</span><span class="token punctuation">(</span><span class="token string">'Updated Context'</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Update Context<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 在应用中使用Provider包裹需要共享数据的组件</span>
+<span class="token keyword">const</span> <span class="token function-variable function">App</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>MyProvider<span class="token operator">></span>
+      <span class="token operator">&lt;</span>ChildComponent <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>MyProvider<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> App<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="使用-reducer-和-context-进行状态扩展">使用 Reducer 和 Context 进行状态扩展</span></h2><p>Reducer 帮助你合并组件的状态更新逻辑同时Context 帮助你将信息深入传递给其他组件。</p>
+<p>你可以将 reducers 和 context 组合在一起使用，以管理复杂应用的状态。</p>
+<p>基于这种想法，使用 reducer 来管理一个具有复杂状态的父组件。组件树中任何深度的其他组件都可以通过 context 读取其状态。还可以 dispatch 一些 action 来更新状态。</p>
+<p><code>合理的使用 Reducer 和 Context 可以帮助你更好的管理状态，同时也可以让你的代码更加简洁。</code></p>
+<p>相比于Vuejs基于Proxy的响应式系统，使用代理的方式，以及provide和inject的方式，Vuejs的状态管理是在一个单独的WeekMap里面进行管理的，当变量的状态进行改变，可以激活effect副作用函数，并进行值的更新。而React的状态管理是与组件绑定的，当状态更新时，组件也会更新，但是当我们要进行一个全局状态的管理时，就得进行在父组件里面定义。</p>
+<p>能基于具体的情况进行React状态的定义，才能更好的进行状态的管理。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2024/01/20/react-2/" itemprop="url">React入门-第二篇</a>
         
     </h1>
@@ -1942,40 +2199,6 @@ document<span class="token punctuation">.</span>body<span class="token punctuati
 <li>互操作层：Custom Elements</li>
 <li>构建⼯具：Vite</li>
 </ul>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/24/2023-11-24-Writing/" itemprop="url">2023-11-24-随笔</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-23T16:21:52.000Z" itemprop="datePublished">2023年11月24日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Essay/">Essay</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <p>「人的一切痛苦，本质上都是对自己无能的愤怒」</p>
 
     
     </div>

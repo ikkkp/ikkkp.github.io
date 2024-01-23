@@ -181,6 +181,264 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2024/01/23/en/react-3/" itemprop="url">Getting Started with React - Part 3</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-01-23T04:36:30.000Z" itemprop="datePublished">23 January 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/React/">React</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="preface">Preface</span></h2><p>This article mainly introduces the concept of state in React.</p>
+<p><strong>Comparison between Declarative UI and Imperative UI</strong></p>
+<p>When designing UI interactions, you may think about how the UI responds to changes based on user actions. Imagine a form that allows users to submit an answer:</p>
+<ul>
+<li><p>As you input data into the form, the “Submit” button becomes enabled.</p>
+</li>
+<li><p>When you click “Submit,” the form and the submit button become disabled, and a loading animation appears.</p>
+</li>
+<li><p>If the network request is successful, the form hides, and a “Submission Successful” message appears.</p>
+</li>
+<li><p>If the network request fails, an error message appears, and the form becomes enabled again.</p>
+</li>
+</ul>
+<p><code>In imperative programming, the above process tells you directly how to implement the interaction. You have to write explicit commands to manipulate the UI based on what should happen.</code></p>
+<p>Both Vue.js and React follow a declarative programming approach.</p>
+<h2><span id="thinking-declaratively-about-ui-in-react">Thinking Declaratively About UI in React</span></h2><p>From the example above, you’ve seen how to implement a form. To better understand how to think in React, you generally need to follow these steps to reimplement this UI in React:</p>
+<ol>
+<li><p>Identify different view states in your component.</p>
+</li>
+<li><p>Determine what triggers the changes in these states.</p>
+</li>
+<li><p>Represent the state in memory (using <code>useState</code>).</p>
+</li>
+<li><p>Remove any unnecessary state variables.</p>
+</li>
+<li><p>Connect event handling functions to set state.</p>
+</li>
+</ol>
+<h2><span id="state-management-in-react">State Management in React</span></h2><p>In React, state management is a crucial concept, and it is achieved through <code>state</code>. <code>state</code> is an internal object in a React component used to store the component’s internal state. It is a regular JavaScript object, accessible through <code>this.state</code>.</p>
+<p><strong>React builds a render tree for the UI components.</strong></p>
+<p>When you add state to a component, you might think that the state “exists” within the component. However, in reality, React keeps track of each state by associating it with the correct component based on its position in the render tree.</p>
+<p>This is different from Vue.js, where the reactive system is isolated from components, while React’s state is bound to components.</p>
+<p><em>We embed the state into React components as part of the component’s vnode information. When React’s state updates, it implies that the component’s information updates, triggering a re-render.</em></p>
+<p>Understanding this, we can easily grasp how React’s reactivity works. React’s state is bound to components, and when the state updates, the component also updates. This is the reactive system in React.</p>
+<p>Let’s take a specific example:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> counter <span class="token operator">=</span> <span class="token operator">&lt;</span>Counter <span class="token operator">/</span><span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>counter<span class="token punctuation">&#125;</span>
+      <span class="token punctuation">&#123;</span>counter<span class="token punctuation">&#125;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>score<span class="token punctuation">,</span> setScore<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>hover<span class="token punctuation">,</span> setHover<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> className <span class="token operator">=</span> <span class="token string">'counter'</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>hover<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' hover'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div
+      className<span class="token operator">=</span><span class="token punctuation">&#123;</span>className<span class="token punctuation">&#125;</span>
+      onPointerEnter<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      onPointerLeave<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+    <span class="token operator">></span>
+      <span class="token operator">&lt;</span>h1<span class="token operator">></span><span class="token punctuation">&#123;</span>score<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setScore</span><span class="token punctuation">(</span>score <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+        Add One
+      <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The tree structure for these components looks like this:</p>
+<p><img src="/img/react/react-4.webp" alt="vue-react"></p>
+<p>These are two independent counters because they are rendered at their respective positions in the tree. In general, you don’t need to consider these positions when using React, but knowing how they work can be useful.</p>
+<p>They have their own states because each component instance has its own state. You can use multiple state variables in a component. When I update the state, it triggers a re-render of the component. Here, you can see that the states of the two counters are independent and do not affect each other.</p>
+<h2><span id="preserving-and-resetting-state-in-react">Preserving and Resetting State in React</span></h2><p><strong>Same Component at the Same Position Retains State</strong></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token function">App</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>isFancy<span class="token punctuation">,</span> setIsFancy<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>isFancy <span class="token operator">?</span> <span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>Counter isFancy<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token boolean">true</span><span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span> 
+      <span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token punctuation">(</span>
+        <span class="token operator">&lt;</span>Counter isFancy<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token boolean">false</span><span class="token punctuation">&#125;</span> <span class="token operator">/</span><span class="token operator">></span> 
+      <span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span>label<span class="token operator">></span>
+        <span class="token operator">&lt;</span>input
+          type<span class="token operator">=</span><span class="token string">"checkbox"</span>
+          checked<span class="token operator">=</span><span class="token punctuation">&#123;</span>isFancy<span class="token punctuation">&#125;</span>
+          onChange<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token parameter">e</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+            <span class="token function">setIsFancy</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span>target<span class="token punctuation">.</span>checked<span class="token punctuation">)</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span>
+        <span class="token operator">/</span><span class="token operator">></span>
+        Use Fancy Style
+      <span class="token operator">&lt;</span><span class="token operator">/</span>label<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> isFancy <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>score<span class="token punctuation">,</span> setScore<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>hover<span class="token punctuation">,</span> setHover<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> className <span class="token operator">=</span> <span class="token string">'counter'</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>hover<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' hover'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>isFancy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    className <span class="token operator">+=</span> <span class="token string">' fancy'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div
+      className<span class="token operator">=</span><span class="token punctuation">&#123;</span>className<span class="token punctuation">&#125;</span>
+      onPointerEnter<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+      onPointerLeave<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setHover</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
+    <span class="token operator">></span>
+      <span class="token operator">&lt;</span>h1<span class="token operator">></span><span class="token punctuation">&#123;</span>score<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setScore</span><span class="token punctuation">(</span>score <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+        Add One
+      <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="/img/react/react-7.webp" alt="vue-react"></p>
+<p><strong>Different Components at the Same Position Reset State</strong></p>
+<p>This is intuitive as changing components at the same position would reset the state. Consider replacing <code>&lt;Counter&gt;</code> with a <code>&lt;p&gt;</code>:</p>
+<p><img src="/img/react/react-5.webp" alt="vue-react"></p>
+<p>When Counter is replaced with p, Counter is removed, and p is added.</p>
+<p><img src="/img/react/react-6.webp" alt="vue-react"></p>
+<p>When switching back, p is removed, and Counter is added.</p>
+<p>Reference in the React documentation: <a target="_blank" rel="noopener" href="https://reactjs.org/docs/state-and-lifecycle.html#preserving-state-in-the-tree">State and Lifecycle - Preserving State in the Tree</a></p>
+<h2><span id="extracting-state-logic-into-a-reducer">Extracting State Logic into a Reducer</span></h2><p><strong>For components requiring updates to multiple states, scattered event handlers may become overwhelming.</strong> In such cases, you can consolidate all state update logic into a function called a “reducer” outside the component. Event handlers become concise as they only need to specify user “actions.” At the bottom of the file, the <code>reducer</code> function specifies how the state should be updated in response to each action!</p>
+<p><strong>useReducer is a React Hook for managing component state logic.</strong> <code>It provides an organized way to handle more complex state logic, suitable for those with multiple sub-values or states that need to be updated based on previous states.</code> The usage of useReducer is similar to the reducer concept in Redux.</p>
+<p>Here’s a basic example of useReducer:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> React<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> useReducer <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Reducer function, takes current state and action, returns new state</span>
+<span class="token keyword">const</span> <span class="token function-variable function">reducer</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">state<span class="token punctuation">,</span> action</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">switch</span> <span class="token punctuation">(</span>action<span class="token punctuation">.</span>type<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">case</span> <span class="token string">'INCREMENT'</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> state<span class="token punctuation">.</span>count <span class="token operator">+</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">case</span> <span class="token string">'DECREMENT'</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> state<span class="token punctuation">.</span>count <span class="token operator">-</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token keyword">default</span><span class="token operator">:</span>
+      <span class="token keyword">return</span> state<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> initialState <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">count</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">Counter</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Use useReducer, pass in reducer and initial state</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>state<span class="token punctuation">,</span> dispatch<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useReducer</span><span class="token punctuation">(</span>reducer<span class="token punctuation">,</span> initialState<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token literal-property property">Count</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>state<span class="token punctuation">.</span>count<span class="token punctuation">&#125;</span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'INCREMENT'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Increment<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">dispatch</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'DECREMENT'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Decrement<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> Counter<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Key steps include:</p>
+<ol>
+<li><p>Define the <code>reducer</code> function: This function takes the current state <code>state</code> and an action describing the action. It then executes the corresponding logic based on the action type and returns a new state.</p>
+</li>
+<li><p>Initialize state: Create state and <code>dispatch</code> function by calling <code>useReducer(reducer, initialState)</code>.</p>
+</li>
+<li><p>Use state and <code>dispatch</code> in the component: Access the current state value through <code>state</code> and trigger the <code>reducer</code> with <code>dispatch</code>.</p>
+</li>
+</ol>
+<h2><span id="deep-data-transfer-using-context">Deep Data Transfer Using Context</span></h2><p><strong>Usually, information is passed from parent to child components through props.</strong> However, if you need to deeply pass some prop in the component tree, or if many components in the tree need to use the same prop, passing props can become cumbersome. Context allows a parent component to provide some information to any lower-level component without the need for props to be passed layer by layer.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> React<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> createContext<span class="token punctuation">,</span> useContext<span class="token punctuation">,</span> useState <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Create a Context</span>
+<span class="token keyword">const</span> MyContext <span class="token operator">=</span> <span class="token function">createContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Create a component with Provider and Consumer</span>
+<span class="token keyword">const</span> <span class="token function-variable function">MyProvider</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">&#123;</span> children <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>data<span class="token punctuation">,</span> setData<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token string">'Hello from Context'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>MyContext<span class="token punctuation">.</span>Provider value<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#123;</span> data<span class="token punctuation">,</span> setData <span class="token punctuation">&#125;</span><span class="token punctuation">&#125;</span><span class="token operator">></span>
+      <span class="token punctuation">&#123;</span>children<span class="token punctuation">&#125;</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>MyContext<span class="token punctuation">.</span>Provider<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Use useContext to get values from Context</span>
+<span class="token keyword">const</span> <span class="token function-variable function">ChildComponent</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> <span class="token punctuation">&#123;</span> data<span class="token punctuation">,</span> setData <span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">useContext</span><span class="token punctuation">(</span>MyContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span>
+      <span class="token operator">&lt;</span>p<span class="token operator">></span><span class="token punctuation">&#123;</span>data<span class="token punctuation">&#125;</span><span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span>
+      <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">&#123;</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setData</span><span class="token punctuation">(</span><span class="token string">'Updated Context'</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token operator">></span>Update Context<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Wrap components that need to share data with Provider in the application</span>
+<span class="token keyword">const</span> <span class="token function-variable function">App</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&lt;</span>MyProvider<span class="token operator">></span>
+      <span class="token operator">&lt;</span>ChildComponent <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>MyProvider<span class="token operator">></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> App<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="extending-state-with-reducer-and-context">Extending State with Reducer and Context</span></h2><p>Reducer helps consolidate state update logic in components, and Context helps pass information deeper into other components.</p>
+<p>You can combine reducers and context to manage the state of complex applications.</p>
+<p>Based on this idea, use a reducer to manage the state of a parent component with complex state. Other components at any depth in the component tree can read its state through context. You can also dispatch some actions to update the state.</p>
+<p><code>Using Reducer and Context intelligently can help you manage state better and make your code more concise.</code></p>
+<p>Compared to Vue.js’s reactive system based on Proxy, using proxies, and the use of provide and inject, Vue.js’s state management is done in a separate WeakMap. When the variable state changes, it can trigger effect side functions and update the value. React’s state management is bound to components, and when the state updates, the component also updates. However, when dealing with global state management, it needs to be defined in the parent component.</p>
+<p>Understanding how to define React state based on specific situations allows for better state management.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2024/01/20/en/react-1/" itemprop="url">Getting Started with React - Part 1</a>
         
     </h1>
