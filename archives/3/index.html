@@ -177,6 +177,52 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/08/Cloud-Computing/" itemprop="url">云计算及应用</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-08T06:56:29.000Z" itemprop="datePublished">2023年11月8日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="云计算的定义">云计算的定义</span></h2><p>即通过网络按需提供可动态伸缩的廉价计算服务。是与信息技术、软件、互联网相关的一种服务。</p>
+<p>云计算是一种按使用量付费的模式，这种模式提供可用的、便捷的、按需的网络访问，进入可配置的计算机资源共享池（资源包括网络、服务器、存储、应用软件、服务），这些资源能够被快速提供。</p>
+<h2><span id="云计算发展史">云计算发展史</span></h2><p>2006年3月，亚马逊（Amazon）推出弹性计算云（Elastic Compute Cloud；EC2）服务。</p>
+<p>2006年8月9日，Google首席执行官埃里克·施密特（Eric Schmidt）在搜索引擎大会（SES San Jose 2006）首次提出“云计算”（Cloud Computing）的概念。Google“云端计算”源于Google工程师克里斯托弗·比希利亚所做的“Google 101”项目。</p>
+<p>2007年10月，Google与IBM开始在美国大学校园推广云计算的计划。</p>
+<p>2008年2月1日，IBM（NYSE: IBM）宣布将在中国无锡太湖新城科教产业园为中国的软件公司建立全球第一个云计算中心（Cloud Computing Center）。</p>
+<p>2008年7月29日，雅虎、惠普和英特尔宣布一项联合研究计划，推出云计算研究测试床，推进云计算。</p>
+<p>2008年8月3日，美国专利商标局网站信息显示，戴尔正在申请“云计算”（Cloud Computing）商标，此举旨在加强对这一未来可能重塑技术架构的术语的控制权。</p>
+<p>2010年3月5日，Novell与云安全联盟（CSA）共同宣布一项供应商中立计划，名为“可信任云计算计划（Trusted Cloud Initiative）”。</p>
+<p>2010年7月，美国国家航空航天局和包括Rackspace、AMD、Intel、戴尔等支持厂商共同宣布“OpenStack”开放源代码计划，微软在2010年10月表示支持OpenStack与Windows Server 2008 R2的集成；而Ubuntu已把OpenStack加至11.04版本中。</p>
+<p>2011年2月，思科系统正式加入OpenStack，重点研制OpenStack的网络服务。</p>
+<h2><span id="云计算的技术背景">云计算的技术背景</span></h2><p>云计算是<code>并行计算(Parallel Computing)</code>、<code>分布式计算(Distributed Computing)</code>和<code>网格计算(Grid Computing)</code>的发展，或者说是这些计算机科学概念的商业实现</p>
+<p>云计算是<code>虚拟化(Virtualization)</code>、<code>效用计算(Utility Computing)</code>、<code>IaaS(基础设施即服务)</code>、<code>PaaS(平台即服务)</code>、<code>SaaS(软件即服务)</code>等技术混合演进、提升的结果</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/05/vue-renderer-3/" itemprop="url">vue-事件渲染的处理</a>
         
     </h1>
@@ -1461,148 +1507,6 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <p>我们首先定义了一个原始的数据对象data，其中有一个属性foo，初始值为1。接着，我们使用Proxy创建了一个代理对象obj，该代理对象会拦截对data的操作。</p>
 <p>当你调用obj.foo++时，会触发Proxy的set拦截器。在set拦截器中，我们首先将属性值设置到目标对象上，然后调用watch函数，并传入obj和一个回调函数。在watch函数中，我们使用了一个假设的effect函数（实际开发中可能是框架提供的响应式函数），这个函数用于监听数据的变化。在watch函数中，我们传入了source.foo的读取操作，以及一个包含scheduler和fn属性的配置对象。scheduler可以用于定义调度逻辑（在示例中为空函数），fn则是一个当数据变化时会被调用的回调函数。</p>
 <p>当obj.foo++执行时，set拦截器触发，watch函数被调用。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/31/vue-effect/" itemprop="url">嵌套的 effect 与 effect 栈</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T02:09:08.000Z" itemprop="datePublished">2023年10月31日</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>effect 副作用函数是可以发生嵌套的，至于为什么要设计成这样呢</p>
-<h2><span id="嵌套的-effect">嵌套的 effect</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
-    <span class="token comment">/* ... */</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在上面这段代码中，effectFn1 内部嵌套了 effectFn2，effectFn1 的执行会导致 effectFn2 的执行。那么，什么场景下会出现嵌套的 effect 呢？拿 Vue.js 来说，实际上 Vue.js 的渲染函数就是在一个 effect 中执行的.</p>
-<p>当组件发生嵌套时，例如 Foo 组件渲染了 Bar 组件：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Bar 组件</span>
-<span class="token keyword">const</span> Bar <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token punctuation">&#123;</span><span class="token comment">/* ... */</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">// Foo 组件渲染了 Bar 组件</span>
-<span class="token keyword">const</span> Foo <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token operator">&lt;</span>Bar <span class="token operator">/</span><span class="token operator">></span> <span class="token punctuation">&#125;</span><span class="token comment">// jsx 语法</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>此时就发生了 effect 嵌套，它相当于：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  Foo<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token comment">// 嵌套</span>
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    Bar<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span class="token punctuation">&#125;</span>
-<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>effect函数可以嵌套使用，也就是说，一个effect函数内部可以包含另一个effect函数。当外部effect函数依赖于内部effect函数创建的响应式数据时，内部effect函数会被自动追踪，确保外部effect函数在内部effect函数发生变化时得以执行。</p>
-<p>这种嵌套的effect函数用于创建依赖关系链，确保当某个响应式数据变化时，所有依赖于它的effect函数都能够被触发执行，从而保持应用的响应性。</p>
-<p>而”effect 栈”，在Vue 3的内部实现中，Vue使用了一个effect栈来追踪当前正在执行的effect函数，这个栈的作用类似于函数调用栈，用于管理effect函数的执行顺序和依赖关系。</p>
-<p>现在有一个不使用栈结构的嵌套的<code>effect</code>函数的例子，但是他并不能实现嵌套的功能。假设我们有两个响应式数据<code>count1</code>和<code>count2</code>，其中<code>count2</code>的值依赖于<code>count1</code>的值。我们可以使用嵌套的<code>effect</code>函数来实现这种依赖关系。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 原始数据</span>
-<span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 代理对象</span>
-<span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">读取属性: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> target<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">// 全局变量</span>
-<span class="token keyword">let</span> temp1<span class="token punctuation">,</span> temp2<span class="token punctuation">;</span>
-
-<span class="token comment">// effectFn1 嵌套了 effectFn2</span>
-<span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn1</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn1 执行'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">function</span> <span class="token function">effectFn2</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'effectFn2 执行'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 在 effectFn2 中读取 obj.bar 属性</span>
-    temp2 <span class="token operator">=</span> obj<span class="token punctuation">.</span>bar<span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 在 effectFn1 中读取 obj.foo 属性</span>
-  temp1 <span class="token operator">=</span> obj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><code>effectFn1</code>是外部的<code>effect</code>函数，它依赖于<code>obj.foo</code>的值，并且在内部包含了一个<code>innerEffect</code>，内部的<code>effect</code>函数依赖于<code>obj.bar</code>的值。当我们修改<code>obj.foo</code>时，我们希望外部的<code>effect</code>函数被触发执行，并且输出<code>obj.foo</code>的值，然后触发内部的依赖函数。当我们修改<code>obj.bar</code>时，内部的<code>effect</code>函数被触发执行，并且输出<code>obj.bar</code>的值。</p>
-<p>我们用全局变量 activeEffect 来存储通过 effect 函数注册的副作用函数，这意味着同一时刻 activeEffect 所存储的副作用函数只能有一个。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
-<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
-
-<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// 定义副作用函数</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 调用 cleanup 函数，具体实现需要根据需求补充</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 将副作用函数赋值给 activeEffect</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-    <span class="token comment">// 执行副作用函数</span>
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">// 将当前副作用函数的依赖集合存储在 effectFn.deps 中（需要根据实际逻辑补充）</span>
-    effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token comment">// 这里需要根据实际逻辑设置依赖集合</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-  
-  <span class="token comment">// 执行副作用函数</span>
-  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>但其实只使用一个变量储存而不使用栈结构，当副作用函数发生嵌套时，内层副作用函数的执行会覆盖 activeEffect 的值，并且永远不会恢复到原来的值。这时如果再有响应式数据进行依赖收集，即使这个响应式数据是在外层副作用函数中读取的，它们收集到的副作用函数也都会是内层副作用函数，也就是说我在读取<code>obj.foo</code>的时候，activeEffect还只是innerEffect的值，并且只触发了innerEffect的效果。</p>
-<p>为了解决这个问题，我们需要一个副作用函数栈 effectStack，在副作用函数执行时，将当前副作用函数压入栈中，待副作用函数执行完毕后将其从栈中弹出，并始终让 activeEffect 指向栈顶的副作用函数。这样就能做到一个响应式数据只会收集直接读取其值的副作用函数，而不会出现互相影响的情况：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 用一个全局变量存储当前激活的 effect 函数</span>
-<span class="token keyword">let</span> activeEffect<span class="token punctuation">;</span>
-
-<span class="token comment">// effect 栈</span>
-<span class="token keyword">const</span> effectStack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-<span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> <span class="token function-variable function">effectFn</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token function">cleanup</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 调用 cleanup 函数，具体实现需要根据需求补充</span>
-    activeEffect <span class="token operator">=</span> effectFn<span class="token punctuation">;</span>
-
-    <span class="token comment">// 将当前副作用函数压入栈中</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effectFn<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">// 在当前副作用函数执行完毕后，将当前副作用函数弹出栈，并把 activeEffect 还原为之前的值</span>
-    effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 初始化副作用函数的依赖集合</span>
-  effectFn<span class="token punctuation">.</span>deps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// 执行副作用函数</span>
-  <span class="token function">effectFn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 
     
     </div>

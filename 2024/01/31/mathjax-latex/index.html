@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>基于Vue3和MathJax渲染的Latex富文本公式编辑器完美实践 - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2024/01/31/en/mathjax-latex/" rel="alternate" hreflang="en" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2024/01/31/mathjax-latex/">
+    
+
+
+
+
+
+    <meta name="description" content="前言做项目需要用到富文本编辑器，但是看了很多的富文本编辑器都很少支持公式编辑，但项目有要用到，怎么办呢？先写一个显然并不现实。于是使用easy-formula-editor和wangeditor写了一个功能小插件，是 基于Vue3和MathJax渲染的Latex富文本公式编辑器，支持零基础即可编辑公式，支持自定义编辑器配置和风格，支持二次编辑公式，支持作为插件和富文本编辑器一起使用。  零基础即可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Vue3和MathJax渲染的Latex富文本公式编辑器完美实践">
+<meta property="og:url" content="https://ikkkp.github.io/2024/01/31/mathjax-latex/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="前言做项目需要用到富文本编辑器，但是看了很多的富文本编辑器都很少支持公式编辑，但项目有要用到，怎么办呢？先写一个显然并不现实。于是使用easy-formula-editor和wangeditor写了一个功能小插件，是 基于Vue3和MathJax渲染的Latex富文本公式编辑器，支持零基础即可编辑公式，支持自定义编辑器配置和风格，支持二次编辑公式，支持作为插件和富文本编辑器一起使用。  零基础即可">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2024-01-31T13:07:42.000Z">
+<meta property="article:modified_time" content="2024-02-01T00:51:47.544Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Vue,MathJax,Latex">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="基于Vue3和MathJax渲染的Latex富文本公式编辑器完美实践" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6DE5K2B5GE"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-6DE5K2B5GE');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#前言">1&nbsp;&nbsp;<b>前言</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#安装和使用">2&nbsp;&nbsp;<b>安装和使用</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#npm">2.1&nbsp;&nbsp;NPM</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#cdn">2.2&nbsp;&nbsp;CDN</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#导出">2.3&nbsp;&nbsp;导出</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#富文本编辑器菜单栏扩展">3&nbsp;&nbsp;<b>富文本编辑器菜单栏扩展</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#注册菜单">3.1&nbsp;&nbsp;注册菜单</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#全局模式">3.2&nbsp;&nbsp;全局模式</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#实例模式">3.3&nbsp;&nbsp;实例模式</a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#实际项目结合示例">4&nbsp;&nbsp;<b>实际项目结合示例</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="/atom-ch.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/2024/01/31/en/mathjax-latex/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            基于Vue3和MathJax渲染的Latex富文本公式编辑器完美实践
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-01-31T13:07:42.000Z" itemprop="datePublished">2024年1月31日</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a><span>></span><a class="article-category-link" href="/categories/Vue/MathJax/">MathJax</a><span>></span><a class="article-category-link" href="/categories/Vue/MathJax/Latex/">Latex</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>做项目需要用到富文本编辑器，但是看了很多的富文本编辑器都很少支持公式编辑，但项目有要用到，怎么办呢？先写一个显然并不现实。于是使用<code>easy-formula-editor</code>和<code>wangeditor</code>写了一个功能小插件，是 <strong>基于Vue3和MathJax渲染的Latex富文本公式编辑器，支持零基础即可编辑公式，支持自定义编辑器配置和风格，支持二次编辑公式，支持作为插件和富文本编辑器一起使用。</strong></p>
+<ul>
+<li>零基础即可编辑公式</li>
+<li>支持自定义编辑器配置和风格</li>
+<li>支持二次编辑公式</li>
+<li>支持作为插件和富文本编辑器一起使用</li>
+</ul>
+<p><img src="/img/mathjax/mathjax-1.png" alt="MathJax"></p>
+<h2><span id="安装和使用">安装和使用</span></h2><h3><span id="npm">NPM</span></h3><pre class="line-numbers language-none"><code class="language-none">npm i easy-formula-editor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>或</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="cdn">CDN</span></h3><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>../dist/formula-editor.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="导出">导出</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// latex 公式</span>
+editor<span class="token punctuation">.</span>latex<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment">// html 公式</span>
+editor<span class="token punctuation">.</span>$textSvgElem<span class="token punctuation">.</span><span class="token function">html</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="富文本编辑器菜单栏扩展">富文本编辑器菜单栏扩展</span></h2><h3><span id="注册菜单">注册菜单</span></h3><p><strong>【注意】 推荐使用全局模式来注册菜单。</strong> 如果有多个编辑器，每个编辑器的自定义菜单不一样，则使用实例的方式来注册菜单</p>
+<h3><span id="全局模式">全局模式</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
+<span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
+
+<span class="token comment">// 注册菜单</span>
+<span class="token constant">E</span><span class="token punctuation">.</span><span class="token function">registerMenu</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span>
+
+<span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div1'</span><span class="token punctuation">)</span>
+editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">const</span> editor2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div2'</span><span class="token punctuation">)</span>
+editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3><span id="实例模式">实例模式</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
+<span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
+<span class="token keyword">const</span> menuKey2 <span class="token operator">=</span> <span class="token string">'alertMenuKey2'</span>
+
+<span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div1'</span><span class="token punctuation">)</span>
+<span class="token comment">// 注册菜单</span>
+editor<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">extend</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span>
+
+<span class="token comment">// 将菜单加入到 editor.config.menus 中    const menuKey = 'alertMenuKey' </span>
+<span class="token comment">// 也可以通过配置 menus 调整菜单的顺序，参考【配置菜单】部分的文档    editor.config.menus.push(menuKey)</span>
+editor<span class="token punctuation">.</span>config<span class="token punctuation">.</span>menus <span class="token operator">=</span> editor<span class="token punctuation">.</span>config<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">concat</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">)</span>
+
+<span class="token comment">// 注册完菜单，再创建编辑器，顺序很重要！！</span>
+editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">const</span> editor2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div2'</span><span class="token punctuation">)</span>
+editor2<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">extend</span><span class="token punctuation">(</span>menuKey2<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span>
+editor2<span class="token punctuation">.</span>config<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>menuKey2<span class="token punctuation">)</span>
+editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2><span id="实际项目结合示例">实际项目结合示例</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token constant">E</span> <span class="token keyword">from</span> <span class="token string">"wangeditor"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> createPanelConf <span class="token keyword">from</span> <span class="token string">"./create-panel-conf"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token punctuation">&#123;</span> PanelMenu<span class="token punctuation">,</span> Panel <span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token constant">E</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">AlertMenu</span> <span class="token keyword">extends</span> <span class="token class-name">PanelMenu</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">editor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// data-title属性表示当鼠标悬停在该按钮上时提示该按钮的功能简述</span>
+    <span class="token keyword">const</span> $elem <span class="token operator">=</span> <span class="token constant">E</span><span class="token punctuation">.</span><span class="token function">$</span><span class="token punctuation">(</span>
+      <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;div class="w-e-menu" data-title="数学公式">
+        &lt;span>公式&lt;/span>
+      &lt;/div></span><span class="token template-punctuation string">`</span></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span>$elem<span class="token punctuation">,</span> editor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">/**
+   * 菜单点击事件
+   */</span>
+  <span class="token function">clickHandler</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> formula <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> conf <span class="token operator">=</span> <span class="token function">createPanelConf</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>editor<span class="token punctuation">,</span> formula<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> panel <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Panel</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> conf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    panel<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    formula<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">"#edit-content"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token function">tryChangeActive</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">"alertMenuKey"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 注册菜单</span>
+<span class="token constant">E</span><span class="token punctuation">.</span><span class="token function">registerMenu</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token constant">E</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">//create-panel-conf.ts</span>
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>wangEditor<span class="token punctuation">,</span> formulaEditor<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> btnOkId <span class="token operator">=</span> <span class="token string">'btn-ok'</span>
+  
+    <span class="token comment">/**
+     * 插入公式
+     */</span>
+    <span class="token keyword">function</span> <span class="token function">insertFomule</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">const</span> formula <span class="token operator">=</span> formulaEditor<span class="token punctuation">.</span>latex<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+      <span class="token comment">// 注意插入wangEditor时左右两边的空格不能去掉，不然会导致无法获取焦点</span>
+      wangEditor<span class="token punctuation">.</span>txt<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">'&lt;p>'</span><span class="token operator">+</span>formula<span class="token operator">+</span><span class="token string">'&lt;/p>'</span><span class="token punctuation">)</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span>
+    <span class="token punctuation">&#125;</span>
+  
+    <span class="token comment">// tabs配置</span>
+    <span class="token keyword">const</span> tabsConf <span class="token operator">=</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">&#123;</span>
+        <span class="token comment">// tab 的标题</span>
+        title<span class="token operator">:</span> <span class="token string">"插入数学公式"</span><span class="token punctuation">,</span>
+        <span class="token comment">// 模板</span>
+        tpl<span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;div>
+                &lt;div id="edit-content">&lt;/div>
+                &lt;div class="w-e-button-container">
+                  &lt;button type="button" id="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>btnOkId<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">" class="right">插入&lt;/button>
+                &lt;/div>
+              &lt;/div></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span>
+        <span class="token comment">// 事件绑定</span>
+        events<span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token comment">// 插入视频</span>
+          <span class="token punctuation">&#123;</span>
+            selector<span class="token operator">:</span> <span class="token string">'#'</span> <span class="token operator">+</span> btnOkId<span class="token punctuation">,</span>
+            type<span class="token operator">:</span> <span class="token string">'click'</span><span class="token punctuation">,</span>
+            fn<span class="token operator">:</span> insertFomule<span class="token punctuation">,</span>
+            bindEnter<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+          <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token comment">// tab end</span>
+    <span class="token punctuation">]</span>
+  
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+        width<span class="token operator">:</span> <span class="token number">660</span><span class="token punctuation">,</span>
+        height<span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token comment">// panel 中可包含多个 tab</span>
+        tabs<span class="token operator">:</span> tabsConf<span class="token punctuation">,</span> <span class="token comment">// tabs end</span>
+      <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>使用上面的代码，就可以在富文本编辑器中添加一个公式编辑器的菜单了：</p>
+<pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;template&gt;
+  &lt;div class&#x3D;&quot;formula-container&quot;&gt;
+    &lt;v-card elevation&#x3D;&quot;0&quot; class&#x3D;&quot;formula-card&quot; title&#x3D;&quot;输出区域&quot; subtitle&#x3D;&quot;Output&quot;&gt;
+      &lt;div id&#x3D;&quot;formula&quot; class&#x3D;&quot;formula-content&quot;&gt;
+        &#123;&#123; renderedFormula ? &#96;$$&#123;renderedFormula&#125;$&#96; : &#39;&#39; &#125;&#125;
+      &lt;&#x2F;div&gt;
+    &lt;&#x2F;v-card&gt;
+    &lt;div class&#x3D;&quot;editor-area&quot;&gt;
+      &lt;div id&#x3D;&quot;wang-editor&quot; class&#x3D;&quot;editor&quot;&gt;&lt;&#x2F;div&gt;
+    &lt;&#x2F;div&gt;
+  &lt;&#x2F;div&gt;
+&lt;&#x2F;template&gt;
+
+
+&lt;script setup&gt;
+import E from &quot;..&#x2F;utils&#x2F;formula-menu-conf&quot;;
+import &#123; ref, onMounted, nextTick, defineProps, watchEffect &#125; from &quot;vue&quot;;
+
+&#x2F;&#x2F; 定义props
+const props &#x3D; defineProps(&#123;
+  initMessage: &#123;
+    type: String,
+    default: &quot;&quot;,
+  &#125;
+&#125;);
+
+watchEffect(() &#x3D;&gt; &#123;
+  props.initMessage;
+&#125;);
+
+const editor &#x3D; ref(null);
+const renderedFormula &#x3D; ref(&quot;&quot;);
+
+function convert() &#123;
+  MathJax.texReset();
+  MathJax.typesetClear();
+  MathJax.typesetPromise();
+&#125;
+
+function updateFormula() &#123;
+  renderedFormula.value &#x3D; editor.value.txt.text();
+  nextTick(convert);
+&#125;
+
+onMounted(() &#x3D;&gt; &#123;
+  editor.value &#x3D; new E(&quot;#wang-editor&quot;);
+  editor.value.config.height &#x3D; 360;
+  editor.value.config.menus &#x3D; [&#39;head&#39;, &#39;bold&#39;, &#39;underline&#39;, &#39;strikeThrough&#39;,&#39;emoticon&#39;, &#39;undo&#39;, &#39;redo&#39;];
+  editor.value.config.onchange &#x3D; updateFormula;
+  editor.value.config.onchangeTimeout &#x3D; 500;
+  editor.value.create();
+  editor.value.txt.html(props.initMessage);
+&#125;);
+
+&lt;&#x2F;script&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，我们的公式编辑器和富文本编辑器完美结合了，效果如下：</p>
+<p><img src="/img/mathjax/mathjax-2.png" alt="MathJax"></p>
+<p>贴一个wangeditor的官方文档：<a target="_blank" rel="noopener" href="https://www.wangeditor.com/v4">www.wangeditor.com/v4</a></p>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Vue-MathJax-Latex/">#Vue,MathJax,Latex</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2024/01/23/react-3/">React入门-第三篇</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2024 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2024/01/31/en/mathjax-latex/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>
