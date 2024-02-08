@@ -202,10 +202,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="what-is-hadoop-yarn">What is Hadoop Yarn?</span></h2><p>In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unreasonable. Therefore, during the upgrade process from 1.0 to 2.0, Hadoop separated the resource scheduling work of JobTracker and made it an independent resource management framework, which directly made Hadoop the most stable cornerstone in big data. This independent resource management framework is Yarn.</p>
+        <h2><span id="what-is-hadoop-yarn">What is Hadoop Yarn?</span></h2>
+<p>In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unreasonable. Therefore, during the upgrade process from 1.0 to 2.0, Hadoop separated the resource scheduling work of JobTracker and made it an independent resource management framework, which directly made Hadoop the most stable cornerstone in big data. This independent resource management framework is Yarn.</p>
 <p>Before we introduce Yarn in detail, let’s briefly talk about Yarn. The full name of Yarn is “Yet Another Resource Negotiator”, which means “another resource scheduler”. This naming is similar to “Have a Nice Inn”. Here’s a little more information: there used to be a Java project compilation tool called Ant, which was named similarly, “Another Neat Tool” in abbreviation, which means “another organizing tool”.</p>
 <p>Since it is called a resource scheduler, its function is naturally responsible for resource management and scheduling. Next, let’s take a closer look at Yarn.</p>
-<h2><span id="yarn-architecture">Yarn Architecture</span></h2><p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
+<h2><span id="yarn-architecture">Yarn Architecture</span></h2>
+<p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
 <p>① Client: The client is responsible for submitting jobs to the cluster.</p>
 <p>② ResourceManager: The main process of the cluster, the arbitration center, is responsible for cluster resource management and task scheduling.</p>
 <p>③ Scheduler: Resource arbitration module.</p>
@@ -213,42 +215,58 @@
 <p>⑤ NodeManager: The cluster’s secondary process, which manages and monitors Containers and executes specific tasks.</p>
 <p>⑥ Container: A collection of local resources, such as a Container with 4 CPUs and 8GB of memory.</p>
 <p>⑦ ApplicationMaster: The task execution and supervision center.</p>
-<h3><span id="three-main-components">Three Main Components</span></h3><p>Looking at the top of the figure, we can intuitively see two main components, ResourceManager and NodeManager, but there is actually an ApplicationMaster that is not displayed in the figure. Let’s take a look at these three components separately.</p>
-<h4><span id="resourcemanager">ResourceManager</span></h4><p>Let’s start with the ResourceManager in the center of the figure. From the name, we can know that this component is responsible for resource management, and there is only one ResourceManager in the entire system to be responsible for resource scheduling.</p>
+<h3><span id="three-main-components">Three Main Components</span></h3>
+<p>Looking at the top of the figure, we can intuitively see two main components, ResourceManager and NodeManager, but there is actually an ApplicationMaster that is not displayed in the figure. Let’s take a look at these three components separately.</p>
+<h4><span id="resourcemanager">ResourceManager</span></h4>
+<p>Let’s start with the ResourceManager in the center of the figure. From the name, we can know that this component is responsible for resource management, and there is only one ResourceManager in the entire system to be responsible for resource scheduling.</p>
 <p>It also includes two main components: the Scheduler and the ApplicationManager.</p>
 <p>The Scheduler: Essentially, the Scheduler is a strategy or algorithm. When a client submits a task, it allocates resources based on the required resources and the current state of the cluster. Note that it only allocates resources to the application and does not monitor the status of the application.</p>
 <p>ApplicationManager: Similarly, you can roughly guess what it does from its name. The ApplicationManager is responsible for managing the applications submitted by the client. Didn’t we say that the Scheduler does not monitor the program submitted by the user? In fact, the monitoring of the application is done by the ApplicationManager.</p>
-<h4><span id="applicationmaster">ApplicationMaster</span></h4><p>Every time a client submits an Application, a new ApplicationMaster is created. This ApplicationMaster applies to the ResourceManager for container resources, sends the program to be run to the container after obtaining the resources, and then performs distributed computing.</p>
+<h4><span id="applicationmaster">ApplicationMaster</span></h4>
+<p>Every time a client submits an Application, a new ApplicationMaster is created. This ApplicationMaster applies to the ResourceManager for container resources, sends the program to be run to the container after obtaining the resources, and then performs distributed computing.</p>
 <p>This may be a bit difficult to understand. Why send the running program to the container? If you look at it from a traditional perspective, the program runs still, and data flows in and out constantly. But when the data volume is large, it cannot be done because the cost of moving massive data is too high and takes too long. However, there is an old Chinese saying that “if the mountain will not come to Muhammad, then Muhammad must go to the mountain.” This is the idea of big data distributed computing. Since big data is difficult to move, I will publish the application program that is easy to move to each node for calculation. This is the idea of big data distributed computing.</p>
-<h4><span id="nodemanager">NodeManager</span></h4><p>The NodeManager is a proxy for the ResourceManager on each machine, responsible for container management, monitoring their resource usage (CPU, memory, disk, and network, etc.), and providing these resource usage reports to the ResourceManager&#x2F;Scheduler.</p>
+<h4><span id="nodemanager">NodeManager</span></h4>
+<p>The NodeManager is a proxy for the ResourceManager on each machine, responsible for container management, monitoring their resource usage (CPU, memory, disk, and network, etc.), and providing these resource usage reports to the ResourceManager/Scheduler.</p>
 <p>The main idea of Yarn is to split the two functions of resource management and task scheduling of MRv1 JobTracker into two independent processes:</p>
 <p><img src="/img/yarn-pkg/Yarn2.png" alt="hadoop-Yarn"></p>
 <ul>
-<li><p>Yarn is still a master&#x2F;slave structure.</p>
+<li>
+<p>Yarn is still a master/slave structure.</p>
 </li>
-<li><p>The main process ResourceManager is the resource arbitration center of the entire cluster.</p>
+<li>
+<p>The main process ResourceManager is the resource arbitration center of the entire cluster.</p>
 </li>
-<li><p>The secondary process NodeManager manages local resources.</p>
+<li>
+<p>The secondary process NodeManager manages local resources.</p>
 </li>
-<li><p>ResourceManager and the subordinate node process NodeManager form the Hadoop 2.0 distributed data computing framework.</p>
+<li>
+<p>ResourceManager and the subordinate node process NodeManager form the Hadoop 2.0 distributed data computing framework.</p>
 </li>
 </ul>
-<h2><span id="the-process-of-submitting-an-application-to-yarn">The Process of Submitting an Application to Yarn</span></h2><p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
+<h2><span id="the-process-of-submitting-an-application-to-yarn">The Process of Submitting an Application to Yarn</span></h2>
+<p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
 <p>This figure shows the process of submitting a program, and we will discuss the process of each step in detail below.</p>
 <ul>
-<li><p>The client submits an application to Yarn, assuming it is a MapReduce job.</p>
+<li>
+<p>The client submits an application to Yarn, assuming it is a MapReduce job.</p>
 </li>
-<li><p>The ResourceManager communicates with the NodeManager to allocate the first container for the application and runs the ApplicationMaster corresponding to the application in this container.</p>
+<li>
+<p>The ResourceManager communicates with the NodeManager to allocate the first container for the application and runs the ApplicationMaster corresponding to the application in this container.</p>
 </li>
-<li><p>After the ApplicationMaster is started, it splits the job (i.e., the application) into tasks that can run in one or more containers. Then it applies to the ResourceManager for containers to run the program and sends heartbeats to the ResourceManager regularly.</p>
+<li>
+<p>After the ApplicationMaster is started, it splits the job (i.e., the application) into tasks that can run in one or more containers. Then it applies to the ResourceManager for containers to run the program and sends heartbeats to the ResourceManager regularly.</p>
 </li>
-<li><p>After obtaining the container, the ApplicationMaster communicates with the NodeManager corresponding to the container and distributes the job to the container in the NodeManager. The MapReduce that has been split will be distributed here, and the container may run Map tasks or Reduce tasks.</p>
+<li>
+<p>After obtaining the container, the ApplicationMaster communicates with the NodeManager corresponding to the container and distributes the job to the container in the NodeManager. The MapReduce that has been split will be distributed here, and the container may run Map tasks or Reduce tasks.</p>
 </li>
-<li><p>The task running in the container sends heartbeats to the ApplicationMaster to report its status. When the program is finished, the ApplicationMaster logs out and releases the container resources to the ResourceManager.<br>The above is the general process of running a job.</p>
+<li>
+<p>The task running in the container sends heartbeats to the ApplicationMaster to report its status. When the program is finished, the ApplicationMaster logs out and releases the container resources to the ResourceManager.<br>
+The above is the general process of running a job.</p>
 </li>
 </ul>
 <p><img src="/img/yarn-pkg/Yarn4.png" alt="hadoop-Yarn"></p>
-<h2><span id="typical-topology-of-yarn-architecture">Typical Topology of Yarn Architecture</span></h2><p>In addition to the two entities of <code>ResourceManager</code> and <code>NodeManager</code>, Yarn also includes two entities of <code>WebAppProxyServer</code> and <code>JobHistoryServer</code>.</p>
+<h2><span id="typical-topology-of-yarn-architecture">Typical Topology of Yarn Architecture</span></h2>
+<p>In addition to the two entities of <code>ResourceManager</code> and <code>NodeManager</code>, Yarn also includes two entities of <code>WebAppProxyServer</code> and <code>JobHistoryServer</code>.</p>
 <p><img src="/img/yarn-pkg/Yarn5.png" alt="hadoop-Yarn"></p>
 <p><code>JobHistoryServer</code>: Manages completed Yarn tasks</p>
 <ul>
@@ -260,9 +278,12 @@
 <li>By using a proxy, not only the pressure on ResourceManager is further reduced, but also the Web attacks on Yarn can be reduced.</li>
 <li>Responsible for supervising the entire MapReduce task execution process, collecting the task execution information from the Container, and displaying it on a Web interface.</li>
 </ul>
-<h2><span id="yarn-scheduling-strategy">Yarn Scheduling Strategy</span></h2><p><strong>Capacity Scheduling Algorithm</strong><br><code>CapacityScheduler</code> is a multi-user and multi-task scheduling strategy that divides tasks into queues and allocates resources in <code>Container</code> units.</p>
+<h2><span id="yarn-scheduling-strategy">Yarn Scheduling Strategy</span></h2>
+<p><strong>Capacity Scheduling Algorithm</strong><br>
+<code>CapacityScheduler</code> is a multi-user and multi-task scheduling strategy that divides tasks into queues and allocates resources in <code>Container</code> units.</p>
 <p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
-<p><strong>Fair Scheduling Strategy</strong><br><code>FairScheduler</code> is a pluggable scheduling strategy that allows multiple <code>Yarn</code> tasks to use cluster resources fairly.</p>
+<p><strong>Fair Scheduling Strategy</strong><br>
+<code>FairScheduler</code> is a pluggable scheduling strategy that allows multiple <code>Yarn</code> tasks to use cluster resources fairly.</p>
 <p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
 
     
@@ -299,23 +320,35 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2><h3><span id="design-goals">Design Goals</span></h3><p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
+        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2>
+<h3><span id="design-goals">Design Goals</span></h3>
+<p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
 <ul>
-<li><p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
+<li>
+<p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
 </li>
-<li><p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
+<li>
+<p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
 </li>
 </ul>
-<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3><p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
+<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3>
+<p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
 <ol>
-<li><p><strong>Low-latency data access</strong><br>Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
+<li>
+<p><strong>Low-latency data access</strong><br>
+Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
 </li>
-<li><p><strong>A large number of small files</strong><br>The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file&#x2F;directory&#x2F;file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
+<li>
+<p><strong>A large number of small files</strong><br>
+The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file/directory/file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
 </li>
-<li><p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
+<li>
+<p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>
+HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
 </li>
 </ol>
-<h2><span id="hdfs-positioning">HDFS Positioning</span></h2><p>To improve scalability, HDFS uses a master&#x2F;slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
+<h2><span id="hdfs-positioning">HDFS Positioning</span></h2>
+<p>To improve scalability, HDFS uses a master/slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
 <p>HDFS is an important component of the Hadoop ecosystem. It is a distributed file system designed to store large amounts of data and provide high-throughput data access. HDFS is designed to store data on inexpensive hardware and provide high fault tolerance. It achieves this goal by distributing data to multiple nodes in the cluster. HDFS is positioned as a batch processing system suitable for offline processing of large-scale data.</p>
 <p>The main features of HDFS include:</p>
 <ul>
@@ -325,62 +358,88 @@
 <li>Stream data access: HDFS supports stream data access, which means it can efficiently process large amounts of data streams.</li>
 </ul>
 <p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
-<h2><span id="hdfs-architecture">HDFS Architecture</span></h2><p>HDFS uses a master&#x2F;slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read&#x2F;write operations.</p>
-<h3><span id="blocks">Blocks</span></h3><p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
-<p>Why are HDFS blocks so large?<br>To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M&#x2F;s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
+<h2><span id="hdfs-architecture">HDFS Architecture</span></h2>
+<p>HDFS uses a master/slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read/write operations.</p>
+<h3><span id="blocks">Blocks</span></h3>
+<p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
+<p>Why are HDFS blocks so large?<br>
+To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M/s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
 <p>Benefits of block abstraction</p>
 <ul>
 <li>The splitting of blocks allows a single file size to be larger than the capacity of the entire disk, and the blocks that make up the file can be distributed across the entire cluster. In theory, a single file can occupy the disk of all machines in the cluster.</li>
 <li>Block abstraction also simplifies the storage system, without worrying about its permissions, owner, and other content (these contents are controlled at the file level).</li>
 <li>Blocks are the unit of replication in fault tolerance and high availability mechanisms.</li>
 </ul>
-<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
+<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3>
+<p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
 <ul>
 <li>Namespace image</li>
 <li>Edit log</li>
 </ul>
 <p>However, the persistent data does not include the node list where the block is located and which nodes the file blocks are distributed to in the cluster. This information is reconstructed when the system is restarted (through the block information reported by the Datanode). In HDFS, the Namenode may become a single point of failure for the cluster. When the Namenode is unavailable, the entire file system is unavailable. HDFS provides two solutions to single point of failure:</p>
 <ol>
-<li><p>Backup persistent metadata<br>Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
+<li>
+<p>Backup persistent metadata<br>
+Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
 </li>
-<li><p>Secondary Namenode<br>The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
+<li>
+<p>Secondary Namenode<br>
+The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
 </li>
 </ol>
 <p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
-<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2>
+<h2><span id="data-redundancy">Data Redundancy</span></h2>
+<ul>
+<li>
+<p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
 </li>
-<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
+<li>
+<p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
 </li>
-<li><p>HDFS files are written once and strictly limited to only one write user at any time.</p>
-</li>
-</ul>
-<h2><span id="replica-placement">Replica Placement</span></h2><ul>
-<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
-</li>
-<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
-</li>
-<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
+<li>
+<p>HDFS files are written once and strictly limited to only one write user at any time.</p>
 </li>
 </ul>
-<h3><span id="replica-selection">Replica Selection</span></h3><ul>
-<li><p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
+<h2><span id="replica-placement">Replica Placement</span></h2>
+<ul>
+<li>
+<p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
 </li>
-<li><p>The HDFS architecture supports data balancing strategies.</p>
+<li>
+<p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
 </li>
-</ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
-<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
-</li>
-<li><p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I&#x2F;O requests.</p>
-</li>
-<li><p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
+<li>
+<p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
 </li>
 </ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
+<h3><span id="replica-selection">Replica Selection</span></h3>
+<ul>
+<li>
+<p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
+</li>
+<li>
+<p>The HDFS architecture supports data balancing strategies.</p>
+</li>
+</ul>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3>
+<ul>
+<li>
+<p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
+</li>
+<li>
+<p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I/O requests.</p>
+</li>
+<li>
+<p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
+</li>
+</ul>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3>
+<ul>
 <li>For various reasons, the data block obtained from the DataNode may be corrupted.</li>
 </ul>
-<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2><p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
+<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2>
+<p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
 <p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
 <p>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</p>
 <p>Therefore, the NameNode and DataNode play different roles in the HDFS architecture.</p>
@@ -388,53 +447,77 @@
 <p>HDFS is an abbreviation for Hadoop Distributed File System, an important component of the Hadoop ecosystem. The HDFS architecture includes one NameNode and multiple DataNodes. The NameNode is the master node of HDFS, responsible for managing the namespace of the file system, the metadata information of the file, and the location information of the file blocks. The DataNode is the slave node of HDFS, responsible for storing the actual data of the file blocks.</p>
 <p><strong>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</strong></p>
 <p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
-<h3><span id="general-topology">General Topology</span></h3><p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
+<h3><span id="general-topology">General Topology</span></h3>
+<p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
 <p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
-<h3><span id="commercial-topology">Commercial Topology</span></h3><p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
+<h3><span id="commercial-topology">Commercial Topology</span></h3>
+<p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
 <p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
-<h2><span id="command-line-interface">Command Line Interface</span></h2><p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
+<h2><span id="command-line-interface">Command Line Interface</span></h2>
+<p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
 <blockquote>
-<p>hadoop fs -copyFromLocal &#x2F;&#x2F; Copy files from local to HDFS<br> hadoop fs mkdir &#x2F;&#x2F; Create a directory<br> hadoop fs -ls  &#x2F;&#x2F; List file list</p>
+<p>hadoop fs -copyFromLocal // Copy files from local to HDFS<br>
+hadoop fs mkdir // Create a directory<br>
+hadoop fs -ls  // List file list</p>
 </blockquote>
 <p>In Hadoop, the permissions of files and directories are similar to the POSIX model, including three permissions: read, write, and execute.</p>
-<p>Read permission (r): Used to read files or list the contents of a directory<br>Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
+<p>Read permission ®: Used to read files or list the contents of a directory<br>
+Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>
+Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
 <p>Each file or directory has three attributes: owner, group, and mode:</p>
-<p>Owner: Refers to the owner of the file<br>Group: For permission groups<br>Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
+<p>Owner: Refers to the owner of the file<br>
+Group: For permission groups<br>
+Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
 <p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2><h3><span id="read-file">Read File</span></h3><p>The rough process of reading a file is as follows:</p>
+<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2>
+<h3><span id="read-file">Read File</span></h3>
+<p>The rough process of reading a file is as follows:</p>
 <p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
 <ol>
-<li><p>The client passes a file Path to the FileSystem’s open method.</p>
+<li>
+<p>The client passes a file Path to the FileSystem’s open method.</p>
 </li>
-<li><p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
+<li>
+<p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
 </li>
-<li><p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
+<li>
+<p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
 </li>
-<li><p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
+<li>
+<p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
 </li>
-<li><p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
+<li>
+<p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
 </li>
-<li><p>After the data is read, the client calls the close method to close the stream object.</p>
+<li>
+<p>After the data is read, the client calls the close method to close the stream object.</p>
 </li>
 </ol>
 <p>During the data reading process, if communication with the DataNode fails, the DFSInputStream object will try to read data from the next best node and remember the failed node, and subsequent block reads will not connect to the node.</p>
 <p>After reading a Block, DFSInputStram performs checksum verification. If the Block is damaged, it tries to read data from other nodes and reports the damaged block to the NameNode.</p>
 <p>Which DataNode does the client connect to get the data block is guided by the NameNode, which can support a large number of concurrent client requests, and the NameNode evenly distributes traffic to the entire cluster as much as possible.</p>
 <p>The location information of the Block is stored in the memory of the NameNode, so the corresponding location request is very efficient and will not become a bottleneck.</p>
-<h3><span id="write-file">Write File</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
+<h3><span id="write-file">Write File</span></h3>
+<p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
 <p>Step breakdown</p>
 <ol>
-<li><p>The client calls the create method of DistributedFileSystem.</p>
+<li>
+<p>The client calls the create method of DistributedFileSystem.</p>
 </li>
-<li><p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
+<li>
+<p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
 </li>
-<li><p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
+<li>
+<p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
 </li>
-<li><p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
+<li>
+<p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
 </li>
-<li><p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
+<li>
+<p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
 </li>
-<li><p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
+<li>
+<p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
 </li>
 </ol>
 <p>How does the Namenode determine which DataNode the replica is on?</p>
@@ -447,67 +530,99 @@
 <p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
 <p>This selection balances reliability, read and write performance well.</p>
 <ul>
-<li><p>Reliability: Blocks are distributed on two racks.</p>
+<li>
+<p>Reliability: Blocks are distributed on two racks.</p>
 </li>
-<li><p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
+<li>
+<p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
 </li>
-<li><p>Read bandwidth: You can choose one of the two racks to read from.</p>
-</li>
-</ul>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
-<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
-</li>
-<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
-</li>
-<li><p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
+<li>
+<p>Read bandwidth: You can choose one of the two racks to read from.</p>
 </li>
 </ul>
-<h2><span id="replica-placement">Replica Placement</span></h2><ul>
-<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
+<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2>
+<h2><span id="data-redundancy">Data Redundancy</span></h2>
+<ul>
+<li>
+<p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
 </li>
-<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
+<li>
+<p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
 </li>
-<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
-</li>
-</ul>
-<h3><span id="replica-selection">Replica Selection</span></h3><ul>
-<li><p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
-</li>
-<li><p>HDFS architecture supports data balancing strategies.</p>
-</li>
-</ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
-<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
-</li>
-<li><p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I&#x2F;O requests.</p>
-</li>
-<li><p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
+<li>
+<p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
 </li>
 </ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
-<li><p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
+<h2><span id="replica-placement">Replica Placement</span></h2>
+<ul>
+<li>
+<p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
 </li>
-<li><p>HDFS client software implements checksum verification of HDFS file content.</p>
+<li>
+<p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
 </li>
-<li><p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
-</li>
-</ul>
-<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3><ul>
-<li><p>HDFS applications generally access files in a write-once, read-many mode.</p>
-</li>
-<li><p>Once a file is created, written, and closed, it does not need to be changed again.</p>
-</li>
-<li><p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
+<li>
+<p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
 </li>
 </ul>
-<h3><span id="client-cache">Client Cache</span></h3><ul>
-<li><p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
+<h3><span id="replica-selection">Replica Selection</span></h3>
+<ul>
+<li>
+<p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
 </li>
-<li><p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
+<li>
+<p>HDFS architecture supports data balancing strategies.</p>
 </li>
-<li><p>If the NameNode crashes before the file is closed, the file will be lost.</p>
+</ul>
+<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3>
+<ul>
+<li>
+<p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
 </li>
-<li><p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
+<li>
+<p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I/O requests.</p>
+</li>
+<li>
+<p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
+</li>
+</ul>
+<h3><span id="data-integrity-check">Data Integrity Check</span></h3>
+<ul>
+<li>
+<p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
+</li>
+<li>
+<p>HDFS client software implements checksum verification of HDFS file content.</p>
+</li>
+<li>
+<p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
+</li>
+</ul>
+<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3>
+<ul>
+<li>
+<p>HDFS applications generally access files in a write-once, read-many mode.</p>
+</li>
+<li>
+<p>Once a file is created, written, and closed, it does not need to be changed again.</p>
+</li>
+<li>
+<p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
+</li>
+</ul>
+<h3><span id="client-cache">Client Cache</span></h3>
+<ul>
+<li>
+<p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
+</li>
+<li>
+<p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
+</li>
+<li>
+<p>If the NameNode crashes before the file is closed, the file will be lost.</p>
+</li>
+<li>
+<p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
 </li>
 </ul>
 
@@ -545,8 +660,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="definition-of-mapreduce">Definition of MapReduce</span></h2><p>MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is to integrate the user’s written business logic code and default components into a complete distributed computing program, which runs concurrently on a Hadoop cluster.</p>
-<h2><span id="reason-for-the-emergence-of-mapreduce">Reason for the Emergence of MapReduce</span></h2><p>Why do we need MapReduce?</p>
+        <h2><span id="definition-of-mapreduce">Definition of MapReduce</span></h2>
+<p>MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is to integrate the user’s written business logic code and default components into a complete distributed computing program, which runs concurrently on a Hadoop cluster.</p>
+<h2><span id="reason-for-the-emergence-of-mapreduce">Reason for the Emergence of MapReduce</span></h2>
+<p>Why do we need MapReduce?</p>
 <ul>
 <li>Massive data cannot be processed on a single machine due to hardware resource limitations.</li>
 <li>Once the single-machine version of the program is extended to run on a cluster, it will greatly increase the complexity and development difficulty of the program.</li>
@@ -558,7 +675,8 @@
 <li>Distributed: file distributed storage (HDFS), computing logic needs to be divided into at least two stages (one stage is independently concurrent, one stage is converged), how to distribute computing programs, how to allocate computing tasks (slicing), how to start the two-stage program? How to coordinate? Monitoring during the entire program running process? Fault tolerance? Retry?</li>
 </ul>
 <p>It can be seen that when the program is extended from a single-machine version to a distributed version, a large amount of complex work will be introduced.</p>
-<h2><span id="relationship-between-mapreduce-and-yarn">Relationship between MapReduce and Yarn</span></h2><p>Yarn is a resource scheduling platform that is responsible for providing server computing resources for computing programs, which is equivalent to a distributed operating system platform. MapReduce and other computing programs are like application programs running on top of the operating system.</p>
+<h2><span id="relationship-between-mapreduce-and-yarn">Relationship between MapReduce and Yarn</span></h2>
+<p>Yarn is a resource scheduling platform that is responsible for providing server computing resources for computing programs, which is equivalent to a distributed operating system platform. MapReduce and other computing programs are like application programs running on top of the operating system.</p>
 <p>Important concepts of YARN:</p>
 <ol>
 <li>Yarn does not know the running mechanism of the program submitted by the user;</li>
@@ -569,20 +687,25 @@
 <li>Therefore, computing frameworks such as Spark and Storm can be integrated to run on Yarn, as long as they have resource request mechanisms that comply with Yarn specifications in their respective frameworks;</li>
 <li>Yarn becomes a universal resource scheduling platform. From then on, various computing clusters that previously existed in enterprises can be integrated on a physical cluster to improve resource utilization and facilitate data sharing.</li>
 </ol>
-<h2><span id="mapreduce-working-principle">MapReduce Working Principle</span></h2><p>Strictly speaking, MapReduce is not an algorithm, but a computing idea. It consists of two stages: map and reduce.</p>
-<h3><span id="mapreduce-process">MapReduce Process</span></h3><p>To improve development efficiency, common functions in distributed programs can be encapsulated into frameworks, allowing developers to focus on business logic.</p>
+<h2><span id="mapreduce-working-principle">MapReduce Working Principle</span></h2>
+<p>Strictly speaking, MapReduce is not an algorithm, but a computing idea. It consists of two stages: map and reduce.</p>
+<h3><span id="mapreduce-process">MapReduce Process</span></h3>
+<p>To improve development efficiency, common functions in distributed programs can be encapsulated into frameworks, allowing developers to focus on business logic.</p>
 <p>MapReduce is such a general framework for distributed programs, and its overall structure is as follows (there are three types of instance processes during distributed operation):</p>
 <ul>
 <li>MRAppMaster: responsible for the process scheduling and status coordination of the entire program</li>
 <li>MapTask: responsible for the entire data processing process of the map phase</li>
 <li>ReduceTask: responsible for the entire data processing process of the reduce phase</li>
 </ul>
-<h3><span id="mapreduce-mechanism">MapReduce Mechanism</span></h3><p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
+<h3><span id="mapreduce-mechanism">MapReduce Mechanism</span></h3>
+<p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
 <p>The process is described as follows:</p>
 <ol>
-<li><p>When an MR program starts, the MRAppMaster is started first. After the MRAppMaster starts, according to the description information of this job, it calculates the number of MapTask instances required and applies to the cluster to start the corresponding number of MapTask processes.</p>
+<li>
+<p>When an MR program starts, the MRAppMaster is started first. After the MRAppMaster starts, according to the description information of this job, it calculates the number of MapTask instances required and applies to the cluster to start the corresponding number of MapTask processes.</p>
 </li>
-<li><p>After the MapTask process is started, data processing is performed according to the given data slice range. The main process is:</p>
+<li>
+<p>After the MapTask process is started, data processing is performed according to the given data slice range. The main process is:</p>
 </li>
 </ol>
 <ul>
@@ -591,23 +714,31 @@
 <li>Sort the KV pairs in the cache according to K partition and continuously overflow to the disk file.</li>
 </ul>
 <ol start="3">
-<li><p>After the MRAppMaster monitors that all MapTask process tasks are completed, it will start the corresponding number of ReduceTask processes according to the customer-specified parameters, and inform the ReduceTask process of the data range (data partition) to be processed.</p>
+<li>
+<p>After the MRAppMaster monitors that all MapTask process tasks are completed, it will start the corresponding number of ReduceTask processes according to the customer-specified parameters, and inform the ReduceTask process of the data range (data partition) to be processed.</p>
 </li>
-<li><p>After the ReduceTask process is started, according to the location of the data to be processed notified by the MRAppMaster, it obtains several MapTask output result files from several machines where the MapTask is running, and performs re-merging and sorting locally. Then, groups the KV with the same key into one group, calls the customer-defined reduce() method for logical operation, collects the result KV output by the operation, and then calls the customer-specified outputformat to output the result data to external storage.</p>
+<li>
+<p>After the ReduceTask process is started, according to the location of the data to be processed notified by the MRAppMaster, it obtains several MapTask output result files from several machines where the MapTask is running, and performs re-merging and sorting locally. Then, groups the KV with the same key into one group, calls the customer-defined reduce() method for logical operation, collects the result KV output by the operation, and then calls the customer-specified outputformat to output the result data to external storage.</p>
 </li>
 </ol>
 <p>Let’s take an example.</p>
-<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>The above figure shows a word frequency counting task.</p>
+<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>
+The above figure shows a word frequency counting task.</p>
 <ol>
-<li><p>Hadoop divides the input data into several slices and assigns each split to a map task for processing.</p>
+<li>
+<p>Hadoop divides the input data into several slices and assigns each split to a map task for processing.</p>
 </li>
-<li><p>After mapping, each word and its frequency in this task are obtained.</p>
+<li>
+<p>After mapping, each word and its frequency in this task are obtained.</p>
 </li>
-<li><p>Shuffle puts the same words together, sorts them, and divides them into several slices.</p>
+<li>
+<p>Shuffle puts the same words together, sorts them, and divides them into several slices.</p>
 </li>
-<li><p>According to these slices, reduce is performed.</p>
+<li>
+<p>According to these slices, reduce is performed.</p>
 </li>
-<li><p>The result of the reduce task is counted and output to a file.</p>
+<li>
+<p>The result of the reduce task is counted and output to a file.</p>
 </li>
 </ol>
 <p>In MapReduce, two roles are required to complete these processes: JobTracker and TaskTracker.</p>
@@ -616,7 +747,8 @@
 <p>Here is a simple MapReduce implementation example:</p>
 <p>It is used to count the number of occurrences of each word in the input file.</p>
 <ol>
-<li><p><strong>Import necessary packages:</strong></p>
+<li>
+<p><strong>Import necessary packages:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>conf<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>fs<span class="token punctuation">.</span></span><span class="token class-name">Path</span></span><span class="token punctuation">;</span>
@@ -629,7 +761,8 @@
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>input<span class="token punctuation">.</span></span><span class="token class-name">FileInputFormat</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>hadoop<span class="token punctuation">.</span>mapreduce<span class="token punctuation">.</span>lib<span class="token punctuation">.</span>output<span class="token punctuation">.</span></span><span class="token class-name">FileOutputFormat</span></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 </li>
-<li><p><strong>Define the Mapper class:</strong></p>
+<li>
+<p><strong>Define the Mapper class:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyMapper</span> <span class="token keyword">extends</span> <span class="token class-name">Mapper</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">LongWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">LongWritable</span> key<span class="token punctuation">,</span> <span class="token class-name">Text</span> value<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
     <span class="token class-name">String</span> line <span class="token operator">=</span> value<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -640,10 +773,10 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>The Mapper class is responsible for splitting the input text data into words and outputting a key-value pair (word, 1) for each word.</p>
 </li>
-<li><p><strong>Define the Reducer class:</strong></p>
+<li>
+<p><strong>Define the Reducer class:</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">MyReduce</span> <span class="token keyword">extends</span> <span class="token class-name">Reducer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">,</span> <span class="token class-name">Text</span><span class="token punctuation">,</span> <span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">reduce</span><span class="token punctuation">(</span><span class="token class-name">Text</span> key<span class="token punctuation">,</span> <span class="token class-name">Iterable</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">IntWritable</span><span class="token punctuation">></span></span> values<span class="token punctuation">,</span> <span class="token class-name">Context</span> context<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">InterruptedException</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
@@ -655,10 +788,10 @@
     context<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">IntWritable</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>The Reducer class receives key-value pairs from the Mapper, accumulates the values of the same key, and then outputs the word and its total number of occurrences.</p>
 </li>
-<li><p><strong>Main function (main method):</strong></p>
+<li>
+<p><strong>Main function (main method):</strong></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">InterruptedException</span><span class="token punctuation">,</span> <span class="token class-name">IOException</span><span class="token punctuation">,</span> <span class="token class-name">ClassNotFoundException</span> <span class="token punctuation">&#123;</span>
   <span class="token class-name">Configuration</span> conf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Configuration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token class-name">Job</span> job <span class="token operator">=</span> <span class="token class-name">Job</span><span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span>conf<span class="token punctuation">,</span> <span class="token string">"word count"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -678,7 +811,8 @@
 
   <span class="token comment">// Submit the job and wait for it to complete</span>
   job<span class="token punctuation">.</span><span class="token function">waitForCompletion</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
 </ol>
 <p><img src="/img/hadoop/hadoop6.png" alt="hadoop"></p>
 <p>In the entire Hadoop architecture, the computing framework plays a crucial role, on the one hand, it can operate on the data in HDFS, on the other hand, it can be encapsulated to provide calls from upper-level components such as Hive and Pig.</p>
@@ -734,37 +868,51 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="what-is-hadoop">What is Hadoop?</span></h2><p>Hadoop is a distributed system infrastructure developed by the Apache Foundation. It is a software framework that combines a storage system and a computing framework. It mainly solves the problem of storing and computing massive data and is the cornerstone of big data technology. Hadoop processes data in a reliable, efficient, and scalable way. Users can develop distributed programs on Hadoop without understanding the underlying details of the distributed system. Users can easily develop and run applications that process massive data on Hadoop.</p>
-<h2><span id="what-problems-can-hadoop-solve">What problems can Hadoop solve?</span></h2><ul>
-<li><p><strong>Massive data storage</strong></p>
+        <h2><span id="what-is-hadoop">What is Hadoop?</span></h2>
+<p>Hadoop is a distributed system infrastructure developed by the Apache Foundation. It is a software framework that combines a storage system and a computing framework. It mainly solves the problem of storing and computing massive data and is the cornerstone of big data technology. Hadoop processes data in a reliable, efficient, and scalable way. Users can develop distributed programs on Hadoop without understanding the underlying details of the distributed system. Users can easily develop and run applications that process massive data on Hadoop.</p>
+<h2><span id="what-problems-can-hadoop-solve">What problems can Hadoop solve?</span></h2>
+<ul>
+<li>
+<p><strong>Massive data storage</strong></p>
 <p>HDFS has high fault tolerance and is designed to be deployed on low-cost hardware. It provides high throughput for accessing data and is suitable for applications with large data sets. It consists of n machines running DataNode and one machine running NameNode (another standby). Each DataNode manages a portion of the data, and NameNode is responsible for managing the information (metadata) of the entire HDFS cluster.</p>
 </li>
-<li><p><strong>Resource management, scheduling, and allocation</strong></p>
+<li>
+<p><strong>Resource management, scheduling, and allocation</strong></p>
 <p><code>Apache Hadoop YARN</code> (Yet Another Resource Negotiator) is a new Hadoop resource manager. It is a general resource management system and scheduling platform that provides unified resource management and scheduling for upper-layer applications. Its introduction has brought huge benefits to the cluster in terms of utilization, unified resource management, and data sharing.</p>
 </li>
 </ul>
-<h2><span id="the-origin-of-hadoop">The origin of Hadoop</span></h2><p><img src="/img/hadoop/hadoop1.png" alt="hadoop"></p>
-<h2><span id="the-core-architecture-of-hadoop">The core architecture of Hadoop</span></h2><p>The core of Hadoop is HDFS and MapReduce. HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data.</p>
-<h3><span id="hdfs">HDFS</span></h3><p><img src="/img/hadoop/hadoop2.png" alt="hadoop"></p>
+<h2><span id="the-origin-of-hadoop">The origin of Hadoop</span></h2>
+<p><img src="/img/hadoop/hadoop1.png" alt="hadoop"></p>
+<h2><span id="the-core-architecture-of-hadoop">The core architecture of Hadoop</span></h2>
+<p>The core of Hadoop is HDFS and MapReduce. HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data.</p>
+<h3><span id="hdfs">HDFS</span></h3>
+<p><img src="/img/hadoop/hadoop2.png" alt="hadoop"></p>
 <p>The entire HDFS has three important roles: <strong>NameNode</strong>, <strong>DataNode</strong>, and <strong>Client</strong>.</p>
-<p>Typical master-slave architecture, using TCP&#x2F;IP communication.</p>
+<p>Typical master-slave architecture, using TCP/IP communication.</p>
 <ul>
-<li><p><strong>NameNode:</strong> The master node of the distributed file system, responsible for managing the namespace of the file system, cluster configuration information, and storage block replication. The NameNode stores the metadata of the file system in memory, including file information, block information for each file, and information about each block in the DataNode.</p>
+<li>
+<p><strong>NameNode:</strong> The master node of the distributed file system, responsible for managing the namespace of the file system, cluster configuration information, and storage block replication. The NameNode stores the metadata of the file system in memory, including file information, block information for each file, and information about each block in the DataNode.</p>
 </li>
-<li><p><strong>DataNode:</strong> The slave node of the distributed file system, which is the basic unit of file storage. It stores blocks in the local file system and saves the metadata of the blocks. It also periodically sends information about all existing blocks to the NameNode.</p>
+<li>
+<p><strong>DataNode:</strong> The slave node of the distributed file system, which is the basic unit of file storage. It stores blocks in the local file system and saves the metadata of the blocks. It also periodically sends information about all existing blocks to the NameNode.</p>
 </li>
-<li><p><strong>Client:</strong> Splits files, accesses HDFS, interacts with the NameNode to obtain file location information, and interacts with the DataNode to read and write data.</p>
+<li>
+<p><strong>Client:</strong> Splits files, accesses HDFS, interacts with the NameNode to obtain file location information, and interacts with the DataNode to read and write data.</p>
 </li>
 </ul>
 <p>There is also the concept of a block: a block is the basic read and write unit in HDFS. Files in HDFS are stored as blocks, which are replicated to multiple DataNodes. The size of a block (usually 64MB) and the number of replicated blocks are determined by the client when the file is created.</p>
-<h3><span id="mapreduce">MapReduce</span></h3><p>MapReduce is a distributed computing model that divides large data sets (greater than 1TB) into many small data blocks, and then performs parallel processing on various nodes in the cluster, and finally aggregates the results. The MapReduce calculation process can be divided into two stages: the Map stage and the Reduce stage.</p>
+<h3><span id="mapreduce">MapReduce</span></h3>
+<p>MapReduce is a distributed computing model that divides large data sets (greater than 1TB) into many small data blocks, and then performs parallel processing on various nodes in the cluster, and finally aggregates the results. The MapReduce calculation process can be divided into two stages: the Map stage and the Reduce stage.</p>
 <ul>
-<li><p><strong>Map stage:</strong> The input data is divided into several small data blocks, and then multiple Map tasks process them in parallel. Each Map task outputs the processing result as several key-value pairs.</p>
+<li>
+<p><strong>Map stage:</strong> The input data is divided into several small data blocks, and then multiple Map tasks process them in parallel. Each Map task outputs the processing result as several key-value pairs.</p>
 </li>
-<li><p><strong>Reduce stage:</strong> The output results of the Map stage are grouped according to the keys in the key-value pairs, and then multiple Reduce tasks process them in parallel. Each Reduce task outputs the processing result as several key-value pairs.</p>
+<li>
+<p><strong>Reduce stage:</strong> The output results of the Map stage are grouped according to the keys in the key-value pairs, and then multiple Reduce tasks process them in parallel. Each Reduce task outputs the processing result as several key-value pairs.</p>
 </li>
 </ul>
-<h2><span id="summary">Summary</span></h2><p>Hadoop is a distributed system infrastructure that mainly solves the problem of storing and computing massive data. Its core is HDFS and MapReduce, where HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data. In addition, Hadoop also has an important component-YARN, which is a general resource management system and scheduling platform that provides unified resource management and scheduling for upper-layer applications.</p>
+<h2><span id="summary">Summary</span></h2>
+<p>Hadoop is a distributed system infrastructure that mainly solves the problem of storing and computing massive data. Its core is HDFS and MapReduce, where HDFS provides storage for massive data, and MapReduce provides a computing framework for massive data. In addition, Hadoop also has an important component-YARN, which is a general resource management system and scheduling platform that provides unified resource management and scheduling for upper-layer applications.</p>
 
     
     </div>

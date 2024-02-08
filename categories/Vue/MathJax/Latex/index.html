@@ -203,7 +203,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2><p>做项目需要用到富文本编辑器，但是看了很多的富文本编辑器都很少支持公式编辑，但项目有要用到，怎么办呢？先写一个显然并不现实。于是使用<code>easy-formula-editor</code>和<code>wangeditor</code>写了一个功能小插件，是 <strong>基于Vue3和MathJax渲染的Latex富文本公式编辑器，支持零基础即可编辑公式，支持自定义编辑器配置和风格，支持二次编辑公式，支持作为插件和富文本编辑器一起使用。</strong></p>
+        <h2><span id="前言">前言</span></h2>
+<p>做项目需要用到富文本编辑器，但是看了很多的富文本编辑器都很少支持公式编辑，但项目有要用到，怎么办呢？先写一个显然并不现实。于是使用<code>easy-formula-editor</code>和<code>wangeditor</code>写了一个功能小插件，是 <strong>基于Vue3和MathJax渲染的Latex富文本公式编辑器，支持零基础即可编辑公式，支持自定义编辑器配置和风格，支持二次编辑公式，支持作为插件和富文本编辑器一起使用。</strong></p>
 <ul>
 <li>零基础即可编辑公式</li>
 <li>支持自定义编辑器配置和风格</li>
@@ -211,26 +212,30 @@
 <li>支持作为插件和富文本编辑器一起使用</li>
 </ul>
 <p><img src="/img/mathjax/mathjax-1.png" alt="MathJax"></p>
-<h2><span id="安装和使用">安装和使用</span></h2><h3><span id="npm">NPM</span></h3><pre class="line-numbers language-none"><code class="language-none">npm i easy-formula-editor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2><span id="安装和使用">安装和使用</span></h2>
+<h3><span id="npm">NPM</span></h3>
+<pre class="line-numbers language-none"><code class="language-none">npm i easy-formula-editor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>或</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
 <span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="cdn">CDN</span></h3><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>../dist/formula-editor.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<h3><span id="cdn">CDN</span></h3>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>../dist/formula-editor.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
   <span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="导出">导出</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// latex 公式</span>
+<h3><span id="导出">导出</span></h3>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// latex 公式</span>
 editor<span class="token punctuation">.</span>latex<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment">// html 公式</span>
 editor<span class="token punctuation">.</span>$textSvgElem<span class="token punctuation">.</span><span class="token function">html</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="富文本编辑器菜单栏扩展">富文本编辑器菜单栏扩展</span></h2><h3><span id="注册菜单">注册菜单</span></h3><p><strong>【注意】 推荐使用全局模式来注册菜单。</strong> 如果有多个编辑器，每个编辑器的自定义菜单不一样，则使用实例的方式来注册菜单</p>
-<h3><span id="全局模式">全局模式</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
+<h2><span id="富文本编辑器菜单栏扩展">富文本编辑器菜单栏扩展</span></h2>
+<h3><span id="注册菜单">注册菜单</span></h3>
+<p><strong>【注意】 推荐使用全局模式来注册菜单。</strong> 如果有多个编辑器，每个编辑器的自定义菜单不一样，则使用实例的方式来注册菜单</p>
+<h3><span id="全局模式">全局模式</span></h3>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
 <span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
 
 <span class="token comment">// 注册菜单</span>
@@ -241,8 +246,8 @@ editor<span class="token punctuation">.</span><span class="token function">creat
 
 <span class="token keyword">const</span> editor2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div2'</span><span class="token punctuation">)</span>
 editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="实例模式">实例模式</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
+<h3><span id="实例模式">实例模式</span></h3>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 菜单 key ，各个菜单不能重复</span>
 <span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
 <span class="token keyword">const</span> menuKey2 <span class="token operator">=</span> <span class="token string">'alertMenuKey2'</span>
 
@@ -262,8 +267,8 @@ editor2<span class="token punctuation">.</span>menus<span class="token punctuati
 editor2<span class="token punctuation">.</span>config<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>menuKey2<span class="token punctuation">)</span>
 editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="实际项目结合示例">实际项目结合示例</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token constant">E</span> <span class="token keyword">from</span> <span class="token string">"wangeditor"</span><span class="token punctuation">;</span>
+<h2><span id="实际项目结合示例">实际项目结合示例</span></h2>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token constant">E</span> <span class="token keyword">from</span> <span class="token string">"wangeditor"</span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> createPanelConf <span class="token keyword">from</span> <span class="token string">"./create-panel-conf"</span><span class="token punctuation">;</span>
 
@@ -301,10 +306,6 @@ editor2<span class="token punctuation">.</span><span class="token function">crea
 <span class="token constant">E</span><span class="token punctuation">.</span><span class="token function">registerMenu</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token constant">E</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-
-
-
 <pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">//create-panel-conf.ts</span>
 <span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>wangEditor<span class="token punctuation">,</span> formulaEditor<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">const</span> btnOkId <span class="token operator">=</span> <span class="token string">'btn-ok'</span>
@@ -351,7 +352,6 @@ editor2<span class="token punctuation">.</span><span class="token function">crea
         tabs<span class="token operator">:</span> tabsConf<span class="token punctuation">,</span> <span class="token comment">// tabs end</span>
       <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>使用上面的代码，就可以在富文本编辑器中添加一个公式编辑器的菜单了：</p>
 <pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;template&gt;
   &lt;div class&#x3D;&quot;formula-container&quot;&gt;

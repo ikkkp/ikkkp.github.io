@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="PrefaceIn fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser. For example:  Clicking a link triggers navigation to the URL. Clicking">
+    <meta name="description" content="Preface In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser. For example:  Clicking a link triggers navigation to the URL. Clicking">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Browser Default Behaviors">
 <meta property="og:url" content="https://ikkkp.github.io/2023/12/06/en/Browser-Default-Behavior/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="PrefaceIn fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser. For example:  Clicking a link triggers navigation to the URL. Clicking">
+<meta property="og:description" content="Preface In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser. For example:  Clicking a link triggers navigation to the URL. Clicking">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-12-06T11:28:33.000Z">
@@ -246,7 +246,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2><p>In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser.</p>
+        <h2><span id="preface">Preface</span></h2>
+<p>In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser.</p>
 <p>For example:</p>
 <ul>
 <li>Clicking a link triggers navigation to the URL.</li>
@@ -254,7 +255,8 @@
 <li>Pressing and dragging the mouse button on text selects the text.</li>
 </ul>
 <p>When handling an event with JavaScript, we usually don’t want the corresponding browser behavior to occur. Instead, we want to implement alternative behaviors.</p>
-<h2><span id="preventing-browser-behavior">Preventing Browser Behavior</span></h2><p>There are two ways to tell the browser that we don’t want it to execute default behavior:</p>
+<h2><span id="preventing-browser-behavior">Preventing Browser Behavior</span></h2>
+<p>There are two ways to tell the browser that we don’t want it to execute default behavior:</p>
 <ul>
 <li>The common way is to use the event object, which has a <code>event.preventDefault()</code> method.</li>
 <li>If the handler is assigned using <code>on&lt;event&gt;</code> (rather than <code>addEventListener</code>), returning false is also effective.</li>
@@ -263,19 +265,21 @@
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token keyword">return</span> <span class="token boolean">false</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
 or
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<p><a href="/" onclick="return false">Click here</a><br>or<br><a href="/" onclick="event.preventDefault()">here</a></p>
+<p><a href="/" onclick="return false">Click here</a><br>
+or<br>
+<a href="/" onclick="event.preventDefault()">here</a></p>
 <br>
-
 <p>It’s important to note that using <code>on&lt;event&gt;</code> and returning false is not a good practice.</p>
 <p>Returning false from the handler is an exception. The return value of event handlers is usually ignored. The only exception is returning false from a handler assigned using <code>on&lt;event&gt;</code>.</p>
-<h2><span id="handler-option-passive">Handler Option “passive”</span></h2><p>The optional <code>passive: true</code> option in <code>addEventListener</code> signals to the browser that the handler will not call <code>preventDefault()</code>.</p>
+<h2><span id="handler-option-passive">Handler Option “passive”</span></h2>
+<p>The optional <code>passive: true</code> option in <code>addEventListener</code> signals to the browser that the handler will not call <code>preventDefault()</code>.</p>
 <p>Why is this necessary?</p>
 <p>On mobile devices, some events like <code>touchmove</code> (when the user moves their finger on the screen) can lead to scrolling by default, which can be prevented using <code>preventDefault()</code> in the handler.</p>
 <p>So, when the browser detects such events, it must first process all handlers. If <code>preventDefault</code> is not called anywhere, the page can continue scrolling. However, this may cause unnecessary delays and “jitter” in the UI.</p>
 <p>The <code>passive: true</code> option informs the browser that the handler will not cancel scrolling. The browser then immediately scrolls the page to provide a smoother experience and somehow processes the event.</p>
 <p>For certain browsers (such as Firefox and Chrome), <code>touchstart</code> and <code>touchmove</code> events have passive set to true by default.</p>
-<h2><span id="eventdefaultprevented"><code>event.defaultPrevented</code></span></h2><p>If the default behavior is prevented, the <code>event.defaultPrevented</code> property is true; otherwise, it is false.</p>
+<h2><span id="eventdefaultprevented"><code>event.defaultPrevented</code></span></h2>
+<p>If the default behavior is prevented, the <code>event.defaultPrevented</code> property is true; otherwise, it is false.</p>
 <p>Here’s an interesting use case.</p>
 <p><strong>Do you remember our discussion on <code>event.stopPropagation()</code> in the Bubbling and Capturing chapter and why stopping propagation is not good?</strong></p>
 <p>Sometimes, we can use <code>event.defaultPrevented</code> as an alternative to notify other event handlers that the event has been handled.</p>
@@ -286,16 +290,12 @@ or
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">oncontextmenu</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>alert('Draw our menu'); return false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
   Right-click shows our context menu
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <br>
-
 <p><button>Right-click shows browser context menu</button></p>
 <button oncontextmenu="alert('Draw our menu'); return false">
   Right-click shows our context menu
 </button>
-
 <br>
-
 <p>Now, in addition to this context menu, let’s implement a document-wide context menu.</p>
 <p>When right-clicking, it should display the nearest context menu:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click here for the document context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
@@ -312,12 +312,9 @@ or
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <br>
-
 <p>Right-click here for the document context menu</p>
 <button id="elem">Right-click here for the button context menu</button>
-
 <script>
   elem.oncontextmenu = function(event) {
     event.preventDefault();
@@ -329,10 +326,9 @@ or
     alert("Document context menu");
   };
 </script>
-
 <br>
-
-<h2><span id="issue-and-solutions">Issue and Solutions</span></h2><p>The problem arises when clicking on <code>elem</code>, and we get two menus: the button-level menu and the document-level menu due to event bubbling.</p>
+<h2><span id="issue-and-solutions">Issue and Solutions</span></h2>
+<p>The problem arises when clicking on <code>elem</code>, and we get two menus: the button-level menu and the document-level menu due to event bubbling.</p>
 <p>One solution is to prevent the event from bubbling up when handling the right-click event in the button. We can achieve this using <code>event.stopPropagation()</code>:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu (fixed with event.stopPropagation)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
@@ -349,7 +345,6 @@ or
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>Now, the button-level menu works as expected. However, this comes at a cost — we deny any external code access to right-click information, including counters for collecting statistics. This is not advisable.</p>
 <p>Another alternative is to check whether the document handler has prevented the browser’s default behavior. If it has, the event has already been handled, and we don’t need to react to it:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu (added a check for event.defaultPrevented)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
@@ -368,19 +363,21 @@ or
     <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>Now everything works as expected. If we have nested elements, each with its own context menu, this approach will work. Just make sure to check <code>event.defaultPrevented</code> in each <code>contextmenu</code> handler.</p>
 <blockquote>
-<p><strong>event.stopPropagation() and event.preventDefault()</strong><br>As we’ve seen, <code>event.stopPropagation()</code> and <code>event.preventDefault()</code> (also considered as <code>return false</code>) are two different things. They are unrelated to each other.</p>
+<p><strong>event.stopPropagation() and event.preventDefault()</strong><br>
+As we’ve seen, <code>event.stopPropagation()</code> and <code>event.preventDefault()</code> (also considered as <code>return false</code>) are two different things. They are unrelated to each other.</p>
 </blockquote>
 <blockquote>
-<p><strong>Nested Context Menu Structure</strong><br>There are other ways to implement nested context menus. One approach is to have a global object with a <code>document.oncontextmenu</code> handler and a method to store other handlers. This object would capture any right-click, browse stored handlers, and run the appropriate one.</p>
+<p><strong>Nested Context Menu Structure</strong><br>
+There are other ways to implement nested context menus. One approach is to have a global object with a <code>document.oncontextmenu</code> handler and a method to store other handlers. This object would capture any right-click, browse stored handlers, and run the appropriate one.</p>
 </blockquote>
 <p>However, every piece of code needing a context menu should be aware of this object and use its assistance rather than having its own <code>contextmenu</code> handler.</p>
-<h2><span id="summary">Summary</span></h2><p>There are many default browser behaviors:</p>
+<h2><span id="summary">Summary</span></h2>
+<p>There are many default browser behaviors:</p>
 <ul>
 <li><code>mousedown</code> — Starts selection (dragging the mouse for selection).</li>
-<li><code>click</code> on <code>&lt;input type=&quot;checkbox&quot;&gt;</code> — Selects&#x2F;deselects the input.</li>
+<li><code>click</code> on <code>&lt;input type=&quot;checkbox&quot;&gt;</code> — Selects/deselects the input.</li>
 <li><code>submit</code> — Clicking <code>&lt;input type=&quot;submit&quot;&gt;</code> or pressing Enter in form fields triggers this event, leading the browser to submit the form.</li>
 <li><code>keydown</code> — Pressing a key adds a character to a field or triggers other actions.</li>
 <li><code>contextmenu</code> — Event occurs on right-click, triggering the default behavior of showing the browser context menu.</li>
