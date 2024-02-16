@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Explore the differences between reactive and shallowReactive, delving into the concepts of deep reactivity and shallow reactivity in Vue.js. Shallow Reactivity vs Deep Reactivity const ob">
+    <meta name="description" content="IntroductionExplore the differences between reactive and shallowReactive, delving into the concepts of deep reactivity and shallow reactivity in Vue.js. Shallow Reactivity vs Deep Reactivityconst obj">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue Shallow Reactivity vs Deep Reactivity">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/01/en/vue-reactive-shallowReactive/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Explore the differences between reactive and shallowReactive, delving into the concepts of deep reactivity and shallow reactivity in Vue.js. Shallow Reactivity vs Deep Reactivity const ob">
+<meta property="og:description" content="IntroductionExplore the differences between reactive and shallowReactive, delving into the concepts of deep reactivity and shallow reactivity in Vue.js. Shallow Reactivity vs Deep Reactivityconst obj">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-01T11:29:41.000Z">
@@ -224,7 +224,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-01T11:29:41.000Z" itemprop="datePublished">1 November 2023</time>
+            <time datetime="2023-11-01T11:29:41.000Z" itemprop="datePublished">November 1, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -240,15 +240,14 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
-<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <h2><span id="introduction">Introduction</span></h2><p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
+<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><span class="token punctuation">&#123;</span> 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar<span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying obj.foo.bar value does not trigger reactivity</span>
 obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar <span class="token operator">=</span> <span class="token number">2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Initially, an object <code>obj</code> is created with a property <code>foo</code> containing another object <code>&#123; bar: 1 &#125;</code>. When accessing <code>obj.foo.bar</code> inside an effect function, it is noticed that modifying <code>obj.foo.bar</code> does not trigger the effect function again. Why does this happen? Let’s take a look at the current implementation:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj <span class="token punctuation">,</span><span class="token punctuation">&#123;</span>
@@ -262,6 +261,7 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token comment">// Other trapping functions are omitted</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the given code, when accessing <code>obj.foo.bar</code>, it first reads the value of <code>obj.foo</code>. Here, <code>Reflect.get</code> is used to directly return the result of <code>obj.foo</code>. Since the result obtained through <code>Reflect.get</code> is a plain object, namely <code>&#123; bar: 1 &#125;</code>, it is not a reactive object. Therefore, when accessing <code>obj.foo.bar</code> inside the effect function, no reactivity is established. To address this, the result returned by <code>Reflect.get</code> needs to be wrapped:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
@@ -276,26 +276,30 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
     <span class="token comment">// Other traps...</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, the <code>reactive</code> function is defined. It takes an object as a parameter and returns a proxy of that object. The proxy uses a <code>get</code> trap function that triggers when accessing a property of the object. In the <code>get</code> trap, <code>Reflect.get</code> is used to retrieve the property value. If the result is an object, it is made reactive by calling the <code>reactive</code> function recursively. This ensures that nested objects also possess reactive properties, allowing modifications to trigger the reactivity system.</p>
-<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2>
-<p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
+<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2><p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
 <p>Suppose we have an object with a nested object as its property:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">innerObj</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>If we apply deep reactivity to <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> reactiveObj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Any modifications to <code>obj</code> or <code>innerObj</code> properties will trigger the reactivity system:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">reactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>However, if we want only the top-level properties of <code>obj</code> to be reactive, meaning modifications to <code>obj</code> trigger reactivity but modifications to <code>innerObj</code> do not, we use the <code>shallowReactive</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>With <code>shallowReactive</code>, only modifications to <code>obj</code> will trigger reactivity:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">shallowReactiveObj<span class="token punctuation">.</span>innerObj <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Does not trigger reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2>
-<p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
+
+<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2><p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
 <p>The <code>reactive</code> function creates deeply reactive objects. This means that both the object itself and all its nested objects become reactive. Any modifications to the object or its nested objects’ properties will trigger the reactivity system.</p>
 <p>On the other hand, the <code>shallowReactive</code> function creates shallowly reactive objects. This means that only the top-level properties of the object are reactive. If the object contains nested objects, modifications to those nested objects’ properties will not trigger the reactivity system.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -303,12 +307,10 @@ shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="t
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>let reactiveObj = Vue.reactive(obj);<br>
-reactiveObj.innerObj.key = ‘new value’; // Triggers reactivity</p>
-<p>let shallowReactiveObj = Vue.shallowReactive(obj);<br>
-shallowReactiveObj.innerObj.key = ‘new value’; // Does not trigger reactivity</p>
-<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2>
-<p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
+
+<p>let reactiveObj &#x3D; Vue.reactive(obj);<br>reactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Triggers reactivity</p>
+<p>let shallowReactiveObj &#x3D; Vue.shallowReactive(obj);<br>shallowReactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Does not trigger reactivity</p>
+<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2><p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
 <p>Vue.js provides <code>readonly</code> and <code>shallowReadonly</code> functions to create readonly reactive objects.</p>
 <p>The <code>readonly</code> function creates deeply readonly reactive objects. This means that both the object itself and all its nested objects are readonly. Any attempts to modify the object or its nested objects’ properties will fail.</p>
 <p>The <code>shallowReadonly</code> function creates shallow readonly reactive objects. This means that only the top-level properties of the object are readonly. If the object contains nested objects, properties of these nested objects can be modified.</p>
@@ -323,9 +325,10 @@ readonlyObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReadonlyObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReadonly</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// This will succeed because only top-level properties are readonly</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>

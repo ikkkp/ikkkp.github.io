@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render func">
+    <meta name="description" content="IntroductionVue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render funct">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Vue Render Mounting and Updating">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/05/en/vue-renderer-2/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render func">
+<meta property="og:description" content="IntroductionVue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render funct">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-05T05:05:27.000Z">
@@ -212,7 +212,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T05:05:27.000Z" itemprop="datePublished">5 November 2023</time>
+            <time datetime="2023-11-05T05:05:27.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -228,16 +228,14 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render function can be a more flexible solution.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render function can be a more flexible solution.</p>
 <p>Developers familiar with the React ecosystem might already be acquainted with render functions, commonly used in JSX to construct React components. While Vue render functions can also be written in JSX, this discussion focuses on using plain JavaScript. This approach simplifies understanding the fundamental concepts of the Vue component system.</p>
 <p>Every Vue component includes a render function. Most of the time, this function is created by the Vue compiler. When a template is specified for a component, the Vue compiler processes the template’s content, ultimately generating a render function. This render function produces a virtual DOM node, which Vue renders in the browser DOM.</p>
 <p>This brings us to the concept of the virtual DOM. <strong>But what exactly is the virtual DOM?</strong></p>
 <p><strong>The virtual Document Object Model (or “DOM”) enables Vue to render components in its memory before updating the browser.</strong> This approach enhances speed and avoids the high cost associated with re-rendering the DOM. Since each DOM node object contains numerous properties and methods, pre-rendering them in memory using the virtual DOM eliminates the overhead of creating DOM nodes directly in the browser.</p>
 <p>When Vue updates the browser DOM, it compares the updated virtual DOM with the previous virtual DOM. Only the modified parts of the virtual DOM are used to update the actual DOM, reducing the number of element changes and enhancing performance. The render function returns virtual DOM nodes, often referred to as VNodes in the Vue ecosystem. These objects enable Vue to write these nodes into the browser DOM. They contain all the necessary information Vue needs.</p>
 <p><img src="/img/vue-render/render-pipeline.png" alt="vue-render"></p>
-<h2><span id="mounting-child-nodes-and-element-attributes">Mounting Child Nodes and Element Attributes</span></h2>
-<p>When <code>vnode.children</code> is a string, it sets the element’s text content. An element can have multiple child elements besides text nodes. To describe an element’s child nodes, <code>vnode.children</code> needs to be defined as an array:</p>
+<h2><span id="mounting-child-nodes-and-element-attributes">Mounting Child Nodes and Element Attributes</span></h2><p>When <code>vnode.children</code> is a string, it sets the element’s text content. An element can have multiple child elements besides text nodes. To describe an element’s child nodes, <code>vnode.children</code> needs to be defined as an array:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -247,6 +245,7 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we describe “a <code>div</code> tag with a child node, which is a <code>p</code> tag.” As seen, <code>vnode.children</code> is an array, and each element of the array is an independent virtual node object. This creates a tree-like structure, or a virtual DOM tree.</p>
 <p>To render child nodes, we need to modify the <code>mountElement</code> function, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -261,13 +260,12 @@
   <span class="token punctuation">&#125;</span>
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we have added a new conditional branch. We use the <code>Array.isArray</code> function to check if <code>vnode.children</code> is an array. If it is, we loop through each child node and call the <code>patch</code> function to mount the virtual nodes in the array. During mounting of child nodes, we need to pay attention to two points:</p>
 <ol>
-<li>
-<p>The first argument passed to the <code>patch</code> function is <code>null</code>. Since this is the mounting phase and there is no old <code>vnode</code>, we only need to pass <code>null</code>. This way, when the <code>patch</code> function is executed, it will recursively call the <code>mountElement</code> function to mount the child nodes.</p>
+<li><p>The first argument passed to the <code>patch</code> function is <code>null</code>. Since this is the mounting phase and there is no old <code>vnode</code>, we only need to pass <code>null</code>. This way, when the <code>patch</code> function is executed, it will recursively call the <code>mountElement</code> function to mount the child nodes.</p>
 </li>
-<li>
-<p>The third argument passed to the <code>patch</code> function is the mounting point. Since the child elements being mounted are child nodes of the <code>div</code> element, the <code>div</code> element created earlier serves as the mounting point to ensure that these child nodes are mounted in the correct position.</p>
+<li><p>The third argument passed to the <code>patch</code> function is the mounting point. Since the child elements being mounted are child nodes of the <code>div</code> element, the <code>div</code> element created earlier serves as the mounting point to ensure that these child nodes are mounted in the correct position.</p>
 </li>
 </ol>
 <p>After mounting the child nodes, let’s look at how to describe the attributes of an element using <code>vnode</code> and how to render these attributes. We know that HTML elements have various attributes, some of which are common, such as <code>id</code> and <code>class</code>, while others are specific to certain elements, such as the <code>action</code> attribute for <code>form</code> elements. In this discussion, we will focus on the basic attribute handling.</p>
@@ -284,6 +282,7 @@
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><code>vnode.props</code> is an object where the keys represent the attribute names of the element, and the values represent the corresponding attribute values. This way, we can iterate through the <code>props</code> object and render these attributes onto the element, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -301,41 +300,52 @@
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, we first check if <code>vnode.props</code> exists. If it does, we iterate through the <code>vnode.props</code> object and use the <code>setAttribute</code> function to set attributes on the element. This approach ensures that the attributes are rendered onto the element during the mounting process.</p>
 <p>When dealing with attributes, it’s essential to understand the distinction between HTML Attributes and DOM Properties. HTML Attributes are the attributes defined in the HTML tags, such as <code>id=&quot;my-input&quot;</code>, <code>type=&quot;text&quot;</code>, and <code>value=&quot;foo&quot;</code>. When the browser parses this HTML code, it creates a corresponding DOM element object, which we can access using JavaScript code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> el <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#my-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Now, let’s talk about DOM Properties. Many HTML Attributes have corresponding DOM Properties on the DOM element object, such as <code>id=&quot;my-input&quot;</code> corresponding to <code>el.id</code>, <code>type=&quot;text&quot;</code> corresponding to <code>el.type</code>, and <code>value=&quot;foo&quot;</code> corresponding to <code>el.value</code>. However, the names of DOM Properties don’t always exactly match HTML Attributes:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>In this case, <code>class=&quot;foo&quot;</code> corresponds to the DOM Property <code>el.className</code>. Additionally, not all HTML Attributes have corresponding DOM Properties:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">aria-valuenow</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>75<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Attributes with the <code>aria-*</code> prefix do not have corresponding DOM Properties.</p>
 <p>Similarly, not all DOM Properties have corresponding HTML Attributes. For example, you can use <code>el.textContent</code> to set the element’s text content, but there is no equivalent HTML Attribute for this operation.</p>
 <p>The values of HTML Attributes and DOM Properties are related. For example, consider the following HTML snippet:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>This snippet defines a <code>div</code> element with an <code>id</code> attribute. The corresponding DOM Property is <code>el.id</code>, and its value is the string <code>'foo'</code>. We consider this situation as a direct mapping, where the HTML Attribute and DOM Property have the same name (<code>id</code> in this case).</p>
+
+<p>This snippet defines a <code>div</code> element with an <code>id</code> attribute. The corresponding DOM Property is <code>el.id</code>, and its value is the string <code>&#39;foo&#39;</code>. We consider this situation as a direct mapping, where the HTML Attribute and DOM Property have the same name (<code>id</code> in this case).</p>
 <p>However, not all HTML Attributes and DOM Properties have a direct mapping relationship. For example:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>Here, the <code>input</code> element has a <code>value</code> attribute set to <code>'foo'</code>. If the user does not modify the input field, accessing <code>el.value</code> would return the string <code>'foo'</code>. If the user changes the input value to <code>'bar'</code>, accessing <code>el.value</code> would return <code>'bar'</code>. But if you run the following code:</p>
+
+<p>Here, the <code>input</code> element has a <code>value</code> attribute set to <code>&#39;foo&#39;</code>. If the user does not modify the input field, accessing <code>el.value</code> would return the string <code>&#39;foo&#39;</code>. If the user changes the input value to <code>&#39;bar&#39;</code>, accessing <code>el.value</code> would return <code>&#39;bar&#39;</code>. But if you run the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Still 'foo'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>You’ll notice that modifying the input value does not affect the return value of <code>el.getAttribute('value')</code>. This behavior indicates the meaning behind HTML Attributes. Essentially, HTML Attributes are used to set the initial value of corresponding DOM Properties. Once the value changes, the DOM Properties always store the current value, while <code>getAttribute</code> retrieves the initial value.</p>
+
+<p>You’ll notice that modifying the input value does not affect the return value of <code>el.getAttribute(&#39;value&#39;)</code>. This behavior indicates the meaning behind HTML Attributes. Essentially, HTML Attributes are used to set the initial value of corresponding DOM Properties. Once the value changes, the DOM Properties always store the current value, while <code>getAttribute</code> retrieves the initial value.</p>
 <p>However, you can still access the initial value using <code>el.defaultValue</code>, as shown below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Still 'foo'</span>
 el<span class="token punctuation">.</span>value<span class="token punctuation">;</span> <span class="token comment">// 'bar'</span>
 el<span class="token punctuation">.</span>defaultValue<span class="token punctuation">;</span> <span class="token comment">// 'foo'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>This example illustrates that an HTML Attribute can be associated with multiple DOM Properties. In this case, <code>value=&quot;foo&quot;</code> is related to both <code>el.value</code> and <code>el.defaultValue</code>.</p>
 <p>Although HTML Attributes are considered as setting the initial values of corresponding DOM Properties, some values are restricted. It’s as if the browser internally checks for default value validity. If the value provided through HTML Attributes is invalid, the browser uses a built-in valid value for the corresponding DOM Properties. For example:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>We know that specifying the string <code>'foo'</code> for the <code>type</code> attribute of the <code>&lt;input/&gt;</code> tag is invalid. Therefore, the browser corrects this invalid value. When you try to read <code>el.type</code>, you actually get the corrected value, which is <code>'text'</code>, not <code>'foo'</code>:</p>
+
+<p>We know that specifying the string <code>&#39;foo&#39;</code> for the <code>type</code> attribute of the <code>&lt;input/&gt;</code> tag is invalid. Therefore, the browser corrects this invalid value. When you try to read <code>el.type</code>, you actually get the corrected value, which is <code>&#39;text&#39;</code>, not <code>&#39;foo&#39;</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'text'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>From the analysis above, we can see that the relationship between HTML Attributes and DOM Properties is complex. However, the core principle to remember is this: HTML Attributes are used to set the initial values of corresponding DOM Properties.</p>
-<h2><span id="how-to-properly-set-element-attributes">How to Properly Set Element Attributes</span></h2>
-<p>In the previous discussion, we explored how HTML Attributes and DOM Properties are handled in Vue.js single-file components’ templates. In regular HTML files, the browser automatically parses HTML Attributes and sets the corresponding DOM Properties. However, in Vue.js templates, the framework needs to handle the setting of these attributes manually.</p>
+<h2><span id="how-to-properly-set-element-attributes">How to Properly Set Element Attributes</span></h2><p>In the previous discussion, we explored how HTML Attributes and DOM Properties are handled in Vue.js single-file components’ templates. In regular HTML files, the browser automatically parses HTML Attributes and sets the corresponding DOM Properties. However, in Vue.js templates, the framework needs to handle the setting of these attributes manually.</p>
 <p>Firstly, let’s consider a disabled button as an example in plain HTML:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>The browser automatically disables this button and sets its corresponding DOM Property <code>el.disabled</code> to <code>true</code>. However, if the same code appears in a Vue.js template, the behavior would be different.</p>
 <p>In Vue.js templates, the HTML template is compiled into virtual nodes (<code>vnode</code>). The value of <code>props.disabled</code> in the virtual node is an empty string. If you use the <code>setAttribute</code> function directly to set the attribute, unexpected behavior occurs, and the button becomes disabled. For example, in the following template:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>The corresponding virtual node is:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> button <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'button'</span><span class="token punctuation">,</span>
@@ -343,8 +353,10 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token literal-property property">disabled</span><span class="token operator">:</span> <span class="token boolean">false</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>If you use the <code>setAttribute</code> function to set the attribute value to an empty string, it is equivalent to:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'disabled'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>However, the <code>el.disabled</code> property is of boolean type and does not care about the specific value of HTML Attributes; it only checks for the existence of the <code>disabled</code> attribute. So, the button becomes disabled. Therefore, renderers should not always use the <code>setAttribute</code> function to set attributes from the <code>vnode.props</code> object.</p>
 <p>To solve this issue, a better approach is to prioritize setting the element’s DOM Properties. However, if the value is an empty string, manually correct it to <code>true</code>. Here is an implementation example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -368,6 +380,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we first check if the property exists on the DOM element. If it does, we determine the type of the property and the value from <code>vnode.props</code>. If the property is of boolean type and the value is an empty string, we correct it to <code>true</code>. If the property does notexist on the DOM element, we use the <code>setAttribute</code> function to set the attribute.</p>
 <p>However, there are still issues with this implementation. Some DOM Properties are read-only, such as <code>el.form</code>. To address this problem, we can create a helper function, <code>shouldSetAsProps</code>, to determine whether an attribute should be set as DOM Properties. If the property is read-only or requires special handling, we should use the <code>setAttribute</code> function to set the attribute.</p>
 <p>Finally, to make the attribute setting operation platform-agnostic, we can extract the attribute-related operations into the renderer options. Here is the updated code:</p>
@@ -394,6 +407,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the <code>mountElement</code> function, we only need to call the <code>patchProps</code> function and pass the appropriate parameters. This way, we’ve extracted the attribute-related rendering logic from the core renderer, making it more maintainable and flexible.</p>
 <p>Please note that the <code>shouldSetAsProps</code> function should be implemented according to your specific requirements and the DOM properties you want to handle differently.</p>
 

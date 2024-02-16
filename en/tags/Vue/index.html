@@ -186,7 +186,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">8 December 2023</time>
+            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">December 8, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -202,34 +202,27 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
 <p>For component events, we’ve previously discussed the browser’s event mechanism:</p>
-<h3><span id="browser-event-review">Browser Event Review</span></h3>
-<p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
-<h4><span id="mouse-events">Mouse Events:</span></h4>
-<ul>
+<h3><span id="browser-event-review">Browser Event Review</span></h3><p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
+<h4><span id="mouse-events">Mouse Events:</span></h4><ul>
 <li><strong>click:</strong> Triggered when the mouse clicks on an element. For touch-screen devices, it’s triggered when there’s a tap on the screen.</li>
 <li><strong>contextmenu:</strong> Triggered when the right mouse button clicks on an element.</li>
-<li><strong>mouseover / mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
-<li><strong>mousedown / mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
+<li><strong>mouseover &#x2F; mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
+<li><strong>mousedown &#x2F; mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
 <li><strong>mousemove:</strong> Triggered when the mouse is moved.</li>
 </ul>
-<h4><span id="keyboard-events">Keyboard Events:</span></h4>
-<ul>
+<h4><span id="keyboard-events">Keyboard Events:</span></h4><ul>
 <li><strong>keydown and keyup:</strong> Triggered when a key is pressed down or released.</li>
 </ul>
-<h4><span id="form-element-events">Form Element Events:</span></h4>
-<ul>
+<h4><span id="form-element-events">Form Element Events:</span></h4><ul>
 <li><strong>submit:</strong> Triggered when a visitor submits a <code>&lt;form&gt;</code>.</li>
 <li><strong>focus:</strong> Triggered when a visitor focuses on an element, such as an <code>&lt;input&gt;</code>.</li>
 </ul>
-<h4><span id="document-events">Document Events:</span></h4>
-<ul>
+<h4><span id="document-events">Document Events:</span></h4><ul>
 <li><strong>DOMContentLoaded:</strong> Triggered when HTML is fully loaded and processed, and the DOM is completely constructed.</li>
 </ul>
-<h4><span id="css-events">CSS Events:</span></h4>
-<ul>
+<h4><span id="css-events">CSS Events:</span></h4><ul>
 <li><strong>transitionend:</strong> Triggered when a CSS animation is completed.</li>
 </ul>
 <p>These events can be captured and processed using event listeners in JavaScript. By adding event listeners to elements, specific code can be executed when certain events occur. Events form the foundation of interaction and responsiveness in web development.</p>
@@ -252,6 +245,7 @@
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Parent Component ParentComponent.vue --></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
@@ -280,12 +274,12 @@
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>Vue’s event mechanism is built on the publish/subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
-<p><strong>Firstly, we notice that the child component uses <code>this.$emit('child-event', 'Hello from child!')</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
+
+<p>Vue’s event mechanism is built on the publish&#x2F;subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
+<p><strong>Firstly, we notice that the child component uses <code>this.$emit(&#39;child-event&#39;, &#39;Hello from child!&#39;)</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
 <p>When using a custom <code>MyComponent</code> component, we can listen to the emitted custom event using the <code>v-on</code> directive:</p>
 <p>You can see that the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations. In the actual implementation, emitting a custom event boils down to finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
-<h2><span id="implementation-of-emit">Implementation of emit</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
+<h2><span id="implementation-of-emit">Implementation of emit</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
 <span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
   <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -298,6 +292,7 @@
     <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The above code will be compiled into a node <code>CompNode</code>, with the type being the <code>MyComponent</code> component. The <code>emit</code> function is passed to the <code>setup</code> function of the component, as shown below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of a Vue component node CompNode</span>
 <span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -310,6 +305,7 @@
     <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As you can see, the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations.</p>
 <p>In the actual implementation, emitting a custom event essentially involves finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Mounting the component</span>
@@ -363,11 +359,11 @@
 
   <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>The implementation principle of <code>emit</code> involves two aspects: the injection of <code>setupContext</code> and the convention-based transformation of event names.</p>
 <ol>
-<li>
-<p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
-<p>Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
+<li><p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
+<p> Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
  <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Add emit to setupContext</span>
   context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
@@ -378,11 +374,11 @@
   <span class="token comment">// Return the object returned by setup</span>
   <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
+
+<p> This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
 </li>
-<li>
-<p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
-<p>Here’s a simple example illustrating the convention-based transformation of event names:</p>
+<li><p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
+<p> Here’s a simple example illustrating the convention-based transformation of event names:</p>
  <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
   <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
@@ -397,7 +393,8 @@
     console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
+
+<p> In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
 </li>
 </ol>
 <p>It’s important to note that event-type props are not found in <code>instance.props</code>, so they are stored in <code>attrs</code>. To address this, when parsing props data, event-type props are specially handled to ensure they are correctly added to <code>props</code> instead of <code>attrs</code>. This allows the <code>emit</code> function to correctly find event handling functions in <code>instance.props</code>.</p>
@@ -420,7 +417,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">8 December 2023</time>
+            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">December 8, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -436,12 +433,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>In a previous discussion, we explored the <a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">Vue renderer</a>, where <strong>the renderer is primarily responsible for rendering the virtual DOM into the real DOM</strong>. We only need to use the virtual DOM to describe the final content to be rendered.</p>
+        <h2><span id="preface">Preface</span></h2><p>In a previous discussion, we explored the <a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">Vue renderer</a>, where <strong>the renderer is primarily responsible for rendering the virtual DOM into the real DOM</strong>. We only need to use the virtual DOM to describe the final content to be rendered.</p>
 <p>However, when creating more complex pages, the code for the virtual DOM used to describe the page structure becomes larger, or we can say that the page template becomes more extensive. In such cases, the ability to modularize components becomes essential.</p>
 <p>With components, we can break down a large page into multiple parts, each part serving as an independent component. These components collectively form the complete page. The implementation of components also requires support from the renderer.</p>
-<h2><span id="rendering-components">Rendering Components</span></h2>
-<p>From the user’s perspective, a stateful component is simply an options object, as shown in the code below:</p>
+<h2><span id="rendering-components">Rendering Components</span></h2><p>From the user’s perspective, a stateful component is simply an options object, as shown in the code below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent is a component, and its value is an options object</span>
 <span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
@@ -449,12 +444,14 @@
     <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>However, from the internal implementation of the renderer, a component is a special type of virtual DOM node. For example, to describe a regular tag, we use the vnode.type property of the virtual node to store the tag name, as shown in the code below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// This vnode is used to describe a regular tag</span>
 <span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span>
   <span class="token comment">// ...</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>To describe a fragment, we set the vnode.type property of the virtual node to ‘Fragment’, and to describe text, we set the vnode.type property to ‘Text’.</p>
 <p>Do you recall the <code>patch function</code> we discussed earlier in the renderer?</p>
 <p><strong>In the patch function, Vue processes different logic based on the differences between the new and old virtual DOM nodes.</strong> If it’s the initial rendering, it executes the logic for the initial rendering; if it’s an update rendering, it updates the actual DOM nodes based on the differences.</p>
@@ -483,6 +480,7 @@
   <span class="token comment">// Return the actual DOM element of the new node</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As you can see, the renderer uses the vnode.type property of the virtual node to differentiate its type. Different types of nodes require different methods for mounting and updating.</p>
 <p>In reality, this applies to components as well. <strong>To use virtual nodes to describe components, we can use the vnode.type property to store the component’s options object.</strong></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -519,6 +517,7 @@
   <span class="token comment">// Return the actual DOM element of the new node</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we added an else if branch to handle the case where the vnode.type property value is an object, treating it as a virtual node describing a component. We call the mountComponent and patchComponent functions to mount and update the component.</p>
 <p>Now let’s focus on the basics of writing components—what the user should write when creating components, what the options object of a component must include, and what capabilities a component possesses.</p>
 <p>Therefore, a component must include a rendering function, i.e., the render function, and the return value of the render function should be a virtual DOM. In other words, the render function of a component is an interface for describing the content that the component renders, as shown in the code below:</p>
@@ -559,8 +558,8 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token comment">// Finally, call the patch function to mount the content described by the component, i.e., subTree</span>
   <span class="token function">patch</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> subTree<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="conclusion">Conclusion</span></h2>
-<p>Let’s recap the basics of components. We explicitly declared an object instance for a component, and the options object of the component must include a rendering function, i.e., the render function. The return value of the render function should be a virtual DOM. We then call render and patch to update and replace components. **In other words, the render function of a component is an interface for describing</p>
+
+<h2><span id="conclusion">Conclusion</span></h2><p>Let’s recap the basics of components. We explicitly declared an object instance for a component, and the options object of the component must include a rendering function, i.e., the render function. The return value of the render function should be a virtual DOM. We then call render and patch to update and replace components. **In other words, the render function of a component is an interface for describing</p>
 
     
     </div>
@@ -580,7 +579,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-28T15:40:22.000Z" itemprop="datePublished">28 November 2023</time>
+            <time datetime="2023-11-28T15:40:22.000Z" itemprop="datePublished">November 28, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -596,75 +595,67 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>After December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility.</p>
-<p>Evan announced that the first RC of Vue 3 will be released in mid-July. This article suggests that library/plugin authors start migrating their support to Vue 3. However, due to significant changes in API and behavior, is it possible to make our libraries support both Vue 2 and 3 simultaneously?</p>
-<h3><span id="universal-code">Universal Code</span></h3>
-<p>The simplest approach is to write <strong>universal code that works for both versions</strong>, without any additional modifications, similar to what people have done with Python 2 and 3. However, simplicity does not mean it’s easy. Writing such components requires avoiding <strong>newly introduced features in Vue 3</strong> and <strong>deprecated features in Vue 2</strong>. In other words, you cannot use:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>After December 31, 2023, the functionality of Vue 2 will still be available, but no further updates will be provided, including security updates and browser compatibility.</p>
+<p>Evan announced that the first RC of Vue 3 will be released in mid-July. This article suggests that library&#x2F;plugin authors start migrating their support to Vue 3. However, due to significant changes in API and behavior, is it possible to make our libraries support both Vue 2 and 3 simultaneously?</p>
+<h3><span id="universal-code">Universal Code</span></h3><p>The simplest approach is to write <strong>universal code that works for both versions</strong>, without any additional modifications, similar to what people have done with Python 2 and 3. However, simplicity does not mean it’s easy. Writing such components requires avoiding <strong>newly introduced features in Vue 3</strong> and <strong>deprecated features in Vue 2</strong>. In other words, you cannot use:</p>
 <ul>
 <li>Composition API</li>
 <li>.sync and .native modifiers</li>
 <li>Filters</li>
 <li>3rd-party vendor objects</li>
 </ul>
-<h3><span id="using-branches">Using Branches</span></h3>
-<p>The response from core team members suggests using different branches to separate support for each targeted version. This is a good solution for existing and mature libraries, as their codebases are usually more stable, and version targeting optimizations may require better code isolation.</p>
+<h3><span id="using-branches">Using Branches</span></h3><p>The response from core team members suggests using different branches to separate support for each targeted version. This is a good solution for existing and mature libraries, as their codebases are usually more stable, and version targeting optimizations may require better code isolation.</p>
 <p>The downside of this approach is that you need to maintain two codebases, which doubles your workload. It is not ideal for small libraries or new libraries that want to support both versions and avoid duplicating bug fixes or feature additions. I do not recommend using this approach from the beginning of a project.</p>
-<h3><span id="build-scripts">Build Scripts</span></h3>
-<p>In VueUse, I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags, <code>vue2</code> and <code>vue3</code>, to differentiate the support for different versions. With this, I can write the code once and make the library support both Vue versions. The issue is that I need to build twice on each version and guide users to install the corresponding plugin versions (manually install <code>@vue/composition-api</code> for Vue 2).</p>
-<h2><span id="approach-for-coexistence-development-of-vue-23">Approach for Coexistence Development of Vue 2/3</span></h2>
-<h3><span id="simultaneous-support-for-vue-23-projects">Simultaneous Support for Vue 2/3 Projects</span></h3>
-<h4><span id="possible-scenarios-for-vue-23-projects">Possible Scenarios for Vue 2/3 Projects</span></h4>
-<p><strong>Progressive Migration:</strong> If there is a large Vue 2 project but you want to gradually migrate to Vue 3, you can choose to introduce Vue 3 into the project and then gradually migrate Vue 2 components to Vue 3.</p>
+<h3><span id="build-scripts">Build Scripts</span></h3><p>In VueUse, I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags, <code>vue2</code> and <code>vue3</code>, to differentiate the support for different versions. With this, I can write the code once and make the library support both Vue versions. The issue is that I need to build twice on each version and guide users to install the corresponding plugin versions (manually install <code>@vue/composition-api</code> for Vue 2).</p>
+<h2><span id="approach-for-coexistence-development-of-vue-2x2f3">Approach for Coexistence Development of Vue 2&#x2F;3</span></h2><h3><span id="simultaneous-support-for-vue-2x2f3-projects">Simultaneous Support for Vue 2&#x2F;3 Projects</span></h3><h4><span id="possible-scenarios-for-vue-2x2f3-projects">Possible Scenarios for Vue 2&#x2F;3 Projects</span></h4><p><strong>Progressive Migration:</strong> If there is a large Vue 2 project but you want to gradually migrate to Vue 3, you can choose to introduce Vue 3 into the project and then gradually migrate Vue 2 components to Vue 3.</p>
 <p><strong>Compatibility with Dependency Libraries and Plugins:</strong> If the project depends on some Vue 2 plugins or libraries that have not been upgraded to Vue 3 yet, it may be necessary to use both Vue 2 and Vue 3 to ensure compatibility.</p>
 <p><strong>Adopting Vue 3 for New Features:</strong> You may want to use Vue 3 in the project to take advantage of its new features and performance benefits while still keeping Vue 2 for old components or features.</p>
-<p><strong>Project Integration:</strong> Based on experience requirements within the company, there is a need to present Vue 2/3 projects on the same page.</p>
+<p><strong>Project Integration:</strong> Based on experience requirements within the company, there is a need to present Vue 2&#x2F;3 projects on the same page.</p>
 <p><strong>Internal Component Asset Maintainer:</strong> Support is needed for both Vue 2 and 3 projects, and the capabilities must be consistent.</p>
 <p><strong>Legacy Application Developer:</strong> Need to use a third-party chart component, but only the Vue 3 version is available, not the Vue 2 version.</p>
-<h3><span id="solutions">Solutions</span></h3>
-<h4><span id="1-coexistence-of-vue-23-projects">1. Coexistence of Vue 2/3 Projects</span></h4>
-<p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
+<h3><span id="solutions">Solutions</span></h3><h4><span id="1-coexistence-of-vue-2x2f3-projects">1. Coexistence of Vue 2&#x2F;3 Projects</span></h4><p><img src="/img/vue5/vue5-1.png" alt="vue-5"></p>
 <p>Directly create a Vue 3 root instance using <code>createApp</code> and mount it to the Vue 2 root instance using the <code>mount</code> method. This allows using Vue 3 components in a Vue 2 project.</p>
 <p>The related code repository can be found here: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5">vue5</a></p>
 <p><img src="/img/vue5/vue5-2.jpg" alt="vue-5"></p>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 3 项⽬</span>
-<span class="token keyword">import</span> <span class="token punctuation">&#123;</span> createApp <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue'</span>
-<span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#x2F;&#x2F; Vue 3 项⽬
+import &#123; createApp &#125; from &#39;vue&#39;
+import App from &#39;.&#x2F;App.vue&#39;
 
-<span class="token function">createApp</span><span class="token punctuation">(</span>App<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">mount</span><span class="token punctuation">(</span><span class="token string">'#vue3'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">// Vue 2 项⽬</span>
-<span class="token keyword">import</span> Vue <span class="token keyword">from</span> <span class="token string">'vue2'</span>
-<span class="token keyword">import</span> App <span class="token keyword">from</span> <span class="token string">'./App.vue'</span>
+createApp(App).mount(&#39;#vue3&#39;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<span class="token keyword">new</span> <span class="token class-name">Vue</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-  <span class="token function-variable function">render</span><span class="token operator">:</span> h <span class="token operator">=></span> <span class="token function">h</span><span class="token punctuation">(</span>App <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">$mount</span><span class="token punctuation">(</span><span class="token string">'#vue2'</span><span class="token punctuation">)</span>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#x2F;&#x2F; Vue 2 项⽬
+import Vue from &#39;vue2&#39;
+import App from &#39;.&#x2F;App.vue&#39;
+
+new Vue(&#123;
+  render: h &#x3D;&gt; h(App as any),
+&#125;).$mount(&#39;#vue2&#39;)
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>The important thing about this approach is that we use the <code>vite.config.ts</code> to solve the compilation problem of different modules: I wrote some build scripts to import code from the target version’s API during the build. After that, I need to publish two tags <code>vue2</code> and <code>vue3</code> to differentiate the support for different versions. But the issue is that it requires guiding users to install the corresponding plugin versions on each version. This is not very friendly for developers to deal with package conflicts.</p>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> path <span class="token keyword">from</span> <span class="token string">'path'</span>
-<span class="token keyword">import</span> <span class="token punctuation">&#123;</span> defineConfig <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vite'</span>
-<span class="token keyword">import</span> Vue2 <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue2'</span>
-<span class="token keyword">import</span> Vue3 <span class="token keyword">from</span> <span class="token string">'@vitejs/plugin-vue'</span>
-<span class="token keyword">import</span> Inspect <span class="token keyword">from</span> <span class="token string">'vite-plugin-inspect'</span>
-<span class="token keyword">import</span> compiler <span class="token keyword">from</span> <span class="token string">'vue2/compiler-sfc'</span>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">import path from &#39;path&#39;
+import &#123; defineConfig &#125; from &#39;vite&#39;
+import Vue2 from &#39;@vitejs&#x2F;plugin-vue2&#39;
+import Vue3 from &#39;@vitejs&#x2F;plugin-vue&#39;
+import Inspect from &#39;vite-plugin-inspect&#39;
+import compiler from &#39;vue2&#x2F;compiler-sfc&#39;
 
-<span class="token keyword">const</span> src <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'src'</span><span class="token punctuation">)</span>
+const src &#x3D; path.resolve(__dirname, &#39;src&#39;)
 
-<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token function">defineConfig</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-  plugins<span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token function">Vue3</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-      include<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">vue3[/\\].*\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token function">Vue2</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-      include<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">vue2[/\\].*\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-      compiler<span class="token operator">:</span> compiler <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token function">Inspect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-  <span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+export default defineConfig(&#123;
+  plugins: [
+    Vue3(&#123;
+      include: [&#x2F;vue3[&#x2F;\\].*\.vue$&#x2F;],
+    &#125;),
+    Vue2(&#123;
+      include: [&#x2F;vue2[&#x2F;\\].*\.vue$&#x2F;],
+      compiler: compiler as any,
+    &#125;),
+    Inspect(),
+  ],
+&#125;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Here we have separated Vue 2 and Vue 3 into two independent packages and configured different compilation rules in vite.config.ts, allowing us to use Vue 2 and Vue 3 in the same page.</p>
-<h4><span id="2-jessicasachspetite-solution">2. JessicaSachs/petite Solution</span></h4>
-<p>Let’s briefly introduce <a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>:</p>
+<h4><span id="2-jessicasachsx2fpetite-solution">2. JessicaSachs&#x2F;petite Solution</span></h4><p>Let’s briefly introduce <a target="_blank" rel="noopener" href="https://github.com/JessicaSachs/petite">petite</a>:</p>
 <blockquote>
 <p><strong>Petite is a subjective GitHub template built for Vue component authors.</strong> It sets up the tools needed for developing, documenting, and testing common SFC components and is backward compatible with Vue 2.7 runtime.</p>
 </blockquote>
@@ -673,32 +664,30 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 <p>This also means that you will be publishing two versions of your package on npm instead of breaking major versions to support Vue 2 or Vue 3.</p>
 <p><strong>The downside of this approach is that your users will need to install the new version when upgrading and changing imports.</strong> The benefit is that you can write backward-compatible code more easily and provide regular updates for users. Additionally, you can also separate dependencies for Vue 2-only and Vue 3-only.</p>
 <p>If you use lodash in your shared code, you will need to run <code>pnpm build</code> in the workspace root directory, and each package (lib-vue3, lib-vue2) should be deployed independently.</p>
-<h4><span id="3-vue-bridge-solution">3. vue-bridge Solution</span></h4>
-<h4><span id="4-vue-demi-solution">4. vue-demi Solution</span></h4>
-<p>Repository example: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
+<h4><span id="3-vue-bridge-solution">3. vue-bridge Solution</span></h4><h4><span id="4-vue-demi-solution">4. vue-demi Solution</span></h4><p>Repository example: <a target="_blank" rel="noopener" href="https://github.com/ikkkp/vue5-baseon-vue-demi">vue-demi</a></p>
 <p>Vue Demi is a development utility that allows you to write universal Vue libraries for both Vue 2 and 3 without worrying about the version installed by the user.</p>
-<p>When creating a Vue plugin/library, simply install vue-demi as a dependency and import any Vue-related content from it. Publish your plugin/library as usual, and your package will become universal!</p>
+<p>When creating a Vue plugin&#x2F;library, simply install vue-demi as a dependency and import any Vue-related content from it. Publish your plugin&#x2F;library as usual, and your package will become universal!</p>
 <pre class="line-numbers language-none"><code class="language-none">&#123;
   &quot;dependencies&quot;: &#123;
     &quot;vue-demi&quot;: &quot;latest&quot;
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token keyword">import</span> Vue<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> reactive<span class="token punctuation">,</span> ref <span class="token punctuation">&#125;</span> <span class="token keyword">from</span> <span class="token string">'vue-demi'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>At the underlying level, it uses the postinstall npm hook. After installing all the packages, the script will start checking the installed Vue version and redirect the exports based on the local Vue version. When using Vue 2, it will also automatically install @vue/composition-api if it is not already installed.</p>
-<p>Points to note about libraries/components:</p>
-<p><strong>Libraries/Components</strong></p>
+
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">import Vue, &#123; reactive, ref &#125; from &#39;vue-demi&#39;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>At the underlying level, it uses the postinstall npm hook. After installing all the packages, the script will start checking the installed Vue version and redirect the exports based on the local Vue version. When using Vue 2, it will also automatically install @vue&#x2F;composition-api if it is not already installed.</p>
+<p>Points to note about libraries&#x2F;components:</p>
+<p><strong>Libraries&#x2F;Components</strong></p>
 <ul>
 <li>Single repository - Multiple package builds</li>
 <li>Dependency management</li>
-<li>Alias configuration
-<ul>
+<li>Alias configuration<ul>
 <li>NPM package names</li>
 <li>Build tool configuration</li>
 </ul>
 </li>
 </ul>
-<h3><span id="importing-vue-3-components-in-a-vue-2-application">Importing Vue 3 Components in a Vue 2 Application</span></h3>
-<p><strong>There are limitations to component interoperability</strong></p>
+<h3><span id="importing-vue-3-components-in-a-vue-2-application">Importing Vue 3 Components in a Vue 2 Application</span></h3><p><strong>There are limitations to component interoperability</strong></p>
 <ul>
 <li>Shared context</li>
 <li>Scoped slots</li>
@@ -730,7 +719,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T10:21:48.000Z" itemprop="datePublished">5 November 2023</time>
+            <time datetime="2023-11-05T10:21:48.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -746,8 +735,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by addressing the first question, which is how to describe events in virtual nodes. Events can be considered as special attributes, so we can agree that any attribute starting with the string “on” in the vnode.props object should be treated as an event. For example:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by addressing the first question, which is how to describe events in virtual nodes. Events can be considered as special attributes, so we can agree that any attribute starting with the string “on” in the vnode.props object should be treated as an event. For example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -758,6 +746,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Once we have resolved how events are described in virtual nodes, let’s see how to add events to DOM elements. This is very simple, just call the <code>addEventListener</code> function in the <code>patchProps</code> method to bind the event, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Match attributes starting with on as events</span>
@@ -777,6 +766,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token comment">// Omitted code (handling other attribute logic)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In fact, the event update mechanism can be further optimized to avoid multiple calls to <code>removeEventListener</code> and <code>addEventListener</code>.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -809,6 +799,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token comment">// Omitted code (handling other attribute logic)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Looking at the above code, event binding is divided into two steps. First, read the corresponding invoker from <code>el._vei</code>. If invoker does not exist, create a fake invoker function and cache it in <code>el._vei</code>. Assign the actual event handler to the <code>invoker.value</code> property, and then bind the fake invoker function as the event handler to the element. When the event is triggered, the fake event handler is executed, indirectly invoking the actual event handler <code>invoker.value(e)</code>.</p>
 <p>When updating events, since <code>el._vei</code> already exists, we only need to modify the value of <code>invoker.value</code> to the new event handler.</p>
 <p>This way, updating events can avoid a call to <code>removeEventListener</code>, improving performance. However, the current implementation still has issues. The problem is that <code>el._vei</code> currently caches only one event handler at a time. This means that if an element binds multiple events simultaneously, event override will occur.</p>
@@ -828,6 +819,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
 <span class="token comment">// Assume renderer is your renderer object</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>When the renderer tries to render the vnode provided in the above code, it first binds the <code>click</code> event and then binds the <code>contextmenu</code> event. The <code>contextmenu</code> event handler bound later will override the <code>click</code> event handler. To solve the event override problem, we need to redesign the data structure of <code>el._vei</code>. We should design <code>el._vei</code> as an object, where the keys are event names and the values are corresponding event handler functions. This way, event override issues will be resolved.</p>
 <p>Based on the code snippet you provided, this code is mainly used for handling attribute updates on DOM elements, including the logic for event binding and unbinding. In this code, it uses an <code>el._vei</code> object to cache event handler functions.</p>
 
@@ -849,7 +841,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T05:05:27.000Z" itemprop="datePublished">5 November 2023</time>
+            <time datetime="2023-11-05T05:05:27.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -865,16 +857,14 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render function can be a more flexible solution.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Vue.js templates are powerful and can meet most of our application needs. However, in certain scenarios, such as creating dynamic components based on input or slot values, the render function can be a more flexible solution.</p>
 <p>Developers familiar with the React ecosystem might already be acquainted with render functions, commonly used in JSX to construct React components. While Vue render functions can also be written in JSX, this discussion focuses on using plain JavaScript. This approach simplifies understanding the fundamental concepts of the Vue component system.</p>
 <p>Every Vue component includes a render function. Most of the time, this function is created by the Vue compiler. When a template is specified for a component, the Vue compiler processes the template’s content, ultimately generating a render function. This render function produces a virtual DOM node, which Vue renders in the browser DOM.</p>
 <p>This brings us to the concept of the virtual DOM. <strong>But what exactly is the virtual DOM?</strong></p>
 <p><strong>The virtual Document Object Model (or “DOM”) enables Vue to render components in its memory before updating the browser.</strong> This approach enhances speed and avoids the high cost associated with re-rendering the DOM. Since each DOM node object contains numerous properties and methods, pre-rendering them in memory using the virtual DOM eliminates the overhead of creating DOM nodes directly in the browser.</p>
 <p>When Vue updates the browser DOM, it compares the updated virtual DOM with the previous virtual DOM. Only the modified parts of the virtual DOM are used to update the actual DOM, reducing the number of element changes and enhancing performance. The render function returns virtual DOM nodes, often referred to as VNodes in the Vue ecosystem. These objects enable Vue to write these nodes into the browser DOM. They contain all the necessary information Vue needs.</p>
 <p><img src="/img/vue-render/render-pipeline.png" alt="vue-render"></p>
-<h2><span id="mounting-child-nodes-and-element-attributes">Mounting Child Nodes and Element Attributes</span></h2>
-<p>When <code>vnode.children</code> is a string, it sets the element’s text content. An element can have multiple child elements besides text nodes. To describe an element’s child nodes, <code>vnode.children</code> needs to be defined as an array:</p>
+<h2><span id="mounting-child-nodes-and-element-attributes">Mounting Child Nodes and Element Attributes</span></h2><p>When <code>vnode.children</code> is a string, it sets the element’s text content. An element can have multiple child elements besides text nodes. To describe an element’s child nodes, <code>vnode.children</code> needs to be defined as an array:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
@@ -884,6 +874,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we describe “a <code>div</code> tag with a child node, which is a <code>p</code> tag.” As seen, <code>vnode.children</code> is an array, and each element of the array is an independent virtual node object. This creates a tree-like structure, or a virtual DOM tree.</p>
 <p>To render child nodes, we need to modify the <code>mountElement</code> function, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -898,13 +889,12 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token punctuation">&#125;</span>
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we have added a new conditional branch. We use the <code>Array.isArray</code> function to check if <code>vnode.children</code> is an array. If it is, we loop through each child node and call the <code>patch</code> function to mount the virtual nodes in the array. During mounting of child nodes, we need to pay attention to two points:</p>
 <ol>
-<li>
-<p>The first argument passed to the <code>patch</code> function is <code>null</code>. Since this is the mounting phase and there is no old <code>vnode</code>, we only need to pass <code>null</code>. This way, when the <code>patch</code> function is executed, it will recursively call the <code>mountElement</code> function to mount the child nodes.</p>
+<li><p>The first argument passed to the <code>patch</code> function is <code>null</code>. Since this is the mounting phase and there is no old <code>vnode</code>, we only need to pass <code>null</code>. This way, when the <code>patch</code> function is executed, it will recursively call the <code>mountElement</code> function to mount the child nodes.</p>
 </li>
-<li>
-<p>The third argument passed to the <code>patch</code> function is the mounting point. Since the child elements being mounted are child nodes of the <code>div</code> element, the <code>div</code> element created earlier serves as the mounting point to ensure that these child nodes are mounted in the correct position.</p>
+<li><p>The third argument passed to the <code>patch</code> function is the mounting point. Since the child elements being mounted are child nodes of the <code>div</code> element, the <code>div</code> element created earlier serves as the mounting point to ensure that these child nodes are mounted in the correct position.</p>
 </li>
 </ol>
 <p>After mounting the child nodes, let’s look at how to describe the attributes of an element using <code>vnode</code> and how to render these attributes. We know that HTML elements have various attributes, some of which are common, such as <code>id</code> and <code>class</code>, while others are specific to certain elements, such as the <code>action</code> attribute for <code>form</code> elements. In this discussion, we will focus on the basic attribute handling.</p>
@@ -921,6 +911,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">]</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><code>vnode.props</code> is an object where the keys represent the attribute names of the element, and the values represent the corresponding attribute values. This way, we can iterate through the <code>props</code> object and render these attributes onto the element, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">const</span> el <span class="token operator">=</span> <span class="token function">createElement</span><span class="token punctuation">(</span>vnode<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -938,41 +929,52 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, we first check if <code>vnode.props</code> exists. If it does, we iterate through the <code>vnode.props</code> object and use the <code>setAttribute</code> function to set attributes on the element. This approach ensures that the attributes are rendered onto the element during the mounting process.</p>
 <p>When dealing with attributes, it’s essential to understand the distinction between HTML Attributes and DOM Properties. HTML Attributes are the attributes defined in the HTML tags, such as <code>id=&quot;my-input&quot;</code>, <code>type=&quot;text&quot;</code>, and <code>value=&quot;foo&quot;</code>. When the browser parses this HTML code, it creates a corresponding DOM element object, which we can access using JavaScript code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> el <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#my-input'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Now, let’s talk about DOM Properties. Many HTML Attributes have corresponding DOM Properties on the DOM element object, such as <code>id=&quot;my-input&quot;</code> corresponding to <code>el.id</code>, <code>type=&quot;text&quot;</code> corresponding to <code>el.type</code>, and <code>value=&quot;foo&quot;</code> corresponding to <code>el.value</code>. However, the names of DOM Properties don’t always exactly match HTML Attributes:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>In this case, <code>class=&quot;foo&quot;</code> corresponds to the DOM Property <code>el.className</code>. Additionally, not all HTML Attributes have corresponding DOM Properties:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">aria-valuenow</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>75<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Attributes with the <code>aria-*</code> prefix do not have corresponding DOM Properties.</p>
 <p>Similarly, not all DOM Properties have corresponding HTML Attributes. For example, you can use <code>el.textContent</code> to set the element’s text content, but there is no equivalent HTML Attribute for this operation.</p>
 <p>The values of HTML Attributes and DOM Properties are related. For example, consider the following HTML snippet:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>This snippet defines a <code>div</code> element with an <code>id</code> attribute. The corresponding DOM Property is <code>el.id</code>, and its value is the string <code>'foo'</code>. We consider this situation as a direct mapping, where the HTML Attribute and DOM Property have the same name (<code>id</code> in this case).</p>
+
+<p>This snippet defines a <code>div</code> element with an <code>id</code> attribute. The corresponding DOM Property is <code>el.id</code>, and its value is the string <code>&#39;foo&#39;</code>. We consider this situation as a direct mapping, where the HTML Attribute and DOM Property have the same name (<code>id</code> in this case).</p>
 <p>However, not all HTML Attributes and DOM Properties have a direct mapping relationship. For example:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>Here, the <code>input</code> element has a <code>value</code> attribute set to <code>'foo'</code>. If the user does not modify the input field, accessing <code>el.value</code> would return the string <code>'foo'</code>. If the user changes the input value to <code>'bar'</code>, accessing <code>el.value</code> would return <code>'bar'</code>. But if you run the following code:</p>
+
+<p>Here, the <code>input</code> element has a <code>value</code> attribute set to <code>&#39;foo&#39;</code>. If the user does not modify the input field, accessing <code>el.value</code> would return the string <code>&#39;foo&#39;</code>. If the user changes the input value to <code>&#39;bar&#39;</code>, accessing <code>el.value</code> would return <code>&#39;bar&#39;</code>. But if you run the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Still 'foo'</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'bar'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>You’ll notice that modifying the input value does not affect the return value of <code>el.getAttribute('value')</code>. This behavior indicates the meaning behind HTML Attributes. Essentially, HTML Attributes are used to set the initial value of corresponding DOM Properties. Once the value changes, the DOM Properties always store the current value, while <code>getAttribute</code> retrieves the initial value.</p>
+
+<p>You’ll notice that modifying the input value does not affect the return value of <code>el.getAttribute(&#39;value&#39;)</code>. This behavior indicates the meaning behind HTML Attributes. Essentially, HTML Attributes are used to set the initial value of corresponding DOM Properties. Once the value changes, the DOM Properties always store the current value, while <code>getAttribute</code> retrieves the initial value.</p>
 <p>However, you can still access the initial value using <code>el.defaultValue</code>, as shown below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Still 'foo'</span>
 el<span class="token punctuation">.</span>value<span class="token punctuation">;</span> <span class="token comment">// 'bar'</span>
 el<span class="token punctuation">.</span>defaultValue<span class="token punctuation">;</span> <span class="token comment">// 'foo'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>This example illustrates that an HTML Attribute can be associated with multiple DOM Properties. In this case, <code>value=&quot;foo&quot;</code> is related to both <code>el.value</code> and <code>el.defaultValue</code>.</p>
 <p>Although HTML Attributes are considered as setting the initial values of corresponding DOM Properties, some values are restricted. It’s as if the browser internally checks for default value validity. If the value provided through HTML Attributes is invalid, the browser uses a built-in valid value for the corresponding DOM Properties. For example:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>foo<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>We know that specifying the string <code>'foo'</code> for the <code>type</code> attribute of the <code>&lt;input/&gt;</code> tag is invalid. Therefore, the browser corrects this invalid value. When you try to read <code>el.type</code>, you actually get the corrected value, which is <code>'text'</code>, not <code>'foo'</code>:</p>
+
+<p>We know that specifying the string <code>&#39;foo&#39;</code> for the <code>type</code> attribute of the <code>&lt;input/&gt;</code> tag is invalid. Therefore, the browser corrects this invalid value. When you try to read <code>el.type</code>, you actually get the corrected value, which is <code>&#39;text&#39;</code>, not <code>&#39;foo&#39;</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>type<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 'text'</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>From the analysis above, we can see that the relationship between HTML Attributes and DOM Properties is complex. However, the core principle to remember is this: HTML Attributes are used to set the initial values of corresponding DOM Properties.</p>
-<h2><span id="how-to-properly-set-element-attributes">How to Properly Set Element Attributes</span></h2>
-<p>In the previous discussion, we explored how HTML Attributes and DOM Properties are handled in Vue.js single-file components’ templates. In regular HTML files, the browser automatically parses HTML Attributes and sets the corresponding DOM Properties. However, in Vue.js templates, the framework needs to handle the setting of these attributes manually.</p>
+<h2><span id="how-to-properly-set-element-attributes">How to Properly Set Element Attributes</span></h2><p>In the previous discussion, we explored how HTML Attributes and DOM Properties are handled in Vue.js single-file components’ templates. In regular HTML files, the browser automatically parses HTML Attributes and sets the corresponding DOM Properties. However, in Vue.js templates, the framework needs to handle the setting of these attributes manually.</p>
 <p>Firstly, let’s consider a disabled button as an example in plain HTML:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>The browser automatically disables this button and sets its corresponding DOM Property <code>el.disabled</code> to <code>true</code>. However, if the same code appears in a Vue.js template, the behavior would be different.</p>
 <p>In Vue.js templates, the HTML template is compiled into virtual nodes (<code>vnode</code>). The value of <code>props.disabled</code> in the virtual node is an empty string. If you use the <code>setAttribute</code> function directly to set the attribute, unexpected behavior occurs, and the button becomes disabled. For example, in the following template:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">disabled</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Button<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>The corresponding virtual node is:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> button <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'button'</span><span class="token punctuation">,</span>
@@ -980,8 +982,10 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token literal-property property">disabled</span><span class="token operator">:</span> <span class="token boolean">false</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>If you use the <code>setAttribute</code> function to set the attribute value to an empty string, it is equivalent to:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">el<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">'disabled'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>However, the <code>el.disabled</code> property is of boolean type and does not care about the specific value of HTML Attributes; it only checks for the existence of the <code>disabled</code> attribute. So, the button becomes disabled. Therefore, renderers should not always use the <code>setAttribute</code> function to set attributes from the <code>vnode.props</code> object.</p>
 <p>To solve this issue, a better approach is to prioritize setting the element’s DOM Properties. However, if the value is an empty string, manually correct it to <code>true</code>. Here is an implementation example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">mountElement</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1005,6 +1009,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 
   <span class="token function">insert</span><span class="token punctuation">(</span>el<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we first check if the property exists on the DOM element. If it does, we determine the type of the property and the value from <code>vnode.props</code>. If the property is of boolean type and the value is an empty string, we correct it to <code>true</code>. If the property does notexist on the DOM element, we use the <code>setAttribute</code> function to set the attribute.</p>
 <p>However, there are still issues with this implementation. Some DOM Properties are read-only, such as <code>el.form</code>. To address this problem, we can create a helper function, <code>shouldSetAsProps</code>, to determine whether an attribute should be set as DOM Properties. If the property is read-only or requires special handling, we should use the <code>setAttribute</code> function to set the attribute.</p>
 <p>Finally, to make the attribute setting operation platform-agnostic, we can extract the attribute-related operations into the renderer options. Here is the updated code:</p>
@@ -1031,6 +1036,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the <code>mountElement</code> function, we only need to call the <code>patchProps</code> function and pass the appropriate parameters. This way, we’ve extracted the attribute-related rendering logic from the core renderer, making it more maintainable and flexible.</p>
 <p>Please note that the <code>shouldSetAsProps</code> function should be implemented according to your specific requirements and the DOM properties you want to handle differently.</p>
 
@@ -1052,7 +1058,7 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T04:47:50.000Z" itemprop="datePublished">5 November 2023</time>
+            <time datetime="2023-11-05T04:47:50.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -1068,23 +1074,16 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>In Vue.js, many functionalities rely on renderers to be implemented, such as Transition components, Teleport components, Suspense components, as well as template refs and custom directives.</p>
+        <h2><span id="preface">Preface</span></h2><p>In Vue.js, many functionalities rely on renderers to be implemented, such as Transition components, Teleport components, Suspense components, as well as template refs and custom directives.</p>
 <p>Moreover, the renderer is the core of the framework’s performance, as its implementation directly affects the framework’s performance. Vue.js 3’s renderer not only includes the traditional Diff algorithm but also introduces a fast path update method, leveraging the information provided by the compiler, significantly improving update performance.</p>
 <p>In Vue.js, the renderer is responsible for executing rendering tasks. On the browser platform, it renders the virtual DOM into real DOM elements. The renderer can render not only real DOM elements but also plays a key role in the framework’s cross-platform capabilities. When designing a renderer, its customizable capabilities need to be considered.</p>
-<h2><span id="basic-concepts-and-meanings-of-renderer">Basic Concepts and Meanings of Renderer</span></h2>
-<p>Before implementing a basic renderer, we need to understand a few fundamental concepts:</p>
+<h2><span id="basic-concepts-and-meanings-of-renderer">Basic Concepts and Meanings of Renderer</span></h2><p>Before implementing a basic renderer, we need to understand a few fundamental concepts:</p>
 <p>In Vue.js, a renderer is a component responsible for rendering virtual DOM (or virtual nodes) into real elements on a specific platform. On the browser platform, the renderer renders virtual DOM into real DOM elements.</p>
-<h3><span id="renderer">Renderer</span></h3>
-<p>The renderer is responsible for rendering virtual DOM (or virtual nodes) into real elements on a specific platform. On the browser platform, the renderer renders virtual DOM into real DOM elements.</p>
-<h3><span id="virtual-dom-vnode">Virtual DOM (vnode)</span></h3>
-<p>The virtual DOM (also known as virtual nodes, abbreviated as vnode) is a tree-like structure, similar to real DOM, consisting of various nodes. The renderer’s task is to render the virtual DOM into real DOM elements.</p>
-<h3><span id="mounting">Mounting</span></h3>
-<p>Mounting refers to rendering the virtual DOM into real DOM elements and adding them to a specified mounting point. In Vue.js, the <code>mounted</code> lifecycle hook of a component is triggered when the mounting is completed, and it can access the real DOM element at this point.</p>
-<h3><span id="container">Container</span></h3>
-<p>The container specifies the mounting position’s DOM element. The renderer renders the virtual DOM into real DOM elements and adds them to the specified container. In the renderer’s <code>render</code> function, a container parameter is usually passed in, indicating which DOM element the virtual DOM is mounted to.</p>
-<h3><span id="creation-and-usage-of-renderer">Creation and Usage of Renderer</span></h3>
-<p>The renderer is usually created using the <code>createRenderer</code> function, which returns an object containing rendering and hydration functions. The hydration function is used in server-side rendering (SSR) to hydrate virtual DOM into existing real DOM elements. Here’s an example of creating and using a renderer:</p>
+<h3><span id="renderer">Renderer</span></h3><p>The renderer is responsible for rendering virtual DOM (or virtual nodes) into real elements on a specific platform. On the browser platform, the renderer renders virtual DOM into real DOM elements.</p>
+<h3><span id="virtual-dom-vnode">Virtual DOM (vnode)</span></h3><p>The virtual DOM (also known as virtual nodes, abbreviated as vnode) is a tree-like structure, similar to real DOM, consisting of various nodes. The renderer’s task is to render the virtual DOM into real DOM elements.</p>
+<h3><span id="mounting">Mounting</span></h3><p>Mounting refers to rendering the virtual DOM into real DOM elements and adding them to a specified mounting point. In Vue.js, the <code>mounted</code> lifecycle hook of a component is triggered when the mounting is completed, and it can access the real DOM element at this point.</p>
+<h3><span id="container">Container</span></h3><p>The container specifies the mounting position’s DOM element. The renderer renders the virtual DOM into real DOM elements and adds them to the specified container. In the renderer’s <code>render</code> function, a container parameter is usually passed in, indicating which DOM element the virtual DOM is mounted to.</p>
+<h3><span id="creation-and-usage-of-renderer">Creation and Usage of Renderer</span></h3><p>The renderer is usually created using the <code>createRenderer</code> function, which returns an object containing rendering and hydration functions. The hydration function is used in server-side rendering (SSR) to hydrate virtual DOM into existing real DOM elements. Here’s an example of creating and using a renderer:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">function</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// Render logic</span>
@@ -1105,17 +1104,21 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// Server-side rendering</span>
 <span class="token function">hydrate</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, the <code>createRenderer</code> function creates a renderer object that contains the <code>render</code> and <code>hydrate</code> functions. The <code>render</code> function is used to render the virtual DOM into real DOM elements, while the <code>hydrate</code> function is used to hydrate the virtual DOM into existing real DOM elements.</p>
 <p>Now that we have a basic understanding of the renderer, let’s dive deeper step by step.</p>
 <p>The implementation of the renderer can be represented by the following function, where <code>domString</code> is the HTML string to be rendered, and <code>container</code> is the DOM element to mount to:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token parameter">domString<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   container<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> domString<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>Example usage of the renderer:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">renderer</span><span class="token punctuation">(</span><span class="token string">'&lt;h1>Hello&lt;/h1>'</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>In the above code, <code>&lt;h1&gt;Hello&lt;/h1&gt;</code> is inserted into the DOM element with the id <code>app</code>. The renderer can not only render static strings but also dynamic HTML content:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>count<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
 <p>If <code>count</code> is a reactive data, the reactivity system can automate the entire rendering process. First, define a reactive data <code>count</code> and then call the renderer function inside the side effect function to render:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> count <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1124,9 +1127,11 @@ el<span class="token punctuation">.</span>defaultValue<span class="token punctua
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 count<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, <code>count</code> is a <code>ref</code> reactive data. When modifying the value of <code>count.value</code>, the side effect function will be re-executed, triggering re-rendering. The final content rendered to the page is <code>&lt;h1&gt;2&lt;/h1&gt;</code>.</p>
 <p>Here, the reactive API provided by Vue 3’s <code>@vue/reactivity</code> package is used. It can be included in the HTML file using the <code>&lt;script&gt;</code> tag:</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://unpkg.com/@vue/reactivity@3.0.5/dist/reactivity.global.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>The basic implementation of the <code>render</code> function is given in the above code. Let’s analyze its execution flow in detail. Suppose we call the <code>renderer.render</code> function three times consecutively for rendering:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> renderer <span class="token operator">=</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -1136,12 +1141,12 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode2<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// Third rendering</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>During the initial rendering, the renderer renders <code>vnode1</code> into real DOM and stores <code>vnode1</code> in the container element’s <code>container.vnode</code> property as the old vnode.</p>
 <p>During the second rendering, the old vnode exists (<code>container.vnode</code> has a value), and the renderer takes <code>vnode2</code> as the new vnode, passing both the new and old vnodes to the <code>patch</code> function to perform patching.</p>
-<p>During the third rendering, the new vnode’s value is <code>null</code>, indicating that no content should be rendered. However, at this point, the container already contains the content described by <code>vnode2</code>, so the renderer needs to clear the container. In the code above, <code>container.innerHTML = ''</code> is used to clear the container. It’s important to note that clearing the container this way is not the best practice but is used here for demonstration purposes.</p>
+<p>During the third rendering, the new vnode’s value is <code>null</code>, indicating that no content should be rendered. However, at this point, the container already contains the content described by <code>vnode2</code>, so the renderer needs to clear the container. In the code above, <code>container.innerHTML = &#39;&#39;</code> is used to clear the container. It’s important to note that clearing the container this way is not the best practice but is used here for demonstration purposes.</p>
 <p>Regarding the <code>patch</code> function, it serves as the core entry point of the renderer. It takes three parameters: the old vnode <code>n1</code>, the new vnode <code>n2</code>, and the container <code>container</code>. During the initial rendering, the old vnode <code>n1</code> is <code>undefined</code>, indicating a mounting action. The <code>patch</code> function not only serves for patching but can also handle mounting actions.</p>
-<h2><span id="custom-renderer">Custom Renderer</span></h2>
-<p>The implementation of a custom renderer involves abstracting the core rendering logic, making it independent of specific platform APIs. The following example demonstrates the implementation of a custom renderer using configuration options to achieve platform-independent rendering:</p>
+<h2><span id="custom-renderer">Custom Renderer</span></h2><p>The implementation of a custom renderer involves abstracting the core rendering logic, making it independent of specific platform APIs. The following example demonstrates the implementation of a custom renderer using configuration options to achieve platform-independent rendering:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Create a renderer function, accepting options as parameters</span>
 <span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token parameter">options</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Retrieve DOM manipulation APIs from options</span>
@@ -1216,6 +1221,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
 <span class="token comment">// Render the virtual node to the mounting point using the custom renderer</span>
 <span class="token function">customRenderer</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we create a custom renderer using the <code>createRenderer</code> function, which takes configuration options as parameters. The configuration options include functions for creating elements, setting text content, and inserting elements into a parent. The <code>customRenderer</code> function takes a virtual node and a container as parameters, and it can handle both mounting and patching logic based on the existence of the old virtual node (<code>container.vnode</code>).</p>
 <p>This custom renderer allows platform-independent rendering by abstracting the core logic and making it adaptable to different platforms through configuration options.</p>
 <p>Please note that the code above demonstrates the concept of a custom renderer and focuses on its implementation logic. In a real-world scenario, you might need additional error handling, optimizations, and proper DOM manipulations based on the specific platform requirements.</p>
@@ -1238,7 +1244,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-01T11:29:41.000Z" itemprop="datePublished">1 November 2023</time>
+            <time datetime="2023-11-01T11:29:41.000Z" itemprop="datePublished">November 1, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -1254,15 +1260,14 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
-<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+        <h2><span id="introduction">Introduction</span></h2><p>Explore the differences between <code>reactive</code> and <code>shallowReactive</code>, delving into the concepts of deep reactivity and shallow reactivity in Vue.js.</p>
+<h2><span id="shallow-reactivity-vs-deep-reactivity">Shallow Reactivity vs Deep Reactivity</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">bar</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span> <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span><span class="token punctuation">&#123;</span> 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar<span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying obj.foo.bar value does not trigger reactivity</span>
 obj<span class="token punctuation">.</span>foo<span class="token punctuation">.</span>bar <span class="token operator">=</span> <span class="token number">2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Initially, an object <code>obj</code> is created with a property <code>foo</code> containing another object <code>&#123; bar: 1 &#125;</code>. When accessing <code>obj.foo.bar</code> inside an effect function, it is noticed that modifying <code>obj.foo.bar</code> does not trigger the effect function again. Why does this happen? Let’s take a look at the current implementation:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj <span class="token punctuation">,</span><span class="token punctuation">&#123;</span>
@@ -1276,6 +1281,7 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
 <span class="token comment">// Other trapping functions are omitted</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the given code, when accessing <code>obj.foo.bar</code>, it first reads the value of <code>obj.foo</code>. Here, <code>Reflect.get</code> is used to directly return the result of <code>obj.foo</code>. Since the result obtained through <code>Reflect.get</code> is a plain object, namely <code>&#123; bar: 1 &#125;</code>, it is not a reactive object. Therefore, when accessing <code>obj.foo.bar</code> inside the effect function, no reactivity is established. To address this, the result returned by <code>Reflect.get</code> needs to be wrapped:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">reactive</span><span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
@@ -1290,26 +1296,30 @@ obj<span class="token punctuation">.</span>foo<span class="token punctuation">.<
     <span class="token comment">// Other traps...</span>
   <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, the <code>reactive</code> function is defined. It takes an object as a parameter and returns a proxy of that object. The proxy uses a <code>get</code> trap function that triggers when accessing a property of the object. In the <code>get</code> trap, <code>Reflect.get</code> is used to retrieve the property value. If the result is an object, it is made reactive by calling the <code>reactive</code> function recursively. This ensures that nested objects also possess reactive properties, allowing modifications to trigger the reactivity system.</p>
-<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2>
-<p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
+<h2><span id="shallow-reactivity">Shallow Reactivity</span></h2><p>However, there are scenarios where deep reactivity is not desired, leading to the concept of <code>shallowReactive</code> or shallow reactivity. Shallow reactivity means that only the top-level properties of an object are reactive. For example:</p>
 <p>Suppose we have an object with a nested object as its property:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">innerObj</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>If we apply deep reactivity to <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> reactiveObj <span class="token operator">=</span> <span class="token function">reactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Any modifications to <code>obj</code> or <code>innerObj</code> properties will trigger the reactivity system:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">reactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>However, if we want only the top-level properties of <code>obj</code> to be reactive, meaning modifications to <code>obj</code> trigger reactivity but modifications to <code>innerObj</code> do not, we use the <code>shallowReactive</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> shallowReactiveObj <span class="token operator">=</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>With <code>shallowReactive</code>, only modifications to <code>obj</code> will trigger reactivity:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">shallowReactiveObj<span class="token punctuation">.</span>innerObj <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span class="token comment">// Triggers reactivity</span>
 shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// Does not trigger reactivity</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2>
-<p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
+
+<h2><span id="vuejs-and-reactive-vs-shallowreactive">Vue.js and <code>reactive</code> vs <code>shallowReactive</code></span></h2><p>In Vue.js, both <code>reactive</code> and <code>shallowReactive</code> functions are used to create reactive objects. Let’s explore their differences.</p>
 <p>The <code>reactive</code> function creates deeply reactive objects. This means that both the object itself and all its nested objects become reactive. Any modifications to the object or its nested objects’ properties will trigger the reactivity system.</p>
 <p>On the other hand, the <code>shallowReactive</code> function creates shallowly reactive objects. This means that only the top-level properties of the object are reactive. If the object contains nested objects, modifications to those nested objects’ properties will not trigger the reactivity system.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1317,12 +1327,10 @@ shallowReactiveObj<span class="token punctuation">.</span>innerObj<span class="t
     <span class="token literal-property property">key</span><span class="token operator">:</span> <span class="token string">'value'</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>let reactiveObj = Vue.reactive(obj);<br>
-reactiveObj.innerObj.key = ‘new value’; // Triggers reactivity</p>
-<p>let shallowReactiveObj = Vue.shallowReactive(obj);<br>
-shallowReactiveObj.innerObj.key = ‘new value’; // Does not trigger reactivity</p>
-<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2>
-<p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
+
+<p>let reactiveObj &#x3D; Vue.reactive(obj);<br>reactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Triggers reactivity</p>
+<p>let shallowReactiveObj &#x3D; Vue.shallowReactive(obj);<br>shallowReactiveObj.innerObj.key &#x3D; ‘new value’; &#x2F;&#x2F; Does not trigger reactivity</p>
+<h2><span id="readonly-and-shallow-readonly">Readonly and Shallow Readonly</span></h2><p>After discussing reactivity and shallow reactivity, let’s talk about readonly and shallow readonly:</p>
 <p>Vue.js provides <code>readonly</code> and <code>shallowReadonly</code> functions to create readonly reactive objects.</p>
 <p>The <code>readonly</code> function creates deeply readonly reactive objects. This means that both the object itself and all its nested objects are readonly. Any attempts to modify the object or its nested objects’ properties will fail.</p>
 <p>The <code>shallowReadonly</code> function creates shallow readonly reactive objects. This means that only the top-level properties of the object are readonly. If the object contains nested objects, properties of these nested objects can be modified.</p>
@@ -1337,9 +1345,10 @@ readonlyObj<span class="token punctuation">.</span>innerObj<span class="token pu
 
 <span class="token keyword">let</span> shallowReadonlyObj <span class="token operator">=</span> Vue<span class="token punctuation">.</span><span class="token function">shallowReadonly</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
 shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="token punctuation">.</span>key <span class="token operator">=</span> <span class="token string">'new value'</span><span class="token punctuation">;</span> <span class="token comment">// This will succeed because only top-level properties are readonly</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -1359,7 +1368,7 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-01T02:52:27.000Z" itemprop="datePublished">1 November 2023</time>
+            <time datetime="2023-11-01T02:52:27.000Z" itemprop="datePublished">November 1, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -1375,8 +1384,7 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Create object proxies with Proxy</a></p>
 <p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Built-in object Reflect</a></p>
 <p>When we talk about “basic semantics” in programming languages, we mean the fundamental operations for reading and modifying data. In JavaScript, these operations typically include reading property values and setting property values. For example, given an object <code>obj</code>, the following operations are considered basic semantics:</p>
@@ -1386,9 +1394,9 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
 </ol>
 <p>In the above code, <code>Proxy</code> objects allow us to intercept (or redefine) these basic semantic operations. The <code>Proxy</code> constructor takes two parameters: the object being proxied and an object containing interceptors (also known as traps). In the interceptor object, we can define the <code>get</code> method to intercept property read operations and the <code>set</code> method to intercept property set operations. This way, we can execute custom logic when these operations occur.</p>
 <p>Understanding these basic semantic operations and how to use <code>Proxy</code> and <code>Reflect</code> to intercept and handle them is crucial for implementing reactive data in JavaScript. In reactive data, we can use <code>Proxy</code> and <code>Reflect</code> to track reads and modifications of object properties, enabling reactive updates of data.</p>
-<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2>
-<p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
+<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2><p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Here, <code>obj.foo</code> is a basic semantic operation for reading property values, and <code>obj.foo = newValue</code> is a basic semantic operation for setting property values.</p>
 <p>Now, we can use <code>Proxy</code> to intercept these basic semantic operations.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
@@ -1406,6 +1414,7 @@ shallowReadonlyObj<span class="token punctuation">.</span>innerObj<span class="t
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// Outputs: Reading property foo</span>
 proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Setting property foo to 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we created a <code>handler</code> object that defines <code>get</code> and <code>set</code> methods to intercept property reads and sets. Then, we created a proxy object <code>proxyObj</code> using the <code>Proxy</code> constructor, which intercepts read and set operations on the <code>obj</code> object. When we access <code>proxyObj.foo</code>, the <code>get</code> method is triggered, outputting the corresponding message. When we set the value of <code>proxyObj.foo</code>, the <code>set</code> method is triggered, again outputting the corresponding message.</p>
 <p>This way, <code>Proxy</code> allows us to execute custom logic when basic semantic operations occur, without directly manipulating the original object. In practical applications, this capability can be used to implement reactive data, data validation, logging, and more.</p>
 <p>When intercepting object property reads with <code>Proxy</code>, special attention is required for accessor properties because accessor properties are defined using getter functions. The <code>this</code> keyword inside these getter functions changes based on the method of invocation.</p>
@@ -1426,13 +1435,12 @@ proxyObj<span class="token punctuation">.</span>foo <span class="token operator"
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// Triggers re-execution of the side effect function</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we use <code>Reflect.get</code> with the <code>receiver</code> parameter to ensure that <code>this</code> points to the proxy object within the <code>get</code> interceptor function. This establishes the correct reactive relationship, allowing proper dependency tracking when accessing object properties.</p>
-<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2>
-<p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
+<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2><p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
 <p>To address this issue, we use <code>Reflect.get(target, key, receiver)</code> instead of <code>target[key]</code>. By doing so, the <code>receiver</code> parameter correctly points to the proxy object, allowing the <code>this</code> keyword inside the getter function to refer to the proxy object. This establishes the proper reactive relationship.</p>
 <p>Here is an example demonstrating the use of the <code>receiver</code> parameter and comparing it with the scenario where the <code>receiver</code> parameter is not used:</p>
-<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -1447,9 +1455,9 @@ proxyObj<span class="token punctuation">.</span>foo<span class="token operator">
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we use the <code>receiver</code> parameter passed to <code>Reflect.get</code> to ensure that <code>this</code> inside the <code>get</code> interceptor function refers to the proxy object <code>proxy</code>. When you access <code>proxy.foo</code>, the <code>get</code> interceptor function is triggered, and <code>this</code> points to the <code>proxy</code> object.</p>
-<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
 
@@ -1465,11 +1473,11 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Output: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
 <p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -1489,7 +1497,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-10-31T16:13:47.000Z" itemprop="datePublished">1 November 2023</time>
+            <time datetime="2023-10-31T16:13:47.000Z" itemprop="datePublished">November 1, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -1505,8 +1513,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
 <p>For instance, consider the following asynchronous code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
 
@@ -1518,10 +1525,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, the <code>fetchData</code> function is asynchronous, and it assigns the data to the <code>data</code> variable after 1 second. However, due to JavaScript’s single-threaded nature, the <code>fetchData</code> function waits in the main thread’s event queue for 1 second. Within this 1 second, the <code>console.log(data)</code> statement executes immediately, and at that point, the value of <code>data</code> is <code>undefined</code> because the <code>fetchData</code> function has not completed yet.</p>
 <p>In asynchronous programming, due to the non-blocking nature of the code, similar race condition issues can arise. When dealing with asynchronous operations, it’s crucial to ensure data consistency and correctness, avoiding accessing or modifying related data before the asynchronous operation is completed.</p>
-<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2>
-<p>So, how are race conditions related to reactivity?</p>
+<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2><p>So, how are race conditions related to reactivity?</p>
 <p>Consider the following example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData<span class="token punctuation">;</span>
 <span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
@@ -1530,6 +1537,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// Assign the request result to data</span>
   finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code snippet, we use the <code>watch</code> function to observe changes to the <code>obj</code> object. Every time the <code>obj</code> object changes, a network request, such as an API call, is sent. After the data request is successful, the result is assigned to the <code>finalData</code> variable. At first glance, this code might seem fine. However, upon closer inspection, you’ll realize that this code can lead to race condition problems. Let’s assume we modify a field of the <code>obj</code> object for the first time, triggering the callback function and sending the first request A. As time passes, before the result of request A returns, we modify a field of the <code>obj</code> object again, triggering the second request B. Now, both request A and request B are in progress. Which request will return its result first? We don’t know. If request B completes before request A, the finalData variable will store the result of request B, making request A’s result outdated.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="Comparison"></p>
 <p>However, because request B was sent later, we consider its data as the “latest.” Request A is deemed “expired,” and its result should be invalidated. By ensuring that request B’s result is considered the latest, we can prevent errors caused by race conditions. Essentially, what we need is a way to expire side effects. To illustrate this concept further, let’s replicate the scenario using the <code>watch</code> function in Vue.js to see how Vue.js helps developers address this problem. Later, we’ll attempt to implement this functionality ourselves.</p>
@@ -1552,11 +1560,11 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token comment">// Subsequent operations...</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
 <p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>
@@ -1576,7 +1584,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">31 October 2023</time>
+            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">October 31, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -1592,13 +1600,12 @@ console<span class="token punctuation">.</span><span class="token function">log<
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
-<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2>
-<p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
+<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2><p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>However, in certain cases, we want the side-effect function to execute only when needed, not immediately. A typical scenario is with computed properties. To achieve this delayed execution, we can add a <code>lazy</code> property to the <code>options</code> object and set it to <code>true</code>. When <code>lazy</code> is <code>true</code>, the side-effect function is not executed during initialization but only when necessary. The modified code looks like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// This function will not execute immediately</span>
@@ -1610,6 +1617,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the implementation, the side-effect function <code>effectFn</code> is returned as the result of the <code>effect</code> function. This means that when we call the <code>effect</code> function, we get the corresponding side-effect function and can manually execute it when needed. This mechanism gives us more control, allowing us to decide when to trigger the execution of the side-effect function rather than executing it immediately.</p>
 <p>This design pattern is particularly suitable for specific scenarios like computed properties. In computed properties, we might want to trigger the side-effect function’s execution at a specific moment rather than immediately during initialization. By returning the side-effect function from the <code>effect</code> function, we can flexibly control when the side-effect function is executed to meet different requirements in various scenarios.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1634,6 +1642,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <span class="token comment">// Return the side-effect function as the result</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, the <code>effect</code> function’s second parameter is an <code>options</code> object, where the <code>lazy</code> property is set to <code>true</code>. This means that the side-effect function passed to <code>effect</code> will be executed only when necessary, such as when accessing a computed property. The <code>lazy</code> property allows us to control the immediate execution of the side-effect function.</p>
 <p>Now that we have achieved lazy computation through computed properties, how do we implement data caching?</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -1660,14 +1669,15 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>With lazy computation resolved, the <code>value</code> is calculated only when it is truly needed, executing <code>effectFn</code> only when necessary. Additionally, a <code>dirty</code> flag is introduced to indicate whether the current computation needs to be recalculated. If <code>dirty</code> is <code>true</code>, the <code>value</code> is recalculated, and the <code>dirty</code> flag is set to <code>false</code> so that the cached value can be used directly next time.</p>
-<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2>
-<p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
+<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2><p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Data changed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying the reactive data triggers the execution of the callback function</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Suppose <code>obj</code> is a reactive data, watched using the <code>watch</code> function with a provided callback function. When modifying the reactive data’s value, the callback function is triggered. In fact, the implementation of <code>watch</code> essentially utilizes the <code>effect</code> and the <code>options.scheduler</code> option, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -1676,6 +1686,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// The scheduler function is executed when obj.foo's value changes</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In a side-effect function accessing the reactive data <code>obj.foo</code>, based on the previous discussion, we know that this establishes a connection between the side-effect function and the reactive data. When the reactive data changes, the side-effect function is re-executed. However, there is an exception: if the side-effect function has a <code>scheduler</code> option, when the reactive data changes, the <code>scheduler</code> function is executed instead of directly triggering the side-effect function. From this perspective, the <code>scheduler</code> function acts as a callback function, and the implementation of <code>watch</code> utilizes this characteristic.</p>
 <p>Below is the simplest implementation of the <code>watch</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// The watch function receives two parameters: source (reactive data) and cb (callback function)</span>
@@ -1692,11 +1703,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
 <p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>

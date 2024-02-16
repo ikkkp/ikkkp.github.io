@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Previously, we discussed the effect function, which is used to register side-effect functions. It allows specifying options parameters, such as the scheduler to control the timing and man">
+    <meta name="description" content="IntroductionPreviously, we discussed the effect function, which is used to register side-effect functions. It allows specifying options parameters, such as the scheduler to control the timing and mann">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-watch-computed">
 <meta property="og:url" content="https://ikkkp.github.io/2023/10/31/en/vue-watch-computed/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Previously, we discussed the effect function, which is used to register side-effect functions. It allows specifying options parameters, such as the scheduler to control the timing and man">
+<meta property="og:description" content="IntroductionPreviously, we discussed the effect function, which is used to register side-effect functions. It allows specifying options parameters, such as the scheduler to control the timing and mann">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-10-31T04:45:41.000Z">
@@ -212,7 +212,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">31 October 2023</time>
+            <time datetime="2023-10-31T04:45:41.000Z" itemprop="datePublished">October 31, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -228,13 +228,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
-<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2>
-<p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Previously, we discussed the <code>effect</code> function, which is used to register side-effect functions. It allows specifying options parameters, such as the <code>scheduler</code> to control the timing and manner of side-effect function execution. We also explored the <code>track</code> function for dependency tracking and the <code>trigger</code> function to re-execute side-effect functions. Combining these concepts, we can implement a fundamental and distinctive feature of Vue.js – computed properties.</p>
+<h2><span id="computed-properties-and-the-lazy-option">Computed Properties and the <code>lazy</code> Option</span></h2><p>In Vue.js, the <code>effect</code> function is used to create reactive side-effect functions. By default, side-effect functions passed to <code>effect</code> are executed immediately. For example, in the code below, the side-effect function passed to the <code>effect</code> function is executed immediately:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>However, in certain cases, we want the side-effect function to execute only when needed, not immediately. A typical scenario is with computed properties. To achieve this delayed execution, we can add a <code>lazy</code> property to the <code>options</code> object and set it to <code>true</code>. When <code>lazy</code> is <code>true</code>, the side-effect function is not executed during initialization but only when necessary. The modified code looks like this:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span>
   <span class="token comment">// This function will not execute immediately</span>
@@ -246,6 +245,7 @@
     <span class="token literal-property property">lazy</span><span class="token operator">:</span> <span class="token boolean">true</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the implementation, the side-effect function <code>effectFn</code> is returned as the result of the <code>effect</code> function. This means that when we call the <code>effect</code> function, we get the corresponding side-effect function and can manually execute it when needed. This mechanism gives us more control, allowing us to decide when to trigger the execution of the side-effect function rather than executing it immediately.</p>
 <p>This design pattern is particularly suitable for specific scenarios like computed properties. In computed properties, we might want to trigger the side-effect function’s execution at a specific moment rather than immediately during initialization. By returning the side-effect function from the <code>effect</code> function, we can flexibly control when the side-effect function is executed to meet different requirements in various scenarios.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">effect</span><span class="token punctuation">(</span><span class="token parameter">fn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -270,6 +270,7 @@
   <span class="token comment">// Return the side-effect function as the result</span>
   <span class="token keyword">return</span> effectFn<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, the <code>effect</code> function’s second parameter is an <code>options</code> object, where the <code>lazy</code> property is set to <code>true</code>. This means that the side-effect function passed to <code>effect</code> will be executed only when necessary, such as when accessing a computed property. The <code>lazy</code> property allows us to control the immediate execution of the side-effect function.</p>
 <p>Now that we have achieved lazy computation through computed properties, how do we implement data caching?</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token parameter">getter</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -296,14 +297,15 @@
 
   <span class="token keyword">return</span> obj<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>With lazy computation resolved, the <code>value</code> is calculated only when it is truly needed, executing <code>effectFn</code> only when necessary. Additionally, a <code>dirty</code> flag is introduced to indicate whether the current computation needs to be recalculated. If <code>dirty</code> is <code>true</code>, the <code>value</code> is recalculated, and the <code>dirty</code> flag is set to <code>false</code> so that the cached value can be used directly next time.</p>
-<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2>
-<p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
+<h2><span id="implementation-principle-of-watch">Implementation Principle of <code>watch</code></span></h2><p>The concept of watch essentially involves observing a reactive data and executing the corresponding callback function when the data changes. For example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Data changed'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token comment">// Modifying the reactive data triggers the execution of the callback function</span>
 obj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Suppose <code>obj</code> is a reactive data, watched using the <code>watch</code> function with a provided callback function. When modifying the reactive data’s value, the callback function is triggered. In fact, the implementation of <code>watch</code> essentially utilizes the <code>effect</code> and the <code>options.scheduler</code> option, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
   console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>foo<span class="token punctuation">)</span>
@@ -312,6 +314,7 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
 <span class="token comment">// The scheduler function is executed when obj.foo's value changes</span>
 <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In a side-effect function accessing the reactive data <code>obj.foo</code>, based on the previous discussion, we know that this establishes a connection between the side-effect function and the reactive data. When the reactive data changes, the side-effect function is re-executed. However, there is an exception: if the side-effect function has a <code>scheduler</code> option, when the reactive data changes, the <code>scheduler</code> function is executed instead of directly triggering the side-effect function. From this perspective, the <code>scheduler</code> function acts as a callback function, and the implementation of <code>watch</code> utilizes this characteristic.</p>
 <p>Below is the simplest implementation of the <code>watch</code> function:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// The watch function receives two parameters: source (reactive data) and cb (callback function)</span>
@@ -328,11 +331,11 @@ obj<span class="token punctuation">.</span>foo<span class="token operator">++</s
     <span class="token punctuation">&#125;</span>
   <span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this code, we first define an original data object named <code>data</code>, which contains a property <code>foo</code> with an initial value of 1. Next, we create a proxy object <code>obj</code> using Proxy, intercepting operations on the data.</p>
 <p>When <code>obj.foo++</code> is executed, the set interceptor of Proxy is triggered. In the set interceptor, we first set the property value on the target object and then call the <code>watch</code> function, passing <code>obj</code> and a callback function. In the <code>watch</code> function, we use a hypothetical <code>effect</code> function (which might be provided by a framework) to listen for data changes.</p>
 <hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em></p>
-<pre><code></code></pre>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 
     
     </div>

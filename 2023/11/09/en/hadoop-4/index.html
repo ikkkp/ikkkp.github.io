@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="What is Hadoop Yarn? In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unr">
+    <meta name="description" content="What is Hadoop Yarn?In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unre">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hadoop 2.0 Architecture - Yarn Distributed File System">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/09/en/hadoop-4/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="What is Hadoop Yarn? In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unr">
+<meta property="og:description" content="What is Hadoop Yarn?In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unre">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-09T04:28:01.000Z">
@@ -240,7 +240,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-09T04:28:01.000Z" itemprop="datePublished">9 November 2023</time>
+            <time datetime="2023-11-09T04:28:01.000Z" itemprop="datePublished">November 9, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -256,12 +256,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="what-is-hadoop-yarn">What is Hadoop Yarn?</span></h2>
-<p>In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unreasonable. Therefore, during the upgrade process from 1.0 to 2.0, Hadoop separated the resource scheduling work of JobTracker and made it an independent resource management framework, which directly made Hadoop the most stable cornerstone in big data. This independent resource management framework is Yarn.</p>
+        <h2><span id="what-is-hadoop-yarn">What is Hadoop Yarn?</span></h2><p>In the ancient Hadoop 1.0, the JobTracker of MapReduce was responsible for too many tasks, including resource scheduling and managing numerous TaskTrackers. This was naturally unreasonable. Therefore, during the upgrade process from 1.0 to 2.0, Hadoop separated the resource scheduling work of JobTracker and made it an independent resource management framework, which directly made Hadoop the most stable cornerstone in big data. This independent resource management framework is Yarn.</p>
 <p>Before we introduce Yarn in detail, let’s briefly talk about Yarn. The full name of Yarn is “Yet Another Resource Negotiator”, which means “another resource scheduler”. This naming is similar to “Have a Nice Inn”. Here’s a little more information: there used to be a Java project compilation tool called Ant, which was named similarly, “Another Neat Tool” in abbreviation, which means “another organizing tool”.</p>
 <p>Since it is called a resource scheduler, its function is naturally responsible for resource management and scheduling. Next, let’s take a closer look at Yarn.</p>
-<h2><span id="yarn-architecture">Yarn Architecture</span></h2>
-<p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
+<h2><span id="yarn-architecture">Yarn Architecture</span></h2><p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
 <p>① Client: The client is responsible for submitting jobs to the cluster.</p>
 <p>② ResourceManager: The main process of the cluster, the arbitration center, is responsible for cluster resource management and task scheduling.</p>
 <p>③ Scheduler: Resource arbitration module.</p>
@@ -269,58 +267,42 @@
 <p>⑤ NodeManager: The cluster’s secondary process, which manages and monitors Containers and executes specific tasks.</p>
 <p>⑥ Container: A collection of local resources, such as a Container with 4 CPUs and 8GB of memory.</p>
 <p>⑦ ApplicationMaster: The task execution and supervision center.</p>
-<h3><span id="three-main-components">Three Main Components</span></h3>
-<p>Looking at the top of the figure, we can intuitively see two main components, ResourceManager and NodeManager, but there is actually an ApplicationMaster that is not displayed in the figure. Let’s take a look at these three components separately.</p>
-<h4><span id="resourcemanager">ResourceManager</span></h4>
-<p>Let’s start with the ResourceManager in the center of the figure. From the name, we can know that this component is responsible for resource management, and there is only one ResourceManager in the entire system to be responsible for resource scheduling.</p>
+<h3><span id="three-main-components">Three Main Components</span></h3><p>Looking at the top of the figure, we can intuitively see two main components, ResourceManager and NodeManager, but there is actually an ApplicationMaster that is not displayed in the figure. Let’s take a look at these three components separately.</p>
+<h4><span id="resourcemanager">ResourceManager</span></h4><p>Let’s start with the ResourceManager in the center of the figure. From the name, we can know that this component is responsible for resource management, and there is only one ResourceManager in the entire system to be responsible for resource scheduling.</p>
 <p>It also includes two main components: the Scheduler and the ApplicationManager.</p>
 <p>The Scheduler: Essentially, the Scheduler is a strategy or algorithm. When a client submits a task, it allocates resources based on the required resources and the current state of the cluster. Note that it only allocates resources to the application and does not monitor the status of the application.</p>
 <p>ApplicationManager: Similarly, you can roughly guess what it does from its name. The ApplicationManager is responsible for managing the applications submitted by the client. Didn’t we say that the Scheduler does not monitor the program submitted by the user? In fact, the monitoring of the application is done by the ApplicationManager.</p>
-<h4><span id="applicationmaster">ApplicationMaster</span></h4>
-<p>Every time a client submits an Application, a new ApplicationMaster is created. This ApplicationMaster applies to the ResourceManager for container resources, sends the program to be run to the container after obtaining the resources, and then performs distributed computing.</p>
+<h4><span id="applicationmaster">ApplicationMaster</span></h4><p>Every time a client submits an Application, a new ApplicationMaster is created. This ApplicationMaster applies to the ResourceManager for container resources, sends the program to be run to the container after obtaining the resources, and then performs distributed computing.</p>
 <p>This may be a bit difficult to understand. Why send the running program to the container? If you look at it from a traditional perspective, the program runs still, and data flows in and out constantly. But when the data volume is large, it cannot be done because the cost of moving massive data is too high and takes too long. However, there is an old Chinese saying that “if the mountain will not come to Muhammad, then Muhammad must go to the mountain.” This is the idea of big data distributed computing. Since big data is difficult to move, I will publish the application program that is easy to move to each node for calculation. This is the idea of big data distributed computing.</p>
-<h4><span id="nodemanager">NodeManager</span></h4>
-<p>The NodeManager is a proxy for the ResourceManager on each machine, responsible for container management, monitoring their resource usage (CPU, memory, disk, and network, etc.), and providing these resource usage reports to the ResourceManager/Scheduler.</p>
+<h4><span id="nodemanager">NodeManager</span></h4><p>The NodeManager is a proxy for the ResourceManager on each machine, responsible for container management, monitoring their resource usage (CPU, memory, disk, and network, etc.), and providing these resource usage reports to the ResourceManager&#x2F;Scheduler.</p>
 <p>The main idea of Yarn is to split the two functions of resource management and task scheduling of MRv1 JobTracker into two independent processes:</p>
 <p><img src="/img/yarn-pkg/Yarn2.png" alt="hadoop-Yarn"></p>
 <ul>
-<li>
-<p>Yarn is still a master/slave structure.</p>
+<li><p>Yarn is still a master&#x2F;slave structure.</p>
 </li>
-<li>
-<p>The main process ResourceManager is the resource arbitration center of the entire cluster.</p>
+<li><p>The main process ResourceManager is the resource arbitration center of the entire cluster.</p>
 </li>
-<li>
-<p>The secondary process NodeManager manages local resources.</p>
+<li><p>The secondary process NodeManager manages local resources.</p>
 </li>
-<li>
-<p>ResourceManager and the subordinate node process NodeManager form the Hadoop 2.0 distributed data computing framework.</p>
+<li><p>ResourceManager and the subordinate node process NodeManager form the Hadoop 2.0 distributed data computing framework.</p>
 </li>
 </ul>
-<h2><span id="the-process-of-submitting-an-application-to-yarn">The Process of Submitting an Application to Yarn</span></h2>
-<p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
+<h2><span id="the-process-of-submitting-an-application-to-yarn">The Process of Submitting an Application to Yarn</span></h2><p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
 <p>This figure shows the process of submitting a program, and we will discuss the process of each step in detail below.</p>
 <ul>
-<li>
-<p>The client submits an application to Yarn, assuming it is a MapReduce job.</p>
+<li><p>The client submits an application to Yarn, assuming it is a MapReduce job.</p>
 </li>
-<li>
-<p>The ResourceManager communicates with the NodeManager to allocate the first container for the application and runs the ApplicationMaster corresponding to the application in this container.</p>
+<li><p>The ResourceManager communicates with the NodeManager to allocate the first container for the application and runs the ApplicationMaster corresponding to the application in this container.</p>
 </li>
-<li>
-<p>After the ApplicationMaster is started, it splits the job (i.e., the application) into tasks that can run in one or more containers. Then it applies to the ResourceManager for containers to run the program and sends heartbeats to the ResourceManager regularly.</p>
+<li><p>After the ApplicationMaster is started, it splits the job (i.e., the application) into tasks that can run in one or more containers. Then it applies to the ResourceManager for containers to run the program and sends heartbeats to the ResourceManager regularly.</p>
 </li>
-<li>
-<p>After obtaining the container, the ApplicationMaster communicates with the NodeManager corresponding to the container and distributes the job to the container in the NodeManager. The MapReduce that has been split will be distributed here, and the container may run Map tasks or Reduce tasks.</p>
+<li><p>After obtaining the container, the ApplicationMaster communicates with the NodeManager corresponding to the container and distributes the job to the container in the NodeManager. The MapReduce that has been split will be distributed here, and the container may run Map tasks or Reduce tasks.</p>
 </li>
-<li>
-<p>The task running in the container sends heartbeats to the ApplicationMaster to report its status. When the program is finished, the ApplicationMaster logs out and releases the container resources to the ResourceManager.<br>
-The above is the general process of running a job.</p>
+<li><p>The task running in the container sends heartbeats to the ApplicationMaster to report its status. When the program is finished, the ApplicationMaster logs out and releases the container resources to the ResourceManager.<br>The above is the general process of running a job.</p>
 </li>
 </ul>
 <p><img src="/img/yarn-pkg/Yarn4.png" alt="hadoop-Yarn"></p>
-<h2><span id="typical-topology-of-yarn-architecture">Typical Topology of Yarn Architecture</span></h2>
-<p>In addition to the two entities of <code>ResourceManager</code> and <code>NodeManager</code>, Yarn also includes two entities of <code>WebAppProxyServer</code> and <code>JobHistoryServer</code>.</p>
+<h2><span id="typical-topology-of-yarn-architecture">Typical Topology of Yarn Architecture</span></h2><p>In addition to the two entities of <code>ResourceManager</code> and <code>NodeManager</code>, Yarn also includes two entities of <code>WebAppProxyServer</code> and <code>JobHistoryServer</code>.</p>
 <p><img src="/img/yarn-pkg/Yarn5.png" alt="hadoop-Yarn"></p>
 <p><code>JobHistoryServer</code>: Manages completed Yarn tasks</p>
 <ul>
@@ -332,12 +314,9 @@ The above is the general process of running a job.</p>
 <li>By using a proxy, not only the pressure on ResourceManager is further reduced, but also the Web attacks on Yarn can be reduced.</li>
 <li>Responsible for supervising the entire MapReduce task execution process, collecting the task execution information from the Container, and displaying it on a Web interface.</li>
 </ul>
-<h2><span id="yarn-scheduling-strategy">Yarn Scheduling Strategy</span></h2>
-<p><strong>Capacity Scheduling Algorithm</strong><br>
-<code>CapacityScheduler</code> is a multi-user and multi-task scheduling strategy that divides tasks into queues and allocates resources in <code>Container</code> units.</p>
+<h2><span id="yarn-scheduling-strategy">Yarn Scheduling Strategy</span></h2><p><strong>Capacity Scheduling Algorithm</strong><br><code>CapacityScheduler</code> is a multi-user and multi-task scheduling strategy that divides tasks into queues and allocates resources in <code>Container</code> units.</p>
 <p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
-<p><strong>Fair Scheduling Strategy</strong><br>
-<code>FairScheduler</code> is a pluggable scheduling strategy that allows multiple <code>Yarn</code> tasks to use cluster resources fairly.</p>
+<p><strong>Fair Scheduling Strategy</strong><br><code>FairScheduler</code> is a pluggable scheduling strategy that allows multiple <code>Yarn</code> tasks to use cluster resources fairly.</p>
 <p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
 
     

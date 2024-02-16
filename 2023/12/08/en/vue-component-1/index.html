@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Preface In a previous discussion, we explored the Vue renderer, where the renderer is primarily responsible for rendering the virtual DOM into the real DOM. We only need to use the virtual DOM to desc">
+    <meta name="description" content="PrefaceIn a previous discussion, we explored the Vue renderer, where the renderer is primarily responsible for rendering the virtual DOM into the real DOM. We only need to use the virtual DOM to descr">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Implementation Principles of Vue.js Components">
 <meta property="og:url" content="https://ikkkp.github.io/2023/12/08/en/vue-component-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Preface In a previous discussion, we explored the Vue renderer, where the renderer is primarily responsible for rendering the virtual DOM into the real DOM. We only need to use the virtual DOM to desc">
+<meta property="og:description" content="PrefaceIn a previous discussion, we explored the Vue renderer, where the renderer is primarily responsible for rendering the virtual DOM into the real DOM. We only need to use the virtual DOM to descr">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-12-08T07:45:05.000Z">
@@ -212,7 +212,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">8 December 2023</time>
+            <time datetime="2023-12-08T07:45:05.000Z" itemprop="datePublished">December 8, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -228,12 +228,10 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="preface">Preface</span></h2>
-<p>In a previous discussion, we explored the <a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">Vue renderer</a>, where <strong>the renderer is primarily responsible for rendering the virtual DOM into the real DOM</strong>. We only need to use the virtual DOM to describe the final content to be rendered.</p>
+        <h2><span id="preface">Preface</span></h2><p>In a previous discussion, we explored the <a href="https://ikkkp.github.io/2023/11/05/vue-renderer-1/">Vue renderer</a>, where <strong>the renderer is primarily responsible for rendering the virtual DOM into the real DOM</strong>. We only need to use the virtual DOM to describe the final content to be rendered.</p>
 <p>However, when creating more complex pages, the code for the virtual DOM used to describe the page structure becomes larger, or we can say that the page template becomes more extensive. In such cases, the ability to modularize components becomes essential.</p>
 <p>With components, we can break down a large page into multiple parts, each part serving as an independent component. These components collectively form the complete page. The implementation of components also requires support from the renderer.</p>
-<h2><span id="rendering-components">Rendering Components</span></h2>
-<p>From the user’s perspective, a stateful component is simply an options object, as shown in the code below:</p>
+<h2><span id="rendering-components">Rendering Components</span></h2><p>From the user’s perspective, a stateful component is simply an options object, as shown in the code below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent is a component, and its value is an options object</span>
 <span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
@@ -241,12 +239,14 @@
     <span class="token keyword">return</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>However, from the internal implementation of the renderer, a component is a special type of virtual DOM node. For example, to describe a regular tag, we use the vnode.type property of the virtual node to store the tag name, as shown in the code below:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// This vnode is used to describe a regular tag</span>
 <span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span>
   <span class="token comment">// ...</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>To describe a fragment, we set the vnode.type property of the virtual node to ‘Fragment’, and to describe text, we set the vnode.type property to ‘Text’.</p>
 <p>Do you recall the <code>patch function</code> we discussed earlier in the renderer?</p>
 <p><strong>In the patch function, Vue processes different logic based on the differences between the new and old virtual DOM nodes.</strong> If it’s the initial rendering, it executes the logic for the initial rendering; if it’s an update rendering, it updates the actual DOM nodes based on the differences.</p>
@@ -275,6 +275,7 @@
   <span class="token comment">// Return the actual DOM element of the new node</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>As you can see, the renderer uses the vnode.type property of the virtual node to differentiate its type. Different types of nodes require different methods for mounting and updating.</p>
 <p>In reality, this applies to components as well. <strong>To use virtual nodes to describe components, we can use the vnode.type property to store the component’s options object.</strong></p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patch</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -311,6 +312,7 @@
   <span class="token comment">// Return the actual DOM element of the new node</span>
   <span class="token keyword">return</span> n2<span class="token punctuation">.</span>el<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In the above code, we added an else if branch to handle the case where the vnode.type property value is an object, treating it as a virtual node describing a component. We call the mountComponent and patchComponent functions to mount and update the component.</p>
 <p>Now let’s focus on the basics of writing components—what the user should write when creating components, what the options object of a component must include, and what capabilities a component possesses.</p>
 <p>Therefore, a component must include a rendering function, i.e., the render function, and the return value of the render function should be a virtual DOM. In other words, the render function of a component is an interface for describing the content that the component renders, as shown in the code below:</p>
@@ -351,8 +353,8 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
   <span class="token comment">// Finally, call the patch function to mount the content described by the component, i.e., subTree</span>
   <span class="token function">patch</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> subTree<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="conclusion">Conclusion</span></h2>
-<p>Let’s recap the basics of components. We explicitly declared an object instance for a component, and the options object of the component must include a rendering function, i.e., the render function. The return value of the render function should be a virtual DOM. We then call render and patch to update and replace components. **In other words, the render function of a component is an interface for describing</p>
+
+<h2><span id="conclusion">Conclusion</span></h2><p>Let’s recap the basics of components. We explicitly declared an object instance for a component, and the options object of the component must include a rendering function, i.e., the render function. The return value of the render function should be a virtual DOM. We then call render and patch to update and replace components. **In other words, the render function of a component is an interface for describing</p>
 
     
     </div>

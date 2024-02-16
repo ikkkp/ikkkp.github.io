@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="前言 在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。 另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。 在Vue.">
+    <meta name="description" content="前言在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。 另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。 在Vue.j">
 <meta property="og:type" content="article">
 <meta property="og:title" content="vue-renderer渲染器的原理">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/05/vue-renderer-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="前言 在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。 另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。 在Vue.">
+<meta property="og:description" content="前言在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。 另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。 在Vue.j">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-05T04:47:50.000Z">
@@ -235,7 +235,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T04:47:50.000Z" itemprop="datePublished">2023年11月5日</time>
+            <time datetime="2023-11-05T04:47:50.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -249,23 +249,16 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="前言">前言</span></h2>
-<p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
+        <h2><span id="前言">前言</span></h2><p>在 Vue.js 中，很多功能依赖渲染器来实现，例如 Transition组件、Teleport 组件、Suspense 组件，以及 template ref 和自定义指令等。</p>
 <p>另外，渲染器也是框架性能的核心，渲染器的实现直接影响框架的性能。Vue.js 3 的渲染器不仅仅包含传统的 Diff 算法，它还独创了快捷路径的更新方式，能够充分利用编译器提供的信息，大大提升了更新性能。</p>
 <p>在Vue.js中，渲染器（renderer）是负责执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。渲染器不仅可以渲染真实DOM元素，还是框架跨平台能力的关键。在设计渲染器时，需要考虑其可自定义的能力。</p>
-<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2>
-<p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
+<h2><span id="渲染器的基本概念及其含义">渲染器的基本概念及其含义</span></h2><p>在实现一个最基本的渲染器之前，我们要先了解几个基本的概念：</p>
 <p>在Vue.js中，渲染器（renderer）是用来执行渲染任务的组件。在浏览器平台上，它将虚拟DOM渲染为真实DOM元素。以下是渲染器的基本概念及其含义：</p>
-<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3>
-<p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3>
-<p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
-<h3><span id="挂载mounting">挂载（Mounting）</span></h3>
-<p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
-<h3><span id="容器container">容器（Container）</span></h3>
-<p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
-<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3>
-<p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
+<h3><span id="渲染器renderer">渲染器（Renderer）</span></h3><p>渲染器是负责将虚拟DOM（或虚拟节点）渲染为特定平台上的真实元素的组件。在浏览器平台上，渲染器会将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="虚拟domvnode">虚拟DOM（vnode）</span></h3><p>虚拟DOM（也称为虚拟节点，简写为vnode）是一个树型结构，类似于真实DOM，由各种节点组成。渲染器的任务是将虚拟DOM渲染为真实的DOM元素。</p>
+<h3><span id="挂载mounting">挂载（Mounting）</span></h3><p>挂载是指将虚拟DOM渲染为真实DOM元素并将其添加到指定的挂载点上。在Vue.js中，组件的<code>mounted</code>钩子函数就是在挂载完成时触发，此时可以访问到真实DOM元素。</p>
+<h3><span id="容器container">容器（Container）</span></h3><p>容器是指用来指定挂载位置的DOM元素。渲染器会将虚拟DOM渲染为真实DOM元素并添加到指定的容器内。在渲染器的<code>render</code>函数中，通常会传入一个容器参数，表示将虚拟DOM挂载到哪个DOM元素上。</p>
+<h3><span id="渲染器的创建与使用">渲染器的创建与使用</span></h3><p>渲染器的创建通常使用<code>createRenderer</code>函数，该函数返回一个包含渲染和激活（hydrate）函数的对象。激活函数在同构渲染时使用，将虚拟DOM激活为已有的真实DOM元素。以下是渲染器的创建和使用示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">function</span> <span class="token function">render</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 渲染逻辑</span>
@@ -286,17 +279,21 @@
 <span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 同构渲染</span>
 <span class="token function">hydrate</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>上面的代码片中通过<code>createRenderer</code>函数创建了一个渲染器对象，包含了<code>render</code>和<code>hydrate</code>函数。<code>render</code>函数用于将虚拟DOM渲染为真实DOM元素，而<code>hydrate</code>函数用于将虚拟DOM激活为已有的真实DOM元素。</p>
 <p>好的，现在我们已经对渲染器有了一个比较基础的认识，下面来一步步深入了解一下：</p>
 <p>渲染器的实现可以通过如下的函数来表示，其中<code>domString</code>是待渲染的HTML字符串，<code>container</code>是挂载点的DOM元素：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token parameter">domString<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   container<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> domString<span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
 <p>使用渲染器的示例：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">renderer</span><span class="token punctuation">(</span><span class="token string">'&lt;h1>Hello&lt;/h1>'</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>上述代码将<code>&lt;h1&gt;Hello&lt;/h1&gt;</code>插入到id为<code>app</code>的DOM元素内。渲染器不仅可以渲染静态字符串，还可以渲染动态拼接的HTML内容：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
 <span class="token function">renderer</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>count<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">'app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
 <p>如果<code>count</code>是一个响应式数据，那么可以使用响应系统来自动化整个渲染过程。首先，定义一个响应式数据<code>count</code>，然后在副作用函数内调用渲染器函数进行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> count <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -305,9 +302,11 @@
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 count<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在上述代码中，<code>count</code>是一个<code>ref</code>响应式数据。当修改<code>count.value</code>的值时，副作用函数会重新执行，完成重新渲染，最终渲染到页面的内容是<code>&lt;h1&gt;2&lt;/h1&gt;</code>。</p>
 <p>这里使用了Vue 3提供的<code>@vue/reactivity</code>包中的响应式API，通过<code>&lt;script&gt;</code>标签引入：</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://unpkg.com/@vue/reactivity@3.0.5/dist/reactivity.global.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>上述代码中给出了<code>render</code>函数的基本实现，下面将其执行流程进行详细分析。假设我们连续三次调用<code>renderer.render</code>函数来执行渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> renderer <span class="token operator">=</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -317,12 +316,12 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode2<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token comment">// 第三次渲染</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>在首次渲染时，渲染器将<code>vnode1</code>渲染为真实DOM，并将<code>vnode1</code>存储到容器元素的<code>container.vnode</code>属性中，作为旧vnode。</p>
 <p>在第二次渲染时，旧的vnode存在（即<code>container.vnode</code>中有值），此时渲染器将<code>vnode2</code>作为新vnode，将新旧vnode一同传递给<code>patch</code>函数进行打补丁。</p>
-<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = ''</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
+<p>在第三次渲染时，新的vnode的值为<code>null</code>，即不渲染任何内容。但是此时容器中渲染的是<code>vnode2</code>所描述的内容，所以渲染器需要清空容器。在上面的代码中，使用<code>container.innerHTML = &#39;&#39;</code>来清空容器。需要注意的是，这种清空容器的方式并不是最佳实践，但在这里仅用于演示目的。</p>
 <p>关于<code>patch</code>函数，它是整个渲染器的核心入口，接收三个参数：旧vnode <code>n1</code>、新vnode <code>n2</code>和容器 <code>container</code>。在首次渲染时，旧vnode <code>n1</code>是<code>undefined</code>，表示挂载动作。<code>patch</code>函数不仅用于打补丁，也可以执行挂载动作。</p>
-<h2><span id="自定义渲染器">自定义渲染器</span></h2>
-<p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
+<h2><span id="自定义渲染器">自定义渲染器</span></h2><p>自定义渲染器的实现是通过抽象核心渲染逻辑，使其不再依赖于特定平台的API。以下是自定义渲染器的实现示例代码，使用配置项来实现平台无关的渲染：</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 创建渲染器函数，接收配置项作为参数</span>
 <span class="token keyword">function</span> <span class="token function">createRenderer</span><span class="token punctuation">(</span><span class="token parameter">options</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// 从配置项中获取操作 DOM 的 API</span>
@@ -397,6 +396,7 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 
 <span class="token comment">// 使用自定义渲染器渲染虚拟节点到挂载点</span>
 <span class="token function">customRenderer</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> container<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>上面的代码片我们通过<code>createRenderer</code>函数创建了一个自定义渲染器，并通过配置项(<code>customRendererOptions</code>)传递操作DOM的API。渲染器在执行时，根据配置项中的API来完成相应的操作。通过这种方式，我们实现了一个通用的、不依赖于特定平台的渲染器。在实际应用中，可以根据不同的平台需求，通过配置不同的API，实现跨平台的渲染能力。</p>
 
     

@@ -186,7 +186,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2024-02-08T01:49:54.000Z" itemprop="datePublished">8 February 2024</time>
+            <time datetime="2024-02-08T01:49:54.000Z" itemprop="datePublished">February 8, 2024</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -202,14 +202,12 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="foreword">Foreword</span></h2>
-<p>One of my goals for the year 24 was to engage with the open-source community, and getting started can be challenging. I chose VueCore and ElementUI as my starting points, submitting a PR to VueCore which, unfortunately, addressed an issue that had been fixed a week prior, leaving it without follow-up.</p>
+        <h2><span id="foreword">Foreword</span></h2><p>One of my goals for the year 24 was to engage with the open-source community, and getting started can be challenging. I chose VueCore and ElementUI as my starting points, submitting a PR to VueCore which, unfortunately, addressed an issue that had been fixed a week prior, leaving it without follow-up.</p>
 <p>However, an interesting issue arose in ElementUI, let’s delve into the details:</p>
-<h2><span id="the-problem">The Problem</span></h2>
-<p>The issue looked like this: <a target="_blank" rel="noopener" href="https://github.com/element-plus/element-plus/issues/15308">Sharp Teeth</a></p>
+<h2><span id="the-problem">The Problem</span></h2><p>The issue looked like this: <a target="_blank" rel="noopener" href="https://github.com/element-plus/element-plus/issues/15308">Sharp Teeth</a></p>
 <p>Here is also an SFC link: <a target="_blank" rel="noopener" href="https://element-plus.run/#eyJzcmMvQXBwLnZ1ZSI6IjxzY3JpcHQgc2V0dXA+IHNldHVwIGNvZGUuLi4gPC9zY3JpcHQ+IHRlbXBsYXRlIGNvZGUuLi4iLCJpbXBvcnQtbWFwLmpzb24iOiJpbXBvcnRzIG1hcC4uLiIsInRzY29uZmlnLmpzb24iOiJjb21waWxlciBvcHRpb25zLi4uIn0=">SFC</a></p>
 <p>The bug occurs when there are numerous menu items in the component; ElementUI condenses the lengthy menu into an expandable section:</p>
-<p><img src="/img/element/element-1.png" alt></p>
+<p><img src="/img/element/element-1.png"></p>
 <p>As shown in the above figure, hovering over or clicking on the ellipsis area reveals an expansion panel containing all menu items.</p>
 <p><strong>The issue arises when clicking the expansion panel</strong>: if there are too many menu items, the length of the expansion panel becomes excessively long, causing the page to extend vertically, introducing a scrollbar and compressing the view width of the content below.</p>
 <p><strong>While the compression may be expected behavior</strong>, since the expansion panel naturally expands to accommodate more menu items, <strong>the problem lies in a throttling function</strong>:</p>
@@ -240,14 +238,15 @@
   isFirstTimeRender <span class="token operator">?</span> <span class="token function">callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> <span class="token function">debounce</span><span class="token punctuation">(</span>callback<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   isFirstTimeRender <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>This function is triggered when the viewport width changes, executing <code>handleResize</code>. This function calculates the current menu length and invokes a debounced function, which executes the callback only once within a specified time frame. The callback recalculates the menu length and assigns it to <code>sliceIndex</code>, thus determining the expansion state of the expansion panel.</p>
 <p><strong>The amusingly problematic part</strong>: the scrollbar introduced triggers the throttled function so frequently that it causes the page to jitter. Since the throttling delay is 33.34ms and the scrollbar trigger frequency is around 16.67ms, the throttled function is repeatedly called, leading to the jittering effect.</p>
-<h2><span id="solution">Solution</span></h2>
-<p>To solve this issue:</p>
+<h2><span id="solution">Solution</span></h2><p>To solve this issue:</p>
 <p>Initially, I considered modifying the SCSS styles, but since the style adjusts based on the menu length, changing the styles wasn’t a viable solution.</p>
 <p>I then realized that the throttling function’s purpose was likely to address the destruction and recreation of the component during window resizing. Was it necessary to invoke this function so frequently? Could we trigger it only when the number of components changes?</p>
 <p>So, I added a line to the original code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">if</span> <span class="token punctuation">(</span>sliceIndex<span class="token punctuation">.</span>value <span class="token operator">===</span> <span class="token function">calcSliceIndex</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
 <p>Although this issue was relatively simple, I found it intriguing enough to document. Submitting this PR allowed me to review Git operations and experience the pull request process and standards in an open-source project, which was indeed enlightening.</p>
 <p>Next milestone: Aim to submit PRs to Vue and ElementUI, and hopefully, contribute to the core team!</p>
 

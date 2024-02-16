@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction In a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I devel">
+    <meta name="description" content="IntroductionIn a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I develo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Perfect Implementation of a Latex Rich Text Formula Editor Based on Vue3 and MathJax Rendering">
 <meta property="og:url" content="https://ikkkp.github.io/2024/01/31/en/mathjax-latex/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction In a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I devel">
+<meta property="og:description" content="IntroductionIn a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I develo">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2024-01-31T13:07:42.000Z">
@@ -242,7 +242,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2024-01-31T13:07:42.000Z" itemprop="datePublished">31 January 2024</time>
+            <time datetime="2024-01-31T13:07:42.000Z" itemprop="datePublished">January 31, 2024</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -258,8 +258,7 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>In a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I developed a small plugin using <code>easy-formula-editor</code> and <code>wangeditor</code>. It is a <strong>Latex rich text formula editor based on Vue3 and MathJax rendering. It supports easy formula editing for users with zero experience, allows customization of the editor’s configuration and style, supports re-editing of formulas, and can be used as a standalone plugin or integrated with rich text editors.</strong></p>
+        <h2><span id="introduction">Introduction</span></h2><p>In a project, there was a need for a rich text editor with support for formula editing. However, many rich text editors lacked robust support for formula editing. To address this, I developed a small plugin using <code>easy-formula-editor</code> and <code>wangeditor</code>. It is a <strong>Latex rich text formula editor based on Vue3 and MathJax rendering. It supports easy formula editing for users with zero experience, allows customization of the editor’s configuration and style, supports re-editing of formulas, and can be used as a standalone plugin or integrated with rich text editors.</strong></p>
 <ul>
 <li>Easy formula editing for users with zero experience</li>
 <li>Customizable editor configuration and style</li>
@@ -267,30 +266,26 @@
 <li>Can be used as a standalone plugin or integrated with rich text editors</li>
 </ul>
 <p><img src="/img/mathjax/mathjax-1.png" alt="MathJax"></p>
-<h2><span id="installation-and-usage">Installation and Usage</span></h2>
-<h3><span id="npm">NPM</span></h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">npm</span> i easy-formula-editor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2><span id="installation-and-usage">Installation and Usage</span></h2><h3><span id="npm">NPM</span></h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">npm i easy-formula-editor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>or</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
 <span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h3><span id="cdn">CDN</span></h3>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>../dist/formula-editor.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+
+<h3><span id="cdn">CDN</span></h3><pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>../dist/formula-editor.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/javascript<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
   <span class="token keyword">const</span> editor <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">formulaEditor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
   editor<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token string">'#test'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="export">Export</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Latex formula</span>
+
+<h3><span id="export">Export</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Latex formula</span>
 editor<span class="token punctuation">.</span>latex<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 
 <span class="token comment">// HTML formula</span>
 editor<span class="token punctuation">.</span>$textSvgElem<span class="token punctuation">.</span><span class="token function">html</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="extending-rich-text-editor-menu-bar">Extending Rich Text Editor Menu Bar</span></h2>
-<h3><span id="registering-menus">Registering Menus</span></h3>
-<p><strong>[Note] It is recommended to use a global approach to register menus.</strong> If there are multiple editors with different custom menus, use the instance method to register menus.</p>
-<h3><span id="global-approach">Global Approach</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Menu key, each menu must be unique</span>
+
+<h2><span id="extending-rich-text-editor-menu-bar">Extending Rich Text Editor Menu Bar</span></h2><h3><span id="registering-menus">Registering Menus</span></h3><p><strong>[Note] It is recommended to use a global approach to register menus.</strong> If there are multiple editors with different custom menus, use the instance method to register menus.</p>
+<h3><span id="global-approach">Global Approach</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Menu key, each menu must be unique</span>
 <span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
 
 <span class="token comment">// Register the menu</span>
@@ -301,8 +296,8 @@ editor<span class="token punctuation">.</span><span class="token function">creat
 
 <span class="token keyword">const</span> editor2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">E</span><span class="token punctuation">(</span><span class="token string">'#div2'</span><span class="token punctuation">)</span>
 editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3><span id="instance-approach">Instance Approach</span></h3>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Menu key, each menu must be unique</span>
+
+<h3><span id="instance-approach">Instance Approach</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Menu key, each menu must be unique</span>
 <span class="token keyword">const</span> menuKey <span class="token operator">=</span> <span class="token string">'alertMenuKey'</span> 
 <span class="token keyword">const</span> menuKey2 <span class="token operator">=</span> <span class="token string">'alertMenuKey2'</span>
 
@@ -322,8 +317,8 @@ editor2<span class="token punctuation">.</span>menus<span class="token punctuati
 editor2<span class="token punctuation">.</span>config<span class="token punctuation">.</span>menus<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>menuKey2<span class="token punctuation">)</span>
 editor2<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2><span id="real-project-integration-example">Real Project Integration Example</span></h2>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token constant">E</span> <span class="token keyword">from</span> <span class="token string">"wangeditor"</span><span class="token punctuation">;</span>
+
+<h2><span id="real-project-integration-example">Real Project Integration Example</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token constant">E</span> <span class="token keyword">from</span> <span class="token string">"wangeditor"</span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> formulaEditor <span class="token keyword">from</span> <span class="token string">"easy-formula-editor"</span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> createPanelConf <span class="token keyword">from</span> <span class="token string">"./create-panel-conf"</span><span class="token punctuation">;</span>
 
@@ -361,54 +356,56 @@ editor2<span class="token punctuation">.</span><span class="token function">crea
 <span class="token constant">E</span><span class="token punctuation">.</span><span class="token function">registerMenu</span><span class="token punctuation">(</span>menuKey<span class="token punctuation">,</span> AlertMenu<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token constant">E</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">//create-panel-conf.ts</span>
-<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token keyword">function</span> <span class="token punctuation">(</span>wangEditor<span class="token punctuation">,</span> formulaEditor<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">const</span> btnOkId <span class="token operator">=</span> <span class="token string">'btn-ok'</span>
+
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#x2F;&#x2F;create-panel-conf.ts
+export default function (wangEditor, formulaEditor) &#123;
+    const btnOkId &#x3D; &#39;btn-ok&#39;
   
-    <span class="token comment">/**
+    &#x2F;**
      * Insert formula
-     */</span>
-    <span class="token keyword">function</span> <span class="token function">insertFomule</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token keyword">const</span> formula <span class="token operator">=</span> formulaEditor<span class="token punctuation">.</span>latex<span class="token punctuation">.</span><span class="token function">text</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-      <span class="token comment">// Ensure that there are spaces on both sides when inserting into wangEditor, otherwise it may lead to focus issues</span>
-      wangEditor<span class="token punctuation">.</span>txt<span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span><span class="token string">'&lt;p>'</span><span class="token operator">+</span>formula<span class="token operator">+</span><span class="token string">'&lt;/p>'</span><span class="token punctuation">)</span>
-      <span class="token keyword">return</span> <span class="token boolean">true</span>
-    <span class="token punctuation">&#125;</span>
+     *&#x2F;
+    function insertFomule() &#123;
+      const formula &#x3D; formulaEditor.latex.text()
+      &#x2F;&#x2F; Ensure that there are spaces on both sides when inserting into wangEditor, otherwise it may lead to focus issues
+      wangEditor.txt.append(&#39;&lt;p&gt;&#39;+formula+&#39;&lt;&#x2F;p&gt;&#39;)
+      return true
+    &#125;
   
-    <span class="token comment">// Tabs configuration</span>
-    <span class="token keyword">const</span> tabsConf <span class="token operator">=</span> <span class="token punctuation">[</span>
-      <span class="token punctuation">&#123;</span>
-        <span class="token comment">// Tab title</span>
-        title<span class="token operator">:</span> <span class="token string">"Insert Math Formula"</span><span class="token punctuation">,</span>
-        <span class="token comment">// Template</span>
-        tpl<span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;div>
-                &lt;div id="edit-content">&lt;/div>
-                &lt;div class="w-e-button-container">
-                  &lt;button type="button" id="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>btnOkId<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">" class="right">Insert&lt;/button>
-                &lt;/div>
-              &lt;/div></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span>
-        <span class="token comment">// Event bindings</span>
-        events<span class="token operator">:</span> <span class="token punctuation">[</span>
-          <span class="token comment">// Insert formula</span>
-          <span class="token punctuation">&#123;</span>
-            selector<span class="token operator">:</span> <span class="token string">'#'</span> <span class="token operator">+</span> btnOkId<span class="token punctuation">,</span>
-            type<span class="token operator">:</span> <span class="token string">'click'</span><span class="token punctuation">,</span>
-            fn<span class="token operator">:</span> insertFomule<span class="token punctuation">,</span>
-            bindEnter<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-          <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-        <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token comment">// Tab end</span>
-    <span class="token punctuation">]</span>
+    &#x2F;&#x2F; Tabs configuration
+    const tabsConf &#x3D; [
+      &#123;
+        &#x2F;&#x2F; Tab title
+        title: &quot;Insert Math Formula&quot;,
+        &#x2F;&#x2F; Template
+        tpl: &#96;&lt;div&gt;
+                &lt;div id&#x3D;&quot;edit-content&quot;&gt;&lt;&#x2F;div&gt;
+                &lt;div class&#x3D;&quot;w-e-button-container&quot;&gt;
+                  &lt;button type&#x3D;&quot;button&quot; id&#x3D;&quot;$&#123;btnOkId&#125;&quot; class&#x3D;&quot;right&quot;&gt;Insert&lt;&#x2F;button&gt;
+                &lt;&#x2F;div&gt;
+              &lt;&#x2F;div&gt;&#96;,
+        &#x2F;&#x2F; Event bindings
+        events: [
+          &#x2F;&#x2F; Insert formula
+          &#123;
+            selector: &#39;#&#39; + btnOkId,
+            type: &#39;click&#39;,
+            fn: insertFomule,
+            bindEnter: true,
+          &#125;,
+        ],
+      &#125;, &#x2F;&#x2F; Tab end
+    ]
   
-    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
-        width<span class="token operator">:</span> <span class="token number">660</span><span class="token punctuation">,</span>
-        height<span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
-        <span class="token comment">// Panel can contain multiple tabs</span>
-        tabs<span class="token operator">:</span> tabsConf<span class="token punctuation">,</span> <span class="token comment">// Tabs end</span>
-      <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    return &#123;
+        width: 660,
+        height: 0,
+        &#x2F;&#x2F; Panel can contain multiple tabs
+        tabs: tabsConf, &#x2F;&#x2F; Tabs end
+      &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Using the above code, you can add a formula editor menu to the rich text editor:</p>
-<pre><code class="language-vue">&lt;template&gt;
+<pre><code class="vue">&lt;template&gt;
   &lt;div class=&quot;formula-container&quot;&gt;
     &lt;v-card elevation=&quot;0&quot; class=&quot;formula-card&quot; title=&quot;Output Area&quot; subtitle=&quot;Output&quot;&gt;
       &lt;div id=&quot;formula&quot; class=&quot;formula-content&quot;&gt;
@@ -455,7 +452,7 @@ function updateFormula() &#123;
 onMounted(() =&gt; &#123;
   editor.value = new E(&quot;#wang-editor&quot;);
   editor.value.config.height = 360;
-  editor.value.config.menus = ['head', 'bold', 'underline', 'strikeThrough','emoticon', 'undo', 'redo'];
+  editor.value.config.menus = [&#39;head&#39;, &#39;bold&#39;, &#39;underline&#39;, &#39;strikeThrough&#39;,&#39;emoticon&#39;, &#39;undo&#39;, &#39;redo&#39;];
   editor.value.config.onchange = updateFormula;
   editor.value.config.onchangeTimeout = 500;
   editor.value.create();
@@ -470,9 +467,10 @@ This setup allows seamless integration of the formula editor with a rich text ed
 
 ![MathJax](/img/mathjax/mathjax-2.png)
 
-Here's a link to the official documentation for WangEditor: [www.wangeditor.com/v4](https://www.wangeditor.com/v4)
+Here&#39;s a link to the official documentation for WangEditor: [www.wangeditor.com/v4](https://www.wangeditor.com/v4)
 
-Feel free to reach out if you have any further questions or need additional clarification.</code></pre>
+Feel free to reach out if you have any further questions or need additional clarification.
+</code></pre>
 
     
     </div>

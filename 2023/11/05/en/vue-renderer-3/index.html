@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start b">
+    <meta name="description" content="IntroductionIn this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Handling Event Rendering in Vue">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/05/en/vue-renderer-3/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start b">
+<meta property="og:description" content="IntroductionIn this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-05T10:21:48.000Z">
@@ -200,7 +200,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-05T10:21:48.000Z" itemprop="datePublished">5 November 2023</time>
+            <time datetime="2023-11-05T10:21:48.000Z" itemprop="datePublished">November 5, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -216,8 +216,7 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by addressing the first question, which is how to describe events in virtual nodes. Events can be considered as special attributes, so we can agree that any attribute starting with the string “on” in the vnode.props object should be treated as an event. For example:</p>
+        <h2><span id="introduction">Introduction</span></h2><p>In this section, we will discuss how to handle events in Vue, including how to describe events in virtual nodes, how to add events to DOM elements, and how to update events. Let’s start by addressing the first question, which is how to describe events in virtual nodes. Events can be considered as special attributes, so we can agree that any attribute starting with the string “on” in the vnode.props object should be treated as an event. For example:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> vnode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
   <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span>
   <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
@@ -228,6 +227,7 @@
   <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
   <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'text'</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Once we have resolved how events are described in virtual nodes, let’s see how to add events to DOM elements. This is very simple, just call the <code>addEventListener</code> function in the <code>patchProps</code> method to bind the event, as shown in the following code:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token comment">// Match attributes starting with on as events</span>
@@ -247,6 +247,7 @@
     <span class="token comment">// Omitted code (handling other attribute logic)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In fact, the event update mechanism can be further optimized to avoid multiple calls to <code>removeEventListener</code> and <code>addEventListener</code>.</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchProps</span><span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> key<span class="token punctuation">,</span> prevValue<span class="token punctuation">,</span> nextValue</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
   <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^on</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -279,6 +280,7 @@
     <span class="token comment">// Omitted code (handling other attribute logic)</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Looking at the above code, event binding is divided into two steps. First, read the corresponding invoker from <code>el._vei</code>. If invoker does not exist, create a fake invoker function and cache it in <code>el._vei</code>. Assign the actual event handler to the <code>invoker.value</code> property, and then bind the fake invoker function as the event handler to the element. When the event is triggered, the fake event handler is executed, indirectly invoking the actual event handler <code>invoker.value(e)</code>.</p>
 <p>When updating events, since <code>el._vei</code> already exists, we only need to modify the value of <code>invoker.value</code> to the new event handler.</p>
 <p>This way, updating events can avoid a call to <code>removeEventListener</code>, improving performance. However, the current implementation still has issues. The problem is that <code>el._vei</code> currently caches only one event handler at a time. This means that if an element binds multiple events simultaneously, event override will occur.</p>
@@ -298,6 +300,7 @@
 
 <span class="token comment">// Assume renderer is your renderer object</span>
 renderer<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span>vnode<span class="token punctuation">,</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'#app'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>When the renderer tries to render the vnode provided in the above code, it first binds the <code>click</code> event and then binds the <code>contextmenu</code> event. The <code>contextmenu</code> event handler bound later will override the <code>click</code> event handler. To solve the event override problem, we need to redesign the data structure of <code>el._vei</code>. We should design <code>el._vei</code> as an object, where the keys are event names and the values are corresponding event handler functions. This way, event override issues will be resolved.</p>
 <p>Based on the code snippet you provided, this code is mainly used for handling attribute updates on DOM elements, including the logic for event binding and unbinding. In this code, it uses an <code>el._vei</code> object to cache event handler functions.</p>
 

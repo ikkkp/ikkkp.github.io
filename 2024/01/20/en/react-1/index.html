@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Recently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understa">
+    <meta name="description" content="IntroductionRecently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understan">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Getting Started with React - Part 1">
 <meta property="og:url" content="https://ikkkp.github.io/2024/01/20/en/react-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Recently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understa">
+<meta property="og:description" content="IntroductionRecently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understan">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2024-01-20T09:10:25.000Z">
@@ -252,7 +252,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2024-01-20T09:10:25.000Z" itemprop="datePublished">20 January 2024</time>
+            <time datetime="2024-01-20T09:10:25.000Z" itemprop="datePublished">January 20, 2024</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -268,10 +268,8 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Recently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understanding of JSX was somewhat one-sided. As a developer transitioning from Vue.js to React, my plan is to first compare the features of Vue.js and React. Then, I’ll dive into React based on the project requirements.</p>
-<h2><span id="similarities-between-vuejs-and-react">Similarities between Vue.js and React</span></h2>
-<p><img src="/img/react/vue-react.jpg" alt="vue-react"></p>
+        <h2><span id="introduction">Introduction</span></h2><p>Recently, I interviewed for the Spring Youth Training Camp at Dewu, where proficiency in React was required for the project. Having previously worked with Next.js for a while, my understanding of JSX was somewhat one-sided. As a developer transitioning from Vue.js to React, my plan is to first compare the features of Vue.js and React. Then, I’ll dive into React based on the project requirements.</p>
+<h2><span id="similarities-between-vuejs-and-react">Similarities between Vue.js and React</span></h2><p><img src="/img/react/vue-react.jpg" alt="vue-react"></p>
 <p>Vue and React share many similarities:</p>
 <ul>
 <li>Both use Virtual DOM.</li>
@@ -286,49 +284,35 @@
 <p><code>vue template/react JSX -&gt; render function -&gt; generate VNode -&gt; when there are changes, diff between old and new VNode -&gt; update the real DOM using the Diff algorithm.</code></p>
 <p>The core is still Virtual DOM, and the advantages of VNode are numerous:</p>
 <ul>
-<li>
-<p>Reduces direct manipulation of the DOM. The framework provides a way to shield the underlying DOM writing, reducing frequent updates to the DOM and making data drive the view.</p>
+<li><p>Reduces direct manipulation of the DOM. The framework provides a way to shield the underlying DOM writing, reducing frequent updates to the DOM and making data drive the view.</p>
 </li>
-<li>
-<p>Provides the possibility for functional UI programming (core idea in React).</p>
+<li><p>Provides the possibility for functional UI programming (core idea in React).</p>
 </li>
-<li>
-<p>Enables cross-platform rendering beyond the DOM (e.g., React Native, Weex).</p>
+<li><p>Enables cross-platform rendering beyond the DOM (e.g., React Native, Weex).</p>
 </li>
 </ul>
 <p><img src="/img/react/react-vue.webp" alt="vue-react"></p>
 <p>Vue calls itself a framework because the official documentation provides a complete set of tools from declarative rendering to build tools.</p>
 <p>React calls itself a library because the official package only includes the core React.js library. Routing, state management, and other features are provided by third-party libraries from the community, ultimately integrated into a solution.</p>
-<h2><span id="differences-between-vue-and-react">Differences between Vue and React</span></h2>
-<h3><span id="different-component-implementations">Different Component Implementations</span></h3>
-<h4><span id="vuejs-implementation">Vue.js Implementation</span></h4>
-<p><strong>Vue’s source code attaches options to the Vue core class and then uses <code>new Vue(&#123;options&#125;)</code> to get an instance</strong> (the script exported by Vue components is just an object filled with options). This makes the <code>this</code> in the options API refer to the internal Vue instance, which is opaque to the user. Therefore, documentation is needed to explain APIs like <code>this.$slot</code> and <code>this.$xxx</code>. Additionally, Vue plugins are built on top of the Vue prototype class, which is why Vue plugins use <code>Vue.install</code> to ensure that the Vue object of third-party libraries and the current application’s Vue object are the same.</p>
-<h4><span id="react-implementation">React Implementation</span></h4>
-<p><strong>React’s internal implementation is relatively simple; it directly defines a render function to generate a VNode.</strong> React internally uses four major component classes to wrap VNodes, and different types of VNodes are handled by the corresponding component class, with clear and distinct responsibilities (the subsequent Diff algorithm is also very clear). React class components all inherit from the <code>React.Component</code> class, and their <code>this</code> refers to the user-defined class, making it transparent to the user.</p>
-<h3><span id="different-reactivity-principles">Different Reactivity Principles</span></h3>
-<h4><span id="vuejs-implementation">Vue.js Implementation</span></h4>
-<ul>
+<h2><span id="differences-between-vue-and-react">Differences between Vue and React</span></h2><h3><span id="different-component-implementations">Different Component Implementations</span></h3><h4><span id="vuejs-implementation">Vue.js Implementation</span></h4><p><strong>Vue’s source code attaches options to the Vue core class and then uses <code>new Vue(&#123;options&#125;)</code> to get an instance</strong> (the script exported by Vue components is just an object filled with options). This makes the <code>this</code> in the options API refer to the internal Vue instance, which is opaque to the user. Therefore, documentation is needed to explain APIs like <code>this.$slot</code> and <code>this.$xxx</code>. Additionally, Vue plugins are built on top of the Vue prototype class, which is why Vue plugins use <code>Vue.install</code> to ensure that the Vue object of third-party libraries and the current application’s Vue object are the same.</p>
+<h4><span id="react-implementation">React Implementation</span></h4><p><strong>React’s internal implementation is relatively simple; it directly defines a render function to generate a VNode.</strong> React internally uses four major component classes to wrap VNodes, and different types of VNodes are handled by the corresponding component class, with clear and distinct responsibilities (the subsequent Diff algorithm is also very clear). React class components all inherit from the <code>React.Component</code> class, and their <code>this</code> refers to the user-defined class, making it transparent to the user.</p>
+<h3><span id="different-reactivity-principles">Different Reactivity Principles</span></h3><h4><span id="vuejs-implementation">Vue.js Implementation</span></h4><ul>
 <li>Vue uses dependency collection, automatic optimization, and mutable data.</li>
 <li>Vue recursively listens to all properties of data and directly modifies them.</li>
 <li>When data changes, it automatically finds the referencing components to re-render.</li>
 </ul>
-<h4><span id="react-implementation">React Implementation</span></h4>
-<ul>
+<h4><span id="react-implementation">React Implementation</span></h4><ul>
 <li>React is based on a state machine, manual optimization, immutable data, and requires <code>setState</code> to drive new state replacement for the old state.</li>
 <li>When data changes, the entire component tree is considered as the root, and by default, all components are re-rendered.</li>
 </ul>
-<h3><span id="different-diff-algorithms">Different Diff Algorithms</span></h3>
-<p>Vue is based on the snabbdom library, which has good speed and a modular mechanism. Vue Diff uses a doubly linked list, comparing and updating the DOM simultaneously.</p>
+<h3><span id="different-diff-algorithms">Different Diff Algorithms</span></h3><p>Vue is based on the snabbdom library, which has good speed and a modular mechanism. Vue Diff uses a doubly linked list, comparing and updating the DOM simultaneously.</p>
 <p>React primarily uses a diff queue to save which DOM elements need updating, obtaining a patch tree, and then performing a batch update of the DOM.</p>
-<h3><span id="different-event-mechanisms">Different Event Mechanisms</span></h3>
-<h4><span id="vuejs-implementation">Vue.js Implementation</span></h4>
-<ul>
+<h3><span id="different-event-mechanisms">Different Event Mechanisms</span></h3><h4><span id="vuejs-implementation">Vue.js Implementation</span></h4><ul>
 <li>Vue uses standard web events for native events.</li>
 <li>Vue has a custom event mechanism for components, forming the basis of parent-child communication.</li>
 <li>Vue makes reasonable use of the snabbdom library’s module plugins.</li>
 </ul>
-<h4><span id="react-implementation">React Implementation</span></h4>
-<ul>
+<h4><span id="react-implementation">React Implementation</span></h4><ul>
 <li>React’s native events are wrapped, and all events bubble up to the top-level document for listening. They are then synthesized here. Based on this system, the event mechanism can be used cross-platform, not tightly bound to the Web DOM.</li>
 <li>React components have no events; parent-child communication is done using props.</li>
 </ul>
@@ -346,7 +330,7 @@
     <div class="columns is-mobile is-multiline article-nav">
         <span class="column is-12-mobile is-half-desktop  article-nav-prev">
             
-            <a href="/2024/01/23/en/react-3/">Getting Started with React - Part 3</a>
+            <a href="/2024/01/20/en/react-2/">Getting Started with React - Part 2</a>
             
         </span>
         <span class="column is-12-mobile is-half-desktop  article-nav-next">

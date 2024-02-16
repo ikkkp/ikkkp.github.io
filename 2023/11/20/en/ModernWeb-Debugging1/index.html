@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Since attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I wan">
+    <meta name="description" content="IntroductionSince attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I want">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ModernWeb - A Simple Record on Chrome Local Code Debugging">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/20/en/ModernWeb-Debugging1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Since attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I wan">
+<meta property="og:description" content="IntroductionSince attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I want">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-20T11:06:50.000Z">
@@ -198,7 +198,7 @@
                     
                     
                     
-                    <a class="navbar-item" href="#integration-with-cicd-pipeline">3.5&nbsp;&nbsp;Integration with CI/CD Pipeline</a>
+                    <a class="navbar-item" href="#integration-with-cix2fcd-pipeline">3.5&nbsp;&nbsp;Integration with CI/CD Pipeline</a>
                     
                 </div>
             </div>
@@ -252,7 +252,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-20T11:06:50.000Z" itemprop="datePublished">20 November 2023</time>
+            <time datetime="2023-11-20T11:06:50.000Z" itemprop="datePublished">November 20, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -268,15 +268,13 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Since attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I want to make a simple record here. First, let me share a link: <a target="_blank" rel="noopener" href="https://www.youtube.com/@ChromeDevs">youtube-ChromeDevs</a></p>
+        <h2><span id="introduction">Introduction</span></h2><p>Since attending a frontend conference last week, I have gained some new insights into new technologies in frontend development. One of them is about Chrome local code debugging. So, I want to make a simple record here. First, let me share a link: <a target="_blank" rel="noopener" href="https://www.youtube.com/@ChromeDevs">youtube-ChromeDevs</a></p>
 <p>I would like to express my gratitude to the Chrome DevTools team for their excellent work. However, before the frontend conference by jecfish, I was not aware of so many friendly web debugging tools and performance testing methods. So, I will make a simple record here. If you are interested, you can check out the link above, which contains a lot of useful information. Feel free to show your support to their team.</p>
 <p>Below is the outline of this chapter, which will be further elaborated.</p>
 <p><img src="/img/ModernWeb/modernWeb1.jpg" alt="ModernWeb"></p>
-<h2><span id="local-code-debugging">Local Code Debugging</span></h2>
-<p>This section will cover local code debugging, mainly focusing on the topic of <code>source maps</code>. I will provide some brief introductions and examples.</p>
-<h3><span id="the-need-for-source-code-mapping">The Need for Source Code Mapping</span></h3>
-<iframe width="100%" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<h2><span id="local-code-debugging">Local Code Debugging</span></h2><p>This section will cover local code debugging, mainly focusing on the topic of <code>source maps</code>. I will provide some brief introductions and examples.</p>
+<h3><span id="the-need-for-source-code-mapping">The Need for Source Code Mapping</span></h3><iframe width="100%" src="https://www.youtube.com/embed/FIYkjjFYvoI" title="What are source maps? | DevTools Tips" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 <p>Here is a link: <a target="_blank" rel="noopener" href="https://web.dev/articles/source-maps?hl=en">source-map</a></p>
 <p>This link contains some content about source maps written by jecfish. If you are interested, you can check it out. If the article is too long for you, you can directly read the content below.</p>
 <p>Today, we are going to discuss source code mapping, an important tool in modern web development that greatly simplifies debugging work. In this article, we will explore the basics of source code mapping, how source code mapping is generated, and how it improves the debugging experience.</p>
@@ -287,28 +285,28 @@
 <p><img src="/img/ModernWeb/modernWeb5.jpg" alt="ModernWeb"></p>
 <p>After 15 years, we can see that the debugging tools in the Chrome DevTools have evolved from a few options to a rich and diverse set of tools. The changes have been significant. So, today, let’s talk about the specific applications of these 32 debugging tools in Chrome.</p>
 <p><img src="/img/ModernWeb/modernWeb6.jpg" alt="ModernWeb"></p>
-<p><strong>We know that browsers only understand a few languages: HTML &lt;/&gt; CSS {;} JavaScript (,) Wasm (of course, modern browser engines now have built-in support for Wasm modules by default). However, our frontend frameworks are extremely rich</strong>, involving languages such as TypeScript, Less, Sass, and frameworks such as Vue, React, and meta frameworks such as Nust.js, Next.js. These frameworks are used in our frontend code, but browsers do not understand these languages. Therefore, we need to convert these languages into languages that browsers can understand.</p>
+<p><strong>We know that browsers only understand a few languages: HTML &lt;&#x2F;&gt; CSS {;} JavaScript (,) Wasm (of course, modern browser engines now have built-in support for Wasm modules by default). However, our frontend frameworks are extremely rich</strong>, involving languages such as TypeScript, Less, Sass, and frameworks such as Vue, React, and meta frameworks such as Nust.js, Next.js. These frameworks are used in our frontend code, but browsers do not understand these languages. Therefore, we need to convert these languages into languages that browsers can understand.</p>
 <p>We are building more complex web applications, and your development workflow may involve the use of various tools. For example:</p>
 <ul>
 <li>Template languages and HTML preprocessors: Pug, Nunjucks, Markdown.</li>
 <li>CSS preprocessors: SCSS, LESS, PostCSS.</li>
 <li>JavaScript frameworks: Angular, React, Vue, Svelte.</li>
 <li>JavaScript meta frameworks: Next.js, Nuxt, Astro.</li>
-<li>Advanced programming languages: TypeScript, Dart, CoffeeScript.<br>
-And more. The list keeps growing!</li>
+<li>Advanced programming languages: TypeScript, Dart, CoffeeScript.<br>And more. The list keeps growing!</li>
 </ul>
 <p><img src="/img/ModernWeb/modernWeb7.png" alt="ModernWeb"></p>
 <p><strong>These tools require a build process to transpile the code into standard HTML, JavaScript, and CSS that browsers can understand.</strong> Additionally, for performance optimization, it is common practice to minify (e.g., using Terser to reduce and obfuscate JavaScript) and concatenate these files to reduce their size and improve web efficiency.</p>
 <p>During the process of converting these various template languages, preprocessors, and meta frameworks into HTML, JavaScript, and CSS that browsers can understand, there is a compilation process that generates some intermediate code. This intermediate code is our source code mapping, which is what we are going to talk about today.</p>
 <p>For example, using a build tool, we can transpile and minify the following TypeScript file into a single line of JavaScript. You can find this demo on GitHub: <a target="_blank" rel="noopener" href="https://github.com/jecfish/parcel-demo">parcel-demo</a></p>
-<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript"><span class="token comment">/* A TypeScript demo: example.ts */</span>
+<pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#x2F;* A TypeScript demo: example.ts *&#x2F;
 
-document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'button'</span><span class="token punctuation">)</span><span class="token operator">?.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> num<span class="token operator">:</span> <span class="token builtin">number</span> <span class="token operator">=</span> Math<span class="token punctuation">.</span><span class="token function">floor</span><span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">101</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">const</span> greet<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">=</span> <span class="token string">'Hello'</span><span class="token punctuation">;</span>
-  <span class="token punctuation">(</span>document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'p'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> HTMLParagraphElement<span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>greet<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>num<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
-  <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>num<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+document.querySelector(&#39;button&#39;)?.addEventListener(&#39;click&#39;, () &#x3D;&gt; &#123;
+  const num: number &#x3D; Math.floor(Math.random() * 101);
+  const greet: string &#x3D; &#39;Hello&#39;;
+  (document.querySelector(&#39;p&#39;) as HTMLParagraphElement).innerText &#x3D; &#96;$&#123;greet&#125;, you are no. $&#123;num&#125;!&#96;;
+  console.log(num);
+&#125;);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>Certainly! Below is the English translation of the provided content:</p>
 <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">/* A compressed JavaScript version of the TypeScript demo: example.min.js */</span>
 
@@ -317,6 +315,7 @@ document<span class="token punctuation">.</span><span class="token function">que
     document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"p"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>innerText <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Hello, you are no. </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>e<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">!</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
     console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>However, this optimization increases the difficulty of debugging. If compressed code puts everything in a single line and uses short variable names, it becomes challenging to trace the root of the problem. This is where source maps come into play—they map the compiled code back to the original code.</p>
 <p><img src="/img/ModernWeb/modernWeb8.jpg" alt="ModernWeb"></p>
 <p>Now let’s look at a specific example. This example is a simple click event triggering an XHR written in TypeScript, where a 404 error is reported.</p>
@@ -325,17 +324,17 @@ document<span class="token punctuation">.</span><span class="token function">que
 <p><img src="/img/ModernWeb/modernWeb10.jpg" alt="ModernWeb"></p>
 <p><img src="/img/ModernWeb/modernWeb11.jpg" alt="ModernWeb"></p>
 <p>Actually, it’s not the case. Looking at this image, it appears that TypeScript is parsed from main.js.</p>
-<h3><span id="understanding-source-code-mapping-source-map">Understanding Source Code Mapping (source-map)</span></h3>
-<p><img src="/img/ModernWeb/modernWeb12.jpg" alt="ModernWeb"></p>
+<h3><span id="understanding-source-code-mapping-source-map">Understanding Source Code Mapping (source-map)</span></h3><p><img src="/img/ModernWeb/modernWeb12.jpg" alt="ModernWeb"></p>
 <p>These source map files contain basic information about how the compiled code maps back to the original code, allowing developers to easily debug. Here’s an example of a source map:</p>
-<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
-  <span class="token property">"mappings"</span><span class="token operator">:</span> <span class="token string">"AAAAA,SAASC,cAAc,WAAWC, ..."</span><span class="token punctuation">,</span>
-  <span class="token property">"sources"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"src/script.ts"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token property">"sourcesContent"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"document.querySelector('button')..."</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token property">"names"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"document"</span><span class="token punctuation">,</span><span class="token string">"querySelector"</span><span class="token punctuation">,</span> ...<span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token property">"version"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
-  <span class="token property">"file"</span><span class="token operator">:</span> <span class="token string">"example.min.js.map"</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json">&#123;
+  &quot;mappings&quot;: &quot;AAAAA,SAASC,cAAc,WAAWC, ...&quot;,
+  &quot;sources&quot;: [&quot;src&#x2F;script.ts&quot;],
+  &quot;sourcesContent&quot;: [&quot;document.querySelector(&#39;button&#39;)...&quot;],
+  &quot;names&quot;: [&quot;document&quot;,&quot;querySelector&quot;, ...],
+  &quot;version&quot;: 3,
+  &quot;file&quot;: &quot;example.min.js.map&quot;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>To understand each field, you can read the <a target="_blank" rel="noopener" href="https://bit.ly/sourcemap">Source Map Specification</a> or this classic article on <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/sourcemaps/?hl=zh-cn#the-anatomy-of-a-source-map">Anatomy of a Source Map</a>.</p>
 <p>The most crucial aspect of source maps is the <code>mappings</code> field. It uses VLQ base 64-encoded strings to map lines and positions in the compiled file to the corresponding original file. Source map visualization tools like <a target="_blank" rel="noopener" href="https://sokra.github.io/source-map-visualization/">source-map-visualization</a> and <a target="_blank" rel="noopener" href="https://evanw.github.io/source-map-visualization/">Source Map Visualization</a> can intuitively display this mapping.</p>
 <p><img src="/img/ModernWeb/modernWeb13.png" alt="ModernWeb"></p>
@@ -351,42 +350,35 @@ document<span class="token punctuation">.</span><span class="token function">que
 <p><img src="/img/ModernWeb/modernWeb14.png" alt="ModernWeb"></p>
 <p><img src="/img/ModernWeb/modernWeb15.jpg" alt="ModernWeb"></p>
 <p><img src="/img/ModernWeb/modernWeb16.jpg" alt="ModernWeb"></p>
-<h3><span id="how-devtools-know-what-to-hide-source-maps">How DevTools Know What to Hide? Source Maps</span></h3>
-<p><img src="/img/ModernWeb/modernWeb17.jpg" alt="ModernWeb"></p>
+<h3><span id="how-devtools-know-what-to-hide-source-maps">How DevTools Know What to Hide? Source Maps</span></h3><p><img src="/img/ModernWeb/modernWeb17.jpg" alt="ModernWeb"></p>
 <p><img src="/img/ModernWeb/modernWeb18.jpg" alt="ModernWeb"></p>
 <p><img src="/img/ModernWeb/modernWeb19.jpg" alt="ModernWeb"></p>
-<h2><span id="practical-chrome-debugging-tips">Practical Chrome Debugging Tips</span></h2>
-<h3><span id="requests">Requests</span></h3>
-<p><img src="/img/ModernWeb/modernWeb20.jpg" alt="ModernWeb"></p>
+<h2><span id="practical-chrome-debugging-tips">Practical Chrome Debugging Tips</span></h2><h3><span id="requests">Requests</span></h3><p><img src="/img/ModernWeb/modernWeb20.jpg" alt="ModernWeb"></p>
 <p>You can view detailed information about requests in the Network panel, including request headers, response headers, request body, response body, Cookies, Timing, and more.</p>
 <p>Additionally, DevTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/overrides/">overrides</a> allow you to simulate remote resources by overriding HTTP response headers and web content (including XHR and fetch requests) through local overrides. This enables you to prototype changes without waiting for backend support. Local overrides also let you retain changes made in DevTools during page load.</p>
 <p>This is particularly useful in situations where frontend requests to the backend return results that haven’t undergone cross-origin handling (cross-origin handling is typically done on the backend). In such cases, even though the frontend receives correct data, the browser may mark the file as untrusted due to security policies. Local overrides allow you to simulate the backend’s response, facilitating frontend debugging.</p>
 <p>Or, if some data on the backend hasn’t been modified yet, and the frontend receives outdated data, do we have to wait for backend engineers to fix the data before we can work on it? That seems a bit inefficient. Instead, we can use content rewriting through local overrides to simulate the modified data, allowing frontend debugging.</p>
 <p><img src="/img/ModernWeb/modernWeb21.jpg" alt="ModernWeb"></p>
-<p>DevTools/overrides indeed is powerful. How does it work?</p>
+<p>DevTools&#x2F;overrides indeed is powerful. How does it work?</p>
 <ul>
 <li>When you make changes in DevTools, DevTools saves a copy of the modified file to a folder you specify.</li>
 <li>When you reload the page, DevTools provides the locally modified file instead of the network resource.</li>
 </ul>
-<h4><span id="overriding-web-content">Overriding Web Content</span></h4>
-<h5><span id="set-up-a-folder"><strong>Set Up a Folder</strong></span></h5>
-<ul>
+<h4><span id="overriding-web-content">Overriding Web Content</span></h4><h5><span id="set-up-a-folder"><strong>Set Up a Folder</strong></span></h5><ul>
 <li>Set up local overrides.</li>
 <li>Make changes to files and save them in DevTools.</li>
 </ul>
 <p>For example, you can edit files in “Sources” or edit CSS in “Elements” &gt; “Styles” unless the CSS is in an HTML file.</p>
 <p>DevTools saves the modified files, listing them in <strong>Sources &gt; Overrides</strong>, and displays them in related panels and panes, indicated by icons next to overridden files in <strong>Elements &gt; Styles, Network, and Sources &gt; Overrides</strong>.</p>
-<h5><span id="override-xhr-or-fetch-requests-to-simulate-remote-resources"><strong>Override XHR or Fetch Requests to Simulate Remote Resources</strong></span></h5>
-<p>With local overrides, you don’t need access to the backend, and you don’t have to wait for it to support your changes. Simulate and experiment instantly:</p>
+<h5><span id="override-xhr-or-fetch-requests-to-simulate-remote-resources"><strong>Override XHR or Fetch Requests to Simulate Remote Resources</strong></span></h5><p>With local overrides, you don’t need access to the backend, and you don’t have to wait for it to support your changes. Simulate and experiment instantly:</p>
 <ul>
 <li>Set up local overrides.</li>
-<li>In Network, filter XHR/fetch requests, find the desired request, right-click it, and choose “Override content.”</li>
+<li>In Network, filter XHR&#x2F;fetch requests, find the desired request, right-click it, and choose “Override content.”</li>
 <li>Make changes to the fetched data and save the file.</li>
 <li>Refresh. Reload the page and observe the applied changes.</li>
 </ul>
 <p>To understand this workflow better, watch the video <a target="_blank" rel="noopener" href="https://www.youtube.com/embed/NJdAV9UgKuN8AhoaPBquL7giZQo1/TNcd8DCxoK6OmHQqJjKT.mp4">here</a>.</p>
-<h4><span id="override-http-response-headers">Override HTTP Response Headers</span></h4>
-<p>In the “Network” panel, you can override HTTP response headers without accessing the web server.</p>
+<h4><span id="override-http-response-headers">Override HTTP Response Headers</span></h4><p>In the “Network” panel, you can override HTTP response headers without accessing the web server.</p>
 <p>With response header overrides, you can prototype fixes for various headers, including but not limited to:</p>
 <ul>
 <li>Cross-Origin Resource Sharing (CORS) headers</li>
@@ -402,8 +394,7 @@ document<span class="token punctuation">.</span><span class="token function">que
 <p>Response Headers Editor**.</p>
 </blockquote>
 <p><img src="/img/ModernWeb/headers.avif" alt="ModernWeb"></p>
-<h3><span id="recorder-beneficial-for-debugging-and-testing">Recorder, Beneficial for Debugging and Testing</span></h3>
-<p>Customize and automate user flows based on the Chrome DevTools Recorder for enhanced debugging and testing.</p>
+<h3><span id="recorder-beneficial-for-debugging-and-testing">Recorder, Beneficial for Debugging and Testing</span></h3><p>Customize and automate user flows based on the Chrome DevTools Recorder for enhanced debugging and testing.</p>
 <p><img src="/img/ModernWeb/modernWeb22.jpg" alt="ModernWeb"></p>
 <p>Writing automated tests might not be the most exciting part of a developer’s life. As developers, our focus is on functionality, fixing bugs, and improving the world! However, having automated tests in our workflow is crucial in the long run. So, we also recognize the importance of writing automated tests.</p>
 <p>With the Chrome DevTools <a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/recorder/">Recorder</a> panel, you can record and replay user flows. You can export these flows in various formats (such as test scripts) using different third-party extensions and libraries. You can also customize user flows using the Puppeteer Replay library and integrate them into your existing workflow.</p>
@@ -411,44 +402,44 @@ document<span class="token punctuation">.</span><span class="token function">que
 <ul>
 <li>How to programmatically export and replay user flows.</li>
 <li>How to customize user flows with Puppeteer Replay.</li>
-<li>How to integrate with your CI/CD workflow.</li>
+<li>How to integrate with your CI&#x2F;CD workflow.</li>
 </ul>
 <p><a target="_blank" rel="noopener" href="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null">Watch the video</a> for a practical demonstration.</p>
 <iframe width="100%" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/LBgzmqzp7ew?autoplay=1&amp;start=0&amp;null"></iframe>
-<h3><span id="programmatically-exporting-user-flows-and-replaying">Programmatically Exporting User Flows and Replaying</span></h3>
-<p>By default, the Recorder allows you to export recordings as <a target="_blank" rel="noopener" href="https://pptr.dev/">Puppeteer</a> or <a target="_blank" rel="noopener" href="https://github.com/puppeteer/replay">Puppeteer Replay</a> scripts or as pure JSON files.</p>
+
+
+<h3><span id="programmatically-exporting-user-flows-and-replaying">Programmatically Exporting User Flows and Replaying</span></h3><p>By default, the Recorder allows you to export recordings as <a target="_blank" rel="noopener" href="https://pptr.dev/">Puppeteer</a> or <a target="_blank" rel="noopener" href="https://github.com/puppeteer/replay">Puppeteer Replay</a> scripts or as pure JSON files.</p>
 <p><img src="/img/ModernWeb/record.avif" alt="ModernWeb"></p>
-<h3><span id="replaying-with-puppeteer-replay">Replaying with Puppeteer Replay</span></h3>
-<p>After exporting the user flow as a JSON file, you have the option to import it back into the Recorder panel and replay it or use external libraries for replay. One such available library is Puppeteer Replay.</p>
+<h3><span id="replaying-with-puppeteer-replay">Replaying with Puppeteer Replay</span></h3><p>After exporting the user flow as a JSON file, you have the option to import it back into the Recorder panel and replay it or use external libraries for replay. One such available library is Puppeteer Replay.</p>
 <p><img src="https://wd.imgix.net/image/S3bCpnsKr6OqVjAww1n02HOXFsv1/Qzo4QVUa4A6HpXhHm5MI.gif?auto=format" alt="Replaying with Puppeteer Replay"></p>
 <p>Puppeteer Replay is a library that helps you replay user flows. It’s based on Puppeteer and allows you to replay user flows in the browser without writing any code. You can use Puppeteer Replay to replay your user flows to ensure that your application performs well in different environments.</p>
-<h3><span id="integration-with-cicd-pipeline">Integration with CI/CD Pipeline</span></h3>
-<p>There are various ways to achieve this, and several tools can be used. Here’s an example of automating this process using GitHub Actions:</p>
-<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># .github/node.js.yml</span>
+<h3><span id="integration-with-cix2fcd-pipeline">Integration with CI&#x2F;CD Pipeline</span></h3><p>There are various ways to achieve this, and several tools can be used. Here’s an example of automating this process using GitHub Actions:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"># .github&#x2F;node.js.yml
 
-<span class="token key atrule">name</span><span class="token punctuation">:</span> Replay recordings
+name: Replay recordings
 
-<span class="token key atrule">on</span><span class="token punctuation">:</span>
-  <span class="token key atrule">push</span><span class="token punctuation">:</span>
-    <span class="token key atrule">branches</span><span class="token punctuation">:</span> <span class="token punctuation">[</span> <span class="token string">"main"</span> <span class="token punctuation">]</span>
-  <span class="token key atrule">schedule</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">cron</span><span class="token punctuation">:</span> <span class="token string">'30 12 * * *'</span> <span class="token comment"># daily 12:30pm</span>
+on:
+  push:
+    branches: [ &quot;main&quot; ]
+  schedule:
+    - cron: &#39;30 12 * * *&#39; # daily 12:30pm
 
-<span class="token key atrule">jobs</span><span class="token punctuation">:</span>
-  <span class="token key atrule">build</span><span class="token punctuation">:</span>
+jobs:
+  build:
 
-    <span class="token key atrule">runs-on</span><span class="token punctuation">:</span> ubuntu<span class="token punctuation">-</span>latest
+    runs-on: ubuntu-latest
 
-    <span class="token key atrule">steps</span><span class="token punctuation">:</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">uses</span><span class="token punctuation">:</span> actions/checkout@v3
-    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Use Node.js
-      <span class="token key atrule">uses</span><span class="token punctuation">:</span> actions/setup<span class="token punctuation">-</span>node@v3
-      <span class="token key atrule">with</span><span class="token punctuation">:</span>
-        <span class="token key atrule">node-version</span><span class="token punctuation">:</span> 18.x
-        <span class="token key atrule">cache</span><span class="token punctuation">:</span> <span class="token string">'npm'</span>
-    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm install puppeteer
-    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm run replay<span class="token punctuation">-</span>all
-    <span class="token punctuation">-</span> <span class="token key atrule">run</span><span class="token punctuation">:</span> npm run start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    steps:
+    - uses: actions&#x2F;checkout@v3
+    - name: Use Node.js
+      uses: actions&#x2F;setup-node@v3
+      with:
+        node-version: 18.x
+        cache: &#39;npm&#39;
+    - run: npm install puppeteer
+    - run: npm run replay-all
+    - run: npm run start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p>In this example, we replay the user flow under the following conditions:</p>
 <ul>
 <li>New changes are pushed to the main branch.</li>

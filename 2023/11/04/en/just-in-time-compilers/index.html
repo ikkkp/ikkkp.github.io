@@ -23,12 +23,12 @@
 
 
 
-    <meta name="description" content="Introduction Before delving into JIT, it’s essential to have a basic understanding of the compilation process. In compiler theory, translating source code into machine instructions generally involves">
+    <meta name="description" content="IntroductionBefore delving into JIT, it’s essential to have a basic understanding of the compilation process. In compiler theory, translating source code into machine instructions generally involves s">
 <meta property="og:type" content="article">
 <meta property="og:title" content="How Does JIT (Just-In-Time) Compiler Work">
 <meta property="og:url" content="https://ikkkp.github.io/2023/11/04/en/just-in-time-compilers/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
-<meta property="og:description" content="Introduction Before delving into JIT, it’s essential to have a basic understanding of the compilation process. In compiler theory, translating source code into machine instructions generally involves">
+<meta property="og:description" content="IntroductionBefore delving into JIT, it’s essential to have a basic understanding of the compilation process. In compiler theory, translating source code into machine instructions generally involves s">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 <meta property="article:published_time" content="2023-11-04T02:05:22.000Z">
@@ -234,7 +234,7 @@
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
         <span class="column is-narrow">
-            <time datetime="2023-11-04T02:05:22.000Z" itemprop="datePublished">4 November 2023</time>
+            <time datetime="2023-11-04T02:05:22.000Z" itemprop="datePublished">November 4, 2023</time>
         </span>
         
         <span class="column is-narrow article-category">
@@ -250,42 +250,33 @@
     
     <div class="article-entry is-size-6-mobile" itemprop="articleBody">
     
-        <h2><span id="introduction">Introduction</span></h2>
-<p>Before delving into JIT, it’s essential to have a basic understanding of the compilation process.</p>
+        <h2><span id="introduction">Introduction</span></h2><p>Before delving into JIT, it’s essential to have a basic understanding of the compilation process.</p>
 <p>In compiler theory, translating source code into machine instructions generally involves several crucial steps:</p>
 <p><img src="/img/just-in-time/JIT1.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h2><span id="jit-overview">JIT Overview</span></h2>
-<p><strong>JIT stands for Just-In-Time compiler.</strong> Through JIT technology, it’s possible to accelerate the execution speed of Java programs. But how is this achieved?</p>
+<h2><span id="jit-overview">JIT Overview</span></h2><p><strong>JIT stands for Just-In-Time compiler.</strong> Through JIT technology, it’s possible to accelerate the execution speed of Java programs. But how is this achieved?</p>
 <p>Java is an interpreted language (or semi-compiled, semi-interpreted language). Java compiles the source code into platform-independent Java bytecode files (.class) using the javac compiler. These bytecode files are then interpreted and executed by the Java Virtual Machine (JVM), ensuring platform independence. However, interpreting bytecode involves translating it into corresponding machine instructions, which inevitably slows down the execution speed compared to directly executing binary bytecode files.</p>
 <p>To enhance execution speed, JIT technology is introduced. When the JVM identifies a method or code block that is executed frequently, it recognizes it as a <strong>“Hot Spot Code.”</strong> JIT compiles these “Hot Spot Codes” into native machine-specific machine code, optimizes it, and caches the compiled machine code for future use.</p>
 <p><img src="/img/just-in-time/JIT2.webp" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="hot-spot-compilation">Hot Spot Compilation</span></h3>
-<p>When the JVM executes code, it doesn’t immediately start compiling it. There are two main reasons for this:</p>
+<h3><span id="hot-spot-compilation">Hot Spot Compilation</span></h3><p>When the JVM executes code, it doesn’t immediately start compiling it. There are two main reasons for this:</p>
 <p>Firstly, if a piece of code is expected to be executed only once in the future, compiling it immediately is essentially a waste of resources. Compiling code into Java bytecode is much faster than both compiling and executing the code.</p>
 <p>However, if a piece of code, such as a method call or a loop, is executed multiple times, compiling it becomes worthwhile. The compiler has the ability to discern which methods are frequently called to ensure efficient compilation. <strong>Hot Spot VM employs JIT compilation technology to directly compile high-frequency bytecode into machine instructions</strong> (with the method as the compilation unit). These compiled machine instructions are executed directly when bytecode is JIT-compiled, providing a performance boost.</p>
 <p>The second reason involves optimization. As a method or loop is executed more frequently, the JVM gains a better understanding of the code structure. Therefore, the JVM can make corresponding optimizations during the compilation process.</p>
-<h2><span id="how-javascript-is-compiled-how-jit-just-in-time-compiler-works">How JavaScript is Compiled - How JIT (Just-In-Time) Compiler Works</span></h2>
-<p>In general, there are two ways to translate programs into machine-executable instructions: using a Compiler or an Interpreter.</p>
-<h3><span id="interpreter">Interpreter</span></h3>
-<p>An interpreter translates and executes code line by line as it encounters it.</p>
+<h2><span id="how-javascript-is-compiled-how-jit-just-in-time-compiler-works">How JavaScript is Compiled - How JIT (Just-In-Time) Compiler Works</span></h2><p>In general, there are two ways to translate programs into machine-executable instructions: using a Compiler or an Interpreter.</p>
+<h3><span id="interpreter">Interpreter</span></h3><p>An interpreter translates and executes code line by line as it encounters it.</p>
 <p>Pros:</p>
 <ul>
-<li>Fast execution, no compilation delay.<br>
-Cons:</li>
+<li>Fast execution, no compilation delay.<br>Cons:</li>
 <li>Same code might be translated multiple times, especially within loops.</li>
 </ul>
 <p><img src="/img/just-in-time/JIT3.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="compiler">Compiler</span></h3>
-<p>A compiler translates the code in advance and generates an executable program.</p>
+<h3><span id="compiler">Compiler</span></h3><p>A compiler translates the code in advance and generates an executable program.</p>
 <p>Pros:</p>
 <ul>
-<li>No need for repeated compilation; can optimize code during compilation.<br>
-Cons:</li>
+<li>No need for repeated compilation; can optimize code during compilation.<br>Cons:</li>
 <li>Requires upfront compilation.</li>
 </ul>
 <p><img src="/img/just-in-time/JIT4.png" alt="JIT (Just-In-Time) Compiler"></p>
-<h3><span id="jit">JIT</span></h3>
-<p>When JavaScript first emerged, it was a typical interpreted language, resulting in slow execution speeds. Later, browsers introduced JIT compilers, significantly improving JavaScript’s execution speed.</p>
+<h3><span id="jit">JIT</span></h3><p>When JavaScript first emerged, it was a typical interpreted language, resulting in slow execution speeds. Later, browsers introduced JIT compilers, significantly improving JavaScript’s execution speed.</p>
 <blockquote>
 <p>Principle: They added a new component to the JavaScript engine, known as a monitor (or profiler). This monitor observes the running code, noting how many times it runs and the types used.</p>
 </blockquote>
@@ -298,6 +289,7 @@ Cons:</li>
     sum <span class="token operator">+=</span> arr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <p><strong>1st Step - Interpreter</strong></p>
 <p>Initially, the code is executed using an interpreter. When a line of code is executed several times, it is marked as <strong>“Warm,”</strong> and if executed frequently, it is labeled as <strong>“Hot.”</strong></p>
 <p><strong>2nd Step - Baseline Compiler</strong></p>
@@ -308,8 +300,7 @@ Cons:</li>
 <p>For instance:</p>
 <ul>
 <li><code>sum</code> is Int, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is simple addition, corresponding to one compilation result.</li>
-<li><code>sum</code> is string, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is string concatenation, requiring the conversion of <code>i</code> to a string type.<br>
-…</li>
+<li><code>sum</code> is string, <code>arr</code> is Array, <code>i</code> is Int; the <code>+</code> operation is string concatenation, requiring the conversion of <code>i</code> to a string type.<br>…</li>
 </ul>
 <p>As illustrated in the diagram below, such a simple line of code has 16 possible compilation results.</p>
 <p><img src="/img/just-in-time/JIT5.png" alt="JIT (Just-In-Time) Compiler"></p>
@@ -318,8 +309,7 @@ Cons:</li>
 <p>However, when the code becomes “Hot,” more optimizations are performed. Here, optimization means JIT makes a specific assumption. For example, assuming <code>sum</code> and <code>i</code> are both Integers and <code>arr</code> is an Array, only one compilation result is needed.</p>
 <p>In practice, type checks are performed before execution. If the assumptions are incorrect, the execution is <strong>“deoptimized,”</strong> reverting to the interpreter or baseline compiler versions. This process is called <strong>“deoptimization.”</strong></p>
 <p>As evident, the speed of execution relies on the accuracy of these assumptions. If the assumption success rate is high, the code executes faster. Conversely, low success rates lead to slower execution than without any optimization (due to the <code>optimize =&gt; deoptimize</code> process).</p>
-<h2><span id="conclusion">Conclusion</span></h2>
-<p>In summary, this is what JIT does at runtime. It monitors running code, identifies hot code paths for optimization, making JavaScript run faster. This significantly improves the performance of most JavaScript applications.</p>
+<h2><span id="conclusion">Conclusion</span></h2><p>In summary, this is what JIT does at runtime. It monitors running code, identifies hot code paths for optimization, making JavaScript run faster. This significantly improves the performance of most JavaScript applications.</p>
 <p>However, JavaScript performance remains unpredictable. To make it faster, JIT adds some overhead at runtime, including:</p>
 <p><strong>Optimization and Deoptimization</strong></p>
 <ul>
