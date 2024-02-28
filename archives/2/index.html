@@ -177,6 +177,387 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/05/Event-Delegation/" itemprop="url">浏览器事件委托</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-05T14:26:41.000Z" itemprop="datePublished">December 5, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/FE/">FE</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>捕获和冒泡允许我们实现最强大的事件处理模式之一，即 <strong>事件委托</strong> 模式。</p>
+<p>这个想法是，如果我们有许多以类似方式处理的元素，那么就不必为每个元素分配一个处理程序 —— 而是将单个处理程序放在它们的共同祖先上。</p>
+<p>在处理程序中，我们获取 <code>event.target</code> 以查看事件实际发生的位置并进行处理。</p>
+<h2><span id="事件委托简介">事件委托简介</span></h2><!DOCTYPE HTML>
+<html>
+
+<body>
+  <link type="text/css" rel="stylesheet" href="bagua.css">
+
+
+  <table id="bagua-table">
+    <tr>
+      <th colspan="3"><em>Bagua</em> Chart: Direction, Element, Color, Meaning</th>
+    </tr>
+    <tr>
+      <td class="nw"><strong>Northwest</strong>
+        <br>Metal
+        <br>Silver
+        <br>Elders
+      </td>
+      <td class="n"><strong>North</strong>
+        <br>Water
+        <br>Blue
+        <br>Change
+      </td>
+      <td class="ne"><strong>Northeast</strong>
+        <br>Earth
+        <br>Yellow
+        <br>Direction
+      </td>
+    </tr>
+    <tr>
+      <td class="w"><strong>West</strong>
+        <br>Metal
+        <br>Gold
+        <br>Youth
+      </td>
+      <td class="c"><strong>Center</strong>
+        <br>All
+        <br>Purple
+        <br>Harmony
+      </td>
+      <td class="e"><strong>East</strong>
+        <br>Wood
+        <br>Blue
+        <br>Future
+      </td>
+    </tr>
+    <tr>
+      <td class="sw"><strong>Southwest</strong>
+        <br>Earth
+        <br>Brown
+        <br>Tranquility
+      </td>
+      <td class="s"><strong>South</strong>
+        <br>Fire
+        <br>Orange
+        <br>Fame
+      </td>
+      <td class="se"><strong>Southeast</strong>
+        <br>Wood
+        <br>Green
+        <br>Romance
+      </td>
+    </tr>
+
+  </table>
+
+  <script>
+    let table = document.getElementById('bagua-table');
+
+    let selectedTd;
+
+    table.onclick = function(event) {
+      let target = event.target;
+
+      while (target != this) {
+        if (target.tagName == 'TD') {
+          highlight(target);
+          return;
+        }
+        target = target.parentNode;
+      }
+    }
+
+    function highlight(node) {
+      if (selectedTd) {
+        selectedTd.classList.remove('highlight');
+      }
+      selectedTd = node;
+      selectedTd.classList.add('highlight');
+    }
+  </script>
+
+  <style>
+      #bagua-table th {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #bagua-table td {
+      width: 150px;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: bottom;
+      padding-top: 5px;
+      padding-bottom: 12px;
+    }
+
+    #bagua-table .nw {
+      background: #999;
+    }
+
+    #bagua-table .n {
+      background: #03f;
+      color: #fff;
+    }
+
+    #bagua-table .ne {
+      background: #ff6;
+    }
+
+    #bagua-table .w {
+      background: #ff0;
+    }
+
+    #bagua-table .c {
+      background: #60c;
+      color: #fff;
+    }
+
+    #bagua-table .e {
+      background: #09f;
+      color: #fff;
+    }
+
+    #bagua-table .sw {
+      background: #963;
+      color: #fff;
+    }
+
+    #bagua-table .s {
+      background: #f60;
+      color: #fff;
+    }
+
+    #bagua-table .se {
+      background: #0c3;
+      color: #fff;
+    }
+
+    #bagua-table .highlight {
+      background: red;
+    }
+  </style>
+
+</body>
+
+</html>
+
+<p>该表格有 9 个单元格（cell），但可以有 99 个或 9999 个单元格，这都不重要。</p>
+<p>我们的任务是在点击时高亮显示被点击的单元格 <code>&lt;td&gt;</code>。</p>
+<p>与其为每个 <code>&lt;td&gt;</code>（可能有很多）分配一个 onclick 处理程序 —— 我们可以在<code>&lt;table&gt;</code>元素上设置一个“捕获所有”的处理程序。</p>
+<p>它将使用 event.target 来获取点击的元素并高亮显示它。</p>
+<p>代码如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> selectedTd<span class="token punctuation">;</span>
+
+table<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> target <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">;</span> <span class="token comment">// 在哪里点击的？</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>target<span class="token punctuation">.</span>tagName <span class="token operator">!=</span> <span class="token string">'TD'</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 不在 TD 上？那么我们就不会在意</span>
+
+  <span class="token function">highlight</span><span class="token punctuation">(</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 高亮显示它</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function">highlight</span><span class="token punctuation">(</span><span class="token parameter">td</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>selectedTd<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">// 移除现有的高亮显示，如果有的话</span>
+    selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  selectedTd <span class="token operator">=</span> td<span class="token punctuation">;</span>
+  selectedTd<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">'highlight'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 高亮显示新的 td</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>此代码不会关心在表格中有多少个单元格。我们可以随时动态添加&#x2F;移除 <code>&lt;td&gt;</code>，高亮显示仍然有效。</strong></p>
+<p>尽管如此，但还是存在缺陷。</p>
+<p><img src="/img/event-bubbling/eventbubling2.jpg" alt="Event-Bubbling"></p>
+<p>点击可能不是发生在 <code>&lt;td&gt;</code> 上，而是发生在其内部。</p>
+<p>在我们的例子中，如果我们看一下 HTML 内部，我们可以看到 <code>&lt;td&gt;</code> 内还有嵌套的标签，例如 <code>&lt;strong&gt;</code>：</p>
+<p>在处理程序 table.onclick 中，我们应该接受这样的 event.target，并确定该点击是否在 <code>&lt;td&gt;</code> 内。</p>
+<p>下面是改进后的代码：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">table<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> td <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span><span class="token function">closest</span><span class="token punctuation">(</span><span class="token string">'td'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (1)</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>td<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// (2)</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>td<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// (3)</span>
+
+  <span class="token function">highlight</span><span class="token punctuation">(</span>td<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (4)</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>解释：</p>
+<ul>
+<li><p>elem.closest(selector) 方法返回与 selector 匹配的最近的祖先。在我们的例子中，我们从源元素开始向上寻找 <code>&lt;td&gt;</code>。</p>
+</li>
+<li><p>如果 event.target 不在任何 <code>&lt;td&gt;</code> 中，那么调用将立即返回，因为这里没有什么事儿可做。</p>
+</li>
+<li><p>对于嵌套的表格，event.target 可能是一个 <code>&lt;td&gt;</code>，但位于当前表格之外。因此我们需要检查它是否是我们的表格中的 <code>&lt;td&gt;</code>。如果是的话，就高亮显示它。</p>
+</li>
+</ul>
+<h2><span id="委托示例标记中的行为">委托示例：标记中的行为</span></h2><p>事件委托还有其他用途。<strong>（译注：本节标题中的“标记中的行为”即 action in markup）</strong></p>
+<p>例如，我们想要编写一个有“保存”、“加载”和“搜索”等按钮的菜单。并且，这里有一个具有 save、load 和 search 等方法的对象。如何匹配它们？</p>
+<p>第一个想法可能是为每个按钮分配一个单独的处理程序。<strong>但是有一个更优雅的解决方案。</strong> 我们可以为整个菜单添加一个处理程序，并为具有方法调用的按钮添加 data-action 特性（attribute）：</p>
+<blockquote>
+<p><code>&lt;button data-action=&quot;save&quot;&gt;Click to Save&lt;/button&gt;</code></p>
+</blockquote>
+<p>处理程序读取特性（attribute）并执行该方法。工作示例如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token operator">&lt;</span>div id<span class="token operator">=</span><span class="token string">"menu"</span><span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"save"</span><span class="token operator">></span>Save<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"load"</span><span class="token operator">></span>Load<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+  <span class="token operator">&lt;</span>button data<span class="token operator">-</span>action<span class="token operator">=</span><span class="token string">"search"</span><span class="token operator">></span>Search<span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>script<span class="token operator">></span>
+  <span class="token keyword">class</span> <span class="token class-name">Menu</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token parameter">elem</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>_elem <span class="token operator">=</span> elem<span class="token punctuation">;</span>
+      elem<span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">onClick</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// (*)</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">save</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'saving'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">load</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'loading'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">search</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'searching'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">onClick</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">let</span> action <span class="token operator">=</span> event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>action<span class="token punctuation">;</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>action<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">this</span><span class="token punctuation">[</span>action<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">new</span> <span class="token class-name">Menu</span><span class="token punctuation">(</span>menu<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+<body>
+<div id="menu">
+  <button data-action="save">Save</button>
+  <button data-action="load">Load</button>
+  <button data-action="search">Search</button>
+</div>
+
+<script>
+  class Menu {
+    constructor(elem) {
+      this._elem = elem;
+      elem.onclick = this.onClick.bind(this); // (*)
+    }
+
+    save() {
+      alert('saving');
+    }
+
+    load() {
+      alert('loading');
+    }
+
+    search() {
+      alert('searching');
+    }
+
+    onClick(event) {
+      let action = event.target.dataset.action;
+      if (action) {
+        this[action]();
+      }
+    };
+  }
+
+  new Menu(menu);
+</script>
+</body>
+
+<br>
+
+<p><strong>请注意，this.onClick 在 (*) 行中被绑定到了 this。这很重要，因为否则内部的 this 将引用 DOM 元素（elem），而不是 Menu 对象，那样的话，this[action] 将不是我们所需要的。</strong></p>
+<p>那么，这里的委托给我们带来了什么好处？</p>
+<ul>
+<li>我们不需要编写代码来为每个按钮分配一个处理程序。只需要创建一个方法并将其放入标记（markup）中即可。</li>
+<li>HTML 结构非常灵活，我们可以随时添加&#x2F;移除按钮。</li>
+</ul>
+<p>我们也可以使用 .action-save，.action-load 类，但 data-action 特性（attribute）在语义上更好。我们也可以在 CSS 规则中使用它。</p>
+<h2><span id="行为模式">“行为”模式</span></h2><p><strong>我们还可以使用事件委托将“行为（behavior）”以 声明方式 添加到具有特殊特性（attribute）和类的元素中。</strong></p>
+<p>行为模式分为两个部分：</p>
+<ul>
+<li>我们将自定义特性添加到描述其行为的元素。</li>
+<li>用文档范围级的处理程序追踪事件，如果事件发生在具有特定特性的元素上 —— 则执行行为（action）。</li>
+</ul>
+<h3><span id="行为计数器">行为：计数器</span></h3><p>例如，这里的特性 data-counter 给按钮添加了一个“点击增加”的行为。</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'click'</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>counter <span class="token operator">!=</span> <span class="token keyword">undefined</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">// 如果这个特性存在...</span>
+      event<span class="token punctuation">.</span>target<span class="token punctuation">.</span>value<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<body>
+Counter: <input type="button" value="1" data-counter>
+One more counter: <input type="button" value="2" data-counter>
+
+<script>
+  document.addEventListener('click', function(event) {
+
+    if (event.target.dataset.counter != undefined) { // 如果这个特性存在...
+      event.target.value++;
+    }
+
+  });
+
+</script>
+</body>
+
+
+<h2><span id="总结">总结</span></h2><p><strong>事件委托真的很酷！这是 DOM 事件最有用的模式之一。</strong></p>
+<p>它通常用于为许多相似的元素添加相同的处理，但不仅限于此。</p>
+<h3><span id="算法">算法</span></h3><ul>
+<li>在容器（container）上放一个处理程序。</li>
+<li>在处理程序中 —— 检查源元素 event.target。</li>
+<li>如果事件发生在我们感兴趣的元素内，那么处理该事件。</li>
+</ul>
+<h3><span id="好处">好处</span></h3><ul>
+<li>简化初始化并节省内存：无需添加许多处理程序。</li>
+<li>更少的代码：添加或移除元素时，无需添加&#x2F;移除处理程序。</li>
+<li>DOM 修改 ：我们可以使用 innerHTML 等，来批量添加&#x2F;移除元素。</li>
+</ul>
+<h3><span id="事件委托也有其局限性">事件委托也有其局限性</span></h3><p>首先，事件必须冒泡。而有些事件不会冒泡。此外，低级别的处理程序不应该使用 <code>event.stopPropagation()</code>。<br>其次，委托可能会增加 CPU 负载，因为容器级别的处理程序会对容器中任意位置的事件做出反应，而不管我们是否对该事件感兴趣。但是，通常负载可以忽略不计，所以我们不考虑它。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/05/Event-Bubbling/" itemprop="url">浏览器事件的冒泡和捕获</a>
         
     </h1>
@@ -1392,222 +1773,6 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
 <p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
 <p><strong>公平调度策略</strong><br><code>FairScheduler</code>是一种允许多个<code>Yarn</code>任务公平使用集群资源的可插拔式调度策略</p>
 <p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/09/hadoop-3/" itemprop="url">Hadoop 2.0体系架构之分布式文件系统HDFS</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-09T02:45:27.000Z" itemprop="datePublished">November 9, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="hdfs设计原则">HDFS设计原则</span></h2><h3><span id="设计目标">设计目标</span></h3><p><strong>存储非常大的文件：这里非常大指的是几百M、G、或者TB级别。</strong></p>
-<ul>
-<li><p>采用流式的数据访问方式: HDFS基于这样的一个假设：最有效的数据处理模式是一次写入、多次读取数据集经常从数据源生成或者拷贝一次，然后在其上做很多分析工作<br>分析工作经常读取其中的大部分数据，即使不是全部。 因此读取整个数据集所需时间比读取第一条记录的延时更重要。</p>
-</li>
-<li><p>运行于商业硬件上: Hadoop不需要特别贵的、reliable的（可靠的）机器，可运行于普通商用机器（可以从多家供应商采购） ，商用机器不代表低端机器。在集群中（尤其是大的集群），节点失败率是比较高的HDFS的目标是确保集群在节点失败的时候不会让用户感觉到明显的中断。</p>
-</li>
-</ul>
-<h3><span id="hdfs不适合的应用类型">HDFS不适合的应用类型</span></h3><p>有些场景不适合使用HDFS来存储数据。下面列举几个：</p>
-<ol>
-<li><p><strong>低延时的数据访问</strong><br>对延时要求在毫秒级别的应用，不适合采用HDFS。HDFS是为高吞吐数据传输设计的,因此可能牺牲延时HBase更适合低延时的数据访问。</p>
-</li>
-<li><p><strong>大量小文件</strong><br>文件的元数据（如目录结构，文件block的节点列表，<code>block-node mapping</code>）保存在NameNode的内存中， 整个文件系统的文件数量会受限于NameNode的内存大小。<br>经验而言，一个文件&#x2F;目录&#x2F;文件块一般占有150字节的元数据内存空间。如果有100万个文件，每个文件占用1个文件块，则需要大约300M的内存。因此十亿级别的文件数量在现有商用机器上难以支持。</p>
-</li>
-<li><p><strong>多方读写，需要任意的文件修改</strong><br>HDFS采用追加（append-only）的方式写入数据。不支持文件任意offset的修改。不支持多个写入器（writer）</p>
-</li>
-</ol>
-<h2><span id="hdfs定位">HDFS定位</span></h2><p>为提高扩展性，HDFS采用了master&#x2F;slave架构来构建分布式存储集群，这种架构很容易向集群中任意添加或删除slave。</p>
-<p>HDFS是Hadoop生态系统中的一个重要组件，它是一个分布式文件系统，旨在存储大量数据，并提供高吞吐量的数据访问。HDFS的设计目标是将数据存储在廉价的硬件上，并提供高容错性。它通过将数据分散到集群中的多个节点上来实现这一目标。HDFS的定位是作为一个批处理系统，适用于大规模数据的离线处理。</p>
-<p>HDFS的主要特点包括：</p>
-<ul>
-<li>高容错性：HDFS将数据分散到多个节点上，因此即使某个节点出现故障，数据仍然可以通过其他节点进行访问。</li>
-<li>高吞吐量：HDFS的设计目标是支持大规模数据的批处理，因此它提供了高吞吐量的数据访问。</li>
-<li>适用于大文件：HDFS适用于存储大文件，因为它将文件分成多个块进行存储，并将这些块分散到多个节点上。</li>
-<li>流式数据访问：HDFS支持流式数据访问，这意味着它可以高效地处理大量的数据流。</li>
-</ul>
-<p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
-<h2><span id="hdfs体系架构">HDFS体系架构</span></h2><p>HDFS采用master&#x2F;slave体系来构建分布式存储服务，提高了HDFS的可扩展性又简化了架构设计。<br>HDFS里将文件分块存储，优化存储颗粒度。namenode统一管理所有slave机器datanode存储空间，datanode以块为单位存储实际的数据。真正的文件I&#x2F;O操作时客户端直接和datanode交互。</p>
-<h2><span id="hdfs核心概念">HDFS核心概念</span></h2><h3><span id="blocks">Blocks</span></h3><p>物理磁盘中有块的概念，磁盘的物理Block是磁盘操作最小的单元，读写操作均以Block为最小单元，一般为512 Byte。文件系统在物理Block之上抽象了另一层概念，文件系统Block物理磁盘Block的整数倍。通常为几KB。Hadoop提供的df、fsck这类运维工具都是在文件系统的Block级别上进行操作。</p>
-<p>HDFS的Block块比一般单机文件系统大得多，默认为128M。HDFS的文件被拆分成block-sized的chunk，chunk作为独立单元存储。比Block小的文件不会占用整个Block，只会占据实际大小。例如， 如果一个文件大小为1M，则在HDFS中只会占用1M的空间，而不是128M。</p>
-<p>HDFS的Block为什么这么大？<br>是为了最小化查找（seek）时间，控制定位文件与传输文件所用的时间比例。假设定位到Block所需的时间为10ms，磁盘传输速度为100M&#x2F;s。如果要将定位到Block所用时间占传输时间的比例控制1%，则Block大小需要约100M。<br>但是如果Block设置过大，在MapReduce任务中，Map或者Reduce任务的个数 如果小于集群机器数量，会使得作业运行效率很低。</p>
-<p>Block抽象的好处 </p>
-<ul>
-<li>Block的拆分使得单个文件大小可以大于整个磁盘的容量，构成文件的Block可以分布在整个集群， 理论上，单个文件可以占据集群中所有机器的磁盘。 </li>
-<li>Block的抽象也简化了存储系统，对于Block，无需关注其权限，所有者等内容（这些内容都在文件级别上进行控制）。 </li>
-<li>Block作为容错和高可用机制中的副本单元，即以Block为单位进行复制。</li>
-</ul>
-<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>整个HDFS集群由Namenode和Datanode构成<code>master-worker（主从）</code>模式。Namenode负责构建命名空间，管理文件的元数据等，而Datanode负责实际存储数据，负责读写工作。</p>
-<h4><span id="namenode">Namenode</span></h4><p>Namenode存放文件系统树及所有文件、目录的元数据。元数据持久化为2种形式：</p>
-<ul>
-<li>namespace image</li>
-<li>edit log</li>
-</ul>
-<p>但是持久化数据中不包括Block所在的节点列表，及文件的Block分布在集群中的哪些节点上，这些信息是在系统重启的时候重新构建（通过Datanode汇报的Block信息）。<br>在HDFS中，Namenode可能成为集群的单点故障，Namenode不可用时，整个文件系统是不可用的。HDFS针对单点故障提供了2种解决机制： </p>
-<ol>
-<li><p>备份持久化元数据<br>将文件系统的元数据同时写到多个文件系统， 例如同时将元数据写到本地文件系统及NFS。这些备份操作都是同步的、原子的。</p>
-</li>
-<li><p>Secondary Namenode<br>Secondary节点定期合并主Namenode的namespace image和edit log， 避免edit log过大，通过创建检查点checkpoint来合并。它会维护一个合并后的namespace image副本， 可用于在Namenode完全崩溃时恢复数据。下图为Secondary Namenode的管理界面：</p>
-</li>
-</ol>
-<p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
-<p>Secondary Namenode通常运行在另一台机器，因为合并操作需要耗费大量的CPU和内存。其数据落后于Namenode，因此当Namenode完全崩溃时，会出现数据丢失。 通常做法是拷贝NFS中的备份元数据到Second，将其作为新的主Namenode。<br>在HA（High Availability高可用性）中可以运行一个Hot Standby，作为热备份，在Active Namenode故障之后，替代原有Namenode成为Active Namenode。</p>
-<h4><span id="datanode">Datanode</span></h4><p>数据节点负责存储和提取Block，读写请求可能来自namenode，也可能直接来自客户端。数据节点周期性向Namenode汇报自己节点上所存储的Block相关信息。</p>
-<p><img src="/img/HDFS/HDFS3.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="经典hdfs体系架构">经典HDFS体系架构</span></h2><p><strong>NameNode负责管理文件系统的元数据信息，而DataNode则负责存储文件块的实际数据。</strong> 这种分工使得HDFS能够高效地存储和管理大规模数据。</p>
-<p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
-<p>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</p>
-<p>因此，NameNode和DataNode在HDFS体系架构中扮演着不同的角色。</p>
-<p>作用上的区别是什么？</p>
-<p>HDFS是Hadoop分布式文件系统的缩写，是Hadoop生态系统中的一个重要组件。HDFS的体系架构包括一个NameNode和多个DataNode。NameNode是HDFS的主节点，负责管理文件系统的命名空间、文件的元数据信息以及文件块的位置信息。而DataNode则是HDFS的从节点，负责存储文件块的实际数据。</p>
-<p><strong>具体来说，当一个客户端需要读取或写入一个文件时，它会向NameNode发送请求。NameNode会返回文件的元数据信息和文件块的位置信息。客户端根据这些信息与DataNode进行通信，从而读取或写入文件块的实际数据。</strong></p>
-<p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
-<h3><span id="一般拓扑">一般拓扑</span></h3><p>只有单个NameNode节点，使用SecondaryNameNode或BackupNode节点实时获取NameNode元数据信息，备份元数据。</p>
-<p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
-<h3><span id="商用拓扑">商用拓扑</span></h3><p>有两个NameNode节点，并使用ZooKeeper实现NameNode节点间的热切换。</p>
-<p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
-<h2><span id="命令行接口">命令行接口</span></h2><p>HDFS提供了各种交互方式，例如通过Java API、HTTP、shell命令行的。命令行的交互主要通过hadoop fs来操作。例如：</p>
-<blockquote>
-<p>hadoop fs -copyFromLocal &#x2F;&#x2F; 从本地复制文件到HDFS<br> hadoop fs mkdir &#x2F;&#x2F; 创建目录<br> hadoop fs -ls  &#x2F;&#x2F; 列出文件列表</p>
-</blockquote>
-<p>Hadoop中，文件和目录的权限类似于POSIX模型，包括读、写、执行3种权限：</p>
-<p>读权限（r）：用于读取文件或者列出目录中的内容<br>写权限（w）：对于文件，就是文件的写权限。目录的写权限指在该目录下创建或者删除文件（目录）的权限。<br>执行权限（x）：文件没有所谓的执行权限，被忽略。对于目录，执行权限用于访问器目录下的内容。</p>
-<p>每个文件或目录都有owner，group，mode三个属性:</p>
-<p>owner：指文件的所有者<br>group：为权限组<br>mode：由所有者权限、文件所属的组中组员的权限、非所有者非组员的权限组成。</p>
-<p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="数据流读写流程">数据流（读写流程）</span></h2><h3><span id="读文件">读文件</span></h3><p>大致读文件的流程如下：</p>
-<p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
-<ol>
-<li><p>客户端传递一个文件Path给FileSystem的open方法</p>
-</li>
-<li><p>DFS采用RPC远程获取文件最开始的几个block的datanode地址。Namenode会根据网络拓扑结构决定返回哪些节点（前提是节点有block副本），如果客户端本身是Datanode并且节点上刚好有block副本，直接从本地读取。</p>
-</li>
-<li><p>客户端使用open方法返回的FSDataInputStream对象读取数据（调用read方法）</p>
-</li>
-<li><p>DFSInputStream（FSDataInputStream实现了改类）连接持有第一个block的、最近的节点，反复调用read方法读取数据</p>
-</li>
-<li><p>第一个block读取完毕之后，寻找下一个block的最佳datanode，读取数据。如果有必要，DFSInputStream会联系Namenode获取下一批Block 的节点信息（存放于内存，不持久化），这些寻址过程对客户端都是不可见的。</p>
-</li>
-<li><p>数据读取完毕，客户端调用close方法关闭流对象</p>
-</li>
-</ol>
-<p>在读数据过程中，如果与Datanode的通信发生错误，DFSInputStream对象会尝试从下一个最佳节点读取数据，并且记住该失败节点， 后续Block的读取不会再连接该节点 </p>
-<p>读取一个Block之后，DFSInputStram会进行检验和验证，如果Block损坏，尝试从其他节点读取数据，并且将损坏的block汇报给Namenode。 </p>
-<p>客户端连接哪个datanode获取数据，是由namenode来指导的，这样可以支持大量并发的客户端请求，namenode尽可能将流量均匀分布到整个集群。 </p>
-<p>Block的位置信息是存储在namenode的内存中，因此相应位置请求非常高效，不会成为瓶颈。</p>
-<h3><span id="写文件">写文件</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
-<p>步骤分解 </p>
-<ol>
-<li><p>客户端调用DistributedFileSystem的create方法</p>
-</li>
-<li><p>DistributedFileSystem远程RPC调用Namenode在文件系统的命名空间中创建一个新文件，此时该文件没有关联到任何block。 这个过程中，Namenode会做很多校验工作，例如是否已经存在同名文件，是否有权限，如果验证通过，返回一个FSDataOutputStream对象。 如果验证不通过，抛出异常到客户端。</p>
-</li>
-<li><p>客户端写入数据的时候，DFSOutputStream分解为packets（数据包），并写入到一个数据队列中，该队列由DataStreamer消费。</p>
-</li>
-<li><p>DateStreamer负责请求Namenode分配新的block存放的数据节点。这些节点存放同一个Block的副本，构成一个管道。 DataStreamer将packet写入到管道的第一个节点，第一个节点存放好packet之后，转发给下一个节点，下一个节点存放 之后继续往下传递。</p>
-</li>
-<li><p>DFSOutputStream同时维护一个ack queue队列，等待来自datanode确认消息。当管道上的所有datanode都确认之后，packet从ack队列中移除。</p>
-</li>
-<li><p>数据写入完毕，客户端close输出流。将所有的packet刷新到管道中，然后安心等待来自datanode的确认消息。全部得到确认之后告知Namenode文件是完整的。 Namenode此时已经知道文件的所有Block信息（因为DataStreamer是请求Namenode分配block的），只需等待达到最小副本数要求，然后返回成功信息给客户端。</p>
-</li>
-</ol>
-<p>Namenode如何决定副本存在哪个Datanode？</p>
-<p>HDFS的副本的存放策略是可靠性、写带宽、读带宽之间的权衡。默认策略如下：</p>
-<p>第一个副本放在客户端相同的机器上，如果机器在集群之外，随机选择一个（但是会尽可能选择容量不是太慢或者当前操作太繁忙的）</p>
-<p>第二个副本随机放在不同于第一个副本的机架上。</p>
-<p>第三个副本放在跟第二个副本同一机架上，但是不同的节点上，满足条件的节点中随机选择。</p>
-<p>更多的副本在整个集群上随机选择，虽然会尽量避免太多副本在同一机架上。 </p>
-<p>副本的位置确定之后，在建立写入管道的时候，会考虑网络拓扑结构。下面是可能的一个存放策略：</p>
-<p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
-<p>这样选择很好的平衡了可靠性、读写性能</p>
-<ul>
-<li><p>可靠性：Block分布在两个机架上</p>
-</li>
-<li><p>写带宽：写入管道的过程只需要跨越一个交换机</p>
-</li>
-<li><p>读带宽：可以从两个机架中任选一个读取</p>
-</li>
-</ul>
-<h2><span id="hdfs内部特性">HDFS内部特性</span></h2><h2><span id="数据冗余">数据冗余</span></h2><ul>
-<li><p>HDFS将每个文件存储成一系列数据块（Block），默认块大小为64MB（可配置）。</p>
-</li>
-<li><p>为了容错，文件的所有数据块都会有副本（副本数量即复制因子，可配置）。</p>
-</li>
-<li><p>HDFS的文件都是一次性写入的，并且严格限制为任何时候都只有一个写用户。</p>
-</li>
-</ul>
-<h2><span id="副本存放">副本存放</span></h2><ul>
-<li><p>HDFS集群一般运行在多个机架上，不同机架上机器的通信需要通过交换机。</p>
-</li>
-<li><p>HDFS采用机架感知（Rack-aware）的策略来改进数据的可靠性、可用性和网络带宽的利用率。</p>
-</li>
-<li><p>机架的错误远比节点的错误少，这个策略可以防止整个机架失效时数据丢失，提高数据的可靠性和可用性，又能保证性能。</p>
-</li>
-</ul>
-<h3><span id="副本选择">副本选择</span></h3><ul>
-<li><p>HDFS会尽量使用离程序最近的副本来满足用户请求，这样可以减少总带宽消耗和读延时。</p>
-</li>
-<li><p>HDFS的架构支持数据均衡策略。</p>
-</li>
-</ul>
-<h3><span id="心跳检测">心跳检测</span></h3><ul>
-<li><p>NameNode周期性地从集群中的每个DataNode接受心跳包和块报告，收到心跳包说明该DataNode工作正常。</p>
-</li>
-<li><p>NameNode会标记最近没有心跳的DataNode为宕机，不会发给它们任何新的I&#x2F;O请求。</p>
-</li>
-<li><p>NameNode会不断检测这些需要复制的数据块，并在需要的时候重新复制。</p>
-</li>
-</ul>
-<h3><span id="数据完整性检测">数据完整性检测</span></h3><ul>
-<li><p>多种原因可能造成从DataNode获取的数据块有损坏。</p>
-</li>
-<li><p>HDFS客户端软件实现了对HDFS文件内容的校验和检查（Checksum）。</p>
-</li>
-<li><p>DataNode获得的数据块对应的校验和隐藏文件中的不同，客户端就会判定数据块有损坏，将从其他DataNode获取该数据块的副本。</p>
-</li>
-</ul>
-<h3><span id="简单一致性模型-流式数据访问">简单一致性模型、流式数据访问</span></h3><ul>
-<li><p>HDFS的应用程序一般对文件实行一次写、多次读的访问模式。</p>
-</li>
-<li><p>文件一旦创建、写入和关闭之后就不需要再更改了。</p>
-</li>
-<li><p>这样就简化了数据一致性问题，高吞吐量的数据访问才成为可能；运行在HDFS上的应用主要以流式读为主，做批量处理；更注重数据访问的高吞吐量。</p>
-</li>
-</ul>
-<h3><span id="客户端缓存">客户端缓存</span></h3><ul>
-<li><p>客户端创建文件的请求不是立即到达NameNode，HDFS客户端先把数据缓存到本地的一个临时文件，程序的写操作透明地重定向到这个临时文件。</p>
-</li>
-<li><p>当这个临时文件累积的数据超过一个块的大小（64MB）时，客户端才会联系NameNode。</p>
-</li>
-<li><p>如果NameNode在文件关闭之前死机，那么文件将会丢失。</p>
-</li>
-<li><p>如果不采用客户端缓存，网络速度和拥塞都会对输出产生很大的影响。</p>
-</li>
-</ul>
 
     
     </div>

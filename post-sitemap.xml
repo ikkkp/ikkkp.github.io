@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2024/02/28/FE-interview-guide/</loc>
+        <lastmod>2024-02-28T02:10:30.087Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2024/02/28/en/FE-interview-guide/</loc>
+        <lastmod>2024-02-28T02:10:28.357Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2024/02/16/en/pm-post1/</loc>
         <lastmod>2024-02-16T07:19:07.356Z</lastmod>
         <changefreq>weekly</changefreq>

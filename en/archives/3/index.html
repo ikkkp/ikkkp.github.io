@@ -174,6 +174,195 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/08/en/hadoop-2/" itemprop="url">MapReduce Working Principle in Hadoop</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-08T07:48:11.000Z" itemprop="datePublished">November 8, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/en/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="definition-of-mapreduce">Definition of MapReduce</span></h2><p>MapReduce is a programming framework for distributed computing programs. It is the core framework for developing “Hadoop-based data analysis applications”. Its core function is to integrate the user’s written business logic code and default components into a complete distributed computing program, which runs concurrently on a Hadoop cluster.</p>
+<h2><span id="reason-for-the-emergence-of-mapreduce">Reason for the Emergence of MapReduce</span></h2><p>Why do we need MapReduce?</p>
+<ul>
+<li>Massive data cannot be processed on a single machine due to hardware resource limitations.</li>
+<li>Once the single-machine version of the program is extended to run on a cluster, it will greatly increase the complexity and development difficulty of the program.</li>
+<li>With the introduction of the MapReduce framework, developers can focus most of their work on the development of business logic, while leaving the complexity of distributed computing to the framework to handle.</li>
+</ul>
+<p>Consider a word count requirement in a scenario with massive data:</p>
+<ul>
+<li>Single-machine version: limited memory, limited disk, limited computing power</li>
+<li>Distributed: file distributed storage (HDFS), computing logic needs to be divided into at least two stages (one stage is independently concurrent, one stage is converged), how to distribute computing programs, how to allocate computing tasks (slicing), how to start the two-stage program? How to coordinate? Monitoring during the entire program running process? Fault tolerance? Retry?</li>
+</ul>
+<p>It can be seen that when the program is extended from a single-machine version to a distributed version, a large amount of complex work will be introduced.</p>
+<h2><span id="relationship-between-mapreduce-and-yarn">Relationship between MapReduce and Yarn</span></h2><p>Yarn is a resource scheduling platform that is responsible for providing server computing resources for computing programs, which is equivalent to a distributed operating system platform. MapReduce and other computing programs are like application programs running on top of the operating system.</p>
+<p>Important concepts of YARN:</p>
+<ol>
+<li>Yarn does not know the running mechanism of the program submitted by the user;</li>
+<li>Yarn only provides scheduling of computing resources (when the user program applies for resources from Yarn, Yarn is responsible for allocating resources);</li>
+<li>The supervisor role in Yarn is called ResourceManager;</li>
+<li>The role that specifically provides computing resources in Yarn is called NodeManager;</li>
+<li>In this way, Yarn is completely decoupled from the running user program, which means that various types of distributed computing programs (MapReduce is just one of them), such as MapReduce, storm programs, spark programs, tez, etc., can run on Yarn;</li>
+<li>Therefore, computing frameworks such as Spark and Storm can be integrated to run on Yarn, as long as they have resource request mechanisms that comply with Yarn specifications in their respective frameworks;</li>
+<li>Yarn becomes a universal resource scheduling platform. From then on, various computing clusters that previously existed in enterprises can be integrated on a physical cluster to improve resource utilization and facilitate data sharing.</li>
+</ol>
+<h2><span id="mapreduce-working-principle">MapReduce Working Principle</span></h2><p>Strictly speaking, MapReduce is not an algorithm, but a computing idea. It consists of two stages: map and reduce.</p>
+<h3><span id="mapreduce-process">MapReduce Process</span></h3><p>To improve development efficiency, common functions in distributed programs can be encapsulated into frameworks, allowing developers to focus on business logic.</p>
+<p>MapReduce is such a general framework for distributed programs, and its overall structure is as follows (there are three types of instance processes during distributed operation):</p>
+<ul>
+<li>MRAppMaster: responsible for the process scheduling and status coordination of the entire program</li>
+<li>MapTask: responsible for the entire data processing process of the map phase</li>
+<li>ReduceTask: responsible for the entire data processing process of the reduce phase</li>
+</ul>
+<h3><span id="mapreduce-mechanism">MapReduce Mechanism</span></h3><p><img src="/img/hadoop/hadoop3.png" alt="hadoop"></p>
+<p>The process is described as follows:</p>
+<ol>
+<li><p>When an MR program starts, the MRAppMaster is started first. After the MRAppMaster starts, according to the description information of this job, it calculates the number of MapTask instances required and applies to the cluster to start the corresponding number of MapTask processes.</p>
+</li>
+<li><p>After the MapTask process is started, data processing is performed according to the given data slice range. The main process is:</p>
+</li>
+</ol>
+<ul>
+<li>Use the inputformat specified by the customer to obtain the RecordReader to read the data and form input KV pairs;</li>
+<li>Pass the input KV pairs to the customer-defined map() method for logical operation, and collect the KV pairs output by the map() method to the cache;</li>
+<li>Sort the KV pairs in the cache according to K partition and continuously overflow to the disk file.</li>
+</ul>
+<ol start="3">
+<li><p>After the MRAppMaster monitors that all MapTask process tasks are completed, it will start the corresponding number of ReduceTask processes according to the customer-specified parameters, and inform the ReduceTask process of the data range (data partition) to be processed.</p>
+</li>
+<li><p>After the ReduceTask process is started, according to the location of the data to be processed notified by the MRAppMaster, it obtains several MapTask output result files from several machines where the MapTask is running, and performs re-merging and sorting locally. Then, groups the KV with the same key into one group, calls the customer-defined reduce() method for logical operation, collects the result KV output by the operation, and then calls the customer-specified outputformat to output the result data to external storage.</p>
+</li>
+</ol>
+<p>Let’s take an example.</p>
+<p><img src="/img/hadoop/hadoop4.webp" alt="hadoop"><br>The above figure shows a word frequency counting task.</p>
+<ol>
+<li><p>Hadoop divides the input data into several slices and assigns each split to a map task for processing.</p>
+</li>
+<li><p>After mapping, each word and its frequency in this task are obtained.</p>
+</li>
+<li><p>Shuffle puts the same words together, sorts them, and divides them into several slices.</p>
+</li>
+<li><p>According to these slices, reduce is performed.</p>
+</li>
+<li><p>The result of the reduce task is counted and output to a file.</p>
+</li>
+</ol>
+<p>In MapReduce, two roles are required to complete these processes: JobTracker and TaskTracker.</p>
+<p><img src="/img/hadoop/hadoop5.webp" alt="hadoop"></p>
+<p>JobTracker is used to schedule and manage other TaskTrackers. JobTracker can run on any computer in the cluster. TaskTracker is responsible for executing tasks and must run on DataNode.</p>
+<p>Here is a simple MapReduce implementation example:</p>
+<p>It is used to count the number of occurrences of each word in the input file.</p>
+<ol>
+<li><p><strong>Import necessary packages:</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li><p><strong>Define the Mapper class:</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">public static class MyMapper extends Mapper&lt;LongWritable, Text, Text, IntWritable&gt; &#123;
+  protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException &#123;
+    String line &#x3D; value.toString();
+    &#x2F;&#x2F; Split each line of text into words and send them to the Reducer
+    String[] words &#x3D; line.split(&quot;\\s+&quot;);
+    for (String word : words) &#123;
+      context.write(new Text(word), new IntWritable(1));
+    &#125;
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The Mapper class is responsible for splitting the input text data into words and outputting a key-value pair (word, 1) for each word.</p>
+</li>
+<li><p><strong>Define the Reducer class:</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">public static class MyReduce extends Reducer&lt;Text, IntWritable, Text, IntWritable&gt; &#123;
+  protected void reduce(Text key, Iterable&lt;IntWritable&gt; values, Context context) throws IOException, InterruptedException &#123;
+    int sum &#x3D; 0;
+    &#x2F;&#x2F; Accumulate the number of occurrences of the same word
+    for (IntWritable value : values) &#123;
+      sum +&#x3D; value.get();
+    &#125;
+    &#x2F;&#x2F; Output the word and its total number of occurrences
+    context.write(key, new IntWritable(sum));
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The Reducer class receives key-value pairs from the Mapper, accumulates the values of the same key, and then outputs the word and its total number of occurrences.</p>
+</li>
+<li><p><strong>Main function (main method):</strong></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException &#123;
+  Configuration conf &#x3D; new Configuration();
+  Job job &#x3D; Job.getInstance(conf, &quot;word count&quot;);
+  job.setJarByClass(word.class);
+
+  job.setMapperClass(MyMapper.class);
+  job.setMapOutputKeyClass(Text.class);
+  job.setMapOutputValueClass(IntWritable.class);
+
+  job.setReducerClass(MyReduce.class);
+  job.setOutputKeyClass(Text.class);
+  job.setOutputValueClass(IntWritable.class);
+
+  &#x2F;&#x2F; Set the input and output paths
+  FileInputFormat.addInputPath(job, new Path(args[0]));
+  FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+  &#x2F;&#x2F; Submit the job and wait for it to complete
+  job.waitForCompletion(true);
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<p><img src="/img/hadoop/hadoop6.png" alt="hadoop"></p>
+<p>In the entire Hadoop architecture, the computing framework plays a crucial role, on the one hand, it can operate on the data in HDFS, on the other hand, it can be encapsulated to provide calls from upper-level components such as Hive and Pig.</p>
+<p>Let’s briefly introduce some of the more important components.</p>
+<p>HBase: originated from Google’s BigTable; it is a highly reliable, high-performance, column-oriented, and scalable distributed database.</p>
+<p>Hive: is a data warehouse tool that can map structured data files to a database table, and quickly implement simple MapReduce statistics through SQL-like statements, without the need to develop dedicated MapReduce applications, which is very suitable for statistical analysis of data warehouses.</p>
+<p>Pig: is a large-scale data analysis tool based on Hadoop. It provides a SQL-LIKE language called Pig Latin. The compiler of this language converts SQL-like data analysis requests into a series of optimized MapReduce operations.</p>
+<p>ZooKeeper: originated from Google’s Chubby; it is mainly used to solve some data management problems frequently encountered in distributed applications, simplifying the difficulty of coordinating and managing distributed application.</p>
+<p>Ambari: Hadoop management tool, which can monitor, deploy, and manage clusters quickly.</p>
+<p>Sqoop: used to transfer data between Hadoop and traditional databases.</p>
+<p>Mahout: an extensible machine learning and data mining library.</p>
+<p>Advantages and Applications of Hadoop</p>
+<p>Overall, Hadoop has the following advantages:</p>
+<p>High reliability: This is determined by its genes. Its genes come from Google. The best thing Google is good at is “garbage utilization.” When Google started, it was poor and couldn’t afford high-end servers, so it especially likes to deploy this kind of large system on ordinary computers. Although the hardware is unreliable, the system is very reliable.</p>
+<p>High scalability: Hadoop distributes data and completes computing tasks among available computer clusters, and these clusters can be easily expanded. In other words, it is easy to become larger.</p>
+<p>High efficiency: Hadoop can dynamically move data between nodes and ensure dynamic balance of each node, so the processing speed is very fast.</p>
+<p>High fault tolerance: Hadoop can automatically save multiple copies of data and automatically redistribute failed tasks. This is also considered high reliability.</p>
+<p>Low cost: Hadoop is open source and relies on community services, so the cost of use is relatively low.</p>
+<p>Based on these advantages, Hadoop is suitable for applications in large data storage and large data analysis, suitable for running on clusters of several thousand to tens of thousands of servers, and supports PB-level storage capacity.</p>
+<p>Hadoop’s applications are very extensive, including: search, log processing, recommendation systems, data analysis, video and image analysis, data storage, etc., can be deployed using it.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/08/en/hadoop-1/" itemprop="url">Understanding Hadoop in One Article</a>
         
     </h1>
@@ -1235,93 +1424,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
 
 
     
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/01/en/vue-expired-side-effects/" itemprop="url">vue-expired-side-effects</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-31T16:13:47.000Z" itemprop="datePublished">November 1, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>When we talk about race conditions, it typically refers to a concurrency problem in multi-process or multi-threaded programming. However, in frontend development, we might not directly encounter multi-threaded programming frequently, but we often face similar situations related to race conditions. A common example is in asynchronous programming, especially when dealing with asynchronous events, callback functions, or Promises.</p>
-<p>For instance, consider the following asynchronous code:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> data<span class="token punctuation">;</span>
-
-<span class="token keyword">function</span> <span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    data <span class="token operator">=</span> <span class="token string">'Fetched data'</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token function">fetchData</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs undefined</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this example, the <code>fetchData</code> function is asynchronous, and it assigns the data to the <code>data</code> variable after 1 second. However, due to JavaScript’s single-threaded nature, the <code>fetchData</code> function waits in the main thread’s event queue for 1 second. Within this 1 second, the <code>console.log(data)</code> statement executes immediately, and at that point, the value of <code>data</code> is <code>undefined</code> because the <code>fetchData</code> function has not completed yet.</p>
-<p>In asynchronous programming, due to the non-blocking nature of the code, similar race condition issues can arise. When dealing with asynchronous operations, it’s crucial to ensure data consistency and correctness, avoiding accessing or modifying related data before the asynchronous operation is completed.</p>
-<h2><span id="race-conditions-and-reactivity">Race Conditions and Reactivity</span></h2><p>So, how are race conditions related to reactivity?</p>
-<p>Consider the following example:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">let</span> finalData<span class="token punctuation">;</span>
-<span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Send and wait for a network request</span>
-  <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token comment">// Assign the request result to data</span>
-  finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In this code snippet, we use the <code>watch</code> function to observe changes to the <code>obj</code> object. Every time the <code>obj</code> object changes, a network request, such as an API call, is sent. After the data request is successful, the result is assigned to the <code>finalData</code> variable. At first glance, this code might seem fine. However, upon closer inspection, you’ll realize that this code can lead to race condition problems. Let’s assume we modify a field of the <code>obj</code> object for the first time, triggering the callback function and sending the first request A. As time passes, before the result of request A returns, we modify a field of the <code>obj</code> object again, triggering the second request B. Now, both request A and request B are in progress. Which request will return its result first? We don’t know. If request B completes before request A, the finalData variable will store the result of request B, making request A’s result outdated.</p>
-<p><img src="/img/expired-side-sffect/expired-side-sffect.png" alt="Comparison"></p>
-<p>However, because request B was sent later, we consider its data as the “latest.” Request A is deemed “expired,” and its result should be invalidated. By ensuring that request B’s result is considered the latest, we can prevent errors caused by race conditions. Essentially, what we need is a way to expire side effects. To illustrate this concept further, let’s replicate the scenario using the <code>watch</code> function in Vue.js to see how Vue.js helps developers address this problem. Later, we’ll attempt to implement this functionality ourselves.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">watch</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">newValue<span class="token punctuation">,</span> oldValue<span class="token punctuation">,</span> onInvalidate</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Define a flag to indicate whether the current side effect has expired, initially set to false (not expired)</span>
-  <span class="token keyword">let</span> expired <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-  
-  <span class="token comment">// Call the onInvalidate() function to register an expiration callback</span>
-  <span class="token function">onInvalidate</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// When expired, set the expired flag to true</span>
-    expired <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Send a network request</span>
-  <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">'/path/to/request'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Perform subsequent operations only if the side effect has not expired</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>expired<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    finalData <span class="token operator">=</span> res<span class="token punctuation">;</span>
-    <span class="token comment">// Subsequent operations...</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>As shown in the code above, before sending the request, we define an <code>expired</code> flag variable to indicate whether the current side effect has expired. We then call the <code>onInvalidate</code> function to register an expiration callback. When the side effect expires, the <code>expired</code> flag is set to <code>true</code>. Finally, we use the request result only if the side effect has not expired, effectively avoiding the issue described earlier.</p>
-<p><img src="/img/expired-side-sffect/expired-side-sffect2.png" alt="Comparison"></p>
-<hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
     
         
 <nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">
@@ -1340,6 +1442,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
         <li><a class="pagination-link is-current" href="/en/archives/3/">3</a></li>
         
         <li><a class="pagination-link" href="/en/archives/4/">4</a></li>
+        
+        <li><a class="pagination-link" href="/en/archives/5/">5</a></li>
         
     </ul>
 </nav>
