@@ -177,6 +177,217 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/06/Browser-Default-Behavior/" itemprop="url">浏览器默认行为</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-06T11:28:33.000Z" itemprop="datePublished">December 6, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/FE/">FE</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>其实浏览器内置了很多的事件。</p>
+<p>而许多事件会自动触发浏览器执行某些行为。</p>
+<p>例如：</p>
+<ul>
+<li>点击一个链接 —— 触发导航（navigation）到该 URL。</li>
+<li>点击表单的提交按钮 —— 触发提交到服务器的行为。</li>
+<li>在文本上按下鼠标按钮并移动 —— 选中文本。</li>
+</ul>
+<p>如果我们使用 JavaScript 处理一个事件，那么我们通常不希望发生相应的浏览器行为。而是想要实现其他行为进行替代。</p>
+<h2><span id="阻止浏览器行为">阻止浏览器行为</span></h2><p>有两种方式来告诉浏览器我们不希望它执行默认行为：</p>
+<ul>
+<li>主流的方式是使用 event 对象。有一个 event.preventDefault() 方法。</li>
+<li>如果处理程序是使用 <code>on&lt;event&gt;</code>（而不是 addEventListener）分配的，那返回 false 也同样有效。</li>
+</ul>
+<p><strong>在下面这个示例中，点击链接不会触发导航（navigation），浏览器不会执行任何操作：</strong></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token keyword">return</span> <span class="token boolean">false</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+or
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><a href="/" onclick="return false">Click here</a><br>or<br><a href="/" onclick="event.preventDefault()">here</a></p>
+<br>
+
+<p>请注意的是，处理程序是使用 <code>on&lt;event&gt;</code>分配的，并进行return返回false并不是一个好的实践。</p>
+<p>从处理程序返回 false 是一个例外<br>事件处理程序返回的值通常会被忽略。</p>
+<p>唯一的例外是从使用 <code>on&lt;event&gt;</code> 分配的处理程序中返回的 return false。</p>
+<p>在所有其他情况下，return 值都会被忽略。并且，返回 true 没有意义。</p>
+<h2><span id="处理程序选项-passive">处理程序选项 “passive”</span></h2><p><strong>addEventListener 的可选项 passive: true 向浏览器发出信号，表明处理程序将不会调用 preventDefault()。</strong></p>
+<p>为什么需要这样做？</p>
+<p><strong>移动设备上会发生一些事件，例如 touchmove（当用户在屏幕上移动手指时），默认情况下会导致滚动，但是可以使用处理程序的 preventDefault() 来阻止滚动。</strong></p>
+<p>因此，当浏览器检测到此类事件时，它必须首先处理所有处理程序，然后如果没有任何地方调用 <code>preventDefault</code>，则页面可以继续滚动。但这可能会导致 UI 中不必要的延迟和“抖动”。</p>
+<p>passive: true 选项告诉浏览器，处理程序不会取消滚动。然后浏览器立即滚动页面以提供最大程度的流畅体验，并通过某种方式处理事件。</p>
+<p>对于某些浏览器（Firefox，Chrome），默认情况下，touchstart 和 touchmove 事件的 passive 为 true。</p>
+<h2><span id="eventdefaultprevented">event.defaultPrevented</span></h2><p>如果默认行为被阻止，那么 <code>event.defaultPrevented</code> 属性为 true，否则为 false。</p>
+<p>这儿有一个有趣的用例。</p>
+<p><strong>你还记得我们在 冒泡和捕获 一章中讨论过的 event.stopPropagation()，以及为什么停止冒泡是不好的吗？</strong></p>
+<p>有时我们可以使用 event.defaultPrevented 来代替，来通知其他事件处理程序，该事件已经被处理。</p>
+<p>我们来看一个实际的例子。</p>
+<p>默认情况下，浏览器在 contextmenu 事件（单击鼠标右键）时，显示带有标准选项的上下文菜单。我们可以阻止它并显示我们自定义的菜单，就像这样：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span><span class="token punctuation">></span></span>Right-click shows browser context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">oncontextmenu</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>alert('Draw our menu'); return false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  Right-click shows our context menu
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<br>
+<button>Right-click shows browser context menu</button>
+
+<button oncontextmenu="alert('Draw our menu'); return false">
+  Right-click shows our context menu
+</button>
+<br>
+现在，除了该上下文菜单外，我们还想实现文档范围的上下文菜单。
+
+<p>右键单击时，应该显示最近的上下文菜单：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click here for the document context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click here for the button context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<br>
+<p>Right-click here for the document context menu</p>
+<button id="elem">Right-click here for the button context menu</button>
+
+<script>
+  elem.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Button context menu");
+  };
+
+  document.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Document context menu");
+  };
+</script>
+<br>
+问题是，当我们点击 elem 时，我们会得到两个菜单：按钮级和文档级（事件冒泡）的菜单。
+
+<p>如何修复呢？其中一个解决方案是：“当我们在按钮处理程序中处理鼠标右键单击事件时，我们阻止其冒泡”，使用 event.stopPropagation()：</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu (fixed with event.stopPropagation)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<br>
+<p>Right-click for the document menu</p>
+<button id="elem">Right-click for the button menu (fixed with event.stopPropagation)</button>
+
+<script>
+  elem.oncontextmenu = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    alert("Button context menu");
+  };
+
+  document.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Document context menu");
+  };
+</script>
+<br>
+现在按钮级菜单如期工作。但是代价太大，我们拒绝了任何外部代码对右键点击信息的访问，包括收集统计信息的计数器等。这是非常不明智的。
+
+<p>另一个替代方案是，检查 document 处理程序是否阻止了浏览器的默认行为？如果阻止了，那么该事件已经得到了处理，我们无需再对此事件做出反应。</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu (added a check for event.defaultPrevented)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>defaultPrevented<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<br>
+<p>Right-click for the document menu (added a check for event.defaultPrevented)</p>
+<button id="elem">Right-click for the button menu</button>
+
+<script>
+  elem.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Button context menu");
+  };
+
+  document.oncontextmenu = function(event) {
+    if (event.defaultPrevented) return;
+
+
+    event.preventDefault();
+    alert("Document context menu");
+  };
+</script>
+
+<p>现在一切都可以正常工作了。如果我们有嵌套的元素，并且每个元素都有自己的上下文菜单，那么这也是可以运行的。只需确保检查每个 contextmenu 处理程序中的 event.defaultPrevented。</p>
+<blockquote>
+<p><strong>event.stopPropagation() 和 event.preventDefault()</strong><br>正如我们所看到的，event.stopPropagation() 和 event.preventDefault()（也被认为是 return false）是两个不同的东西。它们之间毫无关联。</p>
+</blockquote>
+<blockquote>
+<p><strong>嵌套的上下文菜单结构</strong><br>还有其他实现嵌套上下文菜单的方式。其中之一是拥有一个具有 document.oncontextmenu 处理程序的全局对象，以及使我们能够在其中存储其他处理程序的方法。<br>该对象将捕获任何右键单击，浏览存储的处理程序并运行适当的处理程序。</p>
+</blockquote>
+<p>但是，每段需要上下文菜单的代码都应该了解该对象，并使用它的帮助，而不是使用自己的 contextmenu 处理程序。</p>
+<h2><span id="总结">总结</span></h2><p>有很多默认的浏览器行为：</p>
+<ul>
+<li>mousedown —— 开始选择（移动鼠标进行选择）。</li>
+<li>在 <code>&lt;input type=&quot;checkbox&quot;&gt;</code> 上的 click —— 选中&#x2F;取消选中的 input。</li>
+<li>submit —— 点击<code>&lt;input type=&quot;submit&quot;&gt;</code>或者在表单字段中按下 Enter 键会触发该事件，之后浏览器将提交表单。</li>
+<li>keydown —— 按下一个按键会导致将字符添加到字段，或者触发其他行为。</li>
+<li>contextmenu —— 事件发生在鼠标右键单击时，触发的行为是显示浏览器上下文菜单。</li>
+<li>……还有更多……</li>
+</ul>
+<p>如果我们只想通过 JavaScript 来处理事件，那么所有默认行为都是可以被阻止的。</p>
+<p>想要阻止默认行为 —— 可以使用 <code>event.preventDefault() </code>或<code> return false</code>。第二个方法只适用于通过<code> on&lt;event&gt;</code> 分配的处理程序。</p>
+<p><code>addEventListener </code>的 <code>passive: true</code> 选项告诉浏览器该行为不会被阻止。这对于某些移动端的事件（像 touchstart 和 touchmove）很有用，用以告诉浏览器在滚动之前不应等待所有处理程序完成。</p>
+<p>如果默认行为被阻止，<code>event.defaultPrevented</code> 的值会变成 true，否则为 false。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/05/Event-Delegation/" itemprop="url">浏览器事件委托</a>
         
     </h1>
@@ -1678,101 +1889,6 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
 <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>dev-server 先验证是否有更新，没有代码更新的话，重载浏览器。如果在 hotApply 的过程中出现 abort 或者 fail 错误，也进行重载浏览器。</p>
 <p><img src="/img/webpack-optimization/2-core.jpg" alt="webpack-optimization"></p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/09/hadoop-4/" itemprop="url">Hadoop 2.0体系架构之分布式文件系统Yarn</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-09T04:28:01.000Z" itemprop="datePublished">November 9, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="hadoop-yarn-是什么">Hadoop Yarn 是什么</span></h2><p>在古老的 Hadoop1.0 中，MapReduce 的 JobTracker 负责了太多的工作，包括资源调度，管理众多的 TaskTracker 等工作。这自然是不合理的，于是 Hadoop 在 1.0 到 2.0 的升级过程中，便将 JobTracker 的资源调度工作独立了出来，而这一改动，直接让 Hadoop 成为大数据中最稳固的那一块基石。，而这个独立出来的资源管理框架，就是 Yarn 。</p>
-<p>在详细介绍 Yarn 之前，我们先简单聊聊 Yarn ，Yarn 的全称是  <strong>Yet Another Resource Negotiator</strong> ，意思是“另一种资源调度器”，这种命名和“有间客栈”这种可谓是异曲同工之妙。这里多说一句，以前 Java 有一个项目编译工具，叫做 Ant，他的命名也是类似的，叫做 “Another Neat Tool”的缩写，翻译过来是“另一种整理工具”。</p>
-<p>既然都叫做资源调度器了，那么自然，它的功能也是负责资源管理和调度的，接下来，我们就深入到 Yarn 这个东西内部一探究竟吧。</p>
-<h2><span id="yarn-架构">Yarn 架构</span></h2><p><img src="/img/yarn-pkg/Yarn1.png" alt="hadoop-Yarn"></p>
-<p>① Client：客户端，负责向集群提交作业。</p>
-<p>② ResourceManager：集群主进程，仲裁中心，负责集群资源管理和任务调度。</p>
-<p>③ Scheduler：资源仲裁模块。</p>
-<p>④ ApplicationManager：选定，启动和监管ApplicationMaster。</p>
-<p>⑤ NodeManager：集群从进程，管理监视Containers，执行具体任务。</p>
-<p>⑥ Container：本机资源集合体，如某Container为4个CPU，8GB内存。</p>
-<p>⑦ ApplicationMaster：任务执行和监管中心。</p>
-<h3><span id="三个主要组件">三个主要组件</span></h3><p>再看最上面的图，我们能直观发现的两个主要的组件是 <code>ResourceManager</code> 和 <code>NodeManager</code> ，但其实还有一个 <code>ApplicationMaster</code> 在图中没有直观显示。我们分别来看这三个组件。</p>
-<h4><span id="resourcemanager">ResourceManager</span></h4><p>我们先来说说上图中最中央的那个 ResourceManager（RM）。从名字上我们就能知道这个组件是负责资源管理的，整个系统有且只有一个 RM ，来负责资源的调度。</p>
-<p>它也包含了两个主要的组件：<code>定时调用器(Scheduler)</code>以及<code>应用管理器(ApplicationManager)</code>。</p>
-<p><code>定时调度器(Scheduler)</code>：从本质上来说，定时调度器就是一种策略，或者说一种算法。当 Client 提交一个任务的时候，它会根据所需要的资源以及当前集群的资源状况进行分配。注意，它只负责向应用程序分配资源，并不做监控以及应用程序的状态跟踪。</p>
-<p><code>应用管理器(ApplicationManager)</code>：同样，听名字就能大概知道它是干嘛的。应用管理器就是负责管理 Client 用户提交的应用。上面不是说到定时调度器（Scheduler）不对用户提交的程序监控嘛，其实啊，监控应用的工作正是由应用管理器（ApplicationManager）完成的。</p>
-<h4><span id="applicationmaster">ApplicationMaster</span></h4><p>每当 Client 提交一个 Application 时候，就会新建一个 ApplicationMaster 。由这个 ApplicationMaster 去与 ResourceManager 申请容器资源，获得资源后会将要运行的程序发送到容器上启动，然后进行分布式计算。</p>
-<p>这里可能有些难以理解，为什么是把运行程序发送到容器上去运行？如果以传统的思路来看，是程序运行着不动，然后数据进进出出不停流转。但当数据量大的时候就没法这么玩了，因为海量数据移动成本太大，时间太长。但是中国有一句老话山不过来，我就过去。大数据分布式计算就是这种思想，既然大数据难以移动，那我就把容易移动的应用程序发布到各个节点进行计算呗，这就是大数据分布式计算的思路。</p>
-<h4><span id="nodemanager">NodeManager</span></h4><p>NodeManager 是 ResourceManager 在每台机器的上代理，负责容器的管理，并监控他们的资源使用情况（cpu，内存，磁盘及网络等），以及向 ResourceManager&#x2F;Scheduler 提供这些资源使用报告。</p>
-<p>Yarn的主要思想是将MRv1版JobTracker的两大功能——资源管理和任务调度，拆分成两个独立的进程：</p>
-<p><img src="/img/yarn-pkg/Yarn2.png" alt="hadoop-Yarn"></p>
-<ul>
-<li><p>Yarn依旧是master&#x2F;slave结构</p>
-</li>
-<li><p>主进程ResourceManager是整个集群资源仲裁中心</p>
-</li>
-<li><p>从进程NodeManager管理本机资源</p>
-</li>
-<li><p>ResourceManager和从属节点的进程NodeManager组成了Hadoop 2.0的分布式数据计算框架</p>
-</li>
-</ul>
-<h2><span id="提交一个-application-到-yarn-的流程">提交一个 Application 到 Yarn 的流程</span></h2><p><img src="/img/yarn-pkg/Yarn3.webp" alt="hadoop-Yarn"></p>
-<p>这张图简单地标明了提交一个程序所经历的流程，接下来我们来具体说说每一步的过程。</p>
-<ul>
-<li><p>Client 向 Yarn 提交 Application，这里我们假设是一个 MapReduce 作业。</p>
-</li>
-<li><p>ResourceManager 向 NodeManager 通信，为该 Application 分配第一个容器。并在这个容器中运行这个应用程序对应的 ApplicationMaster。</p>
-</li>
-<li><p>ApplicationMaster 启动以后，对 作业（也就是 Application） 进行拆分，拆分 task 出来，这些 task 可以运行在一个或多个容器中。然后向<br>ResourceManager 申请要运行程序的容器，并定时向 ResourceManager 发送心跳。</p>
-</li>
-<li><p>申请到容器后，ApplicationMaster 会去和容器对应的 NodeManager 通信，而后将作业分发到对应的 NodeManager 中的容器去运行，这里会将拆分后的 MapReduce 进行分发，对应容器中运行的可能是 Map 任务，也可能是 Reduce 任务。</p>
-</li>
-<li><p>容器中运行的任务会向 ApplicationMaster 发送心跳，汇报自身情况。当程序运行完成后， ApplicationMaster 再向 ResourceManager 注销并释放容器资源。<br>以上就是一个作业的大体运行流程。</p>
-</li>
-</ul>
-<p><img src="/img/yarn-pkg/Yarn4.png" alt="hadoop-Yarn"></p>
-<h2><span id="yarn-架构典型拓扑">Yarn 架构典型拓扑</span></h2><p>除了<code>ResourceManager</code>和<code>NodeManager</code>两个实体外，Yarn还包括<code>WebAppProxyServer</code>和<code>JobHistoryServer</code>两个实体。</p>
-<p><img src="/img/yarn-pkg/Yarn5.png" alt="hadoop-Yarn"></p>
-<p><code>JobHistoryServer</code>：管理已完成的Yarn任务</p>
-<ul>
-<li>历史任务的日志和执行时的各种统计信息统一由JobTracker管理</li>
-<li>Yarn将管理历史任务的功能抽象成一独立实体JobHistoryServer</li>
-</ul>
-<p><code>WebAppProxyServer</code>：任务执行时的Web页面代理</p>
-<ul>
-<li>通过使用代理，不仅进一步降低了ResourceManager的压力，还能降低Yarn受到的Web攻击</li>
-<li>负责监管具体MapReduce任务执行全过程，将从Container那里收集过的任务执行信息汇总并显示到一个Web界面上</li>
-</ul>
-<h2><span id="yarn-调度策略">Yarn 调度策略</span></h2><p><strong>容量调度算法</strong><br><code>CapacityScheduler</code>是一种多用户多任务调度策略，它以队列为单位划分任务，以<code>Container</code>为单位分配资源</p>
-<p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
-<p><strong>公平调度策略</strong><br><code>FairScheduler</code>是一种允许多个<code>Yarn</code>任务公平使用集群资源的可插拔式调度策略</p>
-<p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
 
     
     </div>

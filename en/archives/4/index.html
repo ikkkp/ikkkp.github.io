@@ -174,6 +174,135 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/01/en/vue-Proxy-and-Reflect/" itemprop="url">Vue Proxy and Reflect</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-01T02:52:27.000Z" itemprop="datePublished">November 1, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>Since Vue.js 3’s reactive data is based on Proxy, it’s essential to understand Proxy and its associated concept, Reflect. What is Proxy? In simple terms, Proxy allows you to create a proxy object. It can proxy other objects, emphasizing that Proxy can only proxy objects and not non-object values like strings, booleans, etc. So, what does proxying mean? Proxying refers to the act of creating a basic semantic representation of an object. It allows us to intercept and redefine the basic operations on an object.</p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy">Create object proxies with Proxy</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">Built-in object Reflect</a></p>
+<p>When we talk about “basic semantics” in programming languages, we mean the fundamental operations for reading and modifying data. In JavaScript, these operations typically include reading property values and setting property values. For example, given an object <code>obj</code>, the following operations are considered basic semantics:</p>
+<ol>
+<li>Read property value: <code>obj.foo</code> (reads the value of property <code>foo</code>)</li>
+<li>Set property value: <code>obj.foo = newValue</code> (sets the value of property <code>foo</code>)</li>
+</ol>
+<p>In the above code, <code>Proxy</code> objects allow us to intercept (or redefine) these basic semantic operations. The <code>Proxy</code> constructor takes two parameters: the object being proxied and an object containing interceptors (also known as traps). In the interceptor object, we can define the <code>get</code> method to intercept property read operations and the <code>set</code> method to intercept property set operations. This way, we can execute custom logic when these operations occur.</p>
+<p>Understanding these basic semantic operations and how to use <code>Proxy</code> and <code>Reflect</code> to intercept and handle them is crucial for implementing reactive data in JavaScript. In reactive data, we can use <code>Proxy</code> and <code>Reflect</code> to track reads and modifications of object properties, enabling reactive updates of data.</p>
+<h2><span id="basic-usage-of-proxy">Basic Usage of Proxy</span></h2><p>When we talk about basic semantics, we refer to fundamental operations in JavaScript, such as reading object property values and setting object property values. Consider the following object <code>obj</code>:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span> <span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>Here, <code>obj.foo</code> is a basic semantic operation for reading property values, and <code>obj.foo = newValue</code> is a basic semantic operation for setting property values.</p>
+<p>Now, we can use <code>Proxy</code> to intercept these basic semantic operations.</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Reading property </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> target<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Setting property </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> to </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>value<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    target<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> value<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> proxyObj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> handler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+proxyObj<span class="token punctuation">.</span>foo<span class="token punctuation">;</span> <span class="token comment">// Outputs: Reading property foo</span>
+proxyObj<span class="token punctuation">.</span>foo <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Setting property foo to 2</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In the above code, we created a <code>handler</code> object that defines <code>get</code> and <code>set</code> methods to intercept property reads and sets. Then, we created a proxy object <code>proxyObj</code> using the <code>Proxy</code> constructor, which intercepts read and set operations on the <code>obj</code> object. When we access <code>proxyObj.foo</code>, the <code>get</code> method is triggered, outputting the corresponding message. When we set the value of <code>proxyObj.foo</code>, the <code>set</code> method is triggered, again outputting the corresponding message.</p>
+<p>This way, <code>Proxy</code> allows us to execute custom logic when basic semantic operations occur, without directly manipulating the original object. In practical applications, this capability can be used to implement reactive data, data validation, logging, and more.</p>
+<p>When intercepting object property reads with <code>Proxy</code>, special attention is required for accessor properties because accessor properties are defined using getter functions. The <code>this</code> keyword inside these getter functions changes based on the method of invocation.</p>
+<p>To solve this issue, we use <code>Reflect.get(target, key, receiver)</code> instead of <code>target[key]</code> when accessing property values. This ensures that the <code>receiver</code> parameter correctly points to the proxy object, not the original object. Consequently, within the getter function of accessor properties, the <code>this</code> keyword refers to the proxy object, establishing the correct reactive relationship.</p>
+<p>Here is the corrected code using <code>Reflect.get</code>:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> handler <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">track</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Reactive data dependency tracking</span>
+    <span class="token keyword">return</span> Reflect<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Use Reflect.get to get property value</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token comment">// Other interceptor methods...</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> proxyObj <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> handler<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">effect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxyObj<span class="token punctuation">.</span>bar<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Access the bar property inside the side effect function</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+proxyObj<span class="token punctuation">.</span>foo<span class="token operator">++</span><span class="token punctuation">;</span> <span class="token comment">// Triggers re-execution of the side effect function</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this code, we use <code>Reflect.get</code> with the <code>receiver</code> parameter to ensure that <code>this</code> points to the proxy object within the <code>get</code> interceptor function. This establishes the correct reactive relationship, allowing proper dependency tracking when accessing object properties.</p>
+<h2><span id="usage-of-reflect-in-reactivity">Usage of Reflect in Reactivity</span></h2><p>In interceptor functions, we aim to establish a connection between side-effect functions and reactive data. This ensures that when properties are accessed, the correct dependencies are tracked, enabling re-execution of side-effect functions when properties change. However, if we directly use <code>target[key]</code> to access property values, the <code>this</code> keyword inside the getter function of accessor properties points to the original object, not the proxy object. This prevents the establishment of the correct reactive relationship.</p>
+<p>To address this issue, we use <code>Reflect.get(target, key, receiver)</code> instead of <code>target[key]</code>. By doing so, the <code>receiver</code> parameter correctly points to the proxy object, allowing the <code>this</code> keyword inside the getter function to refer to the proxy object. This establishes the proper reactive relationship.</p>
+<p>Here is an example demonstrating the use of the <code>receiver</code> parameter and comparing it with the scenario where the <code>receiver</code> parameter is not used:</p>
+<h3><span id="1-using-the-receiver-parameter">1. Using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Use Reflect.get to ensure `this` points to the proxy object</span>
+    <span class="token keyword">const</span> result <span class="token operator">=</span> Reflect<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">,</span> receiver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// Additional processing, such as triggering update operations, can be performed in practical applications</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Accessed </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> property with value </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>result<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Outputs: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this example, we use the <code>receiver</code> parameter passed to <code>Reflect.get</code> to ensure that <code>this</code> inside the <code>get</code> interceptor function refers to the proxy object <code>proxy</code>. When you access <code>proxy.foo</code>, the <code>get</code> interceptor function is triggered, and <code>this</code> points to the <code>proxy</code> object.</p>
+<h3><span id="2-not-using-the-receiver-parameter">2. Not using the <code>receiver</code> parameter:</span></h3><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">foo</span><span class="token operator">:</span> <span class="token number">1</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Without using the receiver parameter, 'this' refers to the original object 'data'</span>
+    
+    <span class="token keyword">const</span> result <span class="token operator">=</span> target<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token comment">// In practical applications, additional processing might be required, such as triggering update operations</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">Accessed </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>key<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string"> property with value </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>result<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>foo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Output: Accessed foo property with value 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>In this example, we did not use the <code>receiver</code> parameter. Since the <code>receiver</code> parameter was not passed, <code>this</code> inside the <code>get</code> interceptor function points to the original object <code>data</code>. Although the proxy object <code>proxy</code> is used, the <code>this</code> inside the <code>get</code> interceptor function does not refer to <code>proxy</code> but instead refers to the original object <code>data</code>. Therefore, in this scenario, the reactive relationship is not established.</p>
+<p>While the output of the two functions is the same, it’s evident that without using the <code>receiver</code> parameter, the reactive relationship is not established. This means that within the <code>effect</code> function, the object will not receive the correct reactivity.</p>
+<hr>
+<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/01/en/vue-expired-side-effects/" itemprop="url">vue-expired-side-effects</a>
         
     </h1>
@@ -1420,234 +1549,6 @@ module<span class="token punctuation">.</span>exports <span class="token operato
 <p><img src="/img/pack-tool-preview/preview.jfif" alt="Comparison"></p>
 <p>There are so many frontend build tools out there: RollDown, Rollup, Rspack, Vite…</p>
 <p>Just a sneak peek; stay tuned for the detailed comparison.</p>
-<hr>
-<p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/10/26/en/Webpack-optimization-1/" itemprop="url">Webpack Performance Optimization-1</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-10-26T13:34:18.000Z" itemprop="datePublished">October 26, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Webpack/">Webpack</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>Let’s talk about why optimization is necessary. If your project is small and builds quickly, you might not need to worry too much about performance optimization. However, as your project grows with more pages, features, and business logic, the build time of webpack, the underlying build tool, also increases. At this point, optimizing performance becomes crucial.</p>
-<p>Webpack offers various avenues for performance optimization, which can be broadly categorized into two areas:</p>
-<p>Optimization One: Optimizing the built result for production, focusing on performance during deployment (e.g., code splitting, reducing bundle size, using CDN servers, etc.).<br>Optimization Two: Optimizing build speed for development or production build, enhancing the speed of the build process (e.g., using exclusion, cache loaders, etc.).<br>The performance during production directly affects user experience, whereas build time is closely related to developers’ daily workflow. If the local development server or production build takes too long, it significantly hampers productivity.</p>
-<h2><span id="performance-optimization-code-splitting">Performance Optimization - Code Splitting</span></h2><p>Code splitting is a critical feature in webpack:</p>
-<p>Its primary purpose is to separate code into different bundles, which can be loaded on demand or in parallel.<br>By default, all JavaScript code (business logic, third-party dependencies, and modules not immediately used) is loaded on the initial page load, impacting the loading speed.<br>Code splitting allows creating smaller bundles and controlling resource loading priorities, thereby enhancing code loading performance.</p>
-<p>Webpack provides three common approaches to code splitting:</p>
-<ul>
-<li><strong>Entry Points: Manually splitting code using entry configuration</strong></li>
-<li><strong>Preventing Duplication: Avoiding duplicate code using Entry Dependencies or SplitChunksPlugin</strong></li>
-<li><strong>Dynamic Imports: Splitting code using inline functions in modules</strong></li>
-</ul>
-<h3><span id="optimizing-entry-points-entry-dependencies">Optimizing Entry Points - Entry Dependencies</span></h3><p>When a project has multiple entry points, there might be issues with duplicate dependencies. Some modules might be referenced in multiple entry points, causing redundancy in the final output, increasing the output file size.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">page1</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-      <span class="token keyword">import</span><span class="token operator">:</span> <span class="token string">'./src/page1.js'</span><span class="token punctuation">,</span>
-      <span class="token literal-property property">dependOn</span><span class="token operator">:</span> <span class="token string">'shared'</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">page2</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-      <span class="token keyword">import</span><span class="token operator">:</span> <span class="token string">'./src/page2.js'</span><span class="token punctuation">,</span>
-      <span class="token literal-property property">dependOn</span><span class="token operator">:</span> <span class="token string">'shared'</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">shared</span><span class="token operator">:</span> <span class="token string">'./src/shared.js'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[name].bundle.js'</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">path</span><span class="token operator">:</span> __dirname <span class="token operator">+</span> <span class="token string">'/dist'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="dynamic-imports">Dynamic Imports</span></h3><p>Dynamic imports are a technique in webpack for lazy loading, allowing modules to load asynchronously at runtime instead of bundling all modules into a large initial file. This approach improves the initial loading speed and reduces the initial bundle size.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">main</span><span class="token operator">:</span> <span class="token string">'./src/index.js'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[name].bundle.js'</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'/'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token comment">// Add your loader rules here</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">splitChunks</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">chunks</span><span class="token operator">:</span> <span class="token string">'all'</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>In the above configuration, code splitting is achieved using <code>optimization.splitChunks</code> with the option <code>chunks: &#39;all&#39;</code>.</p>
-<p>Then, dynamic imports can be used in the code like this:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Dynamically import modules where needed</span>
-<span class="token keyword">const</span> <span class="token function-variable function">loadModule</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token keyword">import</span><span class="token punctuation">(</span><span class="token string">'./Module'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token function">loadModule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token parameter">module</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Use the loaded module</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Webpack will split the modules imported using <code>import()</code> into separate files. These files will be loaded asynchronously when needed during runtime.</p>
-<h3><span id="custom-bundle-splitting-splitchunks">Custom Bundle Splitting - SplitChunks</span></h3><p>Bundle splitting is an optimization strategy that allows breaking down code into smaller pieces, enabling faster content display during loading.</p>
-<p>Webpack provides various strategies for bundle splitting, one of which involves using the <code>SplitChunksPlugin</code> plugin. This strategy is known as <code>splitChunks</code>.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// ...other configurations</span>
-  <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">splitChunks</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">chunks</span><span class="token operator">:</span> <span class="token string">'all'</span><span class="token punctuation">,</span>
-      <span class="token literal-property property">minSize</span><span class="token operator">:</span> <span class="token number">30000</span><span class="token punctuation">,</span> <span class="token comment">// Minimum size of the module before splitting</span>
-      <span class="token literal-property property">minChunks</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token comment">// Minimum number of times a module should be duplicated before splitting</span>
-      <span class="token literal-property property">maxAsyncRequests</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token comment">// Maximum number of parallel requests when loading modules on demand</span>
-      <span class="token literal-property property">maxInitialRequests</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token comment">// Maximum number of parallel requests at an entry point</span>
-      <span class="token literal-property property">automaticNameDelimiter</span><span class="token operator">:</span> <span class="token string">'~'</span><span class="token punctuation">,</span>
-      <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-      <span class="token literal-property property">cacheGroups</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">vendors</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-          <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">[\\/]node_modules[\\/]</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-          <span class="token literal-property property">priority</span><span class="token operator">:</span> <span class="token operator">-</span><span class="token number">10</span><span class="token punctuation">,</span>
-          <span class="token literal-property property">reuseExistingChunk</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-        <span class="token keyword">default</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-          <span class="token literal-property property">minChunks</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
-          <span class="token literal-property property">priority</span><span class="token operator">:</span> <span class="token operator">-</span><span class="token number">20</span><span class="token punctuation">,</span>
-          <span class="token literal-property property">reuseExistingChunk</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>For more information, refer to the <a target="_blank" rel="noopener" href="https://webpack.js.org/plugins/split-chunks-plugin/">webpack-split-chunks-plugin documentation</a>.</p>
-<hr>
-<h2><span id="performance-optimization-cdn">Performance Optimization - CDN</span></h2><p>CDN, or Content Delivery Network, refers to a network of interconnected servers strategically placed to deliver content to users efficiently. It ensures faster and more reliable delivery of resources such as music, images, videos, applications, and other files by utilizing servers closest to each user, providing high performance, scalability, and low-cost content delivery.</p>
-<p>In development, CDN is typically used in two ways:</p>
-<ul>
-<li>All static resources are bundled and stored on a CDN server, and users load resources exclusively through the CDN.</li>
-<li>Some third-party resources are hosted on CDN servers.</li>
-</ul>
-<p>Utilizing a Content Delivery Network (CDN) is a highly effective performance optimization strategy, especially within Webpack. CDN accelerates website loading speed, reduces server load, and enhances user experience. Here’s how you can configure and use CDN in Webpack:</p>
-<h3><span id="using-cdn-for-third-party-libraries">Using CDN for Third-Party Libraries</span></h3><p>Integrate third-party libraries used in your project (such as React, Vue, jQuery, etc.) through CDN links directly in the HTML file:</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@version/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@version/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h3><span id="configuring-externals-in-webpack">Configuring Externals in Webpack</span></h3><p>In your Webpack configuration, utilize the <code>externals</code> field to inform Webpack about externally referenced modules that shouldn’t be bundled:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// ...other configurations</span>
-  <span class="token literal-property property">externals</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">react</span><span class="token operator">:</span> <span class="token string">'React'</span><span class="token punctuation">,</span>
-    <span class="token string-property property">'react-dom'</span><span class="token operator">:</span> <span class="token string">'ReactDOM'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Then, include the CDN links in the HTML file using script tags:</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react@version/dist/react.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://cdn.jsdelivr.net/npm/react-dom@version/dist/react-dom.min.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<h3><span id="configuring-cdns-publicpath">Configuring CDN’s publicPath</span></h3><p>In the Webpack <code>output</code> field, set the <code>publicPath</code> to specify the URL prefix for resource imports, typically set to the CDN’s address:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// ...other configurations</span>
-  <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// ...other output configurations</span>
-    <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'https://cdn.example.com/'</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>This way, during Webpack build, all resource paths will be prefixed with the CDN’s address.</p>
-<h2><span id="performance-optimization-extracting-css-files">Performance Optimization - Extracting CSS Files</span></h2><p>Extracting CSS files from JavaScript bundles is a common performance optimization strategy. This approach reduces the size of JavaScript files, speeds up page loading, and allows browsers to download CSS and JavaScript files in parallel, enhancing loading performance. In Webpack, you can achieve this using the <code>mini-css-extract-plugin</code> plugin.</p>
-<h3><span id="webpack-configuration">Webpack Configuration</span></h3><p>In your Webpack configuration file, include the <code>mini-css-extract-plugin</code> plugin and configure the <code>module.rules</code> to handle CSS files:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> MiniCssExtractPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'mini-css-extract-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// ...other configurations</span>
-
-  <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-      <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.css$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-        <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-          MiniCssExtractPlugin<span class="token punctuation">.</span>loader<span class="token punctuation">,</span>
-          <span class="token string">'css-loader'</span><span class="token punctuation">,</span>
-          <span class="token comment">// Additional CSS loaders like postcss-loader and sass-loader can be added here</span>
-        <span class="token punctuation">]</span><span class="token punctuation">,</span>
-      <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-
-  <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token keyword">new</span> <span class="token class-name">MiniCssExtractPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'styles.css'</span><span class="token punctuation">,</span> <span class="token comment">// Filename for the extracted CSS file</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-  <span class="token punctuation">]</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="including-css-files">Including CSS Files</span></h3><p>In your JavaScript files or entry point file, import the CSS file:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">import</span> <span class="token string">'./styles.css'</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Alternatively, in the HTML file, use the link tag to include the extracted CSS file:</p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>stylesheet<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>styles.css<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<h2><span id="performance-optimization-bundling-file-naming-hash-contenthash-chunkhash">Performance Optimization - Bundling File Naming (Hash, ContentHash, ChunkHash)</span></h2><p>In Webpack, how files are named during bundling is a crucial performance optimization strategy. Proper naming ensures that browsers can cache files correctly, avoiding unnecessary network requests and improving application loading speed. Here are three common bundling file naming techniques: Hash, ContentHash, and ChunkHash.</p>
-<h3><span id="hash">Hash</span></h3><p>Hash is generated based on file content. When file content changes, its corresponding hash value also changes. In Webpack, you can use the <code>[hash]</code> placeholder to represent the hash value.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[hash].js'</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="contenthash">ContentHash</span></h3><p>ContentHash is generated based on file content as well, but unlike Hash, it’s solely influenced by file content and remains unaffected by file name or path changes. In Webpack, you can use the <code>[contenthash]</code> placeholder to represent the ContentHash value.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'bundle.[contenthash].js'</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<h3><span id="chunkhash">ChunkHash</span></h3><p>ChunkHash is generated based on module content. Different module contents result in different ChunkHash values. In Webpack, you can use the <code>[chunkhash]</code> placeholder to represent the ChunkHash value.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[name].[chunkhash].js'</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
-<h2><span id="performance-optimization-implementing-tree-shaking-in-webpack">Performance Optimization - Implementing Tree Shaking in Webpack</span></h2><p>JavaScript Tree Shaking:</p>
-<p>Tree Shaking in JavaScript originates from the rollup bundler, a build tool. It relies on the static syntax analysis of ES Modules (no code execution) to determine module dependencies.</p>
-<p>Webpack 2 introduced native support for ES2015 modules, enhancing tree shaking capabilities. Webpack 4 extended this ability and introduced the <code>sideEffects</code> property in package.json to indicate which files have no side effects, allowing webpack to safely remove unused code.</p>
-<p>In Webpack 5, partial CommonJS tree shaking support was introduced.</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/webpack/changelog-v5#commonjs-tree-shaking">CommonJS Tree Shaking</a></p>
-<h3><span id="implementing-tree-shaking-in-javascript">Implementing Tree Shaking in JavaScript</span></h3><p>Webpack implements Tree Shaking through two methods:</p>
-<ul>
-<li><strong>usedExports:</strong> Marking certain functions as used and optimizing them using Terser.</li>
-<li><strong>sideEffects:</strong> Skipping entire modules&#x2F;files and checking if they have side effects.</li>
-</ul>
-<h3><span id="tree-shaking-for-css">Tree Shaking for CSS</span></h3><p>Tree Shaking for CSS involves using additional plugins. While PurifyCss was used previously, it’s no longer maintained. An alternative is PurgeCSS, a tool for removing unused CSS.</p>
-<hr>
-<p><strong>Note:</strong> This translation includes placeholder strings like <code>[hash]</code>, <code>[contenthash]</code>, and <code>[chunkhash]</code> to represent dynamic values. Please replace these placeholders with appropriate values based on your specific use case.</p>
 <hr>
 <p><em>Note: This article is a translated version of the original post. For the most accurate and up-to-date information, please refer to the original source.</em><br>&#96;&#96;&#96;</p>
 

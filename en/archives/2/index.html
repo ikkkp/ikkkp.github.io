@@ -174,6 +174,185 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/06/en/Browser-Default-Behavior/" itemprop="url">Browser Default Behaviors</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-06T11:28:33.000Z" itemprop="datePublished">December 6, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/FE/">FE</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="preface">Preface</span></h2><p>In fact, browsers come with many built-in events, and many events automatically trigger certain behaviors in the browser.</p>
+<p>For example:</p>
+<ul>
+<li>Clicking a link triggers navigation to the URL.</li>
+<li>Clicking the submit button in a form triggers submission to the server.</li>
+<li>Pressing and dragging the mouse button on text selects the text.</li>
+</ul>
+<p>When handling an event with JavaScript, we usually don’t want the corresponding browser behavior to occur. Instead, we want to implement alternative behaviors.</p>
+<h2><span id="preventing-browser-behavior">Preventing Browser Behavior</span></h2><p>There are two ways to tell the browser that we don’t want it to execute default behavior:</p>
+<ul>
+<li>The common way is to use the event object, which has a <code>event.preventDefault()</code> method.</li>
+<li>If the handler is assigned using <code>on&lt;event&gt;</code> (rather than <code>addEventListener</code>), returning false is also effective.</li>
+</ul>
+<p><strong>In the example below, clicking the link will not trigger navigation, and the browser will not perform any action:</strong></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript"><span class="token keyword">return</span> <span class="token boolean">false</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>Click here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+or
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/<span class="token punctuation">"</span></span> <span class="token special-attr"><span class="token attr-name">onclick</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token value javascript language-javascript">event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span><span class="token punctuation">"</span></span></span><span class="token punctuation">></span></span>here<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><a href="/" onclick="return false">Click here</a><br>or<br><a href="/" onclick="event.preventDefault()">here</a></p>
+<br>
+
+<p>It’s important to note that using <code>on&lt;event&gt;</code> and returning false is not a good practice.</p>
+<p>Returning false from the handler is an exception. The return value of event handlers is usually ignored. The only exception is returning false from a handler assigned using <code>on&lt;event&gt;</code>.</p>
+<h2><span id="handler-option-passive">Handler Option “passive”</span></h2><p>The optional <code>passive: true</code> option in <code>addEventListener</code> signals to the browser that the handler will not call <code>preventDefault()</code>.</p>
+<p>Why is this necessary?</p>
+<p>On mobile devices, some events like <code>touchmove</code> (when the user moves their finger on the screen) can lead to scrolling by default, which can be prevented using <code>preventDefault()</code> in the handler.</p>
+<p>So, when the browser detects such events, it must first process all handlers. If <code>preventDefault</code> is not called anywhere, the page can continue scrolling. However, this may cause unnecessary delays and “jitter” in the UI.</p>
+<p>The <code>passive: true</code> option informs the browser that the handler will not cancel scrolling. The browser then immediately scrolls the page to provide a smoother experience and somehow processes the event.</p>
+<p>For certain browsers (such as Firefox and Chrome), <code>touchstart</code> and <code>touchmove</code> events have passive set to true by default.</p>
+<h2><span id="eventdefaultprevented"><code>event.defaultPrevented</code></span></h2><p>If the default behavior is prevented, the <code>event.defaultPrevented</code> property is true; otherwise, it is false.</p>
+<p>Here’s an interesting use case.</p>
+<p><strong>Do you remember our discussion on <code>event.stopPropagation()</code> in the Bubbling and Capturing chapter and why stopping propagation is not good?</strong></p>
+<p>Sometimes, we can use <code>event.defaultPrevented</code> as an alternative to notify other event handlers that the event has been handled.</p>
+<p>Let’s look at a practical example.</p>
+<p>By default, the browser displays a context menu with standard options on the <code>contextmenu</code> event (right-click). We can prevent it and display our custom menu like this:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span><span class="token punctuation">></span></span>Right-click shows browser context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">oncontextmenu</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>alert('Draw our menu'); return false<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  Right-click shows our context menu
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<br>
+
+<p><button>Right-click shows browser context menu</button></p>
+<button oncontextmenu="alert('Draw our menu'); return false">
+  Right-click shows our context menu
+</button>
+
+<br>
+
+<p>Now, in addition to this context menu, let’s implement a document-wide context menu.</p>
+<p>When right-clicking, it should display the nearest context menu:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click here for the document context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click here for the button context menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<br>
+
+<p>Right-click here for the document context menu</p>
+<button id="elem">Right-click here for the button context menu</button>
+
+<script>
+  elem.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Button context menu");
+  };
+
+  document.oncontextmenu = function(event) {
+    event.preventDefault();
+    alert("Document context menu");
+  };
+</script>
+
+<br>
+
+<h2><span id="issue-and-solutions">Issue and Solutions</span></h2><p>The problem arises when clicking on <code>elem</code>, and we get two menus: the button-level menu and the document-level menu due to event bubbling.</p>
+<p>One solution is to prevent the event from bubbling up when handling the right-click event in the button. We can achieve this using <code>event.stopPropagation()</code>:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu (fixed with event.stopPropagation)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    event<span class="token punctuation">.</span><span class="token function">stopPropagation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Now, the button-level menu works as expected. However, this comes at a cost — we deny any external code access to right-click information, including counters for collecting statistics. This is not advisable.</p>
+<p>Another alternative is to check whether the document handler has prevented the browser’s default behavior. If it has, the event has already been handled, and we don’t need to react to it:</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Right-click for the document menu (added a check for event.defaultPrevented)<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>elem<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Right-click for the button menu<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  elem<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Button context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function-variable function">oncontextmenu</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">event</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>event<span class="token punctuation">.</span>defaultPrevented<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    event<span class="token punctuation">.</span><span class="token function">preventDefault</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">"Document context menu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Now everything works as expected. If we have nested elements, each with its own context menu, this approach will work. Just make sure to check <code>event.defaultPrevented</code> in each <code>contextmenu</code> handler.</p>
+<blockquote>
+<p><strong>event.stopPropagation() and event.preventDefault()</strong><br>As we’ve seen, <code>event.stopPropagation()</code> and <code>event.preventDefault()</code> (also considered as <code>return false</code>) are two different things. They are unrelated to each other.</p>
+</blockquote>
+<blockquote>
+<p><strong>Nested Context Menu Structure</strong><br>There are other ways to implement nested context menus. One approach is to have a global object with a <code>document.oncontextmenu</code> handler and a method to store other handlers. This object would capture any right-click, browse stored handlers, and run the appropriate one.</p>
+</blockquote>
+<p>However, every piece of code needing a context menu should be aware of this object and use its assistance rather than having its own <code>contextmenu</code> handler.</p>
+<h2><span id="summary">Summary</span></h2><p>There are many default browser behaviors:</p>
+<ul>
+<li><code>mousedown</code> — Starts selection (dragging the mouse for selection).</li>
+<li><code>click</code> on <code>&lt;input type=&quot;checkbox&quot;&gt;</code> — Selects&#x2F;deselects the input.</li>
+<li><code>submit</code> — Clicking <code>&lt;input type=&quot;submit&quot;&gt;</code> or pressing Enter in form fields triggers this event, leading the browser to submit the form.</li>
+<li><code>keydown</code> — Pressing a key adds a character to a field or triggers other actions.</li>
+<li><code>contextmenu</code> — Event occurs on right-click, triggering the default behavior of showing the browser context menu.</li>
+<li>…and many more…</li>
+</ul>
+<p>If we want to handle events using JavaScript only, all default behaviors can be prevented.</p>
+<p>To prevent default behavior, you can use <code>event.preventDefault()</code> or <code>return false</code>. The second method is only applicable to handlers assigned through <code>on&lt;event&gt;</code>.</p>
+<p>The <code>passive: true</code> option of <code>addEventListener</code> informs the browser that the behavior will not be prevented. This is useful for certain mobile events (like <code>touchstart</code> and <code>touchmove</code>) to let the browser scroll without waiting for all handlers to finish.</p>
+<p>If the default behavior is prevented, the value of <code>event.defaultPrevented</code> becomes true; otherwise, it is false.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/05/en/Event-Delegation/" itemprop="url">Browser Event Delegation</a>
         
     </h1>
@@ -1707,252 +1886,6 @@ compiler<span class="token punctuation">.</span><span class="token function">plu
 <p><img src="/img/yarn-pkg/Yarn7.png" alt="hadoop-Yarn"></p>
 <p><strong>Fair Scheduling Strategy</strong><br><code>FairScheduler</code> is a pluggable scheduling strategy that allows multiple <code>Yarn</code> tasks to use cluster resources fairly.</p>
 <p><img src="/img/yarn-pkg/Yarn8.png" alt="hadoop-Yarn"></p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/09/en/hadoop-3/" itemprop="url">Hadoop 2.0 Architecture - Distributed File System HDFS</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-09T02:45:27.000Z" itemprop="datePublished">November 9, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Hadoop/">Hadoop</a><span>></span><a class="article-category-link" href="/en/categories/Hadoop/Cloud-Computing/">Cloud-Computing</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="hdfs-design-principles">HDFS Design Principles</span></h2><h3><span id="design-goals">Design Goals</span></h3><p><strong>Store very large files: “very large” here means several hundred M, G, or even TB.</strong></p>
-<ul>
-<li><p>Adopt a stream-based data access method: HDFS is based on the assumption that the most effective data processing mode is to generate or copy a data set once and then do a lot of analysis work on it. Analysis work often reads most of the data in the data set, even if not all of it. Therefore, the time required to read the entire data set is more important than the delay in reading the first record.</p>
-</li>
-<li><p>Run on commercial hardware: Hadoop does not require special expensive, reliable machines and can run on ordinary commercial machines (which can be purchased from multiple vendors). Commercial machines do not mean low-end machines. In a cluster (especially a large one), the node failure rate is relatively high. HDFS’s goal is to ensure that the cluster does not cause significant interruptions to users when nodes fail.</p>
-</li>
-</ul>
-<h3><span id="application-types-not-suitable-for-hdfs">Application Types Not Suitable for HDFS</span></h3><p>Some scenarios are not suitable for storing data in HDFS. Here are a few examples:</p>
-<ol>
-<li><p><strong>Low-latency data access</strong><br>Applications that require latency in the millisecond range are not suitable for HDFS. HDFS is designed for high-throughput data transmission, so latency may be sacrificed. HBase is more suitable for low-latency data access.</p>
-</li>
-<li><p><strong>A large number of small files</strong><br>The metadata of files (such as directory structure, node list of file blocks, and block-node mapping) is stored in the memory of the NameNode. The number of files in the entire file system is limited by the memory size of the NameNode. As a rule of thumb, a file&#x2F;directory&#x2F;file block generally occupies 150 bytes of metadata memory space. If there are one million files, each file occupies one file block, which requires about 300M of memory. Therefore, the number of files in the billions is difficult to support on existing commercial machines.</p>
-</li>
-<li><p><strong>Multiple reads and writes, requiring arbitrary file modification</strong><br>HDFS writes data in an append-only manner. It does not support arbitrary offset modification of files. It does not support multiple writers.</p>
-</li>
-</ol>
-<h2><span id="hdfs-positioning">HDFS Positioning</span></h2><p>To improve scalability, HDFS uses a master&#x2F;slave architecture to build a distributed storage cluster, which makes it easy to add or remove slaves to the cluster.</p>
-<p>HDFS is an important component of the Hadoop ecosystem. It is a distributed file system designed to store large amounts of data and provide high-throughput data access. HDFS is designed to store data on inexpensive hardware and provide high fault tolerance. It achieves this goal by distributing data to multiple nodes in the cluster. HDFS is positioned as a batch processing system suitable for offline processing of large-scale data.</p>
-<p>The main features of HDFS include:</p>
-<ul>
-<li>High fault tolerance: HDFS distributes data to multiple nodes, so even if a node fails, data can still be accessed through other nodes.</li>
-<li>High throughput: HDFS is designed to support batch processing of large-scale data, so it provides high-throughput data access.</li>
-<li>Suitable for large files: HDFS is suitable for storing large files because it divides files into multiple blocks for storage and distributes these blocks to multiple nodes.</li>
-<li>Stream data access: HDFS supports stream data access, which means it can efficiently process large amounts of data streams.</li>
-</ul>
-<p><img src="/img/HDFS/HDFS1.png" alt="hadoop-HDFS"></p>
-<h2><span id="hdfs-architecture">HDFS Architecture</span></h2><p>HDFS uses a master&#x2F;slave architecture to build a distributed storage service, which improves the scalability of HDFS and simplifies the architecture design. HDFS stores files in blocks, optimizing storage granularity. The NameNode manages the storage space of all slave machines, while the DataNode is responsible for actual data storage and read&#x2F;write operations.</p>
-<h3><span id="blocks">Blocks</span></h3><p>There is a concept of blocks in physical disks. The physical block of a disk is the smallest unit of disk operation for reading and writing, usually 512 bytes. The file system abstracts another layer of concepts on top of the physical block of the disk, and the file system block is an integer multiple of the physical disk block. Generally, it is several KB. The blocks in Hadoop are much larger than those in general single-machine file systems, with a default size of 128M. The file in HDFS is split into block-sized chunks for storage, and these chunks are scattered across multiple nodes. If the size of a file is smaller than the block size, the file will not occupy the entire block, only the actual size. For example, if a file is 1M in size, it will only occupy 1M of space in HDFS, not 128M.</p>
-<p>Why are HDFS blocks so large?<br>To minimize the seek time and control the ratio of time spent locating and transmitting files. Assuming that the time required to locate a block is 10ms and the disk transmission speed is 100M&#x2F;s. If the proportion of time spent locating a block to the transmission time is controlled to 1%, the block size needs to be about 100M. However, if the block is set too large, in MapReduce tasks, if the number of Map or Reduce tasks is less than the number of cluster machines, the job efficiency will be very low.</p>
-<p>Benefits of block abstraction</p>
-<ul>
-<li>The splitting of blocks allows a single file size to be larger than the capacity of the entire disk, and the blocks that make up the file can be distributed across the entire cluster. In theory, a single file can occupy the disk of all machines in the cluster.</li>
-<li>Block abstraction also simplifies the storage system, without worrying about its permissions, owner, and other content (these contents are controlled at the file level).</li>
-<li>Blocks are the unit of replication in fault tolerance and high availability mechanisms.</li>
-</ul>
-<h3><span id="namenode-amp-datanode">Namenode &amp; Datanode</span></h3><p>The entire HDFS cluster consists of a master-slave model of Namenode and Datanode. The Namenode stores the file system tree and metadata of all files and directories. The metadata is persisted in two forms:</p>
-<ul>
-<li>Namespace image</li>
-<li>Edit log</li>
-</ul>
-<p>However, the persistent data does not include the node list where the block is located and which nodes the file blocks are distributed to in the cluster. This information is reconstructed when the system is restarted (through the block information reported by the Datanode). In HDFS, the Namenode may become a single point of failure for the cluster. When the Namenode is unavailable, the entire file system is unavailable. HDFS provides two solutions to single point of failure:</p>
-<ol>
-<li><p>Backup persistent metadata<br>Write the file system metadata to multiple file systems at the same time, such as writing metadata to both the local file system and NFS at the same time. These backup operations are synchronous and atomic.</p>
-</li>
-<li><p>Secondary Namenode<br>The Secondary node periodically merges the namespace image and edit log of the main Namenode to avoid the edit log being too large, and merges them by creating a checkpoint. It maintains a merged namespace image replica that can be used to recover data when the Namenode completely crashes. The following figure shows the management interface of the Secondary Namenode:</p>
-</li>
-</ol>
-<p><img src="/img/HDFS/HDFS2.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
-<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
-</li>
-<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
-</li>
-<li><p>HDFS files are written once and strictly limited to only one write user at any time.</p>
-</li>
-</ul>
-<h2><span id="replica-placement">Replica Placement</span></h2><ul>
-<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
-</li>
-<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
-</li>
-<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improve data reliability and availability, and ensure performance.</p>
-</li>
-</ul>
-<h3><span id="replica-selection">Replica Selection</span></h3><ul>
-<li><p>HDFS tries to use the replica closest to the program to meet user requests, reducing total bandwidth consumption and read latency.</p>
-</li>
-<li><p>The HDFS architecture supports data balancing strategies.</p>
-</li>
-</ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
-<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster, indicating that the DataNode is working properly.</p>
-</li>
-<li><p>The NameNode marks DataNodes that have not sent heartbeats recently as down and does not send them any new I&#x2F;O requests.</p>
-</li>
-<li><p>The NameNode continuously checks these data blocks that need to be replicated and re-replicates them when necessary.</p>
-</li>
-</ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
-<li>For various reasons, the data block obtained from the DataNode may be corrupted.</li>
-</ul>
-<h2><span id="classic-hdfs-architecture">Classic HDFS Architecture</span></h2><p><strong>The NameNode is responsible for managing the metadata of the file system, while the DataNode is responsible for storing the actual data of the file blocks.</strong> This division of labor enables HDFS to efficiently store and manage large-scale data.</p>
-<p><img src="/img/HDFS/HDFS4.png" alt="hadoop-HDFS"></p>
-<p>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</p>
-<p>Therefore, the NameNode and DataNode play different roles in the HDFS architecture.</p>
-<p>What is the difference in function?</p>
-<p>HDFS is an abbreviation for Hadoop Distributed File System, an important component of the Hadoop ecosystem. The HDFS architecture includes one NameNode and multiple DataNodes. The NameNode is the master node of HDFS, responsible for managing the namespace of the file system, the metadata information of the file, and the location information of the file blocks. The DataNode is the slave node of HDFS, responsible for storing the actual data of the file blocks.</p>
-<p><strong>Specifically, when a client needs to read or write a file, it sends a request to the NameNode. The NameNode returns the metadata information of the file and the location information of the file blocks. The client communicates with the DataNode based on this information to read or write the actual data of the file blocks.</strong></p>
-<p><img src="/img/HDFS/HDFS5.png" alt="hadoop-HDFS"></p>
-<h3><span id="general-topology">General Topology</span></h3><p>There is only one NameNode node, and the SecondaryNameNode or BackupNode node is used to obtain NameNode metadata information in real time and back up metadata.</p>
-<p><img src="/img/HDFS/HDFS6.png" alt="hadoop-HDFS"></p>
-<h3><span id="commercial-topology">Commercial Topology</span></h3><p>There are two NameNode nodes, and ZooKeeper is used to implement hot standby between NameNode nodes.</p>
-<p><img src="/img/HDFS/HDFS7.png" alt="hadoop-HDFS"></p>
-<h2><span id="command-line-interface">Command Line Interface</span></h2><p>HDFS provides various interaction methods, such as Java API, HTTP, and shell command line. Command line interaction is mainly operated through hadoop fs. For example:</p>
-<blockquote>
-<p>hadoop fs -copyFromLocal &#x2F;&#x2F; Copy files from local to HDFS<br> hadoop fs mkdir &#x2F;&#x2F; Create a directory<br> hadoop fs -ls  &#x2F;&#x2F; List file list</p>
-</blockquote>
-<p>In Hadoop, the permissions of files and directories are similar to the POSIX model, including three permissions: read, write, and execute.</p>
-<p>Read permission (r): Used to read files or list the contents of a directory<br>Write permission (w): For files, it is the write permission of the file. The write permission of the directory refers to the permission to create or delete files (directories) under the directory.<br>Execute permission (x): Files do not have so-called execute permissions and are ignored. For directories, execute permission is used to access the contents of the directory.</p>
-<p>Each file or directory has three attributes: owner, group, and mode:</p>
-<p>Owner: Refers to the owner of the file<br>Group: For permission groups<br>Mode: Consists of the owner’s permissions, the permissions of the members of the file’s group, and the permissions of non-owners and non-group members.</p>
-<p><img src="/img/HDFS/HDFS8.jpg" alt="hadoop-HDFS"></p>
-<h2><span id="data-flow-read-and-write-process">Data Flow (Read and Write Process)</span></h2><h3><span id="read-file">Read File</span></h3><p>The rough process of reading a file is as follows:</p>
-<p><img src="/img/HDFS/HDFS9.png" alt="hadoop-HDFS"></p>
-<ol>
-<li><p>The client passes a file Path to the FileSystem’s open method.</p>
-</li>
-<li><p>DFS uses RPC to remotely obtain the datanode addresses of the first few blocks of the file. The NameNode determines which nodes to return based on the network topology structure (provided that the node has a block replica). If the client itself is a DataNode and there is a block replica on the node, it is read directly from the local node.</p>
-</li>
-<li><p>The client uses the FSDataInputStream object returned by the open method to read data (call the read method).</p>
-</li>
-<li><p>The DFSInputStream (FSDataInputStream implements this class) connects to the node that holds the first block and repeatedly calls the read method to read data.</p>
-</li>
-<li><p>After the first block is read, find the best datanode for the next block and read the data. If necessary, DFSInputStream will contact the NameNode to obtain the node information of the next batch of Blocks (stored in memory, not persistent), and these addressing processes are invisible to the client.</p>
-</li>
-<li><p>After the data is read, the client calls the close method to close the stream object.</p>
-</li>
-</ol>
-<p>During the data reading process, if communication with the DataNode fails, the DFSInputStream object will try to read data from the next best node and remember the failed node, and subsequent block reads will not connect to the node.</p>
-<p>After reading a Block, DFSInputStram performs checksum verification. If the Block is damaged, it tries to read data from other nodes and reports the damaged block to the NameNode.</p>
-<p>Which DataNode does the client connect to get the data block is guided by the NameNode, which can support a large number of concurrent client requests, and the NameNode evenly distributes traffic to the entire cluster as much as possible.</p>
-<p>The location information of the Block is stored in the memory of the NameNode, so the corresponding location request is very efficient and will not become a bottleneck.</p>
-<h3><span id="write-file">Write File</span></h3><p><img src="/img/HDFS/HDFS10.png" alt="hadoop-HDFS"></p>
-<p>Step breakdown</p>
-<ol>
-<li><p>The client calls the create method of DistributedFileSystem.</p>
-</li>
-<li><p>DistributedFileSystem remotely RPC calls the Namenode to create a new file in the namespace of the file system, which is not associated with any blocks at this time. During this process, the Namenode performs many verification tasks, such as whether there is a file with the same name, whether there are permissions, if the verification passes, it returns an FSDataOutputStream object. If the verification fails, an exception is thrown to the client.</p>
-</li>
-<li><p>When the client writes data, DFSOutputStream is decomposed into packets (data packets) and written to a data queue, which is consumed by DataStreamer.</p>
-</li>
-<li><p>DataStreamer is responsible for requesting the Namenode to allocate new blocks to store data nodes. These nodes store replicas of the same Block and form a pipeline. DataStreamer writes the packet to the first node of the pipeline. After the first node stores the packet, it forwards it to the next node, and the next node continues to pass it down.</p>
-</li>
-<li><p>DFSOutputStream also maintains an ack queue, waiting for confirmation messages from datanodes. After all datanodes on the pipeline confirm, the packet is removed from the ack queue.</p>
-</li>
-<li><p>After the data is written, the client closes the output stream. Flush all packets to the pipeline, and then wait for confirmation messages from datanodes. After all are confirmed, inform the Namenode that the file is complete. At this time, the Namenode already knows all the Block information of the file (because DataStreamer is requesting the Namenode to allocate blocks), and only needs to wait for the minimum replica number requirement to be reached, and then return a successful message to the client.</p>
-</li>
-</ol>
-<p>How does the Namenode determine which DataNode the replica is on?</p>
-<p>The storage strategy of HDFS replicas is a trade-off between reliability, write bandwidth, and read bandwidth. The default strategy is as follows:</p>
-<p>The first replica is placed on the machine where the client is located. If the machine is outside the cluster, a random one is selected (but it will try to choose a capacity that is not too slow or too busy).</p>
-<p>The second replica is randomly placed on a rack different from the first replica.</p>
-<p>The third replica is placed on the same rack as the second replica, but on a different node, and a random selection is made from the nodes that meet the conditions.</p>
-<p>More replicas are randomly selected throughout the cluster, although too many replicas are avoided on the same rack as much as possible.</p>
-<p>After the location of the replica is determined, when establishing the write pipeline, the network topology structure is considered. The following is a possible storage strategy:</p>
-<p><img src="/img/HDFS/HDFS11.png" alt="hadoop-HDFS"></p>
-<p>This selection balances reliability, read and write performance well.</p>
-<ul>
-<li><p>Reliability: Blocks are distributed on two racks.</p>
-</li>
-<li><p>Write bandwidth: The write pipeline process only needs to cross one switch.</p>
-</li>
-<li><p>Read bandwidth: You can choose one of the two racks to read from.</p>
-</li>
-</ul>
-<h2><span id="internal-features-of-hdfs">Internal Features of HDFS</span></h2><h2><span id="data-redundancy">Data Redundancy</span></h2><ul>
-<li><p>HDFS stores each file as a series of data blocks, with a default block size of 64MB (configurable).</p>
-</li>
-<li><p>For fault tolerance, all data blocks of a file have replicas (the replication factor is configurable).</p>
-</li>
-<li><p>HDFS files are written once and strictly limited to only one writing user at any time.</p>
-</li>
-</ul>
-<h2><span id="replica-placement">Replica Placement</span></h2><ul>
-<li><p>HDFS clusters usually run on multiple racks, and communication between machines on different racks requires switches.</p>
-</li>
-<li><p>HDFS uses a rack-aware strategy to improve data reliability, availability, and network bandwidth utilization.</p>
-</li>
-<li><p>Rack failures are much less common than node failures, and this strategy can prevent data loss when an entire rack fails, improving data reliability and availability while ensuring performance.</p>
-</li>
-</ul>
-<h3><span id="replica-selection">Replica Selection</span></h3><ul>
-<li><p>HDFS tries to use the replica closest to the program to satisfy user requests, reducing total bandwidth consumption and read latency.</p>
-</li>
-<li><p>HDFS architecture supports data balancing strategies.</p>
-</li>
-</ul>
-<h3><span id="heartbeat-detection">Heartbeat Detection</span></h3><ul>
-<li><p>The NameNode periodically receives heartbeats and block reports from each DataNode in the cluster. Receiving a heartbeat indicates that the DataNode is working properly.</p>
-</li>
-<li><p>The NameNode marks DataNodes that have not sent a heartbeat recently as dead and does not send them any new I&#x2F;O requests.</p>
-</li>
-<li><p>The NameNode continuously checks for data blocks that need to be replicated and replicates them when necessary.</p>
-</li>
-</ul>
-<h3><span id="data-integrity-check">Data Integrity Check</span></h3><ul>
-<li><p>Various reasons may cause the data block obtained from the DataNode to be corrupted.</p>
-</li>
-<li><p>HDFS client software implements checksum verification of HDFS file content.</p>
-</li>
-<li><p>If the checksum of the data block obtained by the DataNode is different from that in the hidden file corresponding to the data block, the client judges that the data block is corrupted and obtains a replica of the data block from another DataNode.</p>
-</li>
-</ul>
-<h3><span id="simple-consistency-model-stream-data-access">Simple Consistency Model, Stream Data Access</span></h3><ul>
-<li><p>HDFS applications generally access files in a write-once, read-many mode.</p>
-</li>
-<li><p>Once a file is created, written, and closed, it does not need to be changed again.</p>
-</li>
-<li><p>This simplifies data consistency issues and makes high-throughput data access possible. Applications running on HDFS mainly focus on stream reading and batch processing, emphasizing high-throughput data access.</p>
-</li>
-</ul>
-<h3><span id="client-cache">Client Cache</span></h3><ul>
-<li><p>The request for the client to create a file does not immediately reach the NameNode. The HDFS client first caches the data to a local temporary file, and the write operation of the program is transparently redirected to this temporary file.</p>
-</li>
-<li><p>When the accumulated data in this temporary file exceeds the size of a block (64MB), the client contacts the NameNode.</p>
-</li>
-<li><p>If the NameNode crashes before the file is closed, the file will be lost.</p>
-</li>
-<li><p>If client caching is not used, network speed and congestion will have a significant impact on output.</p>
-</li>
-</ul>
 
     
     </div>
