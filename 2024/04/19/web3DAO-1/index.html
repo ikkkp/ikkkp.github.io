@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html class="has-navbar-fixed-top" lang="zh-tw">
+<head>
+    <meta charset="utf-8">
+<title>Web3 DAO的迷思与自组织的互联网未来 - Huangzl&#39;s blog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+            
+<link href="https://ikkkp.github.io/2024/04/19/en/web3DAO-1/" rel="alternate" hreflang="en" />
+            
+    
+
+
+
+
+    
+<link rel="canonical" href="https://ikkkp.github.io/2024/04/19/web3DAO-1/">
+    
+
+
+
+
+
+    <meta name="description" content="Web3 DAO的迷思第一次接触到Web3 DAO还是在X上面，看到了以往的程序员郭宇对此的理解和实践 CodeforDAO 的诞生与自组织的互联网未来 现在的Web3 DAO的市场还处于摸索阶段，可以看到Github上面存在着一些智能合约的雏形，但是还没有一个完整的DAO的生态。 使用 DAO 的方法论来改善创业公司的架构，甚至，能否再进一步，允许任何人轻易地创建一个自组织的链上公司，链上组织。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web3 DAO的迷思与自组织的互联网未来">
+<meta property="og:url" content="https://ikkkp.github.io/2024/04/19/web3DAO-1/index.html">
+<meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="Web3 DAO的迷思第一次接触到Web3 DAO还是在X上面，看到了以往的程序员郭宇对此的理解和实践 CodeforDAO 的诞生与自组织的互联网未来 现在的Web3 DAO的市场还处于摸索阶段，可以看到Github上面存在着一些智能合约的雏形，但是还没有一个完整的DAO的生态。 使用 DAO 的方法论来改善创业公司的架构，甚至，能否再进一步，允许任何人轻易地创建一个自组织的链上公司，链上组织。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2024-04-19T02:15:47.000Z">
+<meta property="article:modified_time" content="2024-04-19T02:45:44.284Z">
+<meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Web3">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+
+
+
+<link rel="alternative" href="/atom.xml" title="Web3 DAO的迷思与自组织的互联网未来" type="application/atom+xml">
+
+
+
+<link rel="icon" href="/img/IK.png">
+
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ovo|Source+Code+Pro">
+
+
+<link rel="stylesheet" href="/css/bulma.css?v=2.css">
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/css/lightgallery.min.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+
+<link rel="stylesheet" href="/css/style.css?v=4.css">
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6DE5K2B5GE"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-6DE5K2B5GE');
+</script>
+
+
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body>
+    <script>
+        if (localStorage.getItem('dark-mode')) {
+            if (localStorage.getItem('dark-mode') === 'true') {
+                document.body.classList.add('dark-mode')
+            }
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode')
+            }
+        }
+    </script>
+    
+<nav class="navbar is-transparent is-fixed-top navbar-main" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item navbar-logo" href="/">
+                
+                    
+                    Huangzl&#39;s blog
+                    
+                
+            </a>
+            <div class="navbar-burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="navbar-menu navbar-start">
+            
+            <a class="navbar-item "
+               href="/archives">文章列表</a>
+            
+            <a class="navbar-item "
+               href="/categories">分類</a>
+            
+            <a class="navbar-item "
+               href="/recommend">推薦閱讀</a>
+            
+            <a class="navbar-item "
+               href="/abouts">關於我</a>
+            
+        </div>
+        
+        <div class="navbar-menu navbar-end">
+            
+            
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#web3-dao的迷思">1&nbsp;&nbsp;<b>Web3 DAO的迷思</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#dao以及web3治理的挑战">2&nbsp;&nbsp;<b>DAO以及Web3治理的挑战</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#dao是什么">3&nbsp;&nbsp;<b>DAO是什么？</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#dao的种类">4&nbsp;&nbsp;<b>DAO的种类</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#dao的治理架构">5&nbsp;&nbsp;<b>DAO的治理架构</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#web3-dao的未来与现状">6&nbsp;&nbsp;<b>Web3 DAO的未来与现状</b></a>
+                    
+                </div>
+            </div>
+            
+            
+            <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+               
+            <a class="navbar-item" target="_blank" title="RSS" href="https://ikkkp.github.io/atom.xml">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+               
+            
+            <a class="navbar-item btn-dark-mode" title="dark-mode" href="#">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="15" height="15" viewBox="0 0 256 256" xml:space="preserve">
+                    <defs>
+                    </defs>
+                    <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 87.823 60.7 c -0.463 -0.423 -1.142 -0.506 -1.695 -0.214 c -15.834 8.398 -35.266 2.812 -44.232 -12.718 c -8.966 -15.53 -4.09 -35.149 11.101 -44.665 c 0.531 -0.332 0.796 -0.963 0.661 -1.574 c -0.134 -0.612 -0.638 -1.074 -1.259 -1.153 c -9.843 -1.265 -19.59 0.692 -28.193 5.66 C 13.8 12.041 6.356 21.743 3.246 33.35 S 1.732 57.08 7.741 67.487 c 6.008 10.407 15.709 17.851 27.316 20.961 C 38.933 89.486 42.866 90 46.774 90 c 7.795 0 15.489 -2.044 22.42 -6.046 c 8.601 -4.966 15.171 -12.43 18.997 -21.586 C 88.433 61.79 88.285 61.123 87.823 60.7 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: #ffa716; fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                    </g>
+                    </svg>
+                </div>
+            </a>
+            
+                <a class="navbar-item" href="/2024/04/19/en/web3DAO-1/">English</a>
+            
+            
+
+        </div>
+    </div>
+</nav>
+
+    <section class="section">
+    <div class="container">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
+            Web3 DAO的迷思与自组织的互联网未来
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-04-19T02:15:47.000Z" itemprop="datePublished">April 19, 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Web3/">Web3</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="web3-dao的迷思">Web3 DAO的迷思</span></h2><p>第一次接触到Web3 DAO还是在X上面，看到了以往的程序员郭宇对此的理解和实践 <a target="_blank" rel="noopener" href="https://guoyu.mirror.xyz/8Y05lOuKAZaVvA0hFlAkbVf7S7gyFMs7DTfNIfflCzg">CodeforDAO 的诞生与自组织的互联网未来</a></p>
+<p>现在的Web3 DAO的市场还处于摸索阶段，可以看到Github上面存在着一些智能合约的雏形，但是还没有一个完整的DAO的生态。</p>
+<p><strong>使用 DAO 的方法论来改善创业公司的架构，甚至，能否再进一步，允许任何人轻易地创建一个自组织的链上公司，链上组织。</strong></p>
+<p>其实，你可以很轻易地在学校社团、公司、家庭、朋友圈等等，找到一些自组织的例子。这些自组织的例子，往往是由一群志同道合的人，通过一些共同的目标、规则、价值观等等，自发地组织在一起，共同实现一些目标。这与 DAO 不谋而合。</p>
+<h2><span id="dao以及web3治理的挑战">DAO以及Web3治理的挑战</span></h2><p><strong><a target="_blank" rel="noopener" href="https://chain.link/education/web3">Web3</a> 之所以会出现，是因为中心化机构在管理金融和社会基础设施时无法保障安全性、公平性和透明性。</strong>Web3基于区块链和预言机等信任最小化的分布式网络建立，利用密码学、共识协议和机制设计来管理数字化基础设施，无需信任人类第三方，而是通过技术来实现保障，这就是所谓的“加密事实”。</p>
+<h2><span id="dao是什么">DAO是什么？</span></h2><p><strong>DAO的全名是“decentralized autonomous organization”，中文是“去中心化的自治组织”。</strong>DAO的主要目的是超越传统组织形式，以分布式、透明和信任最小化的方式来进行集体决策。简而言之，DAO是一种新型的组织架构。人们可以独立验证组织的运行方式，并基于这样的共识朝着共同的目标努力。</p>
+<p>更详细的解释，可以在这里看到：<a target="_blank" rel="noopener" href="https://blog.chain.link/daos-zh">一文读懂DAO以及Web3治理的挑战</a></p>
+<p><strong>值得一提的是，虽然DAO的缩写中包含autonomous（自治）一词，但DAO并非完全自治。DAO是由人组成的，因此需要用户手动操作才能运行，比如用户需要进行投票、部署代码并讨论提案。</strong>之所以会使用“自治”这个词，是因为DAO的一些具体功能被写在了智能合约代码中，无法被篡改。然而，人们仍需要与智能合约（即：代码）交互（即：提供输入），以执行具体的任务（即：输出结果）。</p>
+<h2><span id="dao的种类">DAO的种类</span></h2><p><strong>虽然DAO目前仍处于发展初期，但大致可以分为以下六种：</strong></p>
+<p><em><strong>协议DAO</strong>——这类DAO负责开发和管理去中心化应用（dApp）或dApp的基础架构。协议DAO的主要任务是开发开源技术，这点类似于企业或基金会。</em></p>
+<ul>
+<li>Tezos是一条区块链，采用类似DAO的链上治理架构，通过代表制投票体系来触发协议升级，需要绝大多数人投票达成共识才能通过提案。</li>
+<li>MakerDAO是一个组织，负责管理去中心化的stablecoin DAI。DAO成员负责为协议制定参数，比如调整利率、添加&#x2F;删除抵押资产以及核心部门团队入职&#x2F;离职。</li>
+</ul>
+<p><em><strong>投资DAO</strong>——这类DAO负责控制DAO金库中的资金，并使用这些资金来发起并管理投资。投资DAO的主要目的是为成员创造利润，这点与私募基金或对冲基金类似。</em></p>
+<ul>
+<li>BitDAO是一个DAO，BIT通证持有者通过投票决定各种投资策略，并为DAO金库实现收益。BitDAO宣称对Web3项目的投资额超过38亿美元。<br>MetaCartel Ventures (风投DAO)是一家营利性DAO，专门投资于早期dApp。其主要目的是以社区为中心建立会员制，参与机制比传统的风投基金更加灵活。</li>
+</ul>
+<p><em><strong>事业型DAO</strong>——这类DAO负责针对某一事业管理资金和计划。事业型DAO聚焦在某一领域达成共识，比如慈善、政治以及公用事业，这点与慈善组织、游说团体和奖金激励计划等传统组织类似。</em></p>
+<ul>
+<li>Gitcoin是一个DAO，用户在平台上可以通过二次方投票机制，共同为以太坊上的公用事业以及其他开源区块链项目募款。</li>
+<li>Big Green是一个DAO，为学校、社区和家庭提供慈善奖金，帮助他们学习如何种植粮食。</li>
+</ul>
+<p><em><strong>社交DAO</strong>——这类DAO负责管理一个共享社交空间，共同拥有具有艺术价值的资产，为成员营造文化并组织活动。社交DAO围绕娱乐、艺术、游戏和其他社交领域将社区组织起来，这点类似于现代社交俱乐部。</em></p>
+<ul>
+<li>Bored Ape Yacht Club（BAYC）是限量版的NFT藏品，NFT既代表会员身份，又可以领取特殊福利。</li>
+<li>Krause House是一个由篮球迷组成的社交DAO，目标是有朝一日买下一支NBA球队。Krause House DAO目前已经买下了Big3篮球联盟的球队Ball Hogs。</li>
+</ul>
+<p><em><strong>数据DAO</strong>——这类DAO负责开发和管理DAO控制的数据。数据DAO旨在将用户数据聚集在一起，或开发独特的数据产品卖给第三方用户，具体应用场景包括开发AI算法或展开市场调研。</em></p>
+<ul>
+<li>dClimate是一个买卖天气数据、天气预报和预测模型的市场，用户可以在其中销售创新的数据集，机构也可以在其中购买数据。这个DAO会评估发布的数据，以保障数据质量并发放适当的网络激励。</li>
+<li>Delphia是机器人投资顾问，会支付原生通证购买用户个人数据。Delphia会将用户个人数据聚集在一起，并基于数据制定投资策略，用户可以使用原生通证查看这些投资策略。</li>
+</ul>
+<h2><span id="dao的治理架构">DAO的治理架构</span></h2><p>对于任何DAO来说，达成共识都是最重要也最具挑战的任务之一，因为达成共识意味着以去中心化的方式做出决策。下文列举了目前用于达成共识的几种治理机制，其中结合了上文提到的一些工具。</p>
+<p><strong>直接的链上民主</strong>——指DAO成员直接在链上对提案进行投票，提案要通过必须满足上文提到的条件。大多数采用该模式的DAO都会使用通证加权投票机制，用户持有的通证数量决定了他的投票权重（通常1个通证&#x3D;1张选票）。这是DAO最常见也是最简单的共识达成方式，因为这种方式的复杂性和成本最低，而且可以抵御女巫攻击。</p>
+<p><strong>直接的链下民主</strong>——指DAO使用快照在链下进行投票，投票要通过必须满足一定条件。多数采用这种模式的DAO也会使用通证加权投票机制，但需要可信实体通过多重签名的方式严格按照提案来执行链上变更。因此，链下民主需要一定信任假设，就是多重签名者会如实按照DAO投票结果的快照来投票。</p>
+<p><strong>代表制民主</strong>——指DAO委托代表在链上投票，以通过DAO的提案。代表通常由DAO选出，并可能会参考链下快照来了解社区民意。DAO可能还会设置某种机制，当代表的投票结果严重偏离社区民意时对结果进行否决或变更。</p>
+<p><strong>二次方民主</strong>——指基于二次方投票的治理架构，公式如下：投票者的成本&#x3D;（投票数量）^2。比如，对某一提案投一票需要花费一个治理通证，但如果要投五票就需要25个治理通证。二次方投票可以防止DAO的投票结果被少数巨鲸控制。多数成员的共同投票结果将拥有同等或甚至更大的效力。然而，要真正执行二次方投票，需要建立抗女巫攻击机制，以防止欺诈行为或将通证分散在不同钱包里。</p>
+<h2><span id="web3-dao的未来与现状">Web3 DAO的未来与现状</span></h2><p><em>互联网上已经有相当多的 DAO，但大部分 DAO 似乎并不依赖于他们的基础合约而运行，换句话说，许多 DAO 采用<strong>广泛的人治</strong>，而<strong>有限地</strong>依赖<strong>合约治理</strong></em>。这些治理的目的都相当宏观，譬如，是否允许使用 DAO 金库的一些钱来完成一笔投资，或者是制定一个复杂的 Roadmap，由于目的过于宏观，这些治理大部分使用 snapshot 的链下投票来完成，它有点像我们熟悉的代议制民主：可以参与投票，但没有人能保证提案目的是否会得到完整执行。</p>
+<blockquote>
+<p>“网络国家是一个网络社会，在道德上创新，拥有国家意识和公认的创始人，有能力开展集体行动，人与人之间和谐相处，发行cryptocurrency，使用社会智能合约来约束基于共识的政府，通过众筹的方式买下实体领土并形成群岛，建立虚拟首都，在链上进行人口普查，证明国家人口、收入以及房地产，并因此获得外交地位。”</p>
+</blockquote>
+
+    
+    </div>
+    
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Web3/">#Web3</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2024/04/14/http2-0/">HTTP/2 简介</a>
+            
+        </span>
+    </div>
+    
+</article>
+
+
+
+
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
+
+    </div>
+</section>
+    <footer class="footer">
+    <div class="container">
+        <div class="columns content">
+            <div class="column is-narrow has-text-centered">
+                &copy; 2024 Huangzl&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        target="_blank" rel="noopener" href="http://github.com/ppoffice/hexo-theme-minos">Minos</a>
+            </div>
+            <div class="column is-hidden-mobile"></div>
+
+            
+            <div class="column is-narrow">
+                <div class="columns is-mobile is-multiline is-centered">
+                
+                    
+                <a class="column is-narrow" title="GitHub" target="_blank" rel="noopener" href="https://github.com/ikkkp">
+                    
+                    GitHub
+                    
+                </a>
+                
+                </div>
+            </div>
+            
+            
+<div class="column is-narrow has-text-centered">
+    <div class="dropdown is-up is-right is-hoverable" style="margin-top: -0.2em;">
+        <div class="dropdown-trigger">
+            <button class="button is-small" aria-haspopup="true">
+                <span class="icon">
+                    <i class="fas fa-globe"></i>
+                </span>
+                <span>中文</span>
+                <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+            </button>
+        </div>
+        <div class="dropdown-menu has-text-left" role="menu" style="top:100%">
+            <div class="dropdown-content">
+            <!-- NOTE: 永遠回到首頁 -->
+            
+                <a href="/2024/04/19/en/web3DAO-1/" class="dropdown-item">
+                    English
+                </a>
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+
+
+    
+    
+    
+    
+    
+    
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightgallery/1.6.8/js/lightgallery-all.min.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            if (typeof($.fn.lightGallery) === 'function') {
+                $('.article.gallery').lightGallery({ selector: '.gallery-item' });
+            }
+        });
+    })(jQuery);
+</script>
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <style>
+        .hljs {
+            position: relative;
+        }
+
+        .hljs .clipboard-btn {
+            float: right;
+            color: #9a9a9a;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hljs .clipboard-btn:hover {
+          color: #8a8a8a;
+        }
+
+        .hljs > .clipboard-btn {
+            display: none;
+            position: absolute;
+            right: 4px;
+            top: 4px;
+        }
+
+        .hljs:hover > .clipboard-btn {
+            display: inline;
+        }
+
+        .hljs > figcaption > .clipboard-btn {
+            margin-right: 4px;
+        }
+    </style>
+    <script>
+      $(document).ready(function () {
+        $('figure.hljs').each(function(i, figure) {
+          var codeId = 'code-' + i;
+          var code = figure.querySelector('.code');
+          var copyButton = $('<button>Copy <i class="far fa-clipboard"></i></button>');
+          code.id = codeId;
+          copyButton.addClass('clipboard-btn');
+          copyButton.attr('data-clipboard-target-id', codeId);
+
+          var figcaption = figure.querySelector('figcaption');
+
+          if (figcaption) {
+            figcaption.append(copyButton[0]);
+          } else {
+            figure.prepend(copyButton[0]);
+          }
+        })
+
+        var clipboard = new ClipboardJS('.clipboard-btn', {
+          target: function(trigger) {
+            return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+          }
+        });
+        clipboard.on('success', function(e) {
+          e.clearSelection();
+        })
+      })
+    </script>
+
+    
+    
+
+    
+
+
+
+<script src="/js/script.js?v=3.js"></script>
+
+
+    
+</body>
+</html>

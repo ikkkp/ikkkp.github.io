@@ -10,8 +10,8 @@
     
     
     <url>
-        <loc>https://ikkkp.github.io/en/abouts/</loc>
-        <lastmod>2023-10-27T09:47:47.033Z</lastmod>
+        <loc>https://ikkkp.github.io/archive/</loc>
+        <lastmod>2024-04-17T10:23:19.431Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -20,7 +20,16 @@
     
     <url>
         <loc>https://ikkkp.github.io/abouts/</loc>
-        <lastmod>2023-10-27T09:43:23.043Z</lastmod>
+        <lastmod>2024-04-17T10:19:13.571Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    
+    
+    <url>
+        <loc>https://ikkkp.github.io/en/abouts/</loc>
+        <lastmod>2023-10-27T09:47:47.033Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -38,15 +47,6 @@
     
     <url>
         <loc>https://ikkkp.github.io/404.html</loc>
-        <lastmod>2023-10-15T08:40:45.000Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    
-    
-    <url>
-        <loc>https://ikkkp.github.io/archive/</loc>
         <lastmod>2023-10-15T08:40:45.000Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>

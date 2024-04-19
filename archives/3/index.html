@@ -177,6 +177,304 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/11/10/Webpack-optimization-4/" itemprop="url">Webpack HMR 原理解析</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-11-10T02:15:11.000Z" itemprop="datePublished">November 10, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/FE/">FE</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>Hot Module Replacement（以下简称 HMR）是 Webpack 发展至今一大特性 ，当你对代码进行修改并保存后，Webpack 将对代码重新打包，并将新的模块发送到浏览器端，浏览器通过新的模块替换老的模块，这样在不刷新浏览器的前提下就能够对应用进行更新。</p>
+<p>例如，在开发 Web 页面过程中，当你点击按钮，出现一个弹窗的时候，发现弹窗标题没有对齐，这时候你修改 CSS 样式，然后保存，在浏览器没有刷新的前提下，标题样式发生了改变。感觉就像在 Chrome 的开发者工具中直接修改元素样式一样。</p>
+<h2><span id="模块热替换hot-module-replacement">模块热替换(hot module replacement)</span></h2><p><code>模块热替换(HMR - hot module replacement)</code>功能会在应用程序运行过程中，替换、添加或删除 模块，而无需重新加载整个页面。主要是通过以下几种方式，来显著加快开发速度：</p>
+<ul>
+<li><p>保留在完全重新加载页面期间丢失的应用程序状态。</p>
+</li>
+<li><p>只更新变更内容，以节省宝贵的开发时间。</p>
+</li>
+<li><p>在源代码中 CSS&#x2F;JS 产生修改时，会立刻在浏览器中进行更新，这几乎相当于在浏览器 devtools 直接更改样式。</p>
+</li>
+</ul>
+<h2><span id="为什么需要-hmr">为什么需要 HMR</span></h2><p>在 webpack HMR 功能之前，已经有很多 live reload 的工具或库，比如 <a target="_blank" rel="noopener" href="https://tapiov.net/live-server/">live-server</a>，这些库监控文件的变化，然后通知浏览器端刷新页面，那么我们为什么还需要 HMR 呢？答案其实在上文中已经提及一些。</p>
+<ul>
+<li><p>live reload 工具并不能够保存应用的状态（states），当刷新页面后，应用之前状态丢失，还是上文中的例子，点击按钮出现弹窗，当浏览器刷新后，弹窗也随即消失，要恢复到之前状态，还需再次点击按钮。而 webapck HMR 则不会刷新浏览器，而是运行时对模块进行热替换，保证了应用状态不会丢失，提升了开发效率。</p>
+</li>
+<li><p>在古老的开发流程中，我们可能需要手动运行命令对代码进行打包，并且打包后再手动刷新浏览器页面，而这一系列重复的工作都可以通过 HMR 工作流来自动化完成，让更多的精力投入到业务中，而不是把时间浪费在重复的工作上。</p>
+</li>
+<li><p>HMR 兼容市面上大多前端框架或库，比如 <a target="_blank" rel="noopener" href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a>，<a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-loader">Vue-loader</a>，能够监听 React 或者 Vue 组件的变化，实时将最新的组件更新到浏览器端。Elm Hot Loader 支持通过 webpack 对 Elm 语言代码进行转译并打包，当然它也实现了 HMR 功能。</p>
+</li>
+</ul>
+<h2><span id="hmr-的工作原理图解">HMR 的工作原理图解</span></h2><p>初识 HMR 的时候觉得其很神奇，一直有一些疑问萦绕在脑海。</p>
+<ul>
+<li><p>webpack 可以将不同的模块打包成 bundle 文件或者几个 chunk 文件，但是当我通过 webpack HMR 进行开发的过程中，我并没有在我的 dist 目录中找到 webpack 打包好的文件，它们去哪呢？</p>
+</li>
+<li><p>通过查看 webpack-dev-server 的 package.json 文件，我们知道其依赖于 webpack-dev-middleware 库，那么 webpack-dev-middleware 在 HMR 过程中扮演什么角色？</p>
+</li>
+<li><p>使用 HMR 的过程中，通过 Chrome 开发者工具我知道浏览器是通过 websocket 和 webpack-dev-server 进行通信的，但是 websocket 的 message 中并没有发现新模块代码。打包后的新模块又是通过什么方式发送到浏览器端的呢？为什么新的模块不通过 websocket 随消息一起发送到浏览器端呢？</p>
+</li>
+<li><p>浏览器拿到最新的模块代码，HMR 又是怎么将老的模块替换成新的模块，在替换的过程中怎样处理模块之间的依赖关系？</p>
+</li>
+<li><p>当模块的热替换过程中，如果替换模块失败，有什么回退机制吗？</p>
+</li>
+</ul>
+<p>带着上面的问题，于是决定深入到 webpack 源码，寻找 HMR 底层的奥秘。</p>
+<p><img src="/img/webpack-optimization/HMR1.png" alt="webpack-optimization"></p>
+<p>图一：HMR 工作流程图解</p>
+<p>上图是<code>webpack</code> 配合 <code>webpack-dev-server</code> 进行应用开发的模块热更新流程图。</p>
+<p>上图底部红色框内是服务端，而上面的橙色框是浏览器端。</p>
+<p>绿色的方框是 <code>webpack</code> 代码控制的区域。蓝色方框是 <code>webpack-dev-server</code> 代码控制的区域，洋红色的方框是文件系统，文件修改后的变化就发生在这，而青色的方框是应用本身。</p>
+<p>上图显示了我们修改代码到模块热更新完成的一个周期，通过深绿色的阿拉伯数字符号已经将 HMR 的整个过程标识了出来。</p>
+<ul>
+<li><p>第一步，在 webpack 的 watch 模式下，文件系统中某一个文件发生修改，webpack 监听到文件变化，根据配置文件对模块重新编译打包，并将打包后的代码通过简单的 JavaScript 对象保存在内存中。</p>
+</li>
+<li><p>第二步是 webpack-dev-server 和 webpack 之间的接口交互，而在这一步，主要是 dev-server 的中间件 webpack-dev-middleware 和 webpack 之间的交互，webpack-dev-middleware 调用 webpack 暴露的 API对代码变化进行监控，并且告诉 webpack，将代码打包到内存中。</p>
+</li>
+<li><p>第三步是 webpack-dev-server 对文件变化的一个监控，这一步不同于第一步，并不是监控代码变化重新打包。当我们在配置文件中配置了devServer.watchContentBase 为 true 的时候，Server 会监听这些配置文件夹中静态文件的变化，变化后会通知浏览器端对应用进行 live reload。注意，这儿是浏览器刷新，和 HMR 是两个概念。</p>
+</li>
+<li><p>第四步也是 webpack-dev-server 代码的工作，该步骤主要是通过 sockjs（webpack-dev-server 的依赖）在浏览器端和服务端之间建立一个 websocket 长连接，将 webpack 编译打包的各个阶段的状态信息告知浏览器端，同时也包括第三步中 Server 监听静态文件变化的信息。浏览器端根据这些 socket 消息进行不同的操作。当然服务端传递的最主要信息还是新模块的 hash 值，后面的步骤根据这一 hash 值来进行模块热替换。</p>
+</li>
+</ul>
+<p><code>webpack-dev-server/client</code> 端并不能够请求更新的代码，也不会执行热更模块操作，而把这些工作又交回给了 <code>webpack</code> ，<code>webpack/hot/dev-server</code> 的工作就是根据<br><code>webpack-dev-server/client</code> 传给它的信息以及 <code>dev-server</code> 的配置决定是刷新浏览器呢还是进行模块热更新。当然如果仅仅是刷新浏览器，也就没有后面那些步骤了。</p>
+<p><code>HotModuleReplacement.runtime</code> 是客户端 HMR 的中枢，它接收到上一步传递给他的新模块的 hash 值，它通过 JsonpMainTemplate.runtime 向 server 端发送 Ajax 请求，服务端返回一个 json，该 json 包含了所有要更新的模块的 hash 值，获取到更新列表后，该模块再次通过 jsonp 请求，获取到最新的模块代码。这就是上图中 7、8、9 步骤。</p>
+<p>而第 10 步是决定 HMR 成功与否的关键步骤，在该步骤中，HotModulePlugin 将会对新旧模块进行对比，决定是否更新模块，在决定更新模块后，检查模块之间的依赖关系，更新模块的同时更新模块间的依赖引用。</p>
+<p>最后一步，当 HMR 失败后，回退到 live reload 操作，也就是进行浏览器刷新来获取最新打包代码。</p>
+<h2><span id="运用-hmr-的简单例子">运用 HMR 的简单例子</span></h2><p>在上一个部分，通过一张 HMR 流程图，简要的说明了 HMR 进行模块热更新的过程。当然你可能感觉还是很迷糊，对上面出现的一些英文名词也可能比较陌生（上面这些英文名词代表着代码仓库或者仓库中的文件模块），没关系，在这一部分，我将通过一个最简单最纯粹的例子，通过分析 wepack及 webpack-dev-server 源码详细说明各个库在 HMR 过程中的具体职责。</p>
+<p>这边我通过一个简单的vue例子示例一下，这边贴一个仓库的连接<a target="_blank" rel="noopener" href="https://github.com/ikkkp/webpack-vue-demo">github.com&#x2F;ikkkp&#x2F;webpack-vue-demo</a></p>
+<p>在开始这个例子之前简单对这个仓库文件进行下说明，仓库中包含文件如下：</p>
+<p><img src="/img/webpack-optimization/HMR5.jpg" alt="webpack-optimization"></p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
+    VueLoaderPlugin
+<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> webpack <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'webpack'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 引入 webpack</span>
+<span class="token keyword">const</span> AutoImport <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-auto-import/webpack'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> Components <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/webpack'</span><span class="token punctuation">)</span>
+<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
+    ElementPlusResolver
+<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/resolvers'</span><span class="token punctuation">)</span>
+
+<span class="token comment">/**
+* @description 
+* @version 1.0
+* @author Huangzl
+* @fileName webpack.base.config.js
+* @date 2023/11/10 11:00:59
+*/</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">main</span><span class="token operator">:</span> <span class="token string">'./src/main'</span><span class="token punctuation">,</span>
+        <span class="token comment">//单页应用开发模式禁用多入口</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">modules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token string">'node_modules'</span><span class="token punctuation">,</span>
+            path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'./src/loader'</span><span class="token punctuation">)</span>
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[id].[fullhash].js'</span><span class="token punctuation">,</span> <span class="token comment">// 使用 [fullhash] 替代 [hash]，这是新版本 webpack 的写法</span>
+        <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'./'</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'vue-loader'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.css$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token string">'style-loader'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'css-loader'</span><span class="token punctuation">,</span>
+                    <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                        <span class="token literal-property property">importLoaders</span><span class="token operator">:</span> <span class="token number">1</span>
+                    <span class="token punctuation">&#125;</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+                <span class="token string">'postcss-loader'</span>
+            <span class="token punctuation">]</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'babel-loader'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'company-loader'</span><span class="token punctuation">,</span>
+                <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                    <span class="token literal-property property">sign</span><span class="token operator">:</span> <span class="token string">'we-doctor@2021'</span><span class="token punctuation">,</span>
+                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">exclude</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.(ico|png|jpg|gif|svg|eot|woff|woff2|ttf)$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
+            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'file-loader'</span><span class="token punctuation">,</span>
+            <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+                <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'[name].[ext]?[hash]'</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+
+    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+        <span class="token keyword">new</span> <span class="token class-name">HtmlWebpackPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token string">'./public/index.html'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token keyword">new</span> <span class="token class-name">VueLoaderPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token keyword">new</span> <span class="token class-name">webpack<span class="token punctuation">.</span>DefinePlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token constant">BASE_URL</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token string">'./'</span><span class="token punctuation">)</span> <span class="token comment">// 这里定义了 BASE_URL 为根路径 '/'</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">AutoImport</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        <span class="token function">Components</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+        <span class="token literal-property property">splitChunks</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+            <span class="token literal-property property">chunks</span><span class="token operator">:</span> <span class="token string">'all'</span><span class="token punctuation">,</span> <span class="token comment">// 只处理异步模块</span>
+            <span class="token literal-property property">maxSize</span><span class="token operator">:</span> <span class="token number">20000000</span><span class="token punctuation">,</span> <span class="token comment">// 设置最大的chunk大小为2MB</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>值得一提的是，在上面的配置中并没有配置 HotModuleReplacementPlugin，原因在于当我们设置 devServer.hot 为 true 后，并且在package.json 文件中添加如下的 script 脚本：</p>
+<blockquote>
+<p>“start”: “webpack-dev-server –hot –open”</p>
+</blockquote>
+<p>添加 —hot 配置项后，devServer 会告诉 webpack 自动引入 HotModuleReplacementPlugin 插件，而不用我们再手动引入了。</p>
+<p>上面给的是webpack.base.config.js的内容，我们下面通过修改App.vue的内容进行:</p>
+<blockquote>
+<p>- &lt;div&gt;hello&lt;&#x2F;div&gt; &#x2F;&#x2F; 将 hello 字符串修改为 hello world<br>  + &lt;div&gt;hello world&lt;&#x2F;div&gt; </p>
+</blockquote>
+<p><strong>第一步：webpack 对文件系统进行 watch 打包到内存中</strong></p>
+<p>webpack-dev-middleware 调用 webpack 的 api 对文件系统 watch，当 hello.js 文件发生改变后，webpack 重新对文件进行编译打包，然后保存到内存中。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">var</span> watching <span class="token operator">=</span> compiler<span class="token punctuation">.</span><span class="token function">watch</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span>watchOptions<span class="token punctuation">,</span> share<span class="token punctuation">.</span>handleCompilerCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    context<span class="token punctuation">.</span>watching <span class="token operator">=</span> watching<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>你可能会疑问了，为什么 webpack 没有将文件直接打包到 output.path 目录下呢？文件又去了哪儿？原来 webpack 将 bundle.js 文件打包到了内存中，不生成文件的原因就在于访问内存中的代码比访问文件系统中的文件更快，而且也减少了代码写入文件的开销，这一切都归功于memory-fs，memory-fs 是 webpack-dev-middleware 的一个依赖库，webpack-dev-middleware 将 webpack 原本的 outputFileSystem 替换成了MemoryFileSystem 实例，这样代码就将输出到内存中。webpack-dev-middleware 中该部分源码如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
+<span class="token keyword">var</span> isMemoryFs <span class="token operator">=</span> <span class="token operator">!</span>compiler<span class="token punctuation">.</span>compilers <span class="token operator">&amp;&amp;</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token keyword">instanceof</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>isMemoryFs<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>首先判断当前 fileSystem 是否已经是 MemoryFileSystem 的实例，如果不是，用 MemoryFileSystem 的实例替换 compiler 之前的 outputFileSystem。这样 bundle.js 文件代码就作为一个简单 javascript 对象保存在了内存中，当浏览器请求 bundle.js 文件时，devServer就直接去内存中找到上面保存的 javascript 对象返回给浏览器端。</p>
+<p><strong>第二步：devServer 通知浏览器端文件发生改变</strong></p>
+<p>在这一阶段，sockjs 是服务端和浏览器端之间的桥梁，在启动 devServer 的时候，sockjs 在服务端和浏览器端建立了一个 webSocket 长连接，以便将 webpack 编译和打包的各个阶段状态告知浏览器，最关键的步骤还是 webpack-dev-server 调用 webpack api 监听 compile的 done 事件，当compile 完成后，webpack-dev-server通过 _sendStatus 方法将编译打包后的新模块 hash 值发送到浏览器端。</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-server/lib/Server.js</span>
+compiler<span class="token punctuation">.</span><span class="token function">plugin</span><span class="token punctuation">(</span><span class="token string">'done'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">stats</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// stats.hash 是最新打包文件的 hash 值</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_sendStats</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>sockets<span class="token punctuation">,</span> stats<span class="token punctuation">.</span><span class="token function">toJson</span><span class="token punctuation">(</span>clientStats<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_stats <span class="token operator">=</span> stats<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">...</span>
+<span class="token class-name">Server</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">_sendStats</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">sockets<span class="token punctuation">,</span> stats<span class="token punctuation">,</span> force</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>force <span class="token operator">&amp;&amp;</span> stats <span class="token operator">&amp;&amp;</span>
+  <span class="token punctuation">(</span><span class="token operator">!</span>stats<span class="token punctuation">.</span>errors <span class="token operator">||</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> stats<span class="token punctuation">.</span>assets <span class="token operator">&amp;&amp;</span>
+  stats<span class="token punctuation">.</span>assets<span class="token punctuation">.</span><span class="token function">every</span><span class="token punctuation">(</span><span class="token parameter">asset</span> <span class="token operator">=></span> <span class="token operator">!</span>asset<span class="token punctuation">.</span>emitted<span class="token punctuation">)</span>
+  <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'still-ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+  <span class="token comment">// 调用 sockWrite 方法将 hash 值通过 websocket 发送到浏览器端</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'hash'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>hash<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'errors'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span> 
+  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>warnings<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'warnings'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>warnings<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>      <span class="token keyword">else</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><strong>第三步：webpack-dev-server&#x2F;client 接收到服务端消息做出响应</strong></p>
+<p>可能你又会有疑问，我并没有在业务代码里面添加接收 websocket 消息的代码，也没有在 webpack.config.js 中的 entry 属性中添加新的入口文件，那么 bundle.js 中接收 websocket 消息的代码从哪来的呢？原来是 webpack-dev-server 修改了webpack 配置中的 entry 属性，在里面添加了 webpack-dev-client 的代码，这样在最后的 bundle.js 文件中就会有接收 websocket 消息的代码了。</p>
+<p>webpack-dev-server&#x2F;client 当接收到 type 为 hash 消息后会将 hash 值暂存起来，当接收到 type 为 ok 的消息后对应用执行 reload 操作，如下图所示，hash 消息是在 ok 消息之前。</p>
+<p><img src="/img/webpack-optimization/HMR3.jpg" alt="webpack-optimization"></p>
+<p>在 reload 操作中，webpack-dev-server&#x2F;client 会根据 hot 配置决定是刷新浏览器还是对代码进行热更新（HMR）。</p>
+<p>首先将 hash 值暂存到 currentHash 变量，当接收到 ok 消息后，对 App 进行 reload。如果配置了模块热更新，就调用 webpack&#x2F;hot&#x2F;emitter 将最新 hash 值发送给 webpack，然后将控制权交给 webpack 客户端代码。如果没有配置模块热更新，就直接调用 location.reload 方法刷新页面。</p>
+<p><strong>第四步：webpack 接收到最新 hash 值验证并请求模块代码</strong></p>
+<p>在这一步，其实是 webpack 中三个模块（三个文件，后面英文名对应文件路径）之间配合的结果，首先是 <code>webpack/hot/dev-server</code>（以下简称 dev-server） 监听第三步 <code>webpack-dev-server/client</code> 发送的 <code>webpackHotUpdate</code> 消息，调用 webpack&#x2F;lib&#x2F;HotModuleReplacement.runtime（简称 HMR runtime）中的 check 方法，检测是否有新的更新，在 check 过程中会利用 webpack&#x2F;lib&#x2F;JsonpMainTemplate.runtime（简称 jsonp runtime）中的两个方法 <code>hotDownloadUpdateChunk</code> 和 <code>hotDownloadManifest</code> ， 第二个方法是调用 AJAX 向服务端请求是否有更新的文件，如果有将发更新的文件列表返回浏览器端，而第一个方法是通过 jsonp 请求最新的模块代码，然后将代码返回给 <code>HMR runtime</code>，<code>HMR runtime</code> 会根据返回的新模块代码做进一步处理，可能是刷新页面，也可能是对模块进行热更新。</p>
+<p><img src="/img/webpack-optimization/HMR4.jpg" alt="webpack-optimization"></p>
+<p>值得注意的是，两次请求的都是使用上一次的 hash 值拼接的请求文件名，hotDownloadManifest 方法返回的是最新的 hash 值，hotDownloadUpdateChunk 方法返回的就是最新 hash 值对应的代码块。然后将新的代码块返回给 HMR runtime，进行模块热更新</p>
+<p><strong>第五步：HotModuleReplacement.runtime 对模块进行热更新</strong></p>
+<p>这一步是整个模块热更新（HMR）的关键步骤，而且模块热更新都是发生在HMR runtime 中的 hotApply 方法中</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack/lib/HotModuleReplacement.runtime</span>
+<span class="token keyword">function</span> <span class="token function">hotApply</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// ...</span>
+    <span class="token keyword">var</span> idx<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> queue <span class="token operator">=</span> outdatedModules<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span>queue<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        moduleId <span class="token operator">=</span> queue<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        module <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// ...</span>
+        <span class="token comment">// remove module from cache</span>
+        <span class="token keyword">delete</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// when disposing there is no need to call dispose handler</span>
+        <span class="token keyword">delete</span> outdatedDependencies<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token comment">// remove "parents" references from all children</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span>j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> module<span class="token punctuation">.</span>children<span class="token punctuation">.</span>length<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">var</span> child <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>module<span class="token punctuation">.</span>children<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>child<span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
+            idx <span class="token operator">=</span> child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>moduleId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>idx <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span>idx<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+    <span class="token comment">// insert new code</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span>moduleId <span class="token keyword">in</span> appliedUpdate<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function">hasOwnProperty</span><span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>appliedUpdate<span class="token punctuation">,</span> moduleId<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            modules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span> <span class="token operator">=</span> appliedUpdate<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>从上面 hotApply 方法可以看出，模块热替换主要分三个阶段，第一个阶段是找出 <code>outdatedModules</code> 和 <code>outdatedDependencies</code>，这儿我没有贴这部分代码，有兴趣可以自己阅读源码。第二个阶段从缓存中删除过期的模块和依赖，如下：</p>
+<blockquote>
+<p>delete installedModules[moduleId];<br>  delete outdatedDependencies[moduleId];</p>
+</blockquote>
+<p>第三个阶段是将新的模块添加到 modules 中，当下次调用 <strong>webpack_require</strong> (webpack 重写的 require 方法)方法的时候，就是获取到了新的模块代码了。</p>
+<p>模块热更新的错误处理，如果在热更新过程中出现错误，热更新将回退到刷新浏览器，这部分代码在 dev-server 代码中，简要代码如下：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">check</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">updatedModules</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>updatedModules<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// ...</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">err</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">var</span> status <span class="token operator">=</span> module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"abort"</span><span class="token punctuation">,</span> <span class="token string">"fail"</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>status<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>dev-server 先验证是否有更新，没有代码更新的话，重载浏览器。如果在 hotApply 的过程中出现 abort 或者 fail 错误，也进行重载浏览器。</p>
+<p><img src="/img/webpack-optimization/2-core.jpg" alt="webpack-optimization"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/11/09/hadoop-4/" itemprop="url">Hadoop 2.0体系架构之分布式文件系统Yarn</a>
         
     </h1>
@@ -1478,80 +1776,6 @@ renderer<span class="token punctuation">.</span><span class="token function">ren
 <li><p>这里还有改进的空间：可以消除开销，使性能更加可预测。</p>
 </li>
 </ul>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/03/wasm-1/" itemprop="url">浅谈WebAssembly</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-03T11:33:25.000Z" itemprop="datePublished">November 3, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Wasm/">Wasm</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="引言">引言</span></h2><p>看了不少Wasm的文章，也做了一些性能测试，现在来简单的谈下这门技术。</p>
-<h2><span id="wasm-x3dx3d-汇编级性能">WASM &#x3D;&#x3D; 汇编级性能？</span></h2><p>这显然不对，<strong>WASM 里的 Assembly 并不意味着真正的汇编码，而只是种新约定的字节码，也是需要解释器运行的。</strong> 这种解释器肯定比 JS 解释器快得多，但自然也达不到真正的原生机器码水平。</p>
-<p>一个可供参考的数据指标，是 JS 上了 JIT 后整体性能大致是机器码 1&#x2F;20 的水平，而 WASM 则可以跑到机器码 1&#x2F;3 的量级（视场景不同很不好说，仅供参考）。相当于即便你写的是 C++ 和 Rust 级的语言，得到的其实也只是 Java 和 C# 级的性能。</p>
-<p>这也可以解释为什么 WASM 并不能在所有应用场景都显示出压倒性的性能优势：只要你懂得如何让 JS 引擎走在 Happy Path 上，那么在浏览器里，JS 就敢和 Rust 性能优化差不多。</p>
-<p>一个在 WASM 和 JS 之间做性能对比的经典案例，就是 Mozilla 开发者和 V8 开发者的白学现场。整个过程是这样的：</p>
-<p>Mozilla Hacks 发表了一篇名为 <a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">用 Rust 和 WASM 优化 Source Map 性能 的博文</a>，将 source-map 这个 JS 包的性能优化了五倍。</p>
-<p>V8 核心开发 Vyacheslav Egorov 回应名为<a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/01/oxidizing-source-maps-with-rust-and-webassembly/">你也许不需要用 Rust 和 WASM 来优化 JS 的博文</a>，用纯 JS 实现了速度比 Rust 更快的惊人优化。</p>
-<p>原文作者以 无需魔法的速度 为名展开了进一步讨论，并用 Rust 做出了新的性能优化。</p>
-<p>巧的是，这场论战正发生在两年前白色相簿的季节。双方就像雪菜和冬马那样展开了高水平的对决，名场面十分精彩。最终 Vyacheslav 给出了一张三轮过招后的性能对比图。可以看到虽然最终还是 Rust 更快，但 JS 被逼到极限后非但不是败犬，还胜出了一回合：</p>
-<p><img src="/img/wasm/Rust&Js.png" alt="Rust&amp;Js"></p>
-<p>另外，大佬Milo Yip 做过的不同语言光线追踪性能测试（修罗场），也能侧面印证带 VM 语言与机器码之间的性能对比结论。C++、Java 和 JS 在未经特别优化的前提下，可以分别代表三个典型的性能档次：</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/miloyip/archive/2010/07/07/languages_brawl_GI.html">C++&#x2F;C#&#x2F;F#&#x2F;Java&#x2F;JS&#x2F;Lua&#x2F;Python&#x2F;Ruby 渲染比试</a></p>
-<h2><span id="wasm-比-js-快所以计算密集型应用就该用它">WASM 比 JS 快，所以计算密集型应用就该用它？</span></h2><p>这有点偏颇，<code>WASM </code>同样是 CPU 上的计算。对于可以高度并行化的任务，使用 <code>WebGL</code> 来做 GPU 加速往往更快。譬如我在 实用 WebGL 图像处理入门 这篇文章里介绍的图像处理算法，比起 JS 里 for 循环遍历 Canvas 像素就可以很轻松地快个几十倍。</p>
-<p>而这种套两层 for 循环的苦力活，用现在的 WASM 重写能快几倍就非常不错了。至于浏览器内 AI 计算的性能方面，社区的评测结论也是 WebGL 和 WebMetal 具备最高的性能水平，然后才是 WASM。参见这里：<a target="_blank" rel="noopener" href="https://blog.logrocket.com/ai-in-browsers-comparing-tensorflow-onnx-and-webdnn-for-image-classification/">浏览器内的 AI 评测</a></p>
-<p>不过，WebGL 的加速存在精度问题。例如前端图像缩放库 Pica，它的核心用的是 Lanczos 采样算法。我用 WebGL 着色器实现过这个算法，它并不复杂，早期的 Pica 也曾经加入过可选的 WebGL 优化，但现在却劈腿了 WASM。这一决策的理由在于，WASM 能保证相同参数下的计算结果和 JS 一致，但 WebGL 则不行。相关讨论参见这里：<a target="_blank" rel="noopener" href="https://github.com/nodeca/pica/issues/114">Issue #114 · nodeca&#x2F;pica</a></p>
-<p>而且，对于前端来说，计算密集型的应用场景并不算太多，比起 WebGPU 这种图形渲染的技术的发展前景可以说算是比较弱势，但毕竟二者不在同一种应用场景下。</p>
-<p>所以对计算密集型任务，WASM 并不是前端唯一的救星，而是给大家多了一种在性能、开发成本和效果之间权衡的选择。在我个人印象里，前端在图形渲染外需要算力的场景说实话并不太多，像加密、压缩、挖矿这种，都难说是高频刚需。至于未来可能相当重要的 AI 应用，<strong>长期而言我还是看好 WebGPU 这种更能发挥出 GPU 潜力的下一代标准，当然 WASM 也已经是个不错的可选项了。</strong></p>
-<h2><span id="只要嵌入-wasm-函数到-js-就能提高性能">只要嵌入 WASM 函数到 JS 就能提高性能？</span></h2><p>既然 WASM 很快，那么是不是我只要把 JS 里 const add (a, b) &#x3D;&gt; a + b 这样的代码换成用 C 编译出来的 WASM，就可以有效地提高性能了呢？</p>
-<p><strong>这还真不一定。</strong></p>
-<p>因为现代浏览器内的 JS 引擎都有进行性能优化的利器，都标配了一种东西，那就是 <code>JIT</code>。简单来说，上面这个 add 函数如果始终都在算整数加法，那么 JS 引擎就会自动编译出一份计算 int a + int b 的机器码来替代掉原始的 JS 函数，这样高频调用这个函数的性能就会得到极大的提升，这也就是 JIT 所谓 Just-in-time 编译的奥妙所在了。</p>
-<p>所以，不要一觉得 JS 慢就想着手动靠 WASM 来嵌入 C，其实现代 JS 引擎可都是在不停地帮你<code>「自动把 JS 转换成 C」</code>的！如果你可以把一个 JS 函数改写成等价的 C，那么我猜如果把这个函数单独抽离出来，靠 JS 引擎的 JIT 都很可能达到相近的性能。这应该就是 V8 开发者敢用 JS 和 Rust 对线的底气所在吧。</p>
-<p><a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/10/calls-between-javascript-and-webassembly-are-finally-fast-%F0%9F%8E%89/">像在 JS 和 WASM 之间的调用终于变快了</a> 这篇文章中，Lin Clark 非常精彩地论述了整个优化过程，<strong>最终使得 JS 和 WASM 间的函数调用，比非内联的 JS 函数间调用要快</strong>。不过，至于和被 JIT 内联掉的 JS 函数调用相比起来如何，这篇文章就没有提及了。</p>
-<p>这里偏个题，Mozilla 经常宣传自己实现的超大幅优化，有不少都可能来源于之前明显的设计问题（平心而论，我们自己何尝不是这样呢）。像去年 Firefox 70 在 Mac 上实现的 大幅省电优化，其根源是什么呢？粗略的理解是，以前的 Firefox 在 Mac 上竟然每帧都会全量更新窗口像素！当然，这些文章的干货都相当多，十分推荐大家打好基础后看看原文，至少是个更大的世界，也常常能对软件架构设计有所启发。</p>
-<p>如果后续 WASM 支持了 GC，那么嵌入互调的情况很可能更复杂。例如我最近就尝试在 Flutter 的 Dart 和安卓的 Java 之间手动同步大对象，希望能「嵌入一些安卓平台能力到 Flutter 体系里」，然而这带来了许多冗长而低性能的胶水代码，需要通过异步的消息来做深拷贝，可控性很低。</p>
-<p>虽然 WASM 现在还没有 GC，但一旦加上，我有理由怀疑它和 JS 之间的对象生命周期管理也会遇到类似的问题。只是这个问题主要是让 Mozilla 和 Google 的人来操心，用不着我们管而已。</p>
-<h2><span id="在-js-里调-wasm就像-python-里调-c-那样简单">在 JS 里调 WASM，就像 Python 里调 C 那样简单？</span></h2><p>这个问题只有实际做过才有发言权。譬如我最近尝试过的这些东西：</p>
-<ul>
-<li>在安卓的 Java class 里调用 C++</li>
-<li>在 Flutter 的 Dart 里调用 C</li>
-<li>在 QuickJS 这种嵌入式 JS 引擎里调用 C</li>
-</ul>
-<p>它们都能做到一件事，那就是在引擎里新建原生对象，并将它以传引用的方式直接交给<code>C / C++</code>函数调用，并用引擎的 GC 来管理对象的生命周期。这种方式一般称为<code> FFI（Foreign Function Interface 外部函数接口）</code>，可以把原生代码嵌入到语言 Runtime 中。但如果是两个不同的 Runtime，事情就没有这么简单了。<strong>例如 QuickJS 到 Java 的 binding 项目 Quack，就需要在 JS 的对象和 Java 对象中做 Marshalling（类似于 JSON 那样的序列化和反序列化）的过程，不能随便传引用。</strong></p>
-<p><strong>对 WASM 来说是怎样的呢？</strong> 基本上，WASM 的线性内存空间可以随便用 JS 读写，并没有深拷贝的困扰。不过，WASM倒有一些数据流的问题，只有 int 和 float 之流的数据类型，连 string 都没有，因此对于稍复杂一点的对象，都很难手写出 JS 和 WASM 两边各自的结构。这点导致你想直接使用Wasm做复杂的对象转换都较为困难，现在这件脏活是交由 <code>wasm-bindgen </code>等轮子来做的,<strong>wasm-pack 使用另一个工具 wasm-bindgen 来提供 JavaScript 和 Rust 等其他类型之间的桥梁。</strong> 但毕竟这个过程并不是直接在 JS 的 Runtime 里嵌入 C &#x2F; C++ 函数，和传统编译到机器码的 FFI 还是挺不一样的。</p>
-<p>例如现在如果需要频繁地用 WASM 操作 JS 对象，那么几乎必然是影响性能的。这方面典型的坑是基于 WASM 移植的 OpenGL 应用。像 C++ 中的一个 glTexImage2D 函数，目前编译到 WASM 后就需要先从 WASM 走到 JS 胶水层，再在 JS 里调 gl.texImage2D 这样的 WebGL API，最后才能经由 C++ binding 调用到原生的图形 API。这样从一层胶水变成了两层，性能不要说比起原生 C++，能比得上直接写 JS 吗？</p>
-<p>当然，Mozilla 也意识到了这个问题，因此他们在尝试如何更好地将 <code>Web IDL（也就是浏览器原生 API 的 binding）</code>开放给 WASM，并在这个过程中提出了 WASM Interface Types 概念：既然 WASM 已经是个字节码的中间层了，那么干脆给它约定个能一统所有编程语言运行时类型的 IR 规范吧！不过，这一规范还是希望主要靠协议化、结构化的深拷贝来解决问题，只有未来的 anyref 类型是可以传引用的。anyref 有些像 Unix 里的文件描述符，这里就不展开了。</p>
-<p><img src="/img/wasm/Rust&Js3.webp" alt="Js2WASM"></p>
-<h2><span id="wasm-属于前端生态">WASM 属于前端生态？</span></h2><p>这个我不太认可, 要知道Wasm这个玩意其编译工具链和依赖库生态，基本完全不涉及 JS。</p>
-<p>一套支持交叉编译的工具链，会附带上用于支持目标平台的一些库，例如 include 了 <code>&lt;GLES2/gl2.h&gt;</code> 之后，你调用到的<code> glTexImage2D API</code> 就是动态库里提供的。有了动态库，这个 API 才能在 x86 &#x2F; ARM &#x2F; MIPS &#x2F; WASM 等平台上一致地跑起来（就像安卓上的 .so 格式）。</p>
-<p>像 Emscripten 就提供了面向 WASM 平台，编译成 JS 格式的一套动态库。但它只能保证这些 API 能用，性能如何就另说了。它自己也对移植 WebGL 时的性瓶颈提出了很多的优化建议。</p>
-<p>所以这里再重复一遍，编译 WASM 应用所需的依赖库和整套工具链，几乎都跟 JS 没什么关系。JS 就像机器码那样，只是人家工具链编译出来的输出格式而已。在 JS 开发者看来，这整套东西可能显得相当突兀。但从原生应用开发者的视角看来，这一切都再正常不过了。</p>
-<h2><span id="后记">后记</span></h2><p>WASM 当然是个革命性的技术，代表了一种跨平台的全新方向，尤其对原生应用开发者来说具备巨大的商业价值。但它对前端来说其实就是个浏览器内置的字节码虚拟机。</p>
 
     
     </div>
