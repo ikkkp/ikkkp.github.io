@@ -177,6 +177,235 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/08/vue-component-2/" itemprop="url">Vuejs 组件事件与 emit 的实现</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">December 8, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="前言">前言</span></h2><p>想把Vuejs 组件事件与 emit 的实现讲清楚，我先要把组件事件和emit的应用讲清楚，这样大家会更清楚的理解组件事件和emit的实现。</p>
+<p>对于组件事件，我们其实之前就已经提到过了浏览器的事件机制：</p>
+<h3><span id="浏览器事件回顾">浏览器事件回顾</span></h3><p>浏览器事件是指在 Web 页面中发生的各种交互和状态变化的信号。这些事件可以由用户的操作、浏览器的状态变化或其他一些因素触发。以下是一些常见的 DOM 事件和它们的简介：</p>
+<h4><span id="鼠标事件">鼠标事件：</span></h4><ul>
+<li><strong>click：</strong> 当鼠标点击一个元素时触发。对于触摸屏设备，也会在触摸屏上进行点击时触发。</li>
+<li><strong>contextmenu：</strong> 当鼠标右键点击一个元素时触发。</li>
+<li><strong>mouseover &#x2F; mouseout：</strong> 当鼠标指针移入或离开一个元素时触发。</li>
+<li><strong>mousedown &#x2F; mouseup：</strong> 当在元素上按下或释放鼠标按钮时触发。</li>
+<li><strong>mousemove：</strong> 当鼠标移动时触发。</li>
+</ul>
+<h4><span id="键盘事件">键盘事件：</span></h4><ul>
+<li><strong>keydown 和 keyup：</strong> 当按下和松开一个按键时触发。</li>
+</ul>
+<h4><span id="表单form元素事件">表单（form）元素事件：</span></h4><ul>
+<li><strong>submit：</strong> 当访问者提交了一个 <code>&lt;form&gt;</code> 时触发。</li>
+<li><strong>focus：</strong> 当访问者聚焦于一个元素时触发，例如聚焦于一个 <code>&lt;input&gt;</code>。</li>
+</ul>
+<h4><span id="document-事件">Document 事件：</span></h4><ul>
+<li><strong>DOMContentLoaded：</strong> 当 HTML 的加载和处理均完成，DOM 被完全构建完成时触发。</li>
+</ul>
+<h4><span id="css-事件">CSS 事件：</span></h4><ul>
+<li><strong>transitionend：</strong> 当一个 CSS 动画完成时触发。</li>
+</ul>
+<p>这些事件可以通过 JavaScript 中的事件监听器来捕获和处理。例如，通过给元素添加事件监听器，可以在特定事件发生时执行相应的代码。事件是 Web 开发中交互和响应的基础。</p>
+<p>那我们所说的组件事件和浏览器事件有什么区别呢？</p>
+<p><strong>对于事件这一个定义，我们可以这样理解：事件是指在特定的时间点上发生的事情，在某个时间点产生了一个信号，而信号可以被接收处理，这就是事件。</strong></p>
+<p>下面我们所说的组件事件，其实相对于浏览器事件来说更为宏观，它是指在Vue组件中，组件之间的通信方式，而这种通信方式是通过事件来实现的，这里的事件就是我们所说的组件事件。</p>
+<p><strong>Vue 组件之间通过事件进行通信的主要机制是通过 emit 和 on 方法。当子组件需要向父组件通信时，它会触发一个事件，并通过 emit 方法将事件发送出去；而父组件则通过在模板中使用 v-on 指令监听这个事件，从而执行相应的逻辑。</strong></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- 子组件 ChildComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sendMessage<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>点击通知父组件<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">sendMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 使用 emit 发送自定义事件</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'child-event'</span><span class="token punctuation">,</span> <span class="token string">'Hello from child!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- 父组件 ParentComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>child-component</span> <span class="token attr-name">@child-event</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>handleChildEvent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>child-component</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>从子组件接收的消息: &#123;&#123; messageFromChild &#125;&#125;<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">import</span> ChildComponent <span class="token keyword">from</span> <span class="token string">'./ChildComponent.vue'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">components</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    ChildComponent
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">messageFromChild</span><span class="token operator">:</span> <span class="token string">''</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">handleChildEvent</span><span class="token punctuation">(</span><span class="token parameter">message</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 使用 v-on 监听子组件的事件</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>messageFromChild <span class="token operator">=</span> message<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Vue 的事件机制是通过发布&#x2F;订阅模式实现的。$emit 用于发布（触发）事件，而 v-on 则用于订阅（监听）事件。这使得不同组件之间可以相互通信，实现了组件之间的解耦。</p>
+<p><strong>首先，我们会注意到，子组件通过 this.$emit(‘child-event’, ‘Hello from child!’) 发送了一个自定义事件 child-event，而父组件则通过 @child-event&#x3D;”handleChildEvent” 监听了这个事件。</strong> 这里的 child-event 就是我们自定义的事件名，而 handleChildEvent 则是父组件中定义的一个方法，用于处理子组件发送过来的消息。</p>
+<p>当使用一个自定义的MyComponent组件时，我们可以监听由 emit 函数发射的自定义事件</p>
+<p>可以看到，自定义事件 change 被编译成名为 onChange 的属性，并存储在 props 数据对象中。这实际上是一种约定。作为框架设计者，也可以按照自己期望的方式来设计事件的编译结果。在具体的实现上，发射自定义事件的本质就是根据事件名称去props 数据对象中寻找对应的事件处理函数并执行，如下面的代码所示：</p>
+<h2><span id="emit的实现">emit的实现</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// MyComponent 组件定义</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+  <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 发射 change 事件，并传递给事件处理函数两个参数</span>
+    <span class="token function">emit</span><span class="token punctuation">(</span><span class="token string">'change'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 组件的渲染逻辑</span>
+      <span class="token keyword">return</span> <span class="token comment">/* ... */</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>上面这一段代码会被编译成一个节点 CompNode，它的类型为 MyComponent 组件，同时会将 emit 函数传递给组件的 setup 函数，如下所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 定义一个 Vue 组件节点 CompNode</span>
+<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 指定节点的类型为 MyComponent 组件</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent<span class="token punctuation">,</span>
+
+  <span class="token comment">// 为组件传递的 props 对象</span>
+  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 在 MyComponent 组件中，会有一个 onChange 的事件处理函数，其值为 handler</span>
+    <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以看到，自定义事件 change 被编译成名为 onChange 的属性，并存储在 props 数据对象中。这实际上是一种约定。作为框架设计者，也可以按照自己期望的方式来设计事件的编译结果。</p>
+<p>在具体的实现上，发射自定义事件的本质就是根据事件名称去props 数据对象中寻找对应的事件处理函数并执行，如下面的代码所示：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 挂载组件</span>
+<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 省略部分代码</span>
+
+  <span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    state<span class="token punctuation">,</span> <span class="token comment">// 状态</span>
+    <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// 响应式处理 props</span>
+    <span class="token literal-property property">isMounted</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">subTree</span><span class="token operator">:</span> <span class="token keyword">null</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 定义 emit 函数，它接收两个参数</span>
+  <span class="token comment">// event: 事件名称</span>
+  <span class="token comment">// payload: 传递给事件处理函数的参数</span>
+  <span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 根据约定对事件名称进行处理，例如 change --> onChange</span>
+    <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 根据处理后的事件名称去 props 中寻找对应的事件处理函数</span>
+    <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// 调用事件处理函数并传递参数</span>
+      <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'事件不存在'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 将 emit 函数添加到 setupContext 中</span>
+  <span class="token keyword">const</span> setupContext <span class="token operator">=</span> <span class="token punctuation">&#123;</span> attrs<span class="token punctuation">,</span> emit <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 省略部分代码</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 解析 props 数据的函数，对事件类型的 props 做特殊处理</span>
+<span class="token keyword">function</span> <span class="token function">resolveProps</span><span class="token punctuation">(</span><span class="token parameter">options<span class="token punctuation">,</span> propsData</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> props <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> attrs <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">const</span> key <span class="token keyword">in</span> propsData<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 以字符串 'on' 开头的 props 添加到 props 数据中，否则添加到 attrs 中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> options <span class="token operator">||</span> key<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      props<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      attrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>emit</code> 的实现原理主要涉及两个方面：<code>setupContext</code> 的注入和事件名称的约定转换。</p>
+<ol>
+<li><p><strong>setupContext 的注入：</strong> 在 Vue 的组件中，<code>setup</code> 函数接收两个参数：<code>props</code> 和 <code>context</code>。<code>context</code> 中包含了一系列属性和方法，其中之一就是 <code>emit</code> 函数。Vue 3 的组件中，<code>setup</code> 函数返回的对象中，可以将 <code>emit</code> 函数添加到 <code>setupContext</code> 中，以便用户在组件内通过 <code>setupContext.emit</code> 访问。</p>
+<p> 下面是一个简单的例子，展示了如何在 <code>setup</code> 函数中添加 <code>emit</code> 到 <code>setupContext</code>：</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 添加 emit 到 setupContext</span>
+  context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
+
+  <span class="token comment">// 其他 setup 逻辑</span>
+  <span class="token comment">// ...</span>
+
+  <span class="token comment">// 返回 setup 返回的对象</span>
+  <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> 这样，在组件内部，用户就可以通过 <code>setupContext.emit</code> 来调用 <code>emit</code> 函数了。</p>
+</li>
+<li><p><strong>事件名称的约定转换：</strong> 在 <code>emit</code> 函数内部，为了匹配组件模板中的事件处理函数，需要对事件名称进行约定转换。Vue 使用了一种约定，将事件名称转换为驼峰命名的形式。例如，<code>change</code> 事件会转换为 <code>onChange</code>。这样，用户在组件模板中监听事件时，可以使用驼峰命名的方式。</p>
+<p> 下面是一个简单的例子，展示了事件名称的约定转换：</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// 根据约定对事件名称进行处理，例如 change --> onChange</span>
+  <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 根据处理后的事件名称去 props 中寻找对应的事件处理函数</span>
+  <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 调用事件处理函数并传递参数</span>
+    <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'事件不存在'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> 这里的 <code>emit</code> 函数会将事件名称转换为以 “on” 开头并使用驼峰命名的形式，例如 <code>change</code> 转换为 <code>onChange</code>。然后，它会在 <code>instance.props</code> 中查找对应的事件处理函数并执行。</p>
+</li>
+</ol>
+<p>需要注意的是，事件类型的 props 在 <code>instance.props</code> 中是找不到的，因此它们会存储在 <code>attrs</code> 中。为了解决这个问题，在解析 props 数据时，需要对事件类型的 props 做特殊处理，确保它们被正确添加到 <code>props</code> 中，而不是 <code>attrs</code>。这样，<code>emit</code> 函数就能够在 <code>instance.props</code> 中正确地找到对应的事件处理函数。</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/08/vue-component-1/" itemprop="url">Vuejs 组件的实现原理</a>
         
     </h1>
@@ -1666,92 +1895,6 @@ jobs:
     - run: npm run start<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在此示例中，我们将在以下情况下重播用户流：</p>
 <p>新的变更推送到main分支<br>每天中午 12:30<br>除了 GitHub Actions 之外，您还可以与您最喜欢的云提供商集成。</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/11/vue-renderer-4/" itemprop="url">vue-renderer 渲染器的核心 Diff 算法</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-11T08:28:57.000Z" itemprop="datePublished">November 11, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="前言">前言</span></h2><p>渲染器的核心就是 Diff 算法。简单来说，当新旧 vnode 的子节点都是一组节点时，为了以最小的性能开销完成更新操作，需要比较两组子节点，用于比较的算法就叫作 Diff 算法。我们知道，操作 DOM 的性能开销通常比较大，而渲染器的核心 Diff 算法就是为了解决这个问题而诞生的。</p>
-<h2><span id="减少-dom-操作的性能开销">减少 DOM 操作的性能开销</span></h2><p>核心 Diff 只关心新旧虚拟节点都存在一组子节点的情况。针对两组子节点的更新，我们之前采用了一种简单直接的手段，即卸载全部旧子节点，再挂载全部新子节点。这么做的确可以完成更新，但由于没有复用任何 DOM 元素，所以会产生极大的性能开销。</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 旧 vnode</span>
-<span class="token keyword">const</span> oldNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'1'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'2'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'3'</span> <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">// 新 vnode</span>
-<span class="token keyword">const</span> newNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'div'</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'4'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'5'</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#123;</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'p'</span><span class="token punctuation">,</span> <span class="token literal-property property">children</span><span class="token operator">:</span> <span class="token string">'6'</span> <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>按照之前的做法，当更新子节点时，我们需要执行 6 次 DOM 操作：</p>
-<ul>
-<li>卸载所有旧子节点，需要 3 次 DOM 删除操作；</li>
-<li>挂载所有新子节点，需要 3 次 DOM 添加操作。</li>
-</ul>
-<p>但是，通过观察上面新旧 vnode 的子节点，可以发现：更新前后的所有子节点都是 p 标签，即标签元素不变；只有 p 标签的子节点（文本节点）会发生变化。</p>
-<p>例如，oldVNode 的第一个子节点是一个 p 标签，且该 p 标签的子节点类型是文本节点，内容是 ‘1’。而 newVNode 的第一个子节点也是一个 p 标签，它的子节点的类型也是文本节点，内容是 ‘4’。可以发现，更新前后改变的只有 p 标签文本节点的内容。</p>
-<p>所以，最理想的更新方式是，直接更新这个 p 标签的文本节点的内容。这样只需要一次 DOM 操作，即可完成一个 p 标签更新。新旧虚拟节点都有 3 个 p标签作为子节点，所以一共只需要 3 次 DOM 操作就可以完成全部节点的更新。相比原来需要执行 6 次 DOM 操作才能完成更新的方式，其性能提升了一倍。</p>
-<p>按照这个思路，我们可以重新实现两组子节点的更新逻辑，如下面 patchChildren 函数的代码所示：</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">patchChildren</span><span class="token punctuation">(</span><span class="token parameter">n1<span class="token punctuation">,</span> n2<span class="token punctuation">,</span> container</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> n2<span class="token punctuation">.</span>children <span class="token operator">===</span> <span class="token string">'string'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 省略部分代码</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>Array<span class="token punctuation">.</span><span class="token function">isArray</span><span class="token punctuation">(</span>n2<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 重新实现两组子节点的更新方式</span>
-    <span class="token comment">// 新旧 children</span>
-    <span class="token keyword">const</span> oldChildren <span class="token operator">=</span> n1<span class="token punctuation">.</span>children
-    <span class="token keyword">const</span> newChildren <span class="token operator">=</span> n2<span class="token punctuation">.</span>children
-    <span class="token comment">// 遍历旧的 children</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> oldChildren<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// 调用 patch 函数逐个更新子节点</span>
-      <span class="token function">patch</span><span class="token punctuation">(</span>oldChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> newChildren<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// 省略部分代码</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>在这段代码中，oldChildren 和 newChildren 分别是旧的一组子节点和新的一组子节点。我们遍历前者，并将两者中对应位置的节点分别传递给 patch 函数进行更新。patch 函数在执行更新时，发现新旧子节点只有文本内容不同，因此只会更新其文本节点的内容。这样，我们就成功地将 6 次 DOM 操作减少为 3 次。其中菱形代表新子节点，矩形代表旧子节点，圆形代表真实 DOM 节点。</p>
-<p><img src="/img/vue-render/render-diff1.png" alt="render-diff"></p>
-<p>这种做法虽然能够减少 DOM 操作次数，但问题也很明显。在上面的代码中，我们通过遍历旧的一组子节点，并假设新的一组子节点的数量与之相同，只有在这种情况下，这段代码才能正确地工作。但是，新旧两组子节点的数量未必相同。当新的一组子节点的数量少于旧的一组子节点的数量时，意味着有些节点在更新后应该被卸载。</p>
-<p><img src="/img/vue-render/render-diff2.png" alt="render-diff"></p>
 
     
     </div>

@@ -9,8 +9,15 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/categories/Web3/Ethereum/</loc>
+        <lastmod>2024-05-05T10:31:33.753Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/categories/Web3/</loc>
-        <lastmod>2024-04-19T02:50:44.850Z</lastmod>
+        <lastmod>2024-05-05T10:31:33.753Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>

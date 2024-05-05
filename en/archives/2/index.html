@@ -174,6 +174,237 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2023/12/08/en/vue-component-2/" itemprop="url">Implementation of Vue.js Component Events and Emit</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">December 8, 2023</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="introduction">Introduction</span></h2><p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
+<p>For component events, we’ve previously discussed the browser’s event mechanism:</p>
+<h3><span id="browser-event-review">Browser Event Review</span></h3><p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
+<h4><span id="mouse-events">Mouse Events:</span></h4><ul>
+<li><strong>click:</strong> Triggered when the mouse clicks on an element. For touch-screen devices, it’s triggered when there’s a tap on the screen.</li>
+<li><strong>contextmenu:</strong> Triggered when the right mouse button clicks on an element.</li>
+<li><strong>mouseover &#x2F; mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
+<li><strong>mousedown &#x2F; mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
+<li><strong>mousemove:</strong> Triggered when the mouse is moved.</li>
+</ul>
+<h4><span id="keyboard-events">Keyboard Events:</span></h4><ul>
+<li><strong>keydown and keyup:</strong> Triggered when a key is pressed down or released.</li>
+</ul>
+<h4><span id="form-element-events">Form Element Events:</span></h4><ul>
+<li><strong>submit:</strong> Triggered when a visitor submits a <code>&lt;form&gt;</code>.</li>
+<li><strong>focus:</strong> Triggered when a visitor focuses on an element, such as an <code>&lt;input&gt;</code>.</li>
+</ul>
+<h4><span id="document-events">Document Events:</span></h4><ul>
+<li><strong>DOMContentLoaded:</strong> Triggered when HTML is fully loaded and processed, and the DOM is completely constructed.</li>
+</ul>
+<h4><span id="css-events">CSS Events:</span></h4><ul>
+<li><strong>transitionend:</strong> Triggered when a CSS animation is completed.</li>
+</ul>
+<p>These events can be captured and processed using event listeners in JavaScript. By adding event listeners to elements, specific code can be executed when certain events occur. Events form the foundation of interaction and responsiveness in web development.</p>
+<p>Now, how does component events differ from browser events?</p>
+<p><strong>In the context of events, we can understand them as specific occurrences at a given point in time, signaling that something has happened. An event is a signal that can be received and processed, and that’s what events are.</strong></p>
+<p>In the case of component events, it refers to the communication between Vue components, achieved through events. In this context, events serve as a means of communication between components, and this communication is implemented using events. Here, events specifically refer to what we call component events.</p>
+<p><strong>The primary mechanism for communication between Vue components using events is through the use of the <code>emit</code> and <code>on</code> methods. When a child component needs to communicate with a parent component, it triggers an event and uses the <code>emit</code> method to send the event. The parent component, in turn, uses the <code>v-on</code> directive in the template to listen for this event and execute the corresponding logic.</strong></p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Child Component ChildComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sendMessage<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Notify Parent Component<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">sendMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Use emit to send a custom event</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'child-event'</span><span class="token punctuation">,</span> <span class="token string">'Hello from child!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Parent Component ParentComponent.vue --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>child-component</span> <span class="token attr-name">@child-event</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>handleChildEvent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>child-component</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Message received from child: &#123;&#123; messageFromChild &#125;&#125;<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword">import</span> ChildComponent <span class="token keyword">from</span> <span class="token string">'./ChildComponent.vue'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">components</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    ChildComponent
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">messageFromChild</span><span class="token operator">:</span> <span class="token string">''</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">handleChildEvent</span><span class="token punctuation">(</span><span class="token parameter">message</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Listen to the child component's event using v-on</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>messageFromChild <span class="token operator">=</span> message<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Vue’s event mechanism is built on the publish&#x2F;subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
+<p><strong>Firstly, we notice that the child component uses <code>this.$emit(&#39;child-event&#39;, &#39;Hello from child!&#39;)</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
+<p>When using a custom <code>MyComponent</code> component, we can listen to the emitted custom event using the <code>v-on</code> directive:</p>
+<p>You can see that the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations. In the actual implementation, emitting a custom event boils down to finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
+<h2><span id="implementation-of-emit">Implementation of emit</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
+<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
+  <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Emit the 'change' event and pass two parameters to the event handler</span>
+    <span class="token function">emit</span><span class="token punctuation">(</span><span class="token string">'change'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Render logic of the component</span>
+      <span class="token keyword">return</span> <span class="token comment">/* ... */</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The above code will be compiled into a node <code>CompNode</code>, with the type being the <code>MyComponent</code> component. The <code>emit</code> function is passed to the <code>setup</code> function of the component, as shown below:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of a Vue component node CompNode</span>
+<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Specify the type of the node as the MyComponent component</span>
+  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent<span class="token punctuation">,</span>
+
+  <span class="token comment">// Props object passed to the component</span>
+  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// In the MyComponent component, there will be an onChange event handling function, whose value is handler</span>
+    <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>As you can see, the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations.</p>
+<p>In the actual implementation, emitting a custom event essentially involves finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Mounting the component</span>
+<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Omitted code</span>
+
+  <span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    state<span class="token punctuation">,</span> <span class="token comment">// State</span>
+    <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// Reactive handling of props</span>
+    <span class="token literal-property property">isMounted</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">subTree</span><span class="token operator">:</span> <span class="token keyword">null</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Define the emit function, which takes two parameters</span>
+  <span class="token comment">// event: Event name</span>
+  <span class="token comment">// payload: Parameters passed to the event handling function</span>
+  <span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
+    <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Find the corresponding event handling function in props based on the processed event name</span>
+    <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token comment">// Call the event handling function and pass the parameters</span>
+      <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// Add the emit function to setupContext</span>
+  <span class="token keyword">const</span> setupContext <span class="token operator">=</span> <span class="token punctuation">&#123;</span> attrs<span class="token punctuation">,</span> emit <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Omitted code</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// Function to parse props data, with special handling for event-type props</span>
+<span class="token keyword">function</span> <span class="token function">resolveProps</span><span class="token punctuation">(</span><span class="token parameter">options<span class="token punctuation">,</span> propsData</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> props <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> attrs <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">const</span> key <span class="token keyword">in</span> propsData<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Add props starting with 'on' as strings to props data, otherwise add to attrs</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> options <span class="token operator">||</span> key<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      props<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+      attrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The implementation principle of <code>emit</code> involves two aspects: the injection of <code>setupContext</code> and the convention-based transformation of event names.</p>
+<ol>
+<li><p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
+<p> Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Add emit to setupContext</span>
+  context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
+
+  <span class="token comment">// Other setup logic</span>
+  <span class="token comment">// ...</span>
+
+  <span class="token comment">// Return the object returned by setup</span>
+  <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
+</li>
+<li><p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
+<p> Here’s a simple example illustrating the convention-based transformation of event names:</p>
+ <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
+  <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Find the corresponding event handling function in props based on the processed event name</span>
+  <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// Call the event handling function and pass the parameters</span>
+    <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
+</li>
+</ol>
+<p>It’s important to note that event-type props are not found in <code>instance.props</code>, so they are stored in <code>attrs</code>. To address this, when parsing props data, event-type props are specially handled to ensure they are correctly added to <code>props</code> instead of <code>attrs</code>. This allows the <code>emit</code> function to correctly find event handling functions in <code>instance.props</code>.</p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2023/12/08/en/vue-component-1/" itemprop="url">Implementation Principles of Vue.js Components</a>
         
     </h1>
@@ -1653,304 +1884,6 @@ jobs:
 <li>Daily at 12:30 PM.</li>
 </ul>
 <p>In addition to GitHub Actions, you can also integrate this with your preferred cloud provider.</p>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/11/10/en/Webpack-optimization-4/" itemprop="url">Webpack HMR Principle Analysis</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-11-10T02:15:11.000Z" itemprop="datePublished">November 10, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/FE/">FE</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="preface">Preface</span></h2><p>Hot Module Replacement (HMR) is a major feature of Webpack. When you modify and save the code, Webpack repackages the code and sends the new module to the browser, which replaces the old module with the new one without refreshing the browser, allowing you to update the application without refreshing the browser.</p>
-<p>For example, when developing a web page, if you click a button and a pop-up window appears, but the title of the pop-up window is not aligned, you can modify the CSS style and save it. Without refreshing the browser, the title style changes. It feels like directly modifying the element style in Chrome’s developer tools.</p>
-<h2><span id="hot-module-replacement-hmr">Hot Module Replacement (HMR)</span></h2><p>The <code>Hot Module Replacement (HMR)</code> function replaces, adds, or deletes modules during application runtime without reloading the entire page. This significantly speeds up development in the following ways:</p>
-<ul>
-<li><p>Preserve application state lost during a full page reload.</p>
-</li>
-<li><p>Only update the changed content to save valuable development time.</p>
-</li>
-<li><p>When CSS&#x2F;JS changes occur in the source code, they are immediately updated in the browser, which is almost equivalent to directly changing the style in the browser devtools.</p>
-</li>
-</ul>
-<h2><span id="why-do-we-need-hmr">Why do we need HMR?</span></h2><p>Before the webpack HMR function, there were many live reload tools or libraries, such as <a target="_blank" rel="noopener" href="https://tapiov.net/live-server/">live-server</a>. These libraries monitor file changes and notify the browser to refresh the page. So why do we still need HMR? The answer is actually mentioned in the previous text.</p>
-<ul>
-<li><p>Live reload tools cannot save the application state (states). When the page is refreshed, the previous state of the application is lost. In the example mentioned earlier, when you click a button to display a pop-up window, the pop-up window disappears when the browser is refreshed. To restore the previous state, you need to click the button again. However, webapck HMR does not refresh the browser, but replaces the module at runtime, ensuring that the application state is not lost and improving development efficiency.</p>
-</li>
-<li><p>In the ancient development process, we may need to manually run commands to package the code and then manually refresh the browser page after packaging. All these repetitive work can be automated through the HMR workflow, allowing more energy to be devoted to business instead of wasting time on repetitive work.</p>
-</li>
-<li><p>HMR is compatible with most front-end frameworks or libraries on the market, such as <a target="_blank" rel="noopener" href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a>, <a target="_blank" rel="noopener" href="https://github.com/vuejs/vue-loader">Vue-loader</a>, which can listen to changes in React or Vue components and update the latest components to the browser in real-time. Elm Hot Loader supports the translation and packaging of Elm language code through webpack, and of course, it also implements HMR functionality.</p>
-</li>
-</ul>
-<h2><span id="hmr-working-principle-diagram">HMR Working Principle Diagram</span></h2><p>When I first learned about HMR, I thought it was very magical, and there were always some questions lingering in my mind.</p>
-<ul>
-<li><p>Webpack can package different modules into bundle files or several chunk files, but when I develop with webpack HMR, I did not find the webpack packaged files in my dist directory. Where did they go?</p>
-</li>
-<li><p>By looking at the package.json file of webpack-dev-server, we know that it depends on the webpack-dev-middleware library. So what role does webpack-dev-middleware play in the HMR process?</p>
-</li>
-<li><p>During the use of HMR, I know that the browser communicates with webpack-dev-server through websocket, but I did not find new module code in the websocket message. How are the new modules sent to the browser? Why are the new modules not sent to the browser through websocket with the message?</p>
-</li>
-<li><p>After the browser gets the latest module code, how does HMR replace the old module with the new one? How to handle the dependency relationship between modules during the replacement process?</p>
-</li>
-<li><p>During the module hot replacement process, is there any fallback mechanism if the replacement module fails?</p>
-</li>
-</ul>
-<p>With these questions in mind, I decided to delve into the webpack source code and find the underlying secrets of HMR.</p>
-<p><img src="/img/webpack-optimization/HMR1.png" alt="webpack-optimization"></p>
-<p>Figure 1: HMR workflow diagram</p>
-<p>The above figure is a module hot update process diagram for application development using <code>webpack</code> with <code>webpack-dev-server</code>.</p>
-<p>The red box at the bottom of the figure is the server, and the orange box above is the browser.</p>
-<p>The green box is the area controlled by the <code>webpack</code> code. The blue box is the area controlled by the <code>webpack-dev-server</code> code. The magenta box is the file system, where file changes occur, and the cyan box is the application itself.</p>
-<p>The figure shows a cycle from when we modify the code to when the module hot update is completed. The entire process of HMR is marked by Arabic numerals in dark green.</p>
-<ul>
-<li><p>In the first step, in webpack’s watch mode, when a file in the file system is modified, webpack detects the file change, recompiles and packages the module according to the configuration file, and saves the packaged code in memory as a simple JavaScript object.</p>
-</li>
-<li><p>The second step is the interface interaction between webpack-dev-server and webpack. In this step, the main interaction is between the dev-server middleware webpack-dev-middleware and webpack. Webpack-dev-middleware calls webpack’s exposed API to monitor code changes and tells webpack to package the code into memory.</p>
-</li>
-<li><p>The third step is the monitoring of file changes by webpack-dev-server. This step is different from the first step, and it does not monitor code changes and repackage them. When we configure devServer.watchContentBase to true in the configuration file, the server will monitor changes in static files in these configured folders, and notify the browser to perform live reload of the corresponding application after the changes. Note that this is a different concept from HMR.</p>
-</li>
-<li><p>The fourth step is also the work of the webpack-dev-server code. In this step, the server establishes a websocket long connection between the browser and the server through sockjs (a dependency of webpack-dev-server), and informs the browser of the status information of various stages of webpack compilation and packaging, including the information of Server listening to static file changes in the third step. The browser performs different operations based on these socket messages. Of course, the most important information transmitted by the server is the hash value of the new module. The subsequent steps perform module hot replacement based on this hash value.</p>
-</li>
-</ul>
-<p>The <code>webpack-dev-server/client</code> side cannot request updated code or perform hot module replacement operations, but instead returns these tasks to <code>webpack</code>. The role of <code>webpack/hot/dev-server</code> is to determine whether to refresh the browser or perform module hot updates based on the information passed to it by <code>webpack-dev-server/client</code> and the configuration of <code>dev-server</code>. Of course, if it is only to refresh the browser, there will be no subsequent steps.</p>
-<p><code>HotModuleReplacement.runtime</code> is the hub of client HMR. It receives the hash value of the new module passed to it by the previous step, and sends an Ajax request to the server through JsonpMainTemplate.runtime. The server returns a json that contains the hash values of all modules to be updated. After obtaining the update list, the module requests the latest module code again through jsonp. This is steps 7, 8, and 9 in the above figure.</p>
-<p>The tenth step is the key step that determines the success or failure of HMR. In this step, the HotModulePlugin compares the old and new modules and decides whether to update the module. After deciding to update the module, it checks the dependency relationship between the modules and updates the dependency references between the modules while updating the modules.</p>
-<p>The last step is to fall back to live reload when HMR fails, that is, to refresh the browser to obtain the latest packaged code.</p>
-<h2><span id="simple-example-of-using-hmr">Simple Example of Using HMR</span></h2><p>In the previous section, a HMR workflow diagram was presented to briefly explain the process of module hot updates. However, you may still feel confused, and some of the English terms that appear above may be unfamiliar (these English terms represent code repositories or file modules). Don’t worry, in this section, I will use the simplest and purest example to analyze in detail the specific responsibilities of each library in the HMR process through the webpack and webpack-dev-server source code.</p>
-<p>Here, I will use a simple vue example to demonstrate. Here is a link to the repository <a target="_blank" rel="noopener" href="https://github.com/ikkkp/webpack-vue-demo">github.com&#x2F;ikkkp&#x2F;webpack-vue-demo</a></p>
-<p>Before starting this example, let me briefly explain the files in this repository. The files in the repository include:</p>
-<p><img src="/img/webpack-optimization/HMR5.jpg" alt="webpack-optimization"></p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">const</span> path <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'path'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">const</span> HtmlWebpackPlugin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'html-webpack-plugin'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
-    VueLoaderPlugin
-<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'vue-loader'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">const</span> webpack <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'webpack'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 引入 webpack</span>
-<span class="token keyword">const</span> AutoImport <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-auto-import/webpack'</span><span class="token punctuation">)</span>
-<span class="token keyword">const</span> Components <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/webpack'</span><span class="token punctuation">)</span>
-<span class="token keyword">const</span> <span class="token punctuation">&#123;</span>
-    ElementPlusResolver
-<span class="token punctuation">&#125;</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'unplugin-vue-components/resolvers'</span><span class="token punctuation">)</span>
-
-<span class="token comment">/**
-* @description 
-* @version 1.0
-* @author Huangzl
-* @fileName webpack.base.config.js
-* @date 2023/11/10 11:00:59
-*/</span>
-
-module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token literal-property property">entry</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">main</span><span class="token operator">:</span> <span class="token string">'./src/main'</span><span class="token punctuation">,</span>
-        <span class="token comment">//单页应用开发模式禁用多入口</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">resolveLoader</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">modules</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-            <span class="token string">'node_modules'</span><span class="token punctuation">,</span>
-            path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'./src/loader'</span><span class="token punctuation">)</span>
-        <span class="token punctuation">]</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">output</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">filename</span><span class="token operator">:</span> <span class="token string">'[id].[fullhash].js'</span><span class="token punctuation">,</span> <span class="token comment">// 使用 [fullhash] 替代 [hash]，这是新版本 webpack 的写法</span>
-        <span class="token literal-property property">path</span><span class="token operator">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'dist'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token literal-property property">publicPath</span><span class="token operator">:</span> <span class="token string">'./'</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">module</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">rules</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.vue$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'vue-loader'</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.css$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-                <span class="token string">'style-loader'</span><span class="token punctuation">,</span>
-                <span class="token punctuation">&#123;</span>
-                    <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'css-loader'</span><span class="token punctuation">,</span>
-                    <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-                        <span class="token literal-property property">importLoaders</span><span class="token operator">:</span> <span class="token number">1</span>
-                    <span class="token punctuation">&#125;</span>
-                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-                <span class="token string">'postcss-loader'</span>
-            <span class="token punctuation">]</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.js$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-            <span class="token literal-property property">use</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'babel-loader'</span><span class="token punctuation">,</span> <span class="token punctuation">&#123;</span>
-                <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'company-loader'</span><span class="token punctuation">,</span>
-                <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-                    <span class="token literal-property property">sign</span><span class="token operator">:</span> <span class="token string">'we-doctor@2021'</span><span class="token punctuation">,</span>
-                <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-            <span class="token punctuation">&#125;</span><span class="token punctuation">,</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-            <span class="token literal-property property">exclude</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">node_modules</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">test</span><span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.(ico|png|jpg|gif|svg|eot|woff|woff2|ttf)$</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span>
-            <span class="token literal-property property">loader</span><span class="token operator">:</span> <span class="token string">'file-loader'</span><span class="token punctuation">,</span>
-            <span class="token literal-property property">options</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-                <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'[name].[ext]?[hash]'</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-
-        <span class="token punctuation">]</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-
-    <span class="token literal-property property">plugins</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-        <span class="token keyword">new</span> <span class="token class-name">HtmlWebpackPlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">template</span><span class="token operator">:</span> <span class="token string">'./public/index.html'</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token keyword">new</span> <span class="token class-name">VueLoaderPlugin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token keyword">new</span> <span class="token class-name">webpack<span class="token punctuation">.</span>DefinePlugin</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-            <span class="token constant">BASE_URL</span><span class="token operator">:</span> <span class="token constant">JSON</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token string">'./'</span><span class="token punctuation">)</span> <span class="token comment">// 这里定义了 BASE_URL 为根路径 '/'</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token function">AutoImport</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-        <span class="token function">Components</span><span class="token punctuation">(</span><span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">resolvers</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token function">ElementPlusResolver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-    <span class="token punctuation">]</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">optimization</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-        <span class="token literal-property property">splitChunks</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-            <span class="token literal-property property">chunks</span><span class="token operator">:</span> <span class="token string">'all'</span><span class="token punctuation">,</span> <span class="token comment">// 只处理异步模块</span>
-            <span class="token literal-property property">maxSize</span><span class="token operator">:</span> <span class="token number">20000000</span><span class="token punctuation">,</span> <span class="token comment">// 设置最大的chunk大小为2MB</span>
-        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>It is worth mentioning that HotModuleReplacementPlugin is not configured in the above configuration, because when we set devServer.hot to true and add the following script to package.json:</p>
-<blockquote>
-<p>“start”: “webpack-dev-server –hot –open”</p>
-</blockquote>
-<p>After adding the –hot configuration item, devServer will tell webpack to automatically introduce the HotModuleReplacementPlugin plugin, without us having to manually introduce it.</p>
-<p>The above is the content of webpack.base.config.js. We will modify the content of App.vue below:</p>
-<blockquote>
-<p>- &lt;div&gt;hello&lt;&#x2F;div&gt; &#x2F;&#x2F; change the hello string to hello world<br>    + &lt;div&gt;hello world&lt;&#x2F;div&gt; </p>
-</blockquote>
-<p><strong>Step 1: webpack watches the file system and packages it into memory</strong></p>
-<p>webpack-dev-middleware calls webpack’s api to watch the file system. When the hello.js file changes, webpack recompiles and packages the file, then saves it to memory.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>options<span class="token punctuation">.</span>lazy<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">var</span> watching <span class="token operator">=</span> compiler<span class="token punctuation">.</span><span class="token function">watch</span><span class="token punctuation">(</span>options<span class="token punctuation">.</span>watchOptions<span class="token punctuation">,</span> share<span class="token punctuation">.</span>handleCompilerCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    context<span class="token punctuation">.</span>watching <span class="token operator">=</span> watching<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>You may wonder why webpack does not directly package files into the output.path directory. Where do the files go? It turns out that webpack packages the bundle.js file into memory. The reason for not generating files is that accessing code in memory is faster than accessing files in the file system, and it also reduces the overhead of writing code to files. All of this is thanks to memory-fs, a dependency of webpack-dev-middleware. Webpack-dev-middleware replaces the original outputFileSystem of webpack with a MemoryFileSystem instance, so the code is output to memory. The relevant source code of webpack-dev-middleware is as follows:<br><img src="/img/webpack-optimization/HMR3.jpg" alt="webpack-optimization"></p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-middleware/lib/Shared.js</span>
-<span class="token keyword">var</span> isMemoryFs <span class="token operator">=</span> <span class="token operator">!</span>compiler<span class="token punctuation">.</span>compilers <span class="token operator">&amp;&amp;</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token keyword">instanceof</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span><span class="token punctuation">(</span>isMemoryFs<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    fs <span class="token operator">=</span> compiler<span class="token punctuation">.</span>outputFileSystem <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MemoryFileSystem</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>First, check whether the current fileSystem is an instance of MemoryFileSystem. If not, replace the outputFileSystem before the compiler with an instance of MemoryFileSystem. This way, the code of the bundle.js file is saved as a simple JavaScript object in memory. When the browser requests the bundle.js file, devServer directly retrieves the JavaScript object saved above from memory and returns it to the browser.</p>
-<p><strong>Step 2: devServer notifies the browser that the file has changed</strong></p>
-<p>In this stage, sockjs is the bridge between the server and the browser. When devServer is started, sockjs establishes a WebSocket long connection between the server and the browser to inform the browser of the various stages of webpack compilation and packaging. The key step is still webpack-dev-server calling the webpack API to listen for the done event of the compile. After the compile is completed, webpack-dev-server sends the hash value of the newly compiled and packaged module to the browser through the _sendStatus method.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack-dev-server/lib/Server.js</span>
-compiler<span class="token punctuation">.</span><span class="token function">plugin</span><span class="token punctuation">(</span><span class="token string">'done'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">stats</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// stats.hash 是最新打包文件的 hash 值</span>
-  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">_sendStats</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>sockets<span class="token punctuation">,</span> stats<span class="token punctuation">.</span><span class="token function">toJson</span><span class="token punctuation">(</span>clientStats<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">this</span><span class="token punctuation">.</span>_stats <span class="token operator">=</span> stats<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token operator">...</span>
-<span class="token class-name">Server</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">_sendStats</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">sockets<span class="token punctuation">,</span> stats<span class="token punctuation">,</span> force</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>force <span class="token operator">&amp;&amp;</span> stats <span class="token operator">&amp;&amp;</span>
-  <span class="token punctuation">(</span><span class="token operator">!</span>stats<span class="token punctuation">.</span>errors <span class="token operator">||</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> stats<span class="token punctuation">.</span>assets <span class="token operator">&amp;&amp;</span>
-  stats<span class="token punctuation">.</span>assets<span class="token punctuation">.</span><span class="token function">every</span><span class="token punctuation">(</span><span class="token parameter">asset</span> <span class="token operator">=></span> <span class="token operator">!</span>asset<span class="token punctuation">.</span>emitted<span class="token punctuation">)</span>
-  <span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'still-ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
-  <span class="token comment">// 调用 sockWrite 方法将 hash 值通过 websocket 发送到浏览器端</span>
-  <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'hash'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>hash<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>errors<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'errors'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>errors<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span> 
-  <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>stats<span class="token punctuation">.</span>warnings<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'warnings'</span><span class="token punctuation">,</span> stats<span class="token punctuation">.</span>warnings<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>      <span class="token keyword">else</span> <span class="token punctuation">&#123;</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">sockWrite</span><span class="token punctuation">(</span>sockets<span class="token punctuation">,</span> <span class="token string">'ok'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p><strong>Step 3: webpack-dev-server&#x2F;client responds to server messages</strong></p>
-<p>You may wonder how the code in bundle.js receives websocket messages since you did not add any code to receive websocket messages in your business code or add a new entry file in the entry property of webpack.config.js. It turns out that webpack-dev-server modifies the entry property in webpack configuration and adds webpack-dev-client code to it. This way, the code in bundle.js will have the code to receive websocket messages.</p>
-<p>When webpack-dev-server&#x2F;client receives a hash message, it temporarily stores the hash value. When it receives an ok message, it performs a reload operation on the application. The hash message is received before the ok message.</p>
-<p><img src="/img/webpack-optimization/HMR3.jpg" alt="webpack-optimization"></p>
-<p>In the reload operation, webpack-dev-server&#x2F;client stores the hash value in the currentHash variable. When it receives an ok message, it reloads the App. If module hot updates are configured, it calls webpack&#x2F;hot&#x2F;emitter to send the latest hash value to webpack and then hands over control to the webpack client code. If module hot updates are not configured, it directly calls the location.reload method to refresh the page.</p>
-<p><strong>Step 4: webpack receives the latest hash value, verifies it, and requests module code</strong></p>
-<p>In this step, three modules (three files, with the English names corresponding to the file paths) in webpack work together. First, webpack&#x2F;hot&#x2F;dev-server (referred to as dev-server) listens for the webpackHotUpdate message sent by webpack-dev-server&#x2F;client in step 3. It calls the check method in webpack&#x2F;lib&#x2F;HotModuleReplacement.runtime (referred to as HMR runtime) to check for new updates. In the check process, it uses two methods in webpack&#x2F;lib&#x2F;JsonpMainTemplate.runtime (referred to as jsonp runtime): hotDownloadUpdateChunk and hotDownloadManifest. The second method calls AJAX to request whether there are updated files from the server. If there are, it returns the list of updated files to the browser. The first method requests the latest module code through jsonp and returns the code to HMR runtime. HMR runtime further processes the returned new module code, which may involve refreshing the page or hot updating the module.</p>
-<p><img src="/img/webpack-optimization/HMR4.jpg" alt="webpack-optimization"></p>
-<p>It is worth noting that both requests use the file name concatenated with the previous hash value. The hotDownloadManifest method returns the latest hash value, and the hotDownloadUpdateChunk method returns the code block corresponding to the latest hash value. Then, the new code block is returned to HMR runtime for module hot updating.</p>
-<p><strong>Step 5: HotModuleReplacement.runtime hot updates the module</strong></p>
-<p>This step is the key step of the entire module hot updating (HMR), and all module hot updates occur in the hotApply method of HMR runtime.</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// webpack/lib/HotModuleReplacement.runtime</span>
-<span class="token keyword">function</span> <span class="token function">hotApply</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// ...</span>
-    <span class="token keyword">var</span> idx<span class="token punctuation">;</span>
-    <span class="token keyword">var</span> queue <span class="token operator">=</span> outdatedModules<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span>queue<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        moduleId <span class="token operator">=</span> queue<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        module <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token comment">// ...</span>
-        <span class="token comment">// remove module from cache</span>
-        <span class="token keyword">delete</span> installedModules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token comment">// when disposing there is no need to call dispose handler</span>
-        <span class="token keyword">delete</span> outdatedDependencies<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token comment">// remove "parents" references from all children</span>
-        <span class="token keyword">for</span><span class="token punctuation">(</span>j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> module<span class="token punctuation">.</span>children<span class="token punctuation">.</span>length<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            <span class="token keyword">var</span> child <span class="token operator">=</span> installedModules<span class="token punctuation">[</span>module<span class="token punctuation">.</span>children<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>child<span class="token punctuation">)</span> <span class="token keyword">continue</span><span class="token punctuation">;</span>
-            idx <span class="token operator">=</span> child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>moduleId<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">if</span><span class="token punctuation">(</span>idx <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-                child<span class="token punctuation">.</span>parents<span class="token punctuation">.</span><span class="token function">splice</span><span class="token punctuation">(</span>idx<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token punctuation">&#125;</span>
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token comment">// ...</span>
-    <span class="token comment">// insert new code</span>
-    <span class="token keyword">for</span><span class="token punctuation">(</span>moduleId <span class="token keyword">in</span> appliedUpdate<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function">hasOwnProperty</span><span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>appliedUpdate<span class="token punctuation">,</span> moduleId<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-            modules<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span> <span class="token operator">=</span> appliedUpdate<span class="token punctuation">[</span>moduleId<span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token punctuation">&#125;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token comment">// ...</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>From the hotApply method above, it can be seen that module hot replacement mainly consists of three stages. The first stage is to find <code>outdatedModules</code> and <code>outdatedDependencies</code>. I did not include this part of the code here, but if you are interested, you can read the source code yourself. The second stage is to delete expired modules and dependencies from the cache, as follows:</p>
-<blockquote>
-<p>delete installedModules[moduleId];<br>    delete outdatedDependencies[moduleId];</p>
-</blockquote>
-<p>The third stage is to add the new module to the <code>modules</code> object. The next time the <code>__webpack_require__</code> method (the require method rewritten by webpack) is called, the new module code will be obtained.</p>
-<p>For error handling during module hot updates, if an error occurs during the hot update process, the hot update will fall back to refreshing the browser. This part of the code is in the dev-server code, and the brief code is as follows:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">check</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">updatedModules</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>updatedModules<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">return</span> window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token comment">// ...</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">err</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">var</span> status <span class="token operator">=</span> module<span class="token punctuation">.</span>hot<span class="token punctuation">.</span><span class="token function">status</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"abort"</span><span class="token punctuation">,</span> <span class="token string">"fail"</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span>status<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        window<span class="token punctuation">.</span>location<span class="token punctuation">.</span><span class="token function">reload</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>dev-server first verifies if there are any updates, and if there are no code updates, it reloads the browser. If an abort or fail error occurs during the hotApply process, the browser is also reloaded.</p>
-<p><img src="/img/webpack-optimization/2-core.jpg" alt="webpack-optimization"></p>
 
     
     </div>

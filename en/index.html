@@ -174,6 +174,74 @@
         <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
+            <a href="/2024/05/05/en/Ethereum-1/" itemprop="url">Initial Exploration of Ethereum (1)</a>
+        
+    </h1>
+    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
+        <span class="column is-narrow">
+            <time datetime="2024-05-05T07:55:28.000Z" itemprop="datePublished">May 5, 2024</time>
+        </span>
+        
+        <span class="column is-narrow article-category">
+            <i class="far fa-folder"></i>
+            <a class="article-category-link" href="/en/categories/Web3/">Web3</a><span>></span><a class="article-category-link" href="/en/categories/Web3/Ethereum/">Ethereum</a>
+        </span>
+        
+        
+        
+        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
+        
+    </div>
+    
+    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
+    
+        <h2><span id="ethereum-official-website">Ethereum Official Website</span></h2><p><a target="_blank" rel="noopener" href="https://ethereum.org/">Ethereum Official Website</a></p>
+<h2><span id="introduction-to-ethereum">Introduction to Ethereum</span></h2><p>Ethereum is a decentralized, open-source public blockchain platform with smart contract functionality. Ether (ETH) is the native cryptocurrency of Ethereum —— extracted from <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Ethereum">Ethereum Wikipedia</a></p>
+<h2><span id="features-of-ethereum">Features of Ethereum</span></h2><p>Compared to most other cryptocurrencies or blockchain technologies, Ethereum’s features include the following points:</p>
+<ul>
+<li><strong>Smart Contracts:</strong> Programs stored on the blockchain, executed by the nodes, and the executors of the programs pay transaction fees to the miners or stakeholders.</li>
+<li><strong>Distributed Applications:</strong> Applications on Ethereum cannot be shut down or turned off.</li>
+<li><strong>Tokens:</strong> Smart contracts can create tokens for use by distributed applications. Tokenization of distributed applications aligns the interests of users, investors, and managers. Tokens can also be used for initial coin offerings.</li>
+<li><strong>Proof of Stake:</strong> More efficient than proof of work, it saves a lot of computer resources wasted in mining and prevents network centralization caused by specialized integrated circuits. Merged with the main chain on September 15, 2022.</li>
+<li><strong>Gas:</strong> An extension of the transaction fee concept, gas consumption is calculated when performing various operations, and gas fees must be paid, including sending Ether or other tokens, which is considered an operation.</li>
+<li><strong>Proto-Danksharding:</strong> Temporarily stores data on some nodes to enhance efficiency (not yet implemented).</li>
+<li><strong>Uncle Blocks:</strong> This feature was discontinued after switching to proof of stake. The original function was to use Directed Acyclic Graph technology to incorporate shorter blockchains that were not included in the main chain in time, to increase transaction volume.</li>
+</ul>
+<h2><span id="is-ethereum-programmable">Is Ethereum programmable?</span></h2><p>A common question asked is: <strong>What is the difference between Ethereum and Bitcoin?</strong> Are both just cryptocurrencies?<br>Ethereum, launched in 2015, builds on the innovations of Bitcoin and has some significant differences.</p>
+<p>Both allow you to use digital currencies without paying service providers or banks. However, Ethereum is programmable, so you can also build and deploy decentralized applications on the Ethereum network.</p>
+<h3><span id="account-model">Account Model</span></h3><p>It’s worth mentioning the account model. <strong>Bitcoin has two types of accounts: user accounts and contract accounts.</strong></p>
+<p>Ethereum’s global “shared state” consists of many small objects (accounts) that can interact with each other through messaging. Each account has an associated state and a 20-byte address. In Ethereum, an address is a 160-bit identifier used to identify accounts.</p>
+<p>Two types of accounts:</p>
+<ul>
+<li><strong>Externally owned accounts, controlled by private keys with no associated code</strong></li>
+<li><strong>Contract accounts, controlled by their contract code and associated with code</strong></li>
+</ul>
+<h3><span id="comparison-of-externally-owned-accounts-and-contract-accounts">Comparison of Externally Owned Accounts and Contract Accounts</span></h3><p>Understanding the basic differences between externally owned accounts and contract accounts is important. An externally owned account can send messages to another externally owned account or a contract account by creating and signing transactions with its own private key. The messages sent between two externally owned accounts are just simple value transfers. However, messages from an externally owned account to a contract account activate the contract account’s code, allowing it to perform various actions (such as transferring tokens, writing to internal storage, mining a new token, performing some computations, creating a new contract, etc.).</p>
+<p>Unlike externally owned accounts, contract accounts cannot initiate a transaction on their own. Instead, a contract account only triggers a transaction in response to receiving one (from an externally owned account or another contract account).</p>
+<p><strong>Therefore, any action on the Ethereum platform is always initiated by transactions triggered by externally owned accounts.</strong></p>
+<p>This is why Ethereum is known as a “smart contract” platform and is called programmable. Because the code of contract accounts can be called by externally owned accounts, it can perform some operations.</p>
+<h3><span id="account-state">Account State</span></h3><p>The account state consists of four components, regardless of the account type:</p>
+<ul>
+<li>nonce: If the account is an externally owned account, the nonce represents the transaction sequence number sent from this account address. If the account is a contract account, the nonce represents the sequence number of the contract created by this account.</li>
+<li>balance: The amount of Wei owned by this address. 1 Ether &#x3D; 10^18 Wei</li>
+<li>storageRoot: The root node hash value of a Merkle Patricia tree (we’ll explain the Merkle tree later). The Merkle tree encodes the hash values of the content stored by this account, which is empty by default.</li>
+<li>codeHash: The hash value of this account’s EVM (Ethereum Virtual Machine, explained later) code. For contract accounts, it is the hashed code saved as codeHash. For externally owned accounts, the codeHash field is the hash value of an empty string.</li>
+</ul>
+<p><img src="/img/eth1/image1.png" alt="eth account"></p>
+
+    
+    </div>
+    
+    
+</article>
+
+
+
+
+    
+        <article class="article content gallery" itemscope itemprop="blogPost">
+    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
+        
             <a href="/2024/04/19/en/web3DAO-1/" itemprop="url">The Mysteries of Web3 DAOs and the Future of Self-Organizing Internet</a>
         
     </h1>
@@ -1423,237 +1491,6 @@ Feel free to reach out if you have any further questions or need additional clar
 <li>React’s native events are wrapped, and all events bubble up to the top-level document for listening. They are then synthesized here. Based on this system, the event mechanism can be used cross-platform, not tightly bound to the Web DOM.</li>
 <li>React components have no events; parent-child communication is done using props.</li>
 </ul>
-
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2023/12/08/en/vue-component-2/" itemprop="url">Implementation of Vue.js Component Events and Emit</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2023-12-08T08:08:07.000Z" itemprop="datePublished">December 8, 2023</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/en/categories/Vue/">Vue</a>
-        </span>
-        
-        
-        
-        <spen data-nosnippet class="column is-narrow">(Translated by ChatGPT)</span>
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="introduction">Introduction</span></h2><p>To explain the implementation of Vue.js component events and emit, it’s essential to first understand the application of component events and emit. This will provide a clearer understanding of how component events and emit are implemented.</p>
-<p>For component events, we’ve previously discussed the browser’s event mechanism:</p>
-<h3><span id="browser-event-review">Browser Event Review</span></h3><p>Browser events refer to various signals of interaction and state changes that occur on a web page. These events can be triggered by user actions, changes in the browser’s state, or other factors. Here are some common DOM events and their descriptions:</p>
-<h4><span id="mouse-events">Mouse Events:</span></h4><ul>
-<li><strong>click:</strong> Triggered when the mouse clicks on an element. For touch-screen devices, it’s triggered when there’s a tap on the screen.</li>
-<li><strong>contextmenu:</strong> Triggered when the right mouse button clicks on an element.</li>
-<li><strong>mouseover &#x2F; mouseout:</strong> Triggered when the mouse pointer enters or leaves an element.</li>
-<li><strong>mousedown &#x2F; mouseup:</strong> Triggered when the mouse button is pressed or released over an element.</li>
-<li><strong>mousemove:</strong> Triggered when the mouse is moved.</li>
-</ul>
-<h4><span id="keyboard-events">Keyboard Events:</span></h4><ul>
-<li><strong>keydown and keyup:</strong> Triggered when a key is pressed down or released.</li>
-</ul>
-<h4><span id="form-element-events">Form Element Events:</span></h4><ul>
-<li><strong>submit:</strong> Triggered when a visitor submits a <code>&lt;form&gt;</code>.</li>
-<li><strong>focus:</strong> Triggered when a visitor focuses on an element, such as an <code>&lt;input&gt;</code>.</li>
-</ul>
-<h4><span id="document-events">Document Events:</span></h4><ul>
-<li><strong>DOMContentLoaded:</strong> Triggered when HTML is fully loaded and processed, and the DOM is completely constructed.</li>
-</ul>
-<h4><span id="css-events">CSS Events:</span></h4><ul>
-<li><strong>transitionend:</strong> Triggered when a CSS animation is completed.</li>
-</ul>
-<p>These events can be captured and processed using event listeners in JavaScript. By adding event listeners to elements, specific code can be executed when certain events occur. Events form the foundation of interaction and responsiveness in web development.</p>
-<p>Now, how does component events differ from browser events?</p>
-<p><strong>In the context of events, we can understand them as specific occurrences at a given point in time, signaling that something has happened. An event is a signal that can be received and processed, and that’s what events are.</strong></p>
-<p>In the case of component events, it refers to the communication between Vue components, achieved through events. In this context, events serve as a means of communication between components, and this communication is implemented using events. Here, events specifically refer to what we call component events.</p>
-<p><strong>The primary mechanism for communication between Vue components using events is through the use of the <code>emit</code> and <code>on</code> methods. When a child component needs to communicate with a parent component, it triggers an event and uses the <code>emit</code> method to send the event. The parent component, in turn, uses the <code>v-on</code> directive in the template to listen for this event and execute the corresponding logic.</strong></p>
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Child Component ChildComponent.vue --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span> <span class="token attr-name">@click</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>sendMessage<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Notify Parent Component<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
-
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">sendMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Use emit to send a custom event</span>
-      <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$emit</span><span class="token punctuation">(</span><span class="token string">'child-event'</span><span class="token punctuation">,</span> <span class="token string">'Hello from child!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token comment">&lt;!-- Parent Component ParentComponent.vue --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>template</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>child-component</span> <span class="token attr-name">@child-event</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>handleChildEvent<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>child-component</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>Message received from child: &#123;&#123; messageFromChild &#125;&#125;<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
-  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>template</span><span class="token punctuation">></span></span>
-
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-<span class="token keyword">import</span> ChildComponent <span class="token keyword">from</span> <span class="token string">'./ChildComponent.vue'</span><span class="token punctuation">;</span>
-
-<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">components</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    ChildComponent
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token punctuation">&#123;</span>
-      <span class="token literal-property property">messageFromChild</span><span class="token operator">:</span> <span class="token string">''</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
-  <span class="token literal-property property">methods</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token function">handleChildEvent</span><span class="token punctuation">(</span><span class="token parameter">message</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Listen to the child component's event using v-on</span>
-      <span class="token keyword">this</span><span class="token punctuation">.</span>messageFromChild <span class="token operator">=</span> message<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>Vue’s event mechanism is built on the publish&#x2F;subscribe pattern. <code>$emit</code> is used to publish (trigger) an event, while <code>v-on</code> is used to subscribe (listen) to events. This enables decoupling between different components.</p>
-<p><strong>Firstly, we notice that the child component uses <code>this.$emit(&#39;child-event&#39;, &#39;Hello from child!&#39;)</code> to send a custom event named ‘child-event’. The parent component, on the other hand, listens to this event using <code>@child-event=&quot;handleChildEvent&quot;</code>. Here, ‘child-event’ is the custom event name, and ‘handleChildEvent’ is a method defined in the parent component to handle the message sent by the child component.</strong></p>
-<p>When using a custom <code>MyComponent</code> component, we can listen to the emitted custom event using the <code>v-on</code> directive:</p>
-<p>You can see that the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations. In the actual implementation, emitting a custom event boils down to finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
-<h2><span id="implementation-of-emit">Implementation of emit</span></h2><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of MyComponent component</span>
-<span class="token keyword">const</span> MyComponent <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'MyComponent'</span><span class="token punctuation">,</span>
-  <span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> <span class="token punctuation">&#123;</span> emit <span class="token punctuation">&#125;</span></span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Emit the 'change' event and pass two parameters to the event handler</span>
-    <span class="token function">emit</span><span class="token punctuation">(</span><span class="token string">'change'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Render logic of the component</span>
-      <span class="token keyword">return</span> <span class="token comment">/* ... */</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>The above code will be compiled into a node <code>CompNode</code>, with the type being the <code>MyComponent</code> component. The <code>emit</code> function is passed to the <code>setup</code> function of the component, as shown below:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Definition of a Vue component node CompNode</span>
-<span class="token keyword">const</span> CompNode <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Specify the type of the node as the MyComponent component</span>
-  <span class="token literal-property property">type</span><span class="token operator">:</span> MyComponent<span class="token punctuation">,</span>
-
-  <span class="token comment">// Props object passed to the component</span>
-  <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// In the MyComponent component, there will be an onChange event handling function, whose value is handler</span>
-    <span class="token literal-property property">onChange</span><span class="token operator">:</span> handler
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span> <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>As you can see, the custom event ‘change’ is compiled into a property named ‘onChange’ and stored in the props data object. This is essentially a convention. As a framework designer, you can design the compilation result of events according to your expectations.</p>
-<p>In the actual implementation, emitting a custom event essentially involves finding the corresponding event handling function in the props data object based on the event name, as shown in the following code:</p>
-<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// Mounting the component</span>
-<span class="token keyword">function</span> <span class="token function">mountComponent</span><span class="token punctuation">(</span><span class="token parameter">vnode<span class="token punctuation">,</span> container<span class="token punctuation">,</span> anchor</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Omitted code</span>
-
-  <span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    state<span class="token punctuation">,</span> <span class="token comment">// State</span>
-    <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token function">shallowReactive</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// Reactive handling of props</span>
-    <span class="token literal-property property">isMounted</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">subTree</span><span class="token operator">:</span> <span class="token keyword">null</span>
-  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Define the emit function, which takes two parameters</span>
-  <span class="token comment">// event: Event name</span>
-  <span class="token comment">// payload: Parameters passed to the event handling function</span>
-  <span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
-    <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
-
-    <span class="token comment">// Find the corresponding event handling function in props based on the processed event name</span>
-    <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      <span class="token comment">// Call the event handling function and pass the parameters</span>
-      <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-      console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token comment">// Add the emit function to setupContext</span>
-  <span class="token keyword">const</span> setupContext <span class="token operator">=</span> <span class="token punctuation">&#123;</span> attrs<span class="token punctuation">,</span> emit <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Omitted code</span>
-<span class="token punctuation">&#125;</span>
-
-<span class="token comment">// Function to parse props data, with special handling for event-type props</span>
-<span class="token keyword">function</span> <span class="token function">resolveProps</span><span class="token punctuation">(</span><span class="token parameter">options<span class="token punctuation">,</span> propsData</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token keyword">const</span> props <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-  <span class="token keyword">const</span> attrs <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">const</span> key <span class="token keyword">in</span> propsData<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Add props starting with 'on' as strings to props data, otherwise add to attrs</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>key <span class="token keyword">in</span> options <span class="token operator">||</span> key<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token string">'on'</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-      props<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-      attrs<span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> propsData<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-  <span class="token punctuation">&#125;</span>
-
-  <span class="token keyword">return</span> <span class="token punctuation">[</span>props<span class="token punctuation">,</span> attrs<span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>The implementation principle of <code>emit</code> involves two aspects: the injection of <code>setupContext</code> and the convention-based transformation of event names.</p>
-<ol>
-<li><p><strong>Injection of <code>setupContext</code>:</strong> In Vue components, the <code>setup</code> function receives two parameters: <code>props</code> and <code>context</code>. <code>context</code> includes a series of properties and methods, one of which is the <code>emit</code> function. In Vue 3 components, the <code>setup</code> function returns an object, and you can add the <code>emit</code> function to <code>setupContext</code> so that users can access it within the component using <code>setupContext.emit</code>.</p>
-<p> Here’s a simple example demonstrating how to add <code>emit</code> to <code>setupContext</code> in the <code>setup</code> function:</p>
- <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token function">setup</span><span class="token punctuation">(</span><span class="token parameter">props<span class="token punctuation">,</span> context</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Add emit to setupContext</span>
-  context<span class="token punctuation">.</span>emit <span class="token operator">=</span> emit<span class="token punctuation">;</span>
-
-  <span class="token comment">// Other setup logic</span>
-  <span class="token comment">// ...</span>
-
-  <span class="token comment">// Return the object returned by setup</span>
-  <span class="token keyword">return</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p> This way, users can call the <code>emit</code> function within the component using <code>setupContext.emit</code>.</p>
-</li>
-<li><p><strong>Convention-based transformation of event names:</strong> Inside the <code>emit</code> function, to match event handling functions in the component template, event names need to be conventionally transformed. Vue uses a convention of converting event names to camelCase. For example, the <code>change</code> event becomes <code>onChange</code>. This allows users to listen to events in the component template using camelCase.</p>
-<p> Here’s a simple example illustrating the convention-based transformation of event names:</p>
- <pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token parameter">event<span class="token punctuation">,</span> <span class="token operator">...</span>payload</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-  <span class="token comment">// Process the event name according to the convention, e.g., change --> onChange</span>
-  <span class="token keyword">const</span> eventName <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">on</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>event<span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
-
-  <span class="token comment">// Find the corresponding event handling function in props based on the processed event name</span>
-  <span class="token keyword">const</span> handler <span class="token operator">=</span> instance<span class="token punctuation">.</span>props<span class="token punctuation">[</span>eventName<span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">if</span> <span class="token punctuation">(</span>handler<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment">// Call the event handling function and pass the parameters</span>
-    <span class="token function">handler</span><span class="token punctuation">(</span><span class="token operator">...</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
-    console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">'Event does not exist'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p> In this example, the <code>emit</code> function transforms the event name into camelCase with “on” at the beginning. For instance, <code>change</code> becomes <code>onChange</code>. It then looks for the corresponding event handling function in <code>instance.props</code> and executes it.</p>
-</li>
-</ol>
-<p>It’s important to note that event-type props are not found in <code>instance.props</code>, so they are stored in <code>attrs</code>. To address this, when parsing props data, event-type props are specially handled to ensure they are correctly added to <code>props</code> instead of <code>attrs</code>. This allows the <code>emit</code> function to correctly find event handling functions in <code>instance.props</code>.</p>
 
     
     </div>

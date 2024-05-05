@@ -9,6 +9,34 @@
 
 
     <url>
+        <loc>https://ikkkp.github.io/2024/05/05/en/Ethereum-1/</loc>
+        <lastmod>2024-05-05T10:31:33.753Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
+        <loc>https://ikkkp.github.io/2024/05/05/Ethereum-1/</loc>
+        <lastmod>2024-05-05T08:31:38.005Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+        <image:image>
+
+            <image:loc>https://ikkkp.github.io/img/post-name/cover.png</image:loc>
+
+        </image:image>
+
+    </url>
+
+    <url>
         <loc>https://ikkkp.github.io/2024/04/19/en/web3DAO-1/</loc>
         <lastmod>2024-04-19T02:50:44.850Z</lastmod>
         <changefreq>weekly</changefreq>

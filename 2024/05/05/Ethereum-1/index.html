@@ -2,42 +2,45 @@
 <html class="has-navbar-fixed-top" lang="zh-tw">
 <head>
     <meta charset="utf-8">
-<title>分類: Web3 - Huangzl&#39;s blog</title>
+<title>Ethereum 初探 (1) - Huangzl&#39;s blog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
             
-<link href="https://ikkkp.github.io/en/categories/Web3/" rel="alternate" hreflang="en" />
+<link href="https://ikkkp.github.io/2024/05/05/en/Ethereum-1/" rel="alternate" hreflang="en" />
             
     
 
 
-    
-    <meta name="description" content="Huli 的技術部落格，寫關於前端、JavaScript、資安以及各種技術議題。A tech blog about frotn-end and security">
-    
-
 
 
     
-<link rel="canonical" href="https://ikkkp.github.io/categories/Web3/">
+<link rel="canonical" href="https://ikkkp.github.io/2024/05/05/Ethereum-1/">
     
 
 
 
 
 
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Huangzl&#39;s blog">
-<meta property="og:url" content="https://ikkkp.github.io/categories/Web3/index.html">
+    <meta name="description" content="以太坊官网以太坊官网 以太坊（Ethereum）简介以太坊（Ethereum）是一个去中心化、开源并且具备智能合约功能的公共区块链平台，以太币（ETH）是以太坊的原生加密货币————摘自wikipedia 以太坊 以太坊的特点相较于较大多数其他加密货币或区块链技术，以太坊的特点包括以下几点：  智能合约：存储在区块链上的程序，由各节点执行，需要执行程序的人支付手续费给节点的矿工或权益人。 分布式应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ethereum 初探 (1)">
+<meta property="og:url" content="https://ikkkp.github.io/2024/05/05/Ethereum-1/index.html">
 <meta property="og:site_name" content="Huangzl&#39;s blog">
+<meta property="og:description" content="以太坊官网以太坊官网 以太坊（Ethereum）简介以太坊（Ethereum）是一个去中心化、开源并且具备智能合约功能的公共区块链平台，以太币（ETH）是以太坊的原生加密货币————摘自wikipedia 以太坊 以太坊的特点相较于较大多数其他加密货币或区块链技术，以太坊的特点包括以下几点：  智能合约：存储在区块链上的程序，由各节点执行，需要执行程序的人支付手续费给节点的矿工或权益人。 分布式应">
 <meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ikkkp.github.io/img/post-name/cover.png">
+<meta property="article:published_time" content="2024-05-05T07:55:28.000Z">
+<meta property="article:modified_time" content="2024-05-05T08:31:38.005Z">
 <meta property="article:author" content="Huangzl">
+<meta property="article:tag" content="Web3,Ethereum">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ikkkp.github.io/img/post-name/cover.png">
 
 
 
-<link rel="alternative" href="/atom.xml" title="Huangzl&#39;s blog" type="application/atom+xml">
+<link rel="alternative" href="/atom.xml" title="Ethereum 初探 (1)" type="application/atom+xml">
 
 
 
@@ -137,6 +140,50 @@
         <div class="navbar-menu navbar-end">
             
             
+            <div class="navbar-item is-hoverable has-dropdown is-hidden-mobile is-hidden-tablet-only toc">
+                <a class="navbar-item" title="目錄">
+                    目錄
+                </a>
+                <div class="navbar-dropdown">
+                    
+                    
+                    
+                    
+                    <a class="navbar-item" href="#以太坊官网">1&nbsp;&nbsp;<b>以太坊官网</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#以太坊ethereum简介">2&nbsp;&nbsp;<b>以太坊（Ethereum）简介</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#以太坊的特点">3&nbsp;&nbsp;<b>以太坊的特点</b></a>
+                    
+                    
+                    <hr class="navbar-divider">
+                    
+                    
+                    <a class="navbar-item" href="#以太坊是可编程的how">4&nbsp;&nbsp;<b>以太坊是可编程的？how</b></a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#账户模型">4.1&nbsp;&nbsp;账户模型</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#外部拥有账户与合约账户的比较">4.2&nbsp;&nbsp;外部拥有账户与合约账户的比较</a>
+                    
+                    
+                    
+                    <a class="navbar-item" href="#账户状态">4.3&nbsp;&nbsp;账户状态</a>
+                    
+                </div>
+            </div>
+            
             
             <a class="navbar-item" target="_blank" title="Twitter" href="https://twitter.com/hungzln3">
                 
@@ -163,7 +210,7 @@
                 </div>
             </a>
             
-                <a class="navbar-item" href="/en/categories/Web3/">English</a>
+                <a class="navbar-item" href="/2024/05/05/en/Ethereum-1/">English</a>
             
             
 
@@ -171,20 +218,17 @@
     </div>
 </nav>
 
-    <section class="section section-heading">
+    <section class="section">
     <div class="container">
-        <div class="content">
-            <h5><i class="far fa-folder"></i>Web3</h5>
-        </div>
-    </div>
-</section>
-<section class="section">
-    <div class="container">
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
+      
+      <div data-nosnippet class="self-notice">
+        最近開了一個讀者回饋表單郵箱，無論是對文章的感想或是對部落格的感想，有什麼想回饋的都可以發郵箱跟我說：<a href="i_kkkp@163.com" target="_blank">i_kkkp@163.com</a>
+      </div>
+      
+    <article class="article content gallery" itemscope itemprop="blogPost">
     <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
         
-            <a href="/2024/05/05/Ethereum-1/" itemprop="url">Ethereum 初探 (1)</a>
+            Ethereum 初探 (1)
         
     </h1>
     <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
@@ -240,89 +284,40 @@
     
     </div>
     
+    <div class="columns is-variable is-1 is-multiline is-mobile">
+    
+        <span class="column is-narrow"><a class="tag is-light article-tag" href="/tags/Web3-Ethereum/">#Web3,Ethereum</a></span>
+    
+    </div>
+    
+    
+    <div class="columns is-mobile is-multiline article-nav">
+        <span class="column is-12-mobile is-half-desktop is-hidden-mobile article-nav-prev">
+            
+        </span>
+        <span class="column is-12-mobile is-half-desktop  article-nav-next">
+            
+            <a href="/2024/04/19/web3DAO-1/">Web3 DAO的迷思与自组织的互联网未来</a>
+            
+        </span>
+    </div>
     
 </article>
 
 
 
 
-    
-        <article class="article content gallery" itemscope itemprop="blogPost">
-    <h1 class="article-title is-size-3 is-size-4-mobile" itemprop="name">
-        
-            <a href="/2024/04/19/web3DAO-1/" itemprop="url">Web3 DAO的迷思与自组织的互联网未来</a>
-        
-    </h1>
-    <div class="article-meta columns is-variable is-1 is-multiline is-mobile is-size-7-mobile">
-        <span class="column is-narrow">
-            <time datetime="2024-04-19T02:15:47.000Z" itemprop="datePublished">April 19, 2024</time>
-        </span>
-        
-        <span class="column is-narrow article-category">
-            <i class="far fa-folder"></i>
-            <a class="article-category-link" href="/categories/Web3/">Web3</a>
-        </span>
-        
-        
-        
-    </div>
-    
-    <div class="article-entry is-size-6-mobile" itemprop="articleBody">
-    
-        <h2><span id="web3-dao的迷思">Web3 DAO的迷思</span></h2><p>第一次接触到Web3 DAO还是在X上面，看到了以往的程序员郭宇对此的理解和实践 <a target="_blank" rel="noopener" href="https://guoyu.mirror.xyz/8Y05lOuKAZaVvA0hFlAkbVf7S7gyFMs7DTfNIfflCzg">CodeforDAO 的诞生与自组织的互联网未来</a></p>
-<p>现在的Web3 DAO的市场还处于摸索阶段，可以看到Github上面存在着一些智能合约的雏形，但是还没有一个完整的DAO的生态。</p>
-<p><strong>使用 DAO 的方法论来改善创业公司的架构，甚至，能否再进一步，允许任何人轻易地创建一个自组织的链上公司，链上组织。</strong></p>
-<p>其实，你可以很轻易地在学校社团、公司、家庭、朋友圈等等，找到一些自组织的例子。这些自组织的例子，往往是由一群志同道合的人，通过一些共同的目标、规则、价值观等等，自发地组织在一起，共同实现一些目标。这与 DAO 不谋而合。</p>
-<h2><span id="dao以及web3治理的挑战">DAO以及Web3治理的挑战</span></h2><p><strong><a target="_blank" rel="noopener" href="https://chain.link/education/web3">Web3</a> 之所以会出现，是因为中心化机构在管理金融和社会基础设施时无法保障安全性、公平性和透明性。</strong>Web3基于区块链和预言机等信任最小化的分布式网络建立，利用密码学、共识协议和机制设计来管理数字化基础设施，无需信任人类第三方，而是通过技术来实现保障，这就是所谓的“加密事实”。</p>
-<h2><span id="dao是什么">DAO是什么？</span></h2><p><strong>DAO的全名是“decentralized autonomous organization”，中文是“去中心化的自治组织”。</strong>DAO的主要目的是超越传统组织形式，以分布式、透明和信任最小化的方式来进行集体决策。简而言之，DAO是一种新型的组织架构。人们可以独立验证组织的运行方式，并基于这样的共识朝着共同的目标努力。</p>
-<p>更详细的解释，可以在这里看到：<a target="_blank" rel="noopener" href="https://blog.chain.link/daos-zh">一文读懂DAO以及Web3治理的挑战</a></p>
-<p><strong>值得一提的是，虽然DAO的缩写中包含autonomous（自治）一词，但DAO并非完全自治。DAO是由人组成的，因此需要用户手动操作才能运行，比如用户需要进行投票、部署代码并讨论提案。</strong>之所以会使用“自治”这个词，是因为DAO的一些具体功能被写在了智能合约代码中，无法被篡改。然而，人们仍需要与智能合约（即：代码）交互（即：提供输入），以执行具体的任务（即：输出结果）。</p>
-<h2><span id="dao的种类">DAO的种类</span></h2><p><strong>虽然DAO目前仍处于发展初期，但大致可以分为以下六种：</strong></p>
-<p><em><strong>协议DAO</strong>——这类DAO负责开发和管理去中心化应用（dApp）或dApp的基础架构。协议DAO的主要任务是开发开源技术，这点类似于企业或基金会。</em></p>
-<ul>
-<li>Tezos是一条区块链，采用类似DAO的链上治理架构，通过代表制投票体系来触发协议升级，需要绝大多数人投票达成共识才能通过提案。</li>
-<li>MakerDAO是一个组织，负责管理去中心化的stablecoin DAI。DAO成员负责为协议制定参数，比如调整利率、添加&#x2F;删除抵押资产以及核心部门团队入职&#x2F;离职。</li>
-</ul>
-<p><em><strong>投资DAO</strong>——这类DAO负责控制DAO金库中的资金，并使用这些资金来发起并管理投资。投资DAO的主要目的是为成员创造利润，这点与私募基金或对冲基金类似。</em></p>
-<ul>
-<li>BitDAO是一个DAO，BIT通证持有者通过投票决定各种投资策略，并为DAO金库实现收益。BitDAO宣称对Web3项目的投资额超过38亿美元。<br>MetaCartel Ventures (风投DAO)是一家营利性DAO，专门投资于早期dApp。其主要目的是以社区为中心建立会员制，参与机制比传统的风投基金更加灵活。</li>
-</ul>
-<p><em><strong>事业型DAO</strong>——这类DAO负责针对某一事业管理资金和计划。事业型DAO聚焦在某一领域达成共识，比如慈善、政治以及公用事业，这点与慈善组织、游说团体和奖金激励计划等传统组织类似。</em></p>
-<ul>
-<li>Gitcoin是一个DAO，用户在平台上可以通过二次方投票机制，共同为以太坊上的公用事业以及其他开源区块链项目募款。</li>
-<li>Big Green是一个DAO，为学校、社区和家庭提供慈善奖金，帮助他们学习如何种植粮食。</li>
-</ul>
-<p><em><strong>社交DAO</strong>——这类DAO负责管理一个共享社交空间，共同拥有具有艺术价值的资产，为成员营造文化并组织活动。社交DAO围绕娱乐、艺术、游戏和其他社交领域将社区组织起来，这点类似于现代社交俱乐部。</em></p>
-<ul>
-<li>Bored Ape Yacht Club（BAYC）是限量版的NFT藏品，NFT既代表会员身份，又可以领取特殊福利。</li>
-<li>Krause House是一个由篮球迷组成的社交DAO，目标是有朝一日买下一支NBA球队。Krause House DAO目前已经买下了Big3篮球联盟的球队Ball Hogs。</li>
-</ul>
-<p><em><strong>数据DAO</strong>——这类DAO负责开发和管理DAO控制的数据。数据DAO旨在将用户数据聚集在一起，或开发独特的数据产品卖给第三方用户，具体应用场景包括开发AI算法或展开市场调研。</em></p>
-<ul>
-<li>dClimate是一个买卖天气数据、天气预报和预测模型的市场，用户可以在其中销售创新的数据集，机构也可以在其中购买数据。这个DAO会评估发布的数据，以保障数据质量并发放适当的网络激励。</li>
-<li>Delphia是机器人投资顾问，会支付原生通证购买用户个人数据。Delphia会将用户个人数据聚集在一起，并基于数据制定投资策略，用户可以使用原生通证查看这些投资策略。</li>
-</ul>
-<h2><span id="dao的治理架构">DAO的治理架构</span></h2><p>对于任何DAO来说，达成共识都是最重要也最具挑战的任务之一，因为达成共识意味着以去中心化的方式做出决策。下文列举了目前用于达成共识的几种治理机制，其中结合了上文提到的一些工具。</p>
-<p><strong>直接的链上民主</strong>——指DAO成员直接在链上对提案进行投票，提案要通过必须满足上文提到的条件。大多数采用该模式的DAO都会使用通证加权投票机制，用户持有的通证数量决定了他的投票权重（通常1个通证&#x3D;1张选票）。这是DAO最常见也是最简单的共识达成方式，因为这种方式的复杂性和成本最低，而且可以抵御女巫攻击。</p>
-<p><strong>直接的链下民主</strong>——指DAO使用快照在链下进行投票，投票要通过必须满足一定条件。多数采用这种模式的DAO也会使用通证加权投票机制，但需要可信实体通过多重签名的方式严格按照提案来执行链上变更。因此，链下民主需要一定信任假设，就是多重签名者会如实按照DAO投票结果的快照来投票。</p>
-<p><strong>代表制民主</strong>——指DAO委托代表在链上投票，以通过DAO的提案。代表通常由DAO选出，并可能会参考链下快照来了解社区民意。DAO可能还会设置某种机制，当代表的投票结果严重偏离社区民意时对结果进行否决或变更。</p>
-<p><strong>二次方民主</strong>——指基于二次方投票的治理架构，公式如下：投票者的成本&#x3D;（投票数量）^2。比如，对某一提案投一票需要花费一个治理通证，但如果要投五票就需要25个治理通证。二次方投票可以防止DAO的投票结果被少数巨鲸控制。多数成员的共同投票结果将拥有同等或甚至更大的效力。然而，要真正执行二次方投票，需要建立抗女巫攻击机制，以防止欺诈行为或将通证分散在不同钱包里。</p>
-<h2><span id="web3-dao的未来与现状">Web3 DAO的未来与现状</span></h2><p><em>互联网上已经有相当多的 DAO，但大部分 DAO 似乎并不依赖于他们的基础合约而运行，换句话说，许多 DAO 采用<strong>广泛的人治</strong>，而<strong>有限地</strong>依赖<strong>合约治理</strong></em>。这些治理的目的都相当宏观，譬如，是否允许使用 DAO 金库的一些钱来完成一笔投资，或者是制定一个复杂的 Roadmap，由于目的过于宏观，这些治理大部分使用 snapshot 的链下投票来完成，它有点像我们熟悉的代议制民主：可以参与投票，但没有人能保证提案目的是否会得到完整执行。</p>
-<blockquote>
-<p>“网络国家是一个网络社会，在道德上创新，拥有国家意识和公认的创始人，有能力开展集体行动，人与人之间和谐相处，发行cryptocurrency，使用社会智能合约来约束基于共识的政府，通过众筹的方式买下实体领土并形成群岛，建立虚拟首都，在链上进行人口普查，证明国家人口、收入以及房地产，并因此获得外交地位。”</p>
-</blockquote>
+<div class="comments">
+    <h3 class="title is-4">評論</h3>
+    <script src="https://utteranc.es/client.js"
+        repo="aszx87410/huli-blog"
+        issue-term="title"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+</div>
 
-    
-    </div>
-    
-    
-</article>
-
-
-
-
-    
-    
     </div>
 </section>
     <footer class="footer">
@@ -367,7 +362,7 @@
             <div class="dropdown-content">
             <!-- NOTE: 永遠回到首頁 -->
             
-                <a href="/en/categories/Web3/" class="dropdown-item">
+                <a href="/2024/05/05/en/Ethereum-1/" class="dropdown-item">
                     English
                 </a>
             
